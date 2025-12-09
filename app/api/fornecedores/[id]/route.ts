@@ -3,13 +3,14 @@ import { db, schema } from '@/db';
 import { eq } from 'drizzle-orm';
 
 type Params = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
-export async function GET({ params }: Params) {
-  const id = Number(params.id);
+export async function GET(_request: Request, { params }: Params) {
+  const { id: idParam } = await params;
+  const id = Number(idParam);
 
   const fornecedor = await db
     .select()
@@ -19,7 +20,8 @@ export async function GET({ params }: Params) {
 }
 
 export async function PUT(request: Request, { params }: Params) {
-  const id = Number(params.id);
+  const { id: idParam } = await params;
+  const id = Number(idParam);
   const data = await request.json();
 
   const updatedFornecedor = await db
@@ -37,8 +39,9 @@ export async function PUT(request: Request, { params }: Params) {
   return new Response(JSON.stringify(updatedFornecedor));
 }
 
-export async function DELETE({ params }: Params) {
-  const id = Number(params.id);
+export async function DELETE(_request: Request, { params }: Params) {
+  const { id: idParam } = await params;
+  const id = Number(idParam);
 
   await db.delete(schema.fornecedor).where(eq(schema.fornecedor.id, id));
 
