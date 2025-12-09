@@ -10,6 +10,5 @@ export const fornecedor = pgTable('fornecedor', {
   createdAt: timestamp('created_at').defaultNow()
 });
 
-// Exporte seus tipos para usar no TypeScript
 export type Fornecedor = typeof fornecedor.$inferSelect;
 export type NewFornecedor = typeof fornecedor.$inferInsert;
