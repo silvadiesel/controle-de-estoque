@@ -39,11 +39,11 @@ const data = {
       items: [
         {
           title: "Option One",
-          url: "#",
+          url: "/dashboard/exemple-one",
         },
         {
           title: "Option Two",
-          url: "#",
+          url: "/dashboard/exemple-two",
         },
         {
           title: "Option Three",
