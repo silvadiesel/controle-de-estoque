@@ -148,6 +148,7 @@ export function AppSidebar() {
                       <SidebarMenuButton
                         asChild
                         isActive={isActive}
+                        className={`h-10 ${isActive ? 'bg-primary! text-black!' : ''}`}
                         tooltip={item.label}>
                         <a href={item.href}>
                           <Icon className='h-4 w-4' />
