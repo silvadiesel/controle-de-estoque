@@ -1,32 +1,38 @@
 'use client';
 
+import type React from 'react';
 import { useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { signUp } from '@/lib/auth-client';
 
-import { Loader2 } from 'lucide-react';
+import {
+  AlertCircle,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Loader2,
+  Shield,
+  Sparkles,
+  Truck,
+  UserPlus,
+  Zap
+} from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [isFocused, setIsFocused] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,84 +59,275 @@ export default function RegisterPage() {
   };
 
   return (
-    <Card className='w-full max-w-md relative z-10 backdrop-blur-sm bg-card/95'>
-      <CardHeader className='space-y-1 text-center'>
-        <CardTitle className='text-2xl font-bold tracking-tight'>
-          Criar Conta
-        </CardTitle>
-        <CardDescription>
-          Preencha os dados abaixo para criar sua conta
-        </CardDescription>
-      </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className='space-y-4'>
-          {error && (
-            <div className='p-3 text-sm text-destructive bg-destructive/10 rounded-md border border-destructive/20'>
-              {error}
+    <div className='min-h-screen bg-background flex'>
+      {/* Lado esquerdo - Visual impactante */}
+      <div className='hidden lg:flex lg:w-1/2 xl:w-3/5 relative overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900'>
+        {/* Grid pattern */}
+        <div
+          className='absolute inset-0 opacity-[0.03]'
+          style={{
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+            backgroundSize: '60px 60px'
+          }}
+        />
+
+        {/* Círculos decorativos */}
+        <div className='absolute top-1/3 -right-32 w-96 h-96 bg-primary/20 rounded-full blur-[100px]' />
+        <div className='absolute bottom-1/3 left-0 w-80 h-80 bg-primary/10 rounded-full blur-[80px]' />
+
+        {/* Linhas diagonais decorativas */}
+        <div className='absolute inset-0 overflow-hidden'>
+          <div className='absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-primary/20 to-transparent transform rotate-12' />
+          <div className='absolute top-0 left-1/2 w-px h-full bg-gradient-to-b from-transparent via-primary/10 to-transparent transform -rotate-12' />
+          <div className='absolute top-0 right-1/4 w-px h-full bg-gradient-to-b from-transparent via-primary/20 to-transparent transform rotate-6' />
+        </div>
+
+        {/* Conteúdo principal */}
+        <div className='relative z-10 flex flex-col justify-between p-12 xl:p-16 w-full'>
+          {/* Logo */}
+          <div className='flex items-center gap-3'>
+            <div className='flex items-center justify-center w-12 h-12 rounded-xl bg-primary text-primary-foreground'>
+              <Truck className='w-6 h-6' />
             </div>
-          )}
-          <div className='space-y-2'>
-            <Label htmlFor='name'>Nome</Label>
-            <Input
-              id='name'
-              type='text'
-              placeholder='Seu nome'
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              disabled={loading}
-            />
+            <div>
+              <span className='text-xl font-bold text-white tracking-tight'>
+                StockTruck
+              </span>
+              <span className='block text-xs text-zinc-500 uppercase tracking-widest'>
+                Oficina Pro
+              </span>
+            </div>
           </div>
-          <div className='space-y-2'>
-            <Label htmlFor='email'>Email</Label>
-            <Input
-              id='email'
-              type='email'
-              placeholder='seu@email.com'
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={loading}
-            />
+
+          {/* Texto central */}
+          <div className='space-y-8'>
+            <div className='space-y-4'>
+              <h1 className='text-4xl xl:text-5xl font-bold text-white leading-tight'>
+                Comece sua
+                <span className='block text-primary'>jornada agora</span>
+              </h1>
+              <p className='text-zinc-400 text-lg max-w-md leading-relaxed'>
+                Crie sua conta e tenha acesso completo ao sistema de gestão mais
+                moderno para oficinas e estoques.
+              </p>
+            </div>
+
+            {/* Features cards */}
+            <div className='grid gap-4 max-w-md'>
+              {[
+                {
+                  icon: Zap,
+                  title: 'Configuração Rápida',
+                  desc: 'Comece a usar em menos de 5 minutos'
+                },
+                {
+                  icon: Shield,
+                  title: 'Dados Seguros',
+                  desc: 'Proteção avançada para suas informações'
+                },
+                {
+                  icon: Sparkles,
+                  title: 'Interface Moderna',
+                  desc: 'Design intuitivo e fácil de usar'
+                }
+              ].map((item, i) => (
+                <div
+                  key={i}
+                  className='flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.05] backdrop-blur-sm hover:bg-white/[0.05] transition-colors group'>
+                  <div className='flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors'>
+                    <item.icon className='w-5 h-5' />
+                  </div>
+                  <div>
+                    <h3 className='text-sm font-medium text-white'>
+                      {item.title}
+                    </h3>
+                    <p className='text-xs text-zinc-500'>{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className='space-y-2'>
-            <Label htmlFor='password'>Senha</Label>
-            <Input
-              id='password'
-              type='password'
-              placeholder='••••••••'
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={8}
-              disabled={loading}
-            />
-            <p className='text-xs text-muted-foreground'>
-              Mínimo de 8 caracteres
+
+          {/* Stats */}
+          <div className='flex items-center gap-12'>
+            {[
+              { value: 'Grátis', label: 'Para começar' },
+              { value: 'Ilimitado', label: 'Produtos' },
+              { value: '100%', label: 'Funcional' }
+            ].map((stat, i) => (
+              <div key={i} className='space-y-1'>
+                <span className='text-2xl font-bold text-white'>
+                  {stat.value}
+                </span>
+                <span className='block text-xs text-zinc-500 uppercase tracking-wider'>
+                  {stat.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Lado direito - Formulário */}
+      <div className='flex-1 flex items-center justify-center p-6 sm:p-12 relative'>
+        {/* Background sutil */}
+        <div className='absolute inset-0 bg-gradient-to-br from-background via-background to-primary/[0.02]' />
+
+        <div className='w-full max-w-sm relative z-10'>
+          {/* Mobile logo */}
+          <div className='flex lg:hidden items-center justify-center gap-3 mb-12'>
+            <div className='flex items-center justify-center w-12 h-12 rounded-xl bg-primary text-primary-foreground'>
+              <Truck className='w-6 h-6' />
+            </div>
+            <span className='text-xl font-bold text-foreground'>
+              StockTruck
+            </span>
+          </div>
+
+          {/* Header do form */}
+          <div className='space-y-2 mb-8'>
+            <h2 className='text-2xl font-bold text-foreground flex items-center gap-2'>
+              <UserPlus className='w-6 h-6 text-primary' />
+              Criar sua conta
+            </h2>
+            <p className='text-muted-foreground'>
+              Preencha os dados abaixo para começar
             </p>
           </div>
-        </CardContent>
-        <CardFooter className='flex flex-col space-y-4'>
-          <Button type='submit' className='w-full' disabled={loading}>
-            {loading ? (
-              <>
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                Criando conta...
-              </>
-            ) : (
-              'Criar Conta'
+
+          {/* Formulário */}
+          <form onSubmit={handleSubmit} className='space-y-5'>
+            {/* Nome */}
+            <div className='space-y-2'>
+              <Label
+                htmlFor='name'
+                className='text-sm font-medium text-foreground'>
+                Nome completo
+              </Label>
+              <div
+                className={`relative rounded-xl transition-all duration-200 ${isFocused === 'name' ? 'ring-2 ring-primary/20' : ''}`}>
+                <Input
+                  id='name'
+                  type='text'
+                  placeholder='Seu nome'
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  onFocus={() => setIsFocused('name')}
+                  onBlur={() => setIsFocused(null)}
+                  required
+                  disabled={loading}
+                  className='h-12 px-4 bg-secondary/50 border-border/50 rounded-xl focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors'
+                />
+              </div>
+            </div>
+
+            {/* Email */}
+            <div className='space-y-2'>
+              <Label
+                htmlFor='email'
+                className='text-sm font-medium text-foreground'>
+                Email
+              </Label>
+              <div
+                className={`relative rounded-xl transition-all duration-200 ${isFocused === 'email' ? 'ring-2 ring-primary/20' : ''}`}>
+                <Input
+                  id='email'
+                  type='email'
+                  placeholder='seu@email.com'
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onFocus={() => setIsFocused('email')}
+                  onBlur={() => setIsFocused(null)}
+                  required
+                  disabled={loading}
+                  className='h-12 px-4 bg-secondary/50 border-border/50 rounded-xl focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors'
+                />
+              </div>
+            </div>
+
+            {/* Senha */}
+            <div className='space-y-2'>
+              <Label
+                htmlFor='password'
+                className='text-sm font-medium text-foreground'>
+                Senha
+              </Label>
+              <div
+                className={`relative rounded-xl transition-all duration-200 ${isFocused === 'password' ? 'ring-2 ring-primary/20' : ''}`}>
+                <Input
+                  id='password'
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder='••••••••'
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onFocus={() => setIsFocused('password')}
+                  onBlur={() => setIsFocused(null)}
+                  required
+                  minLength={8}
+                  disabled={loading}
+                  className='h-12 px-4 pr-12 bg-secondary/50 border-border/50 rounded-xl focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors'
+                />
+                <button
+                  type='button'
+                  onClick={() => setShowPassword(!showPassword)}
+                  className='absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors'>
+                  {showPassword ? (
+                    <EyeOff className='w-5 h-5' />
+                  ) : (
+                    <Eye className='w-5 h-5' />
+                  )}
+                </button>
+              </div>
+              <p className='text-xs text-muted-foreground'>
+                Mínimo de 8 caracteres
+              </p>
+            </div>
+
+            {/* Erro */}
+            {error && (
+              <div className='flex items-center gap-3 text-destructive text-sm bg-destructive/10 border border-destructive/20 rounded-xl px-4 py-3'>
+                <AlertCircle className='w-5 h-5 flex-shrink-0' />
+                <span>{error}</span>
+              </div>
             )}
-          </Button>
-          <p className='text-sm text-muted-foreground text-center'>
-            Já tem uma conta?{' '}
-            <Link
-              href='/login'
-              className='text-primary hover:underline font-medium'>
-              Entrar
-            </Link>
+
+            {/* Botão */}
+            <Button
+              type='submit'
+              className='w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl transition-all duration-200 group'
+              disabled={loading}>
+              {loading ? (
+                <>
+                  <Loader2 className='w-5 h-5 mr-2 animate-spin' />
+                  Criando conta...
+                </>
+              ) : (
+                <>
+                  Criar minha conta
+                  <ArrowRight className='w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform' />
+                </>
+              )}
+            </Button>
+          </form>
+
+          {/* Link para login */}
+          <div className='mt-8 text-center'>
+            <p className='text-sm text-muted-foreground'>
+              Já tem uma conta?{' '}
+              <Link
+                href='/login'
+                className='text-primary hover:underline font-medium'>
+                Entrar
+              </Link>
+            </p>
+          </div>
+
+          {/* Footer */}
+          <p className='text-center text-xs text-muted-foreground mt-8'>
+            © 2025 StockTruck · Todos os direitos reservados
           </p>
-        </CardFooter>
-      </form>
-    </Card>
+        </div>
+      </div>
+    </div>
   );
 }
