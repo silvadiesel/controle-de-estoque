@@ -46,7 +46,7 @@ export default function LoginPage() {
       if (result.error) {
         setError(result.error.message || 'Erro ao fazer login');
       } else {
-        router.push('/');
+        router.push('/dashboard');
         router.refresh();
       }
     } catch {
