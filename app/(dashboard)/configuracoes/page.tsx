@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 
 import { ModalDelete } from '@/components/modal-delete';
+import { PaginationControls } from '@/components/pagination-controls';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -23,15 +24,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious
-} from '@/components/ui/pagination';
-import {
   Table,
   TableBody,
   TableCell,
@@ -39,8 +31,9 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
+import { usePagination } from '@/hooks/usePagination';
 
-import { useCategories, usePagination } from './_hooks';
+import { useCategories } from './_hooks';
 import { Building2, Loader2, Pencil, Plus, Tags, Trash2 } from 'lucide-react';
 
 export default function Configuracoes() {
@@ -305,57 +298,20 @@ export default function Configuracoes() {
                   </Table>
                 </div>
 
-                {totalPages > 1 && (
-                  <div className='flex flex-col relative sm:flex-row items-center justify-between gap-4 mt-4'>
-                    <p className='absolute left-0 text-sm text-muted-foreground'>
-                      Mostrando {startItem} a {endItem} de {totalItems}{' '}
-                      categorias
-                    </p>
-
-                    <Pagination>
-                      <PaginationContent>
-                        <PaginationItem>
-                          <PaginationPrevious
-                            onClick={goToPreviousPage}
-                            className={
-                              isFirstPage
-                                ? 'pointer-events-none opacity-50'
-                                : 'cursor-pointer'
-                            }
-                          />
-                        </PaginationItem>
-
-                        {pageItems.map((item) =>
-                          typeof item === 'number' ? (
-                            <PaginationItem key={item}>
-                              <PaginationLink
-                                onClick={() => goToPage(item)}
-                                isActive={item === currentPage}
-                                className='cursor-pointer'>
-                                {item}
-                              </PaginationLink>
-                            </PaginationItem>
-                          ) : (
-                            <PaginationItem key={item}>
-                              <PaginationEllipsis />
-                            </PaginationItem>
-                          )
-                        )}
-
-                        <PaginationItem>
-                          <PaginationNext
-                            onClick={goToNextPage}
-                            className={
-                              isLastPage
-                                ? 'pointer-events-none opacity-50'
-                                : 'cursor-pointer'
-                            }
-                          />
-                        </PaginationItem>
-                      </PaginationContent>
-                    </Pagination>
-                  </div>
-                )}
+                <PaginationControls
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  totalItems={totalItems}
+                  startItem={startItem}
+                  endItem={endItem}
+                  pageItems={pageItems}
+                  isFirstPage={isFirstPage}
+                  isLastPage={isLastPage}
+                  onPageChange={goToPage}
+                  onNextPage={goToNextPage}
+                  onPreviousPage={goToPreviousPage}
+                  itemLabel='categorias'
+                />
               </div>
             )}
           </CardContent>

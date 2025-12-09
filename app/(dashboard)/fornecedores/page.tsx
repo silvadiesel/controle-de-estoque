@@ -1,6 +1,7 @@
 'use client';
 
 import { ModalDelete } from '@/components/modal-delete';
+import { PaginationControls } from '@/components/pagination-controls';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,6 +13,7 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
+import { usePagination } from '@/hooks/usePagination';
 
 import { ModalFornecedores } from './_components/modal-fornecedores';
 import { useFornecedores } from './_hook/useFornecedores';
@@ -46,6 +48,21 @@ export default function Fornecedores() {
     isDeleteOpen,
     setIsDeleteOpen
   } = useFornecedores();
+
+  const {
+    paginatedItems: paginatedFornecedores,
+    currentPage,
+    totalPages,
+    totalItems,
+    startItem,
+    endItem,
+    pageItems,
+    isFirstPage,
+    isLastPage,
+    goToPage,
+    goToNextPage,
+    goToPreviousPage
+  } = usePagination({ items: filteredFornecedores, itemsPerPage: 7 });
 
   return (
     <div className='flex flex-1 flex-col gap-6 p-4 lg:p-8'>
@@ -150,7 +167,7 @@ export default function Fornecedores() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredFornecedores.map((fornecedor) => (
+                  paginatedFornecedores.map((fornecedor) => (
                     <TableRow key={fornecedor.id} className='border-border'>
                       <TableCell>
                         <div>
@@ -240,6 +257,21 @@ export default function Fornecedores() {
               </TableBody>
             </Table>
           </div>
+
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            startItem={startItem}
+            endItem={endItem}
+            pageItems={pageItems}
+            isFirstPage={isFirstPage}
+            isLastPage={isLastPage}
+            onPageChange={goToPage}
+            onNextPage={goToNextPage}
+            onPreviousPage={goToPreviousPage}
+            itemLabel='fornecedores'
+          />
         </CardContent>
       </Card>
     </div>
