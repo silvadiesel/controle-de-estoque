@@ -1,7 +1,9 @@
-import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import { appRouter } from "@silva-diesel-controle-estoque/api/routers/index";
-import { createContext } from "@silva-diesel-controle-estoque/api/context";
 import { NextRequest } from "next/server";
+
+import { createContext } from "@silva-diesel-controle-estoque/api/context";
+import { appRouter } from "@silva-diesel-controle-estoque/api/routers/index";
+
+import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 
 function handler(req: NextRequest) {
   return fetchRequestHandler({
