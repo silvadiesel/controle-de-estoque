@@ -1,19 +1,5 @@
-/**
- * Hook personalizado para gerenciamento de Categorias
- * ====================================================
- *
- * O que é um Custom Hook?
- * -----------------------
- * Custom Hooks são funções JavaScript que começam com "use" e podem usar
- * outros hooks do React. Eles permitem extrair lógica reutilizável de componentes.
- *
- * Benefícios:
- * -----------
- * 1. Separação de responsabilidades - lógica separada da UI
- * 2. Reutilização - mesma lógica em diferentes componentes
- * 3. Testabilidade - mais fácil testar lógica isoladamente
- * 4. Manutenção - código mais organizado e fácil de atualizar
- */
+'use client';
+
 import {
   type Dispatch,
   type SetStateAction,
@@ -23,78 +9,37 @@ import {
 
 import type { Categorias } from '@/db/schema';
 
-/**
- * Interface que define o retorno do hook
- */
-export interface UseCategoriesReturn {
-  // Dados
-  categories: Categorias[];
+import { toast } from 'sonner';
 
-  // Estados de loading
+export interface UseCategoriesReturn {
+  categories: Categorias[];
   isLoading: boolean;
   isSaving: boolean;
-
-  // Tratamento de erros
-  error: string | null;
-  setError: (error: string | null) => void;
-
-  // Estados dos dialogs
   isAddOpen: boolean;
   setIsAddOpen: (open: boolean) => void;
   editingCategory: Categorias | null;
   setEditingCategory: Dispatch<SetStateAction<Categorias | null>>;
-
-  // Formulário de nova categoria
   newCategoryName: string;
   setNewCategoryName: (name: string) => void;
-
-  // Operações CRUD
   fetchCategories: () => Promise<void>;
   handleAddCategory: () => Promise<void>;
   handleUpdateCategory: () => Promise<void>;
   handleDeleteCategory: (id: number) => Promise<boolean>;
 }
 
-/**
- * Hook para gerenciar o CRUD de categorias
- *
- * @example
- * ```tsx
- * const {
- *   categories,
- *   isLoading,
- *   handleAddCategory,
- *   // ... outros retornos
- * } = useCategories();
- * ```
- */
 export function useCategories(): UseCategoriesReturn {
-  // ============================================
-  // ESTADOS
-  // ============================================
-
   const [categories, setCategories] = useState<Categorias[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Categorias | null>(
     null
   );
   const [newCategoryName, setNewCategoryName] = useState('');
 
-  // ============================================
-  // FUNÇÕES DE API
-  // ============================================
-
-  /**
-   * Busca todas as categorias da API
-   */
   const fetchCategories = useCallback(async () => {
     try {
       setIsLoading(true);
-      setError(null);
-
       const response = await fetch('/api/categorias');
 
       if (!response.ok) {
@@ -104,7 +49,7 @@ export function useCategories(): UseCategoriesReturn {
       const data = await response.json();
       setCategories(data);
     } catch (err) {
-      setError(
+      toast.error(
         err instanceof Error ? err.message : 'Erro ao carregar categorias'
       );
     } finally {
@@ -112,18 +57,14 @@ export function useCategories(): UseCategoriesReturn {
     }
   }, []);
 
-  /**
-   * Cria uma nova categoria
-   */
   const handleAddCategory = useCallback(async () => {
     if (!newCategoryName.trim()) {
-      setError('O nome da categoria é obrigatório');
+      toast.warning('O nome da categoria é obrigatório');
       return;
     }
 
     try {
       setIsSaving(true);
-      setError(null);
 
       const response = await fetch('/api/categorias', {
         method: 'POST',
@@ -136,31 +77,27 @@ export function useCategories(): UseCategoriesReturn {
         throw new Error(data.error || 'Falha ao criar categoria');
       }
 
-      // Recarrega a lista
       await fetchCategories();
-
-      // Limpa o formulário e fecha o dialog
       setNewCategoryName('');
       setIsAddOpen(false);
+      toast.success('Categoria criada com sucesso!');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao criar categoria');
+      toast.error(
+        err instanceof Error ? err.message : 'Erro ao criar categoria'
+      );
     } finally {
       setIsSaving(false);
     }
   }, [newCategoryName, fetchCategories]);
 
-  /**
-   * Atualiza uma categoria existente
-   */
   const handleUpdateCategory = useCallback(async () => {
     if (!editingCategory?.name.trim()) {
-      setError('O nome da categoria é obrigatório');
+      toast.warning('O nome da categoria é obrigatório');
       return;
     }
 
     try {
       setIsSaving(true);
-      setError(null);
 
       const response = await fetch(`/api/categorias/${editingCategory.id}`, {
         method: 'PUT',
@@ -175,8 +112,9 @@ export function useCategories(): UseCategoriesReturn {
 
       await fetchCategories();
       setEditingCategory(null);
+      toast.success('Categoria atualizada com sucesso!');
     } catch (err) {
-      setError(
+      toast.error(
         err instanceof Error ? err.message : 'Erro ao atualizar categoria'
       );
     } finally {
@@ -184,10 +122,6 @@ export function useCategories(): UseCategoriesReturn {
     }
   }, [editingCategory, fetchCategories]);
 
-  /**
-   * Remove uma categoria
-   * @returns true se a categoria foi deletada
-   */
   const handleDeleteCategory = useCallback(
     async (id: number): Promise<boolean> => {
       if (!confirm('Tem certeza que deseja excluir esta categoria?')) {
@@ -195,8 +129,6 @@ export function useCategories(): UseCategoriesReturn {
       }
 
       try {
-        setError(null);
-
         const response = await fetch(`/api/categorias/${id}`, {
           method: 'DELETE'
         });
@@ -207,9 +139,10 @@ export function useCategories(): UseCategoriesReturn {
         }
 
         await fetchCategories();
+        toast.success('Categoria excluída com sucesso!');
         return true;
       } catch (err) {
-        setError(
+        toast.error(
           err instanceof Error ? err.message : 'Erro ao excluir categoria'
         );
         return false;
@@ -218,16 +151,10 @@ export function useCategories(): UseCategoriesReturn {
     [fetchCategories]
   );
 
-  // ============================================
-  // RETORNO
-  // ============================================
-
   return {
     categories,
     isLoading,
     isSaving,
-    error,
-    setError,
     isAddOpen,
     setIsAddOpen,
     editingCategory,
