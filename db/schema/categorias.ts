@@ -1,8 +1,9 @@
-import { pgTable, serial, text } from 'drizzle-orm/pg-core';
+import { boolean, pgTable, serial, text } from 'drizzle-orm/pg-core';
 
 export const categorias = pgTable('categorias', {
   id: serial('id').primaryKey(),
-  name: text('name').notNull()
+  name: text('name').notNull(),
+  status: boolean('status').notNull().default(true)
 });
 
 // Exporte seus tipos para usar no TypeScript
