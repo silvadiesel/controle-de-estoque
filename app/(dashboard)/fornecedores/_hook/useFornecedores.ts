@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 
+import { fornecedorSchema } from '@/app/utils/validators';
 import type { Fornecedor } from '@/db/schema';
+
+import { toast } from 'sonner';
+import { ZodError } from 'zod';
 
 export interface UseFornecedoresReturn {
   fornecedores: Fornecedor[];
@@ -17,6 +21,10 @@ export interface UseFornecedoresReturn {
   handleAddFornecedor: () => Promise<void>;
   handleUpdateFornecedor: () => Promise<void>;
   handleDeleteFornecedor: (id: number) => Promise<void>;
+  deleteId: number | null;
+  setDeleteId: (id: number | null) => void;
+  isDeleteOpen: boolean;
+  setIsDeleteOpen: (isOpen: boolean) => void;
 }
 
 const fornecedorVazio: Partial<Fornecedor> = {
@@ -36,6 +44,8 @@ export function useFornecedores(): UseFornecedoresReturn {
   );
   const [newFornecedor, setNewFornecedor] =
     useState<Partial<Fornecedor>>(fornecedorVazio);
+  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   // GET: Listar
   const fetchFornecedores = useCallback(async () => {
@@ -114,24 +124,52 @@ export function useFornecedores(): UseFornecedoresReturn {
 
   // Handlers
   const handleAddFornecedor = async () => {
-    if (newFornecedor.name_empresa?.trim() && newFornecedor.cnpj?.trim()) {
+    setIsLoading(true);
+    try {
+      fornecedorSchema.parse(newFornecedor);
+
       await createFornecedor(newFornecedor);
       setNewFornecedor(fornecedorVazio);
       setIsAddOpen(false);
+      toast.success('Fornecedor adicionado com sucesso!');
+    } catch (error) {
+      if (error instanceof ZodError) {
+        // Exibe o primeiro erro de validação
+        toast.error(error.issues[0].message);
+      } else {
+        toast.error('Erro ao adicionar fornecedor');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleUpdateFornecedor = async () => {
-    if (editingFornecedor && editingFornecedor.name_empresa.trim()) {
+    if (!editingFornecedor) return;
+
+    setIsLoading(true);
+    try {
+      fornecedorSchema.parse(editingFornecedor);
+
       await updateFornecedor(editingFornecedor.id, editingFornecedor);
       setEditingFornecedor(null);
+      toast.success('Fornecedor atualizado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao atualizar:', error);
+      if (error instanceof ZodError) {
+        toast.error(error.issues[0].message);
+      } else {
+        toast.error('Erro ao atualizar fornecedor');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleDeleteFornecedor = async (id: number) => {
-    if (confirm('Tem certeza que deseja excluir este fornecedor?')) {
-      await deleteFornecedor(id);
-    }
+    await deleteFornecedor(id);
+    setIsDeleteOpen(false);
+    setDeleteId(null);
   };
 
   return {
@@ -148,6 +186,10 @@ export function useFornecedores(): UseFornecedoresReturn {
     setNewFornecedor,
     handleAddFornecedor,
     handleUpdateFornecedor,
-    handleDeleteFornecedor
+    handleDeleteFornecedor,
+    deleteId,
+    setDeleteId,
+    isDeleteOpen,
+    setIsDeleteOpen
   };
 }
