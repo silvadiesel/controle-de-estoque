@@ -55,3 +55,54 @@ export function unformatCNPJ(value: string): string {
 export function unformatPhone(value: string): string {
   return value.replace(/\D/g, '');
 }
+
+/**
+ * Formata CPF conforme o usuário digita
+ * Formato: 999.999.999-99
+ */
+export function formatCPF(value: string): string {
+  // Remove tudo que não é dígito
+  const cleanValue = value.replace(/\D/g, '');
+
+  // Limita a 11 dígitos
+  const limitedValue = cleanValue.slice(0, 11);
+
+  // Aplica a máscara
+  return limitedValue
+    .replace(/^(\d{3})(\d)/, '$1.$2')
+    .replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
+    .replace(/\.(\d{3})(\d)/, '.$1-$2');
+}
+
+/**
+ * Remove a formatação do CPF
+ */
+export function unformatCPF(value: string): string {
+  return value.replace(/\D/g, '');
+}
+
+/**
+ * Formata placa de veículo conforme o usuário digita
+ * Suporta formato antigo (AAA-1234) e Mercosul (AAA1A23)
+ */
+export function formatPlaca(value: string): string {
+  // Remove tudo que não é letra ou número
+  const cleanValue = value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+
+  // Limita a 7 caracteres
+  const limitedValue = cleanValue.slice(0, 7);
+
+  // Aplica a máscara se tiver mais de 3 caracteres
+  if (limitedValue.length > 3) {
+    return `${limitedValue.slice(0, 3)}-${limitedValue.slice(3)}`;
+  }
+
+  return limitedValue;
+}
+
+/**
+ * Remove a formatação da placa
+ */
+export function unformatPlaca(value: string): string {
+  return value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+}

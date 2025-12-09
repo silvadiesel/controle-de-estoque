@@ -2,6 +2,9 @@
 
 import { useState } from 'react';
 
+import { ModalDelete } from '@/components/modal-delete';
+import { PaginationControls } from '@/components/pagination-controls';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -11,169 +14,118 @@ import {
   CardTitle
 } from '@/components/ui/card';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog';
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger
+} from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table';
-import { Textarea } from '@/components/ui/textarea';
-import { type Client, useStockStore } from '@/lib/store';
+import { usePagination } from '@/hooks/usePagination';
 
+import { ModalClientes } from './_components/modal-clientes';
+import { ModalVeiculos } from './_components/modal-veiculos';
+import { useClientes, useVeiculos } from './_hooks';
 import {
-  Mail,
+  Building2,
+  Car,
+  ChevronDown,
+  Loader2,
   Pencil,
   Phone,
   Plus,
   Search,
   Trash2,
-  Truck,
+  User,
   Users
 } from 'lucide-react';
 
-const emptyClient = {
-  name: '',
-  document: '',
-  phone: '',
-  email: '',
-  address: '',
-  vehiclePlate: '',
-  vehicleModel: '',
-  notes: ''
-};
-
-// ClientForm defined outside the main component to prevent recreation on every render
-function ClientForm({
-  data,
-  setData
-}: {
-  data: typeof emptyClient | Client;
-  setData: (data: typeof emptyClient | Client) => void;
-}) {
-  return (
-    <div className='grid gap-4 py-4'>
-      <div className='grid gap-4 sm:grid-cols-2'>
-        <div className='space-y-2'>
-          <Label>Nome / Razão Social *</Label>
-          <Input
-            value={data.name}
-            onChange={(e) => setData({ ...data, name: e.target.value })}
-            placeholder='Transportadora Silva'
-            className='bg-input border-border'
-          />
-        </div>
-        <div className='space-y-2'>
-          <Label>CPF / CNPJ *</Label>
-          <Input
-            value={data.document}
-            onChange={(e) => setData({ ...data, document: e.target.value })}
-            placeholder='00.000.000/0001-00'
-            className='bg-input border-border'
-          />
-        </div>
-      </div>
-      <div className='grid gap-4 sm:grid-cols-2'>
-        <div className='space-y-2'>
-          <Label>Telefone</Label>
-          <Input
-            value={data.phone}
-            onChange={(e) => setData({ ...data, phone: e.target.value })}
-            placeholder='(11) 99999-9999'
-            className='bg-input border-border'
-          />
-        </div>
-        <div className='space-y-2'>
-          <Label>Email</Label>
-          <Input
-            value={data.email}
-            onChange={(e) => setData({ ...data, email: e.target.value })}
-            placeholder='contato@empresa.com'
-            className='bg-input border-border'
-          />
-        </div>
-      </div>
-      <div className='space-y-2'>
-        <Label>Endereço</Label>
-        <Input
-          value={data.address}
-          onChange={(e) => setData({ ...data, address: e.target.value })}
-          placeholder='Rua, número, bairro, cidade'
-          className='bg-input border-border'
-        />
-      </div>
-      <div className='grid gap-4 sm:grid-cols-2'>
-        <div className='space-y-2'>
-          <Label>Placa do Veículo</Label>
-          <Input
-            value={data.vehiclePlate}
-            onChange={(e) => setData({ ...data, vehiclePlate: e.target.value })}
-            placeholder='ABC-1234'
-            className='bg-input border-border'
-          />
-        </div>
-        <div className='space-y-2'>
-          <Label>Modelo do Veículo</Label>
-          <Input
-            value={data.vehicleModel}
-            onChange={(e) => setData({ ...data, vehicleModel: e.target.value })}
-            placeholder='Scania R450'
-            className='bg-input border-border'
-          />
-        </div>
-      </div>
-      <div className='space-y-2'>
-        <Label>Observações</Label>
-        <Textarea
-          value={data.notes}
-          onChange={(e) => setData({ ...data, notes: e.target.value })}
-          placeholder='Informações adicionais sobre o cliente'
-          className='bg-input border-border min-h-[80px]'
-        />
-      </div>
-    </div>
-  );
-}
-
 export default function Clientes() {
-  const { clients, addClient, updateClient, deleteClient } = useStockStore();
-  const [search, setSearch] = useState('');
-  const [isAddOpen, setIsAddOpen] = useState(false);
-  const [editingClient, setEditingClient] = useState<Client | null>(null);
-  const [newClient, setNewClient] = useState(emptyClient);
+  const {
+    clientes,
+    isLoading,
+    search,
+    setSearch,
+    filteredClientes,
+    isAddOpen,
+    setIsAddOpen,
+    editingCliente,
+    setEditingCliente,
+    newCliente,
+    setNewCliente,
+    handleAddCliente,
+    handleUpdateCliente,
+    handleDeleteCliente,
+    deleteId,
+    setDeleteId,
+    isDeleteOpen,
+    setIsDeleteOpen
+  } = useClientes();
 
-  const filteredClients = clients.filter(
-    (client) =>
-      client.name.toLowerCase().includes(search.toLowerCase()) ||
-      client.document.includes(search) ||
-      client.vehiclePlate.toLowerCase().includes(search.toLowerCase())
+  const {
+    isAddOpen: isVeiculoAddOpen,
+    setIsAddOpen: setIsVeiculoAddOpen,
+    editingVeiculo,
+    setEditingVeiculo,
+    newVeiculo,
+    setNewVeiculo,
+    currentClienteId,
+    setCurrentClienteId,
+    deleteVeiculoId,
+    setDeleteVeiculoId,
+    isDeleteOpen: isVeiculoDeleteOpen,
+    setIsDeleteOpen: setIsVeiculoDeleteOpen,
+    isSaving,
+    fetchVeiculosByCliente,
+    handleAddVeiculo,
+    handleUpdateVeiculo,
+    handleDeleteVeiculo,
+    getVeiculosForCliente,
+    isLoadingCliente,
+    getTotalVeiculos
+  } = useVeiculos();
+
+  const {
+    paginatedItems: paginatedClientes,
+    currentPage,
+    totalPages,
+    totalItems,
+    startItem,
+    endItem,
+    pageItems,
+    isFirstPage,
+    isLastPage,
+    goToPage,
+    goToNextPage,
+    goToPreviousPage
+  } = usePagination({ items: filteredClientes, itemsPerPage: 10 });
+
+  // Track which clients have their vehicles section expanded
+  const [expandedClientes, setExpandedClientes] = useState<Set<number>>(
+    new Set()
   );
 
-  const handleAddClient = () => {
-    if (newClient.name.trim() && newClient.document.trim()) {
-      addClient(newClient);
-      setNewClient(emptyClient);
-      setIsAddOpen(false);
-    }
+  const toggleExpandCliente = (clienteId: number) => {
+    setExpandedClientes((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(clienteId)) {
+        newSet.delete(clienteId);
+      } else {
+        newSet.add(clienteId);
+        // Fetch vehicles when expanding
+        fetchVeiculosByCliente(clienteId);
+        setCurrentClienteId(clienteId);
+      }
+      return newSet;
+    });
   };
 
-  const handleUpdateClient = () => {
-    if (editingClient && editingClient.name.trim()) {
-      updateClient(editingClient.id, editingClient);
-      setEditingClient(null);
-    }
-  };
+  // Search also by vehicle plate
+  const searchFilteredClientes = filteredClientes.filter((cliente) => {
+    const veiculos = getVeiculosForCliente(cliente.id);
+    const matchesVeiculo = veiculos.some((v) =>
+      v.placa.toLowerCase().includes(search.toLowerCase())
+    );
+    return matchesVeiculo || filteredClientes.includes(cliente);
+  });
 
   return (
     <div className='flex flex-1 flex-col gap-6 p-4 lg:p-8'>
@@ -182,43 +134,24 @@ export default function Clientes() {
         <div>
           <h2 className='text-2xl font-bold text-foreground'>Clientes</h2>
           <p className='text-muted-foreground'>
-            Gerencie os clientes da oficina
+            Gerencie os clientes e seus veículos
           </p>
         </div>
-        <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-          <DialogTrigger asChild>
+        <ModalClientes
+          mode='create'
+          data={newCliente}
+          setData={setNewCliente}
+          isOpen={isAddOpen}
+          setIsOpen={setIsAddOpen}
+          onSubmit={handleAddCliente}
+          isLoading={isLoading}
+          trigger={
             <Button className='bg-primary hover:bg-primary/90'>
               <Plus className='h-4 w-4 mr-2' />
               Novo Cliente
             </Button>
-          </DialogTrigger>
-          <DialogContent className='bg-card border-border max-w-2xl'>
-            <DialogHeader>
-              <DialogTitle className='text-foreground'>
-                Adicionar Cliente
-              </DialogTitle>
-              <DialogDescription>
-                Cadastre um novo cliente no sistema
-              </DialogDescription>
-            </DialogHeader>
-            <ClientForm
-              data={newClient}
-              setData={
-                setNewClient as (data: typeof emptyClient | Client) => void
-              }
-            />
-            <DialogFooter>
-              <Button variant='outline' onClick={() => setIsAddOpen(false)}>
-                Cancelar
-              </Button>
-              <Button
-                onClick={handleAddClient}
-                className='bg-primary hover:bg-primary/90'>
-                Adicionar
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+          }
+        />
       </div>
 
       {/* Search */}
@@ -233,7 +166,7 @@ export default function Clientes() {
       </div>
 
       {/* Stats */}
-      <div className='grid gap-4 sm:grid-cols-3'>
+      <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
         <Card className='bg-card border-border'>
           <CardContent className='p-4'>
             <div className='flex items-center gap-3'>
@@ -242,7 +175,7 @@ export default function Clientes() {
               </div>
               <div>
                 <p className='text-2xl font-bold text-foreground'>
-                  {clients.length}
+                  {clientes.length}
                 </p>
                 <p className='text-sm text-muted-foreground'>
                   Total de Clientes
@@ -251,143 +184,310 @@ export default function Clientes() {
             </div>
           </CardContent>
         </Card>
+        <Card className='bg-card border-border'>
+          <CardContent className='p-4'>
+            <div className='flex items-center gap-3'>
+              <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10'>
+                <Car className='h-5 w-5 text-emerald-500' />
+              </div>
+              <div>
+                <p className='text-2xl font-bold text-foreground'>
+                  {getTotalVeiculos()}
+                </p>
+                <p className='text-sm text-muted-foreground'>
+                  Veículos Cadastrados
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Clients Table */}
+      {/* Clients List */}
       <Card className='bg-card border-border'>
         <CardHeader>
           <CardTitle className='text-foreground'>Lista de Clientes</CardTitle>
           <CardDescription>
-            {filteredClients.length} cliente(s) encontrado(s)
+            {searchFilteredClientes.length} cliente(s) encontrado(s)
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className='rounded-lg border border-border overflow-hidden'>
-            <Table>
-              <TableHeader>
-                <TableRow className='border-border hover:bg-transparent'>
-                  <TableHead className='text-muted-foreground'>
-                    Cliente
-                  </TableHead>
-                  <TableHead className='text-muted-foreground hidden md:table-cell'>
-                    Contato
-                  </TableHead>
-                  <TableHead className='text-muted-foreground hidden lg:table-cell'>
-                    Veículo
-                  </TableHead>
-                  <TableHead className='text-muted-foreground text-right'>
-                    Ações
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredClients.map((client) => (
-                  <TableRow key={client.id} className='border-border'>
-                    <TableCell>
-                      <div>
-                        <p className='font-medium text-foreground'>
-                          {client.name}
-                        </p>
-                        <p className='text-sm text-muted-foreground'>
-                          {client.document}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell className='hidden md:table-cell'>
-                      <div className='space-y-1'>
-                        <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-                          <Phone className='h-3 w-3' />
-                          {client.phone || '-'}
+        <CardContent className='space-y-4'>
+          {isLoading ? (
+            <div className='flex items-center justify-center py-12'>
+              <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
+              <span className='ml-2 text-muted-foreground'>
+                Carregando clientes...
+              </span>
+            </div>
+          ) : searchFilteredClientes.length === 0 ? (
+            <div className='text-center py-12 text-muted-foreground'>
+              Nenhum cliente encontrado
+            </div>
+          ) : (
+            paginatedClientes.map((cliente) => {
+              const isExpanded = expandedClientes.has(cliente.id);
+              const veiculos = getVeiculosForCliente(cliente.id);
+              const isLoadingVeiculos = isLoadingCliente(cliente.id);
+
+              return (
+                <Collapsible
+                  key={cliente.id}
+                  open={isExpanded}
+                  onOpenChange={() => toggleExpandCliente(cliente.id)}>
+                  <div className='rounded-lg border border-border bg-muted/30 overflow-hidden transition-all hover:bg-muted/50'>
+                    {/* Client Row */}
+                    <div className='flex items-center justify-between p-4'>
+                      <div className='flex items-center gap-4'>
+                        {/* Avatar */}
+                        <div className='flex h-12 w-12 items-center justify-center rounded-full bg-primary/10'>
+                          <User className='h-6 w-6 text-primary' />
                         </div>
-                        <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-                          <Mail className='h-3 w-3' />
-                          {client.email || '-'}
+
+                        {/* Client Info */}
+                        <div className='space-y-1'>
+                          <div className='flex items-center gap-2'>
+                            <p className='font-semibold text-foreground'>
+                              {cliente.name_cliente}
+                            </p>
+                          </div>
+                          <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+                            <Building2 className='h-3 w-3' />
+                            <span>{cliente.nome_empresa}</span>
+                          </div>
+                          <div className='flex flex-wrap items-center gap-3 text-xs text-muted-foreground'>
+                            {cliente.cpf && <span>CPF: {cliente.cpf}</span>}
+                            {cliente.cnpj && <span>CNPJ: {cliente.cnpj}</span>}
+                            {cliente.telefone && (
+                              <span className='flex items-center gap-1'>
+                                <Phone className='h-3 w-3' />
+                                {cliente.telefone}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </TableCell>
-                    <TableCell className='hidden lg:table-cell'>
+
+                      {/* Actions */}
                       <div className='flex items-center gap-2'>
-                        <Truck className='h-4 w-4 text-muted-foreground' />
-                        <div>
-                          <p className='text-sm font-medium text-foreground'>
-                            {client.vehiclePlate || '-'}
-                          </p>
-                          <p className='text-xs text-muted-foreground'>
-                            {client.vehicleModel || '-'}
-                          </p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className='text-right'>
-                      <div className='flex justify-end gap-2'>
-                        <Dialog
-                          open={editingClient?.id === client.id}
-                          onOpenChange={(open) =>
-                            !open && setEditingClient(null)
-                          }>
-                          <DialogTrigger asChild>
+                        {/* Vehicles Toggle */}
+                        <CollapsibleTrigger asChild>
+                          <Button variant='outline' size='sm' className='gap-2'>
+                            <Car className='h-4 w-4' />
+                            <span className='hidden sm:inline'>Veículos</span>
+                            <Badge variant='secondary' className='ml-1'>
+                              {veiculos.length}
+                            </Badge>
+                            <ChevronDown
+                              className={`h-4 w-4 transition-transform duration-200 ${
+                                isExpanded ? 'rotate-180' : ''
+                              }`}
+                            />
+                          </Button>
+                        </CollapsibleTrigger>
+
+                        {/* Edit */}
+                        <ModalClientes
+                          mode='edit'
+                          data={editingCliente || {}}
+                          setData={(data) =>
+                            setEditingCliente(data as typeof cliente)
+                          }
+                          isOpen={editingCliente?.id === cliente.id}
+                          setIsOpen={(open) => !open && setEditingCliente(null)}
+                          onSubmit={handleUpdateCliente}
+                          isLoading={isLoading}
+                          trigger={
                             <Button
                               variant='ghost'
                               size='icon'
-                              onClick={() => setEditingClient(client)}>
+                              onClick={() => setEditingCliente(cliente)}>
                               <Pencil className='h-4 w-4 text-muted-foreground' />
                             </Button>
-                          </DialogTrigger>
-                          <DialogContent className='bg-card border-border max-w-2xl'>
-                            <DialogHeader>
-                              <DialogTitle className='text-foreground'>
-                                Editar Cliente
-                              </DialogTitle>
-                              <DialogDescription>
-                                Altere os dados do cliente
-                              </DialogDescription>
-                            </DialogHeader>
-                            {editingClient && (
-                              <ClientForm
-                                data={editingClient}
-                                setData={
-                                  setEditingClient as (
-                                    data: typeof emptyClient | Client
-                                  ) => void
-                                }
-                              />
-                            )}
-                            <DialogFooter>
+                          }
+                        />
+
+                        {/* Delete */}
+                        <ModalDelete
+                          isOpen={isDeleteOpen && deleteId === cliente.id}
+                          setIsOpen={(open) => {
+                            setIsDeleteOpen(open);
+                            if (!open) setDeleteId(null);
+                          }}
+                          onConfirm={() => handleDeleteCliente(cliente.id)}
+                          isLoading={isLoading}
+                          title='Excluir Cliente'
+                          description={`Tem certeza que deseja excluir o cliente "${cliente.name_cliente}"? Todos os veículos associados também serão removidos. Esta ação não pode ser desfeita.`}
+                          trigger={
+                            <Button
+                              variant='ghost'
+                              size='icon'
+                              onClick={() => {
+                                setDeleteId(cliente.id);
+                                setIsDeleteOpen(true);
+                              }}>
+                              <Trash2 className='h-4 w-4 text-destructive' />
+                            </Button>
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    {/* Vehicles Section (Expandable) */}
+                    <CollapsibleContent>
+                      <div className='border-t border-border bg-background/50 p-4'>
+                        <div className='flex items-center justify-between mb-4'>
+                          <h4 className='text-sm font-medium text-foreground flex items-center gap-2'>
+                            <Car className='h-4 w-4' />
+                            Veículos do Cliente
+                          </h4>
+                          <ModalVeiculos
+                            mode='create'
+                            data={newVeiculo}
+                            setData={setNewVeiculo}
+                            isOpen={
+                              isVeiculoAddOpen &&
+                              currentClienteId === cliente.id
+                            }
+                            setIsOpen={(open) => {
+                              setCurrentClienteId(cliente.id);
+                              setIsVeiculoAddOpen(open);
+                            }}
+                            onSubmit={handleAddVeiculo}
+                            isLoading={isSaving}
+                            trigger={
                               <Button
                                 variant='outline'
-                                onClick={() => setEditingClient(null)}>
-                                Cancelar
+                                size='sm'
+                                onClick={() => setCurrentClienteId(cliente.id)}>
+                                <Plus className='h-3 w-3 mr-1' />
+                                Adicionar Veículo
                               </Button>
-                              <Button
-                                onClick={handleUpdateClient}
-                                className='bg-primary hover:bg-primary/90'>
-                                Salvar
-                              </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                        <Button
-                          variant='ghost'
-                          size='icon'
-                          onClick={() => deleteClient(client.id)}>
-                          <Trash2 className='h-4 w-4 text-destructive' />
-                        </Button>
+                            }
+                          />
+                        </div>
+
+                        {/* Loading */}
+                        {isLoadingVeiculos && (
+                          <div className='flex items-center justify-center py-8'>
+                            <Loader2 className='h-5 w-5 animate-spin text-muted-foreground' />
+                            <span className='ml-2 text-sm text-muted-foreground'>
+                              Carregando veículos...
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Empty State */}
+                        {!isLoadingVeiculos && veiculos.length === 0 && (
+                          <div className='text-center py-8 text-sm text-muted-foreground border border-dashed border-border rounded-lg'>
+                            <Car className='h-8 w-8 mx-auto mb-2 opacity-50' />
+                            Nenhum veículo cadastrado para este cliente
+                          </div>
+                        )}
+
+                        {/* Vehicles Grid */}
+                        {!isLoadingVeiculos && veiculos.length > 0 && (
+                          <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-3'>
+                            {veiculos.map((veiculo) => (
+                              <div
+                                key={veiculo.id}
+                                className='flex items-center justify-between p-3 rounded-lg bg-muted/50 border border-border hover:bg-muted transition-colors'>
+                                <div className='flex items-center gap-3'>
+                                  <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10'>
+                                    <Car className='h-5 w-5 text-primary' />
+                                  </div>
+                                  <div>
+                                    <p className='font-medium text-foreground'>
+                                      {veiculo.placa}
+                                    </p>
+                                    <p className='text-xs text-muted-foreground'>
+                                      {veiculo.modelo}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className='flex gap-1'>
+                                  {/* Edit Vehicle */}
+                                  <ModalVeiculos
+                                    mode='edit'
+                                    data={editingVeiculo || {}}
+                                    setData={(data) =>
+                                      setEditingVeiculo(data as typeof veiculo)
+                                    }
+                                    isOpen={editingVeiculo?.id === veiculo.id}
+                                    setIsOpen={(open) =>
+                                      !open && setEditingVeiculo(null)
+                                    }
+                                    onSubmit={handleUpdateVeiculo}
+                                    isLoading={isSaving}
+                                    trigger={
+                                      <Button
+                                        variant='ghost'
+                                        size='icon'
+                                        className='h-8 w-8'
+                                        onClick={() => {
+                                          setCurrentClienteId(cliente.id);
+                                          setEditingVeiculo(veiculo);
+                                        }}>
+                                        <Pencil className='h-3 w-3 text-muted-foreground' />
+                                      </Button>
+                                    }
+                                  />
+                                  {/* Delete Vehicle */}
+                                  <ModalDelete
+                                    isOpen={
+                                      isVeiculoDeleteOpen &&
+                                      deleteVeiculoId === veiculo.id
+                                    }
+                                    setIsOpen={(open) => {
+                                      setIsVeiculoDeleteOpen(open);
+                                      if (!open) setDeleteVeiculoId(null);
+                                    }}
+                                    onConfirm={() =>
+                                      handleDeleteVeiculo(veiculo.id)
+                                    }
+                                    isLoading={isSaving}
+                                    title='Excluir Veículo'
+                                    description={`Tem certeza que deseja excluir o veículo "${veiculo.placa}"?`}
+                                    trigger={
+                                      <Button
+                                        variant='ghost'
+                                        size='icon'
+                                        className='h-8 w-8'
+                                        onClick={() => {
+                                          setCurrentClienteId(cliente.id);
+                                          setDeleteVeiculoId(veiculo.id);
+                                          setIsVeiculoDeleteOpen(true);
+                                        }}>
+                                        <Trash2 className='h-3 w-3 text-destructive' />
+                                      </Button>
+                                    }
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {filteredClients.length === 0 && (
-                  <TableRow>
-                    <TableCell
-                      colSpan={4}
-                      className='h-24 text-center text-muted-foreground'>
-                      Nenhum cliente encontrado
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                    </CollapsibleContent>
+                  </div>
+                </Collapsible>
+              );
+            })
+          )}
+
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            startItem={startItem}
+            endItem={endItem}
+            pageItems={pageItems}
+            isFirstPage={isFirstPage}
+            isLastPage={isLastPage}
+            onPageChange={goToPage}
+            onNextPage={goToNextPage}
+            onPreviousPage={goToPreviousPage}
+            itemLabel='clientes'
+          />
         </CardContent>
       </Card>
     </div>
