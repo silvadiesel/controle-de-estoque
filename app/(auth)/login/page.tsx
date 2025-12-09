@@ -89,10 +89,10 @@ export default function LoginPage() {
             </div>
             <div>
               <span className='text-xl font-bold text-white tracking-tight'>
-                StockTruck
+                Igne System
               </span>
               <span className='block text-xs text-zinc-500 uppercase tracking-widest'>
-                Oficina Pro
+                Tudo em um só lugar
               </span>
             </div>
           </div>
@@ -105,8 +105,8 @@ export default function LoginPage() {
                 <span className='block text-primary'>seu estoque</span>
               </h1>
               <p className='text-zinc-400 text-lg max-w-md leading-relaxed'>
-                Gerencie peças, ordens de serviço e fornecedores em um único
-                lugar. Simples, rápido e eficiente.
+                Gerencie seus clientes, pedidos, estoque e muito mais em um
+                único lugar. Simples, rápido e eficiente.
               </p>
             </div>
 
@@ -115,13 +115,13 @@ export default function LoginPage() {
               {[
                 {
                   icon: Package,
-                  title: 'Gestão de Estoque',
-                  desc: 'Controle completo de entradas e saídas'
+                  title: 'Gestão de Pedidos',
+                  desc: 'Controle completo de pedidos de clientes'
                 },
                 {
                   icon: ClipboardList,
-                  title: 'Ordens de Serviço',
-                  desc: 'Acompanhe cada manutenção em tempo real'
+                  title: 'Gestão de Clientes',
+                  desc: 'Acompanhe cada cliente e seus pedidos em tempo real'
                 },
                 {
                   icon: Wrench,
@@ -178,7 +178,7 @@ export default function LoginPage() {
               <Truck className='w-6 h-6' />
             </div>
             <span className='text-xl font-bold text-foreground'>
-              StockTruck
+              Igne System
             </span>
           </div>
 
@@ -213,7 +213,7 @@ export default function LoginPage() {
                   onBlur={() => setIsFocused(null)}
                   required
                   disabled={loading}
-                  className='h-12 px-4 bg-secondary/50 border-border/50 rounded-xl focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors'
+                  className='h-12 px-4 bg-secondary/50 border-border/50 rounded-md focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors'
                 />
               </div>
             </div>
@@ -237,7 +237,7 @@ export default function LoginPage() {
                   onBlur={() => setIsFocused(null)}
                   required
                   disabled={loading}
-                  className='h-12 px-4 pr-12 bg-secondary/50 border-border/50 rounded-xl focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors'
+                  className='h-12 px-4 pr-12 bg-secondary/50 border-border/50 rounded-md focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors'
                 />
                 <button
                   type='button'
@@ -263,7 +263,7 @@ export default function LoginPage() {
             {/* Botão */}
             <Button
               type='submit'
-              className='w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl transition-all duration-200 group'
+              className='w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-md transition-all duration-200 group'
               disabled={loading}>
               {loading ? (
                 <>
@@ -293,7 +293,7 @@ export default function LoginPage() {
 
           {/* Footer */}
           <p className='text-center text-xs text-muted-foreground mt-8'>
-            © 2025 StockTruck · Todos os direitos reservados
+            © 2025 Igne System · Todos os direitos reservados
           </p>
         </div>
       </div>
