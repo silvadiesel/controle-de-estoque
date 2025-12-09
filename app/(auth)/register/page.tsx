@@ -29,14 +29,26 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [codigoVerificacao, setCodigoVerificacao] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isFocused, setIsFocused] = useState<string | null>(null);
 
+  const CODIGO_LOJA = '367';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Verificar código de loja antes de continuar
+    if (codigoVerificacao !== CODIGO_LOJA) {
+      setError(
+        'Código de verificação inválido. Entre em contato com o administrador.'
+      );
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -61,7 +73,7 @@ export default function RegisterPage() {
   return (
     <div className='min-h-screen bg-background flex'>
       {/* Lado esquerdo - Visual impactante */}
-      <div className='hidden lg:flex lg:w-1/2 xl:w-3/5 relative overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900'>
+      <div className='hidden lg:flex lg:w-1/2 xl:w-3/5 relative overflow-hidden bg-linear-to-br from-zinc-900 via-zinc-800 to-zinc-900'>
         {/* Grid pattern */}
         <div
           className='absolute inset-0 opacity-[0.03]'
@@ -77,9 +89,9 @@ export default function RegisterPage() {
 
         {/* Linhas diagonais decorativas */}
         <div className='absolute inset-0 overflow-hidden'>
-          <div className='absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-primary/20 to-transparent transform rotate-12' />
-          <div className='absolute top-0 left-1/2 w-px h-full bg-gradient-to-b from-transparent via-primary/10 to-transparent transform -rotate-12' />
-          <div className='absolute top-0 right-1/4 w-px h-full bg-gradient-to-b from-transparent via-primary/20 to-transparent transform rotate-6' />
+          <div className='absolute top-0 left-1/4 w-px h-full bg-linear-to-b from-transparent via-primary/20 to-transparent transform rotate-12' />
+          <div className='absolute top-0 left-1/2 w-px h-full bg-linear-to-b from-transparent via-primary/10 to-transparent transform -rotate-12' />
+          <div className='absolute top-0 right-1/4 w-px h-full bg-linear-to-b from-transparent via-primary/20 to-transparent transform rotate-6' />
         </div>
 
         {/* Conteúdo principal */}
@@ -91,10 +103,10 @@ export default function RegisterPage() {
             </div>
             <div>
               <span className='text-xl font-bold text-white tracking-tight'>
-                StockTruck
+                Igne System
               </span>
               <span className='block text-xs text-zinc-500 uppercase tracking-widest'>
-                Oficina Pro
+                Tudo em um só lugar
               </span>
             </div>
           </div>
@@ -108,7 +120,7 @@ export default function RegisterPage() {
               </h1>
               <p className='text-zinc-400 text-lg max-w-md leading-relaxed'>
                 Crie sua conta e tenha acesso completo ao sistema de gestão mais
-                moderno para oficinas e estoques.
+                moderno para clientes e pedidos.
               </p>
             </div>
 
@@ -117,23 +129,23 @@ export default function RegisterPage() {
               {[
                 {
                   icon: Zap,
-                  title: 'Configuração Rápida',
+                  title: 'Gestão de Pedidos',
                   desc: 'Comece a usar em menos de 5 minutos'
                 },
                 {
                   icon: Shield,
-                  title: 'Dados Seguros',
-                  desc: 'Proteção avançada para suas informações'
+                  title: 'Gestão de Clientes',
+                  desc: 'Acompanhe cada cliente e seus pedidos em tempo real'
                 },
                 {
                   icon: Sparkles,
-                  title: 'Interface Moderna',
-                  desc: 'Design intuitivo e fácil de usar'
+                  title: 'Gestão de Estoque',
+                  desc: 'Controle completo de entradas e saídas'
                 }
               ].map((item, i) => (
                 <div
                   key={i}
-                  className='flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.05] backdrop-blur-sm hover:bg-white/[0.05] transition-colors group'>
+                  className='flex items-center gap-4 p-4 rounded-xl bg-background/5 border border-border/5 backdrop-blur-sm hover:bg-background/10 transition-colors group'>
                   <div className='flex items-center justify-center w-10 h-10 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors'>
                     <item.icon className='w-5 h-5' />
                   </div>
@@ -171,7 +183,7 @@ export default function RegisterPage() {
       {/* Lado direito - Formulário */}
       <div className='flex-1 flex items-center justify-center p-6 sm:p-12 relative'>
         {/* Background sutil */}
-        <div className='absolute inset-0 bg-gradient-to-br from-background via-background to-primary/[0.02]' />
+        <div className='absolute inset-0 bg-linear-to-br from-background via-background to-primary/2' />
 
         <div className='w-full max-w-sm relative z-10'>
           {/* Mobile logo */}
@@ -180,7 +192,7 @@ export default function RegisterPage() {
               <Truck className='w-6 h-6' />
             </div>
             <span className='text-xl font-bold text-foreground'>
-              StockTruck
+              Igne System
             </span>
           </div>
 
@@ -205,7 +217,7 @@ export default function RegisterPage() {
                 Nome completo
               </Label>
               <div
-                className={`relative rounded-xl transition-all duration-200 ${isFocused === 'name' ? 'ring-2 ring-primary/20' : ''}`}>
+                className={`relative rounded-md transition-all duration-200 ${isFocused === 'name' ? 'ring-2 ring-primary/20' : ''}`}>
                 <Input
                   id='name'
                   type='text'
@@ -216,7 +228,7 @@ export default function RegisterPage() {
                   onBlur={() => setIsFocused(null)}
                   required
                   disabled={loading}
-                  className='h-12 px-4 bg-secondary/50 border-border/50 rounded-xl focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors'
+                  className='h-12 px-4 bg-secondary/50 border-border/50 rounded-md focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors'
                 />
               </div>
             </div>
@@ -229,7 +241,7 @@ export default function RegisterPage() {
                 Email
               </Label>
               <div
-                className={`relative rounded-xl transition-all duration-200 ${isFocused === 'email' ? 'ring-2 ring-primary/20' : ''}`}>
+                className={`relative rounded-md transition-all duration-200 ${isFocused === 'email' ? 'ring-2 ring-primary/20' : ''}`}>
                 <Input
                   id='email'
                   type='email'
@@ -240,7 +252,7 @@ export default function RegisterPage() {
                   onBlur={() => setIsFocused(null)}
                   required
                   disabled={loading}
-                  className='h-12 px-4 bg-secondary/50 border-border/50 rounded-xl focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors'
+                  className='h-12 px-4 bg-secondary/50 border-border/50 rounded-md focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors'
                 />
               </div>
             </div>
@@ -253,7 +265,7 @@ export default function RegisterPage() {
                 Senha
               </Label>
               <div
-                className={`relative rounded-xl transition-all duration-200 ${isFocused === 'password' ? 'ring-2 ring-primary/20' : ''}`}>
+                className={`relative rounded-md transition-all duration-200 ${isFocused === 'password' ? 'ring-2 ring-primary/20' : ''}`}>
                 <Input
                   id='password'
                   type={showPassword ? 'text' : 'password'}
@@ -265,7 +277,7 @@ export default function RegisterPage() {
                   required
                   minLength={8}
                   disabled={loading}
-                  className='h-12 px-4 pr-12 bg-secondary/50 border-border/50 rounded-xl focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors'
+                  className='h-12 px-4 pr-12 bg-secondary/50 border-border/50 rounded-md focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors'
                 />
                 <button
                   type='button'
@@ -282,11 +294,37 @@ export default function RegisterPage() {
                 Mínimo de 8 caracteres
               </p>
             </div>
+            {/* Código de verificação */}
+            <div className='space-y-2'>
+              <Label
+                htmlFor='codigoVerificacao'
+                className='text-sm font-medium text-foreground'>
+                Código de verificação
+              </Label>
+              <div
+                className={`relative rounded-md transition-all duration-200 ${isFocused === 'codigoVerificacao' ? 'ring-2 ring-primary/20' : ''}`}>
+                <Input
+                  id='codigoVerificacao'
+                  type='text'
+                  placeholder='Digite o código da loja: 367'
+                  value={codigoVerificacao}
+                  onChange={(e) => setCodigoVerificacao(e.target.value)}
+                  onFocus={() => setIsFocused('codigoVerificacao')}
+                  onBlur={() => setIsFocused(null)}
+                  required
+                  disabled={loading}
+                  className='h-12 px-4 bg-secondary/50 border-border/50 rounded-md focus:border-primary focus-visible:ring-0 focus-visible:ring-offset-0 transition-colors'
+                />
+              </div>
+              <p className='text-xs text-muted-foreground'>
+                Solicite o código ao administrador
+              </p>
+            </div>
 
             {/* Erro */}
             {error && (
               <div className='flex items-center gap-3 text-destructive text-sm bg-destructive/10 border border-destructive/20 rounded-xl px-4 py-3'>
-                <AlertCircle className='w-5 h-5 flex-shrink-0' />
+                <AlertCircle className='w-5 h-5 shrink-0' />
                 <span>{error}</span>
               </div>
             )}
@@ -294,7 +332,7 @@ export default function RegisterPage() {
             {/* Botão */}
             <Button
               type='submit'
-              className='w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl transition-all duration-200 group'
+              className='w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-md transition-all duration-200 group'
               disabled={loading}>
               {loading ? (
                 <>
@@ -324,7 +362,7 @@ export default function RegisterPage() {
 
           {/* Footer */}
           <p className='text-center text-xs text-muted-foreground mt-8'>
-            © 2025 StockTruck · Todos os direitos reservados
+            © 2025 Igne System · Todos os direitos reservados
           </p>
         </div>
       </div>

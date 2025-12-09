@@ -42,16 +42,16 @@ const menuItems = [
         href: '/dashboard'
       },
       {
-        id: 'products',
+        id: 'produtos',
         label: 'Produtos',
         icon: Package,
-        href: '/dashboard/produtos'
+        href: '/produtos'
       },
       {
-        id: 'movements',
+        id: 'movimentacoes',
         label: 'Movimentações',
         icon: ArrowUpDown,
-        href: '/dashboard/movimentacoes'
+        href: '/movimentacoes'
       }
     ]
   },
@@ -59,22 +59,22 @@ const menuItems = [
     title: 'Gestão',
     items: [
       {
-        id: 'orders',
+        id: 'ordens',
         label: 'Ordens',
         icon: ClipboardList,
-        href: '/dashboard/ordens'
+        href: '/ordens'
       },
       {
-        id: 'clients',
+        id: 'clientes',
         label: 'Clientes',
         icon: Users,
-        href: '/dashboard/clientes'
+        href: '/clientes'
       },
       {
-        id: 'suppliers',
+        id: 'fornecedores',
         label: 'Fornecedores',
         icon: Factory,
-        href: '/dashboard/fornecedores'
+        href: '/fornecedores'
       }
     ]
   },
@@ -82,16 +82,16 @@ const menuItems = [
     title: 'Sistema',
     items: [
       {
-        id: 'alerts',
+        id: 'alertas',
         label: 'Alertas',
         icon: AlertTriangle,
-        href: '/dashboard/alertas'
+        href: '/alertas'
       },
       {
-        id: 'settings',
+        id: 'configuracoes',
         label: 'Configurações',
         icon: Settings,
-        href: '/dashboard/configuracoes'
+        href: '/configuracoes'
       }
     ]
   }
@@ -120,16 +120,14 @@ export function AppSidebar() {
   return (
     <Sidebar>
       {/* Header com Logo */}
-      <SidebarHeader className='border-b border-border px-4 py-4'>
+      <SidebarHeader className='border-b border-border px-4 py-4 bg-background'>
         <div className='flex items-center gap-3'>
           <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary'>
             <Truck className='h-6 w-6 text-primary-foreground' />
           </div>
           <div>
-            <h1 className='text-lg font-bold text-foreground'>StockTruck</h1>
-            <p className='text-xs text-muted-foreground'>
-              Oficina de Caminhões
-            </p>
+            <h1 className='text-lg font-bold text-foreground'>Igne System</h1>
+            <p className='text-xs text-muted-foreground'>Tudo em um só lugar</p>
           </div>
         </div>
       </SidebarHeader>
