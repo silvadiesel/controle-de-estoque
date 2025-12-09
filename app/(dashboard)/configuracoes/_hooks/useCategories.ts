@@ -15,24 +15,31 @@ export interface UseCategoriesReturn {
   categories: Categorias[];
   isLoading: boolean;
   isSaving: boolean;
+  isDeleting: boolean;
   isAddOpen: boolean;
   setIsAddOpen: (open: boolean) => void;
   editingCategory: Categorias | null;
   setEditingCategory: Dispatch<SetStateAction<Categorias | null>>;
+  deletingCategoryId: number | null;
+  setDeletingCategoryId: (id: number | null) => void;
   newCategoryName: string;
   setNewCategoryName: (name: string) => void;
   fetchCategories: () => Promise<void>;
   handleAddCategory: () => Promise<void>;
   handleUpdateCategory: () => Promise<void>;
-  handleDeleteCategory: (id: number) => Promise<boolean>;
+  confirmDeleteCategory: () => Promise<boolean>;
 }
 
 export function useCategories(): UseCategoriesReturn {
   const [categories, setCategories] = useState<Categorias[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Categorias | null>(
+    null
+  );
+  const [deletingCategoryId, setDeletingCategoryId] = useState<number | null>(
     null
   );
   const [newCategoryName, setNewCategoryName] = useState('');
@@ -122,48 +129,53 @@ export function useCategories(): UseCategoriesReturn {
     }
   }, [editingCategory, fetchCategories]);
 
-  const handleDeleteCategory = useCallback(
-    async (id: number): Promise<boolean> => {
-      if (!confirm('Tem certeza que deseja excluir esta categoria?')) {
-        return false;
+  const confirmDeleteCategory = useCallback(async (): Promise<boolean> => {
+    if (!deletingCategoryId) {
+      return false;
+    }
+
+    try {
+      setIsDeleting(true);
+
+      const response = await fetch(`/api/categorias/${deletingCategoryId}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Falha ao excluir categoria');
       }
 
-      try {
-        const response = await fetch(`/api/categorias/${id}`, {
-          method: 'DELETE'
-        });
-
-        if (!response.ok) {
-          const data = await response.json();
-          throw new Error(data.error || 'Falha ao excluir categoria');
-        }
-
-        await fetchCategories();
-        toast.success('Categoria excluída com sucesso!');
-        return true;
-      } catch (err) {
-        toast.error(
-          err instanceof Error ? err.message : 'Erro ao excluir categoria'
-        );
-        return false;
-      }
-    },
-    [fetchCategories]
-  );
+      await fetchCategories();
+      setDeletingCategoryId(null);
+      toast.success('Categoria excluída com sucesso!');
+      return true;
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : 'Erro ao excluir categoria'
+      );
+      return false;
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [deletingCategoryId, fetchCategories]);
 
   return {
     categories,
     isLoading,
     isSaving,
+    isDeleting,
     isAddOpen,
     setIsAddOpen,
     editingCategory,
     setEditingCategory,
+    deletingCategoryId,
+    setDeletingCategoryId,
     newCategoryName,
     setNewCategoryName,
     fetchCategories,
     handleAddCategory,
     handleUpdateCategory,
-    handleDeleteCategory
+    confirmDeleteCategory
   };
 }
