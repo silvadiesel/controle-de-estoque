@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 
+import { ModalDelete } from '@/components/modal-delete';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -47,16 +48,19 @@ export default function Configuracoes() {
     categories,
     isLoading,
     isSaving,
+    isDeleting,
     isAddOpen,
     setIsAddOpen,
     editingCategory,
     setEditingCategory,
+    deletingCategoryId,
+    setDeletingCategoryId,
     newCategoryName,
     setNewCategoryName,
     fetchCategories,
     handleAddCategory,
     handleUpdateCategory,
-    handleDeleteCategory
+    confirmDeleteCategory
   } = useCategories();
 
   const {
@@ -276,14 +280,23 @@ export default function Configuracoes() {
                                 </DialogContent>
                               </Dialog>
 
-                              <Button
-                                variant='ghost'
-                                size='icon'
-                                onClick={() =>
-                                  handleDeleteCategory(category.id)
-                                }>
-                                <Trash2 className='h-4 w-4 text-destructive' />
-                              </Button>
+                              <ModalDelete
+                                isOpen={deletingCategoryId === category.id}
+                                setIsOpen={(open) =>
+                                  setDeletingCategoryId(
+                                    open ? category.id : null
+                                  )
+                                }
+                                onConfirm={confirmDeleteCategory}
+                                isLoading={isDeleting}
+                                title='Excluir Categoria'
+                                description={`Tem certeza que deseja excluir a categoria "${category.name}"? Esta ação não pode ser desfeita.`}
+                                trigger={
+                                  <Button variant='ghost' size='icon'>
+                                    <Trash2 className='h-4 w-4 text-destructive' />
+                                  </Button>
+                                }
+                              />
                             </div>
                           </TableCell>
                         </TableRow>
