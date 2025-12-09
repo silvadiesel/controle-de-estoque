@@ -1,22 +1,8 @@
 'use client';
 
+import { ModalDelete } from '@/components/modal-delete';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   Table,
@@ -26,9 +12,8 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import type { Fornecedor } from '@/db/schema';
 
-import { modalFornecedores } from './_components/modal-fornecedores';
+import { ModalFornecedores } from './_components/modal-fornecedores';
 import { useFornecedores } from './_hook/useFornecedores';
 import {
   Factory,
@@ -55,7 +40,11 @@ export default function Fornecedores() {
     setNewFornecedor,
     handleAddFornecedor,
     handleUpdateFornecedor,
-    handleDeleteFornecedor
+    handleDeleteFornecedor,
+    deleteId,
+    setDeleteId,
+    isDeleteOpen,
+    setIsDeleteOpen
   } = useFornecedores();
 
   return (
@@ -68,39 +57,21 @@ export default function Fornecedores() {
             Gerencie os fornecedores de peças
           </p>
         </div>
-        <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-          <DialogTrigger asChild>
+        <ModalFornecedores
+          mode='create'
+          data={newFornecedor}
+          setData={setNewFornecedor}
+          isOpen={isAddOpen}
+          setIsOpen={setIsAddOpen}
+          onSubmit={handleAddFornecedor}
+          isLoading={isLoading}
+          trigger={
             <Button className='bg-primary hover:bg-primary/90'>
               <Plus className='h-4 w-4 mr-2' />
               Novo Fornecedor
             </Button>
-          </DialogTrigger>
-          <DialogContent className='bg-card border-border max-w-2xl'>
-            <DialogHeader>
-              <DialogTitle className='text-foreground'>
-                Adicionar Fornecedor
-              </DialogTitle>
-              <DialogDescription>
-                Cadastre um novo fornecedor no sistema
-              </DialogDescription>
-            </DialogHeader>
-            {modalFornecedores({
-              data: newFornecedor,
-              setData: setNewFornecedor
-            })}
-            <DialogFooter>
-              <Button variant='outline' onClick={() => setIsAddOpen(false)}>
-                Cancelar
-              </Button>
-              <Button
-                onClick={handleAddFornecedor}
-                className='bg-primary hover:bg-primary/90'
-                disabled={isLoading}>
-                Adicionar
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+          }
+        />
       </div>
 
       {/* Search */}
@@ -141,9 +112,6 @@ export default function Fornecedores() {
           <CardTitle className='text-foreground'>
             Lista de Fornecedores
           </CardTitle>
-          <CardDescription>
-            {filteredFornecedores.length} fornecedor(es) encontrado(s)
-          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className='rounded-lg border border-border overflow-hidden'>
@@ -217,12 +185,19 @@ export default function Fornecedores() {
                       </TableCell>
                       <TableCell className='text-right'>
                         <div className='flex justify-end gap-2'>
-                          <Dialog
-                            open={editingFornecedor?.id === fornecedor.id}
-                            onOpenChange={(open) =>
+                          <ModalFornecedores
+                            mode='edit'
+                            data={editingFornecedor || {}}
+                            setData={(data) =>
+                              setEditingFornecedor(data as typeof fornecedor)
+                            }
+                            isOpen={editingFornecedor?.id === fornecedor.id}
+                            setIsOpen={(open) =>
                               !open && setEditingFornecedor(null)
-                            }>
-                            <DialogTrigger asChild>
+                            }
+                            onSubmit={handleUpdateFornecedor}
+                            isLoading={isLoading}
+                            trigger={
                               <Button
                                 variant='ghost'
                                 size='icon'
@@ -231,45 +206,32 @@ export default function Fornecedores() {
                                 }>
                                 <Pencil className='h-4 w-4 text-muted-foreground' />
                               </Button>
-                            </DialogTrigger>
-                            <DialogContent className='bg-card border-border max-w-2xl'>
-                              <DialogHeader>
-                                <DialogTitle className='text-foreground'>
-                                  Editar Fornecedor
-                                </DialogTitle>
-                                <DialogDescription>
-                                  Altere os dados do fornecedor
-                                </DialogDescription>
-                              </DialogHeader>
-                              {editingFornecedor &&
-                                modalFornecedores({
-                                  data: editingFornecedor,
-                                  setData: (data) =>
-                                    setEditingFornecedor(data as Fornecedor)
-                                })}
-                              <DialogFooter>
-                                <Button
-                                  variant='outline'
-                                  onClick={() => setEditingFornecedor(null)}>
-                                  Cancelar
-                                </Button>
-                                <Button
-                                  onClick={handleUpdateFornecedor}
-                                  className='bg-primary hover:bg-primary/90'
-                                  disabled={isLoading}>
-                                  Salvar
-                                </Button>
-                              </DialogFooter>
-                            </DialogContent>
-                          </Dialog>
-                          <Button
-                            variant='ghost'
-                            size='icon'
-                            onClick={() =>
+                            }
+                          />
+                          <ModalDelete
+                            isOpen={isDeleteOpen && deleteId === fornecedor.id}
+                            setIsOpen={(open) => {
+                              setIsDeleteOpen(open);
+                              if (!open) setDeleteId(null);
+                            }}
+                            onConfirm={() =>
                               handleDeleteFornecedor(fornecedor.id)
-                            }>
-                            <Trash2 className='h-4 w-4 text-destructive' />
-                          </Button>
+                            }
+                            isLoading={isLoading}
+                            title='Excluir Fornecedor'
+                            description={`Tem certeza que deseja excluir o fornecedor "${fornecedor.name_empresa}"? Esta ação não pode ser desfeita.`}
+                            trigger={
+                              <Button
+                                variant='ghost'
+                                size='icon'
+                                onClick={() => {
+                                  setDeleteId(fornecedor.id);
+                                  setIsDeleteOpen(true);
+                                }}>
+                                <Trash2 className='h-4 w-4 text-destructive' />
+                              </Button>
+                            }
+                          />
                         </div>
                       </TableCell>
                     </TableRow>
