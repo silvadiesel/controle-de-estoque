@@ -9,5 +9,21 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true
+  },
+  user: {
+    additionalFields: {
+      cargo: {
+        type: 'string',
+        required: false,
+        defaultValue: 'atendente',
+        input: false // Impede que o usuário defina no signup
+      },
+      status: {
+        type: 'boolean',
+        required: false,
+        defaultValue: true,
+        input: false
+      }
+    }
   }
 });
