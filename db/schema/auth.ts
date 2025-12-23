@@ -1,4 +1,7 @@
-import { boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { boolean, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+
+// Enum para cargo do usuário
+export const cargoEnum = pgEnum('cargo', ['atendente', 'estoquista', 'admin']);
 
 // Tabela de usuários - armazena dados básicos do usuário
 export const user = pgTable('user', {
@@ -6,6 +9,8 @@ export const user = pgTable('user', {
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
   emailVerified: boolean('email_verified').notNull().default(false),
+  cargo: cargoEnum().notNull().default('atendente'),
+  status: boolean('status').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
