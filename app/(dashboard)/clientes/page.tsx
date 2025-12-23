@@ -19,6 +19,7 @@ import {
   CollapsibleTrigger
 } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import { usePagination } from '@/hooks/usePagination';
 
 import { ModalClientes } from './_components/modal-clientes';
@@ -80,7 +81,8 @@ export default function Clientes() {
     handleDeleteVeiculo,
     getVeiculosForCliente,
     isLoadingCliente,
-    getTotalVeiculos
+    getTotalVeiculos,
+    isInitialLoading
   } = useVeiculos();
 
   const {
@@ -191,9 +193,13 @@ export default function Clientes() {
                 <Car className='h-5 w-5 text-emerald-500' />
               </div>
               <div>
-                <p className='text-2xl font-bold text-foreground'>
-                  {getTotalVeiculos()}
-                </p>
+                {isInitialLoading ? (
+                  <div className='h-8 w-12 animate-pulse rounded bg-muted'></div>
+                ) : (
+                  <p className='text-2xl font-bold text-foreground animate-in fade-in duration-300'>
+                    {getTotalVeiculos()}
+                  </p>
+                )}
                 <p className='text-sm text-muted-foreground'>
                   Veículos Cadastrados
                 </p>
@@ -274,7 +280,9 @@ export default function Clientes() {
                           <Button variant='outline' size='sm' className='gap-2'>
                             <Car className='h-4 w-4' />
                             <span className='hidden sm:inline'>Veículos</span>
-                            <Badge variant='secondary' className='ml-1'>
+                            <Badge
+                              variant='secondary'
+                              className='ml-1 transition-all duration-200'>
                               {veiculos.length}
                             </Badge>
                             <ChevronDown
@@ -333,7 +341,7 @@ export default function Clientes() {
                     </div>
 
                     {/* Vehicles Section (Expandable) */}
-                    <CollapsibleContent>
+                    <CollapsibleContent className='data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 overflow-hidden transition-all duration-300 ease-in-out'>
                       <div className='border-t border-border bg-background/50 p-4'>
                         <div className='flex items-center justify-between mb-4'>
                           <h4 className='text-sm font-medium text-foreground flex items-center gap-2'>
@@ -366,13 +374,26 @@ export default function Clientes() {
                           />
                         </div>
 
-                        {/* Loading */}
+                        {/* Loading Skeleton */}
                         {isLoadingVeiculos && (
-                          <div className='flex items-center justify-center py-8'>
-                            <Loader2 className='h-5 w-5 animate-spin text-muted-foreground' />
-                            <span className='ml-2 text-sm text-muted-foreground'>
-                              Carregando veículos...
-                            </span>
+                          <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-3'>
+                            {[1, 2, 3].map((i) => (
+                              <div
+                                key={i}
+                                className='flex items-center justify-between p-3 rounded-lg bg-muted/50 border border-border'>
+                                <div className='flex items-center gap-3'>
+                                  <Skeleton className='h-10 w-10 rounded-lg' />
+                                  <div className='space-y-2'>
+                                    <Skeleton className='h-4 w-20' />
+                                    <Skeleton className='h-3 w-16' />
+                                  </div>
+                                </div>
+                                <div className='flex gap-1'>
+                                  <Skeleton className='h-8 w-8 rounded' />
+                                  <Skeleton className='h-8 w-8 rounded' />
+                                </div>
+                              </div>
+                            ))}
                           </div>
                         )}
 
