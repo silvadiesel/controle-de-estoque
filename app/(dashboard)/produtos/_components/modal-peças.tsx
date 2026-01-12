@@ -33,8 +33,6 @@ interface ModalPecasProps {
   fornecedores: Fornecedor[];
   handleOpenChange: (open: boolean) => void;
   trigger?: React.ReactNode;
-
-  // Novas props que vêm do hook usePecas
   handleImageChange: (e: ChangeEvent<HTMLInputElement>) => void;
   handleRemoveImage: () => void;
   categoryItems: ComboItem[];
@@ -50,7 +48,6 @@ export function ModalPecas({
   isLoading,
   handleOpenChange,
   trigger,
-  // Recebendo as funções e dados prontos
   handleImageChange,
   handleRemoveImage,
   categoryItems,
@@ -69,7 +66,6 @@ export function ModalPecas({
 
         <div className='p-6'>
           <div className='grid grid-cols-1 md:grid-cols-12 gap-8'>
-            {/* --- COLUNA ESQUERDA: IMAGEM --- */}
             <div className='md:col-span-4 flex flex-col gap-3'>
               <Label className='text-lg font-semibold'>Imagem do Produto</Label>
 
@@ -93,7 +89,6 @@ export function ModalPecas({
                   </Button>
                 </div>
               ) : (
-                /* ESTADO 2: Sem Imagem (Upload) */
                 <label
                   htmlFor='dropzone-file'
                   className='flex flex-col items-center justify-center w-full h-64 md:h-full min-h-[250px] border-2 border-dashed rounded-xl cursor-pointer bg-muted/30 border-muted-foreground/30 hover:bg-muted/50 hover:border-primary transition-colors group'>
@@ -117,13 +112,11 @@ export function ModalPecas({
               )}
             </div>
 
-            {/* --- COLUNA DIREITA: FORMULÁRIO --- */}
             <div className='md:col-span-8'>
               <form
                 id='peca-form'
                 onSubmit={onSubmit}
                 className='flex flex-col gap-6'>
-                {/* Linha 1: Nome e Código */}
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                   <div className='md:col-span-2 flex flex-col gap-2'>
                     <Label htmlFor='name' className='text-base'>
@@ -155,7 +148,6 @@ export function ModalPecas({
                   </div>
                 </div>
 
-                {/* Linha 2: Localização */}
                 <div className='p-4 border rounded-lg bg-muted/10'>
                   <h3 className='text-sm font-semibold text-muted-foreground mb-3'>
                     Localização no Estoque
@@ -216,50 +208,46 @@ export function ModalPecas({
                   </div>
                 </div>
 
-                {/* Linha 3: Comboboxes */}
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                   <div className='flex flex-col gap-2'>
                     <Label htmlFor='category' className='text-base'>
                       Categoria
                     </Label>
-                    <div className='h-12 flex items-center'>
-                      <ComboboxSearch
-                        items={categoryItems}
-                        value={newPeca.categoria_id}
-                        onSelect={(value) =>
-                          setNewPeca({
-                            ...newPeca,
-                            categoria_id: value ?? undefined
-                          })
-                        }
-                        placeholder='Selecione a categoria'
-                        searchPlaceholder='Buscar...'
-                        emptyMessage='Nada encontrado.'
-                      />
-                    </div>
+                    <ComboboxSearch
+                      items={categoryItems}
+                      value={newPeca.categoria_id}
+                      onSelect={(value) =>
+                        setNewPeca({
+                          ...newPeca,
+                          categoria_id: value ?? undefined
+                        })
+                      }
+                      placeholder='Selecione a categoria'
+                      searchPlaceholder='Buscar...'
+                      emptyMessage='Nada encontrado.'
+                      className='h-12'
+                    />
                   </div>
                   <div className='flex flex-col gap-2'>
                     <Label htmlFor='supplier' className='text-base'>
                       Fornecedor
                     </Label>
-                    <div className='h-12 flex items-center'>
-                      <ComboboxSearch
-                        items={fornecedorItems}
-                        value={newPeca.fornecedor_id}
-                        onSelect={(value) =>
-                          setNewPeca({ ...newPeca, fornecedor_id: value })
-                        }
-                        placeholder='Selecione o fornecedor'
-                        searchPlaceholder='Buscar...'
-                        emptyMessage='Nada encontrado.'
-                        allowNone
-                        noneLabel='Nenhum'
-                      />
-                    </div>
+                    <ComboboxSearch
+                      items={fornecedorItems}
+                      value={newPeca.fornecedor_id}
+                      onSelect={(value) =>
+                        setNewPeca({ ...newPeca, fornecedor_id: value })
+                      }
+                      placeholder='Selecione o fornecedor'
+                      searchPlaceholder='Buscar...'
+                      emptyMessage='Nada encontrado.'
+                      allowNone
+                      noneLabel='Nenhum'
+                      className='h-12'
+                    />
                   </div>
                 </div>
 
-                {/* Linha 4: Quantidade e Preço */}
                 <div className='grid grid-cols-2 gap-4'>
                   <div className='flex flex-col gap-2'>
                     <Label htmlFor='quantity' className='text-base'>
@@ -314,7 +302,6 @@ export function ModalPecas({
           </div>
         </div>
 
-        {/* Rodapé Fixo */}
         <div className='flex justify-end gap-4 p-6 border-t border-border bg-muted/20'>
           <Button
             type='button'
