@@ -1,5 +1,8 @@
-import type { FormEvent } from 'react';
+import type { ChangeEvent, FormEvent } from 'react';
 
+import Image from 'next/image';
+
+import { ComboboxSearch } from '@/components/combobox-search';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -10,18 +13,18 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
 import type { Categorias, Fornecedor, Peca } from '@/db/schema';
+
+import { CloudDownload, Trash2 } from 'lucide-react';
+
+interface ComboItem {
+  id: number;
+  label: string;
+}
 
 interface ModalPecasProps {
   editingPeca: Peca | null;
-  newPeca: Partial<Peca>;
+  newPeca: Partial<Peca> & { imagem?: string | null };
   setNewPeca: (data: Partial<Peca>) => void;
   isOpen: boolean;
   onSubmit: (e: FormEvent) => Promise<void>;
@@ -30,6 +33,12 @@ interface ModalPecasProps {
   fornecedores: Fornecedor[];
   handleOpenChange: (open: boolean) => void;
   trigger?: React.ReactNode;
+
+  // Novas props que vêm do hook usePecas
+  handleImageChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  handleRemoveImage: () => void;
+  categoryItems: ComboItem[];
+  fornecedorItems: ComboItem[];
 }
 
 export function ModalPecas({
@@ -39,267 +48,296 @@ export function ModalPecas({
   isOpen,
   onSubmit,
   isLoading,
-  categories,
-  fornecedores,
   handleOpenChange,
-  trigger
+  trigger,
+  // Recebendo as funções e dados prontos
+  handleImageChange,
+  handleRemoveImage,
+  categoryItems,
+  fornecedorItems
 }: ModalPecasProps) {
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className='bg-card border-border max-w-lg max-h-[90vh] overflow-y-auto'>
-        <DialogHeader>
-          <DialogTitle className='text-foreground'>
-            {editingPeca ? 'Editar Produto' : 'Adicionar Produto'}
+
+      <DialogContent className='bg-card border-border sm:max-w-5xl max-h-[90vh] overflow-y-auto p-0 gap-0'>
+        <DialogHeader className='p-6 pb-2 border-b border-border/10'>
+          <DialogTitle className='text-2xl font-bold text-foreground'>
+            {editingPeca ? 'Editar Produto' : 'Adicionar Novo Produto'}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={onSubmit} className='flex flex-col gap-4'>
-          <div className='flex gap-4'>
-            <div className='flex flex-col gap-2'>
-              <Label htmlFor='name'>Nome do produto</Label>
-              <Input
-                id='name'
-                value={newPeca.name_peca || ''}
-                onChange={(e) =>
-                  setNewPeca({ ...newPeca, name_peca: e.target.value })
-                }
-                className='bg-input border-border'
-                required
-              />
+
+        <div className='p-6'>
+          <div className='grid grid-cols-1 md:grid-cols-12 gap-8'>
+            {/* --- COLUNA ESQUERDA: IMAGEM --- */}
+            <div className='md:col-span-4 flex flex-col gap-3'>
+              <Label className='text-lg font-semibold'>Imagem do Produto</Label>
+
+              {newPeca.imagem ? (
+                <div className='relative flex flex-col items-center justify-center w-full h-64 md:h-full min-h-[250px] border-2 border-border rounded-xl overflow-hidden bg-black/5'>
+                  <Image
+                    src={newPeca.imagem}
+                    alt='Prévia do produto'
+                    fill
+                    className='object-contain'
+                    unoptimized
+                  />
+                  <Button
+                    type='button'
+                    variant='destructive'
+                    size='icon'
+                    className='absolute top-2 right-2 h-10 w-10 rounded-full shadow-md hover:scale-105 transition-transform'
+                    onClick={handleRemoveImage}
+                    title='Remover imagem'>
+                    <Trash2 className='h-5 w-5' />
+                  </Button>
+                </div>
+              ) : (
+                /* ESTADO 2: Sem Imagem (Upload) */
+                <label
+                  htmlFor='dropzone-file'
+                  className='flex flex-col items-center justify-center w-full h-64 md:h-full min-h-[250px] border-2 border-dashed rounded-xl cursor-pointer bg-muted/30 border-muted-foreground/30 hover:bg-muted/50 hover:border-primary transition-colors group'>
+                  <div className='flex flex-col items-center justify-center pt-5 pb-6 text-center px-4'>
+                    <CloudDownload className='w-16 h-16 text-muted-foreground mb-4 group-hover:text-primary transition-colors' />
+                    <p className='mb-2 text-base text-muted-foreground font-medium'>
+                      <span className='font-bold text-foreground'>
+                        Clique para adicionar foto
+                      </span>
+                    </p>
+                    <p className='text-xs text-muted-foreground'>(Opcional)</p>
+                  </div>
+                  <input
+                    id='dropzone-file'
+                    type='file'
+                    className='hidden'
+                    accept='image/*'
+                    onChange={handleImageChange}
+                  />
+                </label>
+              )}
             </div>
-            <div className='flex flex-col gap-2'>
-              <Label htmlFor='code'>Código do produto</Label>
-              <Input
-                id='code'
-                value={newPeca.codigo || ''}
-                onChange={(e) =>
-                  setNewPeca({ ...newPeca, codigo: e.target.value })
-                }
-                className='bg-input border-border'
-                required
-              />
+
+            {/* --- COLUNA DIREITA: FORMULÁRIO --- */}
+            <div className='md:col-span-8'>
+              <form
+                id='peca-form'
+                onSubmit={onSubmit}
+                className='flex flex-col gap-6'>
+                {/* Linha 1: Nome e Código */}
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                  <div className='md:col-span-2 flex flex-col gap-2'>
+                    <Label htmlFor='name' className='text-base'>
+                      Nome do produto
+                    </Label>
+                    <Input
+                      id='name'
+                      value={newPeca.name_peca || ''}
+                      onChange={(e) =>
+                        setNewPeca({ ...newPeca, name_peca: e.target.value })
+                      }
+                      className='bg-input border-border h-12 text-lg'
+                      required
+                    />
+                  </div>
+                  <div className='flex flex-col gap-2'>
+                    <Label htmlFor='code' className='text-base'>
+                      Código
+                    </Label>
+                    <Input
+                      id='code'
+                      value={newPeca.codigo || ''}
+                      onChange={(e) =>
+                        setNewPeca({ ...newPeca, codigo: e.target.value })
+                      }
+                      className='bg-input border-border h-12 text-lg'
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Linha 2: Localização */}
+                <div className='p-4 border rounded-lg bg-muted/10'>
+                  <h3 className='text-sm font-semibold text-muted-foreground mb-3'>
+                    Localização no Estoque
+                  </h3>
+                  <div className='grid grid-cols-2 gap-4'>
+                    <div className='flex flex-col gap-2'>
+                      <Label htmlFor='estante' className='text-base'>
+                        Estante
+                      </Label>
+                      <Input
+                        id='estante'
+                        value={
+                          Array.isArray(newPeca.localizacao)
+                            ? String(newPeca.localizacao[0] || '')
+                            : ''
+                        }
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          const prat = Array.isArray(newPeca.localizacao)
+                            ? newPeca.localizacao[1]
+                            : '';
+                          setNewPeca({
+                            ...newPeca,
+                            localizacao:
+                              val || prat ? [val, String(prat || '')] : null
+                          });
+                        }}
+                        className='bg-input border-border h-12 text-lg'
+                        placeholder='Ex: A1'
+                      />
+                    </div>
+                    <div className='flex flex-col gap-2'>
+                      <Label htmlFor='prateleira' className='text-base'>
+                        Prateleira
+                      </Label>
+                      <Input
+                        id='prateleira'
+                        value={
+                          Array.isArray(newPeca.localizacao)
+                            ? String(newPeca.localizacao[1] || '')
+                            : ''
+                        }
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          const est = Array.isArray(newPeca.localizacao)
+                            ? newPeca.localizacao[0]
+                            : '';
+                          setNewPeca({
+                            ...newPeca,
+                            localizacao:
+                              est || val ? [String(est || ''), val] : null
+                          });
+                        }}
+                        className='bg-input border-border h-12 text-lg'
+                        placeholder='Ex: 3'
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Linha 3: Comboboxes */}
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div className='flex flex-col gap-2'>
+                    <Label htmlFor='category' className='text-base'>
+                      Categoria
+                    </Label>
+                    <div className='h-12 flex items-center'>
+                      <ComboboxSearch
+                        items={categoryItems}
+                        value={newPeca.categoria_id}
+                        onSelect={(value) =>
+                          setNewPeca({
+                            ...newPeca,
+                            categoria_id: value ?? undefined
+                          })
+                        }
+                        placeholder='Selecione a categoria'
+                        searchPlaceholder='Buscar...'
+                        emptyMessage='Nada encontrado.'
+                      />
+                    </div>
+                  </div>
+                  <div className='flex flex-col gap-2'>
+                    <Label htmlFor='supplier' className='text-base'>
+                      Fornecedor
+                    </Label>
+                    <div className='h-12 flex items-center'>
+                      <ComboboxSearch
+                        items={fornecedorItems}
+                        value={newPeca.fornecedor_id}
+                        onSelect={(value) =>
+                          setNewPeca({ ...newPeca, fornecedor_id: value })
+                        }
+                        placeholder='Selecione o fornecedor'
+                        searchPlaceholder='Buscar...'
+                        emptyMessage='Nada encontrado.'
+                        allowNone
+                        noneLabel='Nenhum'
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Linha 4: Quantidade e Preço */}
+                <div className='grid grid-cols-2 gap-4'>
+                  <div className='flex flex-col gap-2'>
+                    <Label htmlFor='quantity' className='text-base'>
+                      Quantidade
+                    </Label>
+                    <Input
+                      id='quantity'
+                      type='number'
+                      value={newPeca.quantidade || ''}
+                      onChange={(e) =>
+                        setNewPeca({
+                          ...newPeca,
+                          quantidade: Number(e.target.value) || undefined
+                        })
+                      }
+                      placeholder='0'
+                      className='bg-input border-border h-12 text-lg font-mono'
+                    />
+                  </div>
+                  <div className='flex flex-col gap-2'>
+                    <Label htmlFor='price' className='text-base'>
+                      Preço (R$)
+                    </Label>
+                    <Input
+                      id='price'
+                      inputMode='decimal'
+                      value={
+                        newPeca.preco
+                          ? (newPeca.preco / 100).toString().replace('.', ',')
+                          : ''
+                      }
+                      onChange={(e) => {
+                        const raw = e.target.value
+                          .replace(/[^\d,]/g, '')
+                          .replace(',', '.');
+                        const num = parseFloat(raw);
+                        if (!isNaN(num))
+                          setNewPeca({
+                            ...newPeca,
+                            preco: Math.round(num * 100)
+                          });
+                        else if (raw === '')
+                          setNewPeca({ ...newPeca, preco: undefined });
+                      }}
+                      placeholder='0,00'
+                      className='bg-input border-border h-12 text-lg font-mono'
+                    />
+                  </div>
+                </div>
+              </form>
             </div>
           </div>
+        </div>
 
-          <div className='flex gap-4'>
-            <div className='flex flex-col gap-2'>
-              <Label htmlFor='estante'>Estante</Label>
-              <Input
-                id='estante'
-                type='text'
-                value={
-                  Array.isArray(newPeca.localizacao) &&
-                  newPeca.localizacao.length > 0 &&
-                  newPeca.localizacao[0] !== null &&
-                  newPeca.localizacao[0] !== undefined
-                    ? String(newPeca.localizacao[0])
-                    : ''
-                }
-                onChange={(e) => {
-                  const estanteValue = e.target.value.trim();
-                  const prateleira =
-                    Array.isArray(newPeca.localizacao) &&
-                    newPeca.localizacao.length > 1 &&
-                    newPeca.localizacao[1] !== null &&
-                    newPeca.localizacao[1] !== undefined
-                      ? String(newPeca.localizacao[1])
-                      : '';
-                  setNewPeca({
-                    ...newPeca,
-                    localizacao:
-                      estanteValue || prateleira
-                        ? [estanteValue, prateleira]
-                        : null
-                  });
-                }}
-                className='bg-input border-border'
-                placeholder='Ex: 1, A1, E-2'
-              />
-            </div>
-            <div className='flex flex-col gap-2'>
-              <Label htmlFor='prateleira'>Prateleira</Label>
-              <Input
-                id='prateleira'
-                type='text'
-                value={
-                  Array.isArray(newPeca.localizacao) &&
-                  newPeca.localizacao.length > 1 &&
-                  newPeca.localizacao[1] !== null &&
-                  newPeca.localizacao[1] !== undefined
-                    ? String(newPeca.localizacao[1])
-                    : ''
-                }
-                onChange={(e) => {
-                  const prateleiraValue = e.target.value.trim();
-                  const estante =
-                    Array.isArray(newPeca.localizacao) &&
-                    newPeca.localizacao.length > 0 &&
-                    newPeca.localizacao[0] !== null &&
-                    newPeca.localizacao[0] !== undefined
-                      ? String(newPeca.localizacao[0])
-                      : '';
-                  setNewPeca({
-                    ...newPeca,
-                    localizacao:
-                      estante || prateleiraValue
-                        ? [estante, prateleiraValue]
-                        : null
-                  });
-                }}
-                className='bg-input border-border'
-                placeholder='Ex: 2, B3, P-5'
-              />
-            </div>
-          </div>
-
-          <div className='flex gap-4'>
-            <div className='flex flex-col gap-2'>
-              <Label htmlFor='category'>Categoria</Label>
-              <Select
-                value={newPeca.categoria_id?.toString() || ''}
-                onValueChange={(value) =>
-                  setNewPeca({
-                    ...newPeca,
-                    categoria_id: Number.parseInt(value) || undefined
-                  })
-                }>
-                <SelectTrigger className='bg-input border-border'>
-                  <SelectValue placeholder='Selecione' />
-                </SelectTrigger>
-                <SelectContent className='bg-popover border-border'>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id.toString()}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className='flex flex-col gap-2'>
-              <Label htmlFor='supplier'>Fornecedor</Label>
-              <Select
-                value={
-                  newPeca.fornecedor_id === null
-                    ? 'none'
-                    : newPeca.fornecedor_id
-                      ? newPeca.fornecedor_id.toString()
-                      : undefined
-                }
-                onValueChange={(value) =>
-                  setNewPeca({
-                    ...newPeca,
-                    fornecedor_id:
-                      value === 'none' ? null : Number.parseInt(value)
-                  })
-                }>
-                <SelectTrigger className='bg-input border-border'>
-                  <SelectValue placeholder='Selecione' />
-                </SelectTrigger>
-                <SelectContent className='bg-popover border-border'>
-                  <SelectItem value='none'>Nenhum</SelectItem>
-                  {fornecedores.map((fornecedor) => (
-                    <SelectItem
-                      key={fornecedor.id}
-                      value={fornecedor.id.toString()}>
-                      {fornecedor.name_empresa}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className='flex gap-4'>
-            <div className='flex flex-col gap-2'>
-              <Label htmlFor='quantity'>Quantidade</Label>
-              <Input
-                id='quantity'
-                type='number'
-                value={newPeca.quantidade || ''}
-                onChange={(e) =>
-                  setNewPeca({
-                    ...newPeca,
-                    quantidade:
-                      e.target.value === ''
-                        ? undefined
-                        : Number.parseInt(e.target.value) || undefined
-                  })
-                }
-                placeholder='Ex: 10'
-                className='bg-input border-border [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
-              />
-            </div>
-            <div className='flex flex-col gap-2'>
-              <Label htmlFor='price'>Preço (R$)</Label>
-              <Input
-                id='price'
-                type='text'
-                inputMode='decimal'
-                value={
-                  newPeca.preco && newPeca.preco > 0
-                    ? (newPeca.preco / 100).toString()
-                    : ''
-                }
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value === '') {
-                    setNewPeca({
-                      ...newPeca,
-                      preco: undefined
-                    });
-                    return;
-                  }
-
-                  // Remove caracteres não numéricos exceto ponto e vírgula
-                  const cleanValue = value
-                    .replace(/[^\d.,]/g, '')
-                    .replace(',', '.');
-
-                  // Permite apenas um ponto decimal
-                  const parts = cleanValue.split('.');
-                  const formattedValue =
-                    parts.length > 2
-                      ? parts[0] + '.' + parts.slice(1).join('')
-                      : cleanValue;
-
-                  if (formattedValue === '' || formattedValue === '.') {
-                    setNewPeca({
-                      ...newPeca,
-                      preco: undefined
-                    });
-                    return;
-                  }
-
-                  const numValue = Number.parseFloat(formattedValue);
-                  if (!isNaN(numValue) && numValue >= 0) {
-                    setNewPeca({
-                      ...newPeca,
-                      preco: Math.round(numValue * 100)
-                    });
-                  }
-                }}
-                placeholder='Ex: 25.50'
-                className='bg-input border-border'
-              />
-            </div>
-          </div>
-
-          <div className='flex justify-end gap-2 pt-4'>
-            <Button
-              type='button'
-              variant='outline'
-              onClick={() => handleOpenChange(false)}
-              disabled={isLoading}>
-              Cancelar
-            </Button>
-            <Button
-              type='submit'
-              className='bg-primary text-primary-foreground'
-              disabled={isLoading}>
-              {isLoading ? 'Salvando...' : editingPeca ? 'Salvar' : 'Adicionar'}
-            </Button>
-          </div>
-        </form>
+        {/* Rodapé Fixo */}
+        <div className='flex justify-end gap-4 p-6 border-t border-border bg-muted/20'>
+          <Button
+            type='button'
+            variant='outline'
+            size='lg'
+            onClick={() => handleOpenChange(false)}
+            disabled={isLoading}
+            className='text-base'>
+            Cancelar
+          </Button>
+          <Button
+            type='submit'
+            form='peca-form'
+            size='lg'
+            className='bg-primary text-primary-foreground text-base px-8'
+            disabled={isLoading}>
+            {isLoading
+              ? 'Salvando...'
+              : editingPeca
+                ? 'Salvar Alterações'
+                : 'Adicionar Produto'}
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );
