@@ -50,7 +50,11 @@ export default function Products() {
     getCategoryName,
     getFornecedorName,
     formatPrice,
-    handleOpenChange
+    handleOpenChange,
+    handleImageChange,
+    handleRemoveImage,
+    categoryItems,
+    fornecedorItems
   } = usePecas();
 
   return (
@@ -74,6 +78,10 @@ export default function Products() {
           categories={categories}
           fornecedores={fornecedores}
           handleOpenChange={handleOpenChange}
+          handleImageChange={handleImageChange}
+          handleRemoveImage={handleRemoveImage}
+          categoryItems={categoryItems}
+          fornecedorItems={fornecedorItems}
           trigger={
             <Button className='bg-primary text-primary-foreground hover:bg-primary/90'>
               <Plus className='mr-2 h-4 w-4' />

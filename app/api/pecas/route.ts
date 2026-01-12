@@ -33,7 +33,8 @@ export async function POST(request: Request) {
         quantidade: data.quantidade,
         preco: data.preco,
         fornecedor_id: data.fornecedor_id,
-        localizacao: data.localizacao
+        localizacao: data.localizacao,
+        imagem: data.imagem || null
       })
       .returning();
 

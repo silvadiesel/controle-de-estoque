@@ -1,4 +1,4 @@
-import type { FormEvent } from 'react';
+import type { ChangeEvent, FormEvent } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 
 import { pecaSchema } from '@/app/utils/validators';
@@ -6,6 +6,11 @@ import type { Categorias, Fornecedor, Peca } from '@/db/schema';
 
 import { toast } from 'sonner';
 import { ZodError } from 'zod';
+
+interface ComboItem {
+  id: number;
+  label: string;
+}
 
 export interface UsePecasReturn {
   pecas: Peca[];
@@ -38,6 +43,10 @@ export interface UsePecasReturn {
   formatPrice: (price: number) => string;
   formatLocalizacao: (localizacao: string[] | null | undefined) => string;
   handleOpenChange: (open: boolean) => void;
+  handleImageChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  handleRemoveImage: () => void;
+  categoryItems: ComboItem[];
+  fornecedorItems: ComboItem[];
 }
 
 const pecaVazia: Partial<Peca> = {
@@ -47,7 +56,8 @@ const pecaVazia: Partial<Peca> = {
   quantidade: 0,
   preco: 0,
   fornecedor_id: null,
-  localizacao: null
+  localizacao: null,
+  imagem: null
 };
 
 export function usePecas(): UsePecasReturn {
@@ -68,28 +78,12 @@ export function usePecas(): UsePecasReturn {
     setIsLoading(true);
     try {
       const res = await fetch('/api/pecas');
-
-      if (!res.ok) {
-        throw new Error(`Erro ${res.status}: ${res.statusText}`);
-      }
-
-      const contentType = res.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('Resposta não é JSON válido');
-      }
-
+      if (!res.ok) throw new Error(`Erro ${res.status}`);
       const data: Peca[] = await res.json();
 
       setPecas(
         data.map((item) => ({
-          id: item.id,
-          name_peca: item.name_peca,
-          codigo: item.codigo,
-          categoria_id: item.categoria_id,
-          quantidade: item.quantidade,
-          preco: item.preco,
-          fornecedor_id: item.fornecedor_id,
-          localizacao: item.localizacao,
+          ...item,
           data_cadastro: item.data_cadastro
             ? new Date(item.data_cadastro)
             : null
@@ -108,7 +102,6 @@ export function usePecas(): UsePecasReturn {
     fetchPecas();
   }, [fetchPecas]);
 
-  // Buscar categorias e fornecedores
   useEffect(() => {
     fetch('/api/categorias')
       .then((res) => res.json())
@@ -122,6 +115,16 @@ export function usePecas(): UsePecasReturn {
       .then((data) => setFornecedores(data))
       .catch(console.error);
   }, []);
+
+  const categoryItems = categories.map((cat) => ({
+    id: cat.id,
+    label: cat.name
+  }));
+
+  const fornecedorItems = fornecedores.map((f) => ({
+    id: f.id,
+    label: f.name_empresa
+  }));
 
   // Filtered pecas
   const filteredPecas = pecas.filter(
@@ -138,6 +141,27 @@ export function usePecas(): UsePecasReturn {
     return matchesCategory;
   });
 
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        // Atualiza o estado newPeca com a string Base64
+        setNewPeca((prev) => ({
+          ...prev,
+          imagem: reader.result as string
+        }));
+      };
+
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setNewPeca((prev) => ({ ...prev, imagem: null }));
+  };
+
   // POST: Criar
   const createPeca = async (data: Partial<Peca>) => {
     const res = await fetch('/api/pecas', {
@@ -152,7 +176,8 @@ export function usePecas(): UsePecasReturn {
         quantidade: data.quantidade,
         preco: data.preco,
         fornecedor_id: data.fornecedor_id,
-        localizacao: data.localizacao
+        localizacao: data.localizacao,
+        imagem: data.imagem
       })
     });
     if (res.ok) await fetchPecas();
@@ -173,7 +198,8 @@ export function usePecas(): UsePecasReturn {
         quantidade: data.quantidade,
         preco: data.preco,
         fornecedor_id: data.fornecedor_id,
-        localizacao: data.localizacao
+        localizacao: data.localizacao,
+        imagem: data.imagem
       })
     });
     if (res.ok) await fetchPecas();
@@ -213,9 +239,9 @@ export function usePecas(): UsePecasReturn {
 
     setIsLoading(true);
     try {
-      pecaSchema.parse(editingPeca);
+      pecaSchema.parse(newPeca);
 
-      await updatePeca(editingPeca.id, editingPeca);
+      await updatePeca(editingPeca.id, newPeca);
       setEditingPeca(null);
       setIsAddOpen(false);
       toast.success('Peça atualizada com sucesso!');
@@ -264,7 +290,8 @@ export function usePecas(): UsePecasReturn {
       quantidade: peca.quantidade,
       preco: peca.preco,
       fornecedor_id: peca.fornecedor_id,
-      localizacao: peca.localizacao
+      localizacao: peca.localizacao,
+      imagem: peca.imagem || null
     });
     setIsAddOpen(true);
   };
@@ -333,6 +360,10 @@ export function usePecas(): UsePecasReturn {
     getFornecedorName,
     formatPrice,
     formatLocalizacao,
-    handleOpenChange
+    handleOpenChange,
+    handleImageChange,
+    handleRemoveImage,
+    categoryItems,
+    fornecedorItems
   };
 }
