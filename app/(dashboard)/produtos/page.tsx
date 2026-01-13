@@ -44,7 +44,6 @@ export default function Products() {
     isDeleteOpen,
     setIsDeleteOpen,
     categories,
-    fornecedores,
     categoryFilter,
     setCategoryFilter,
     getCategoryName,
@@ -54,7 +53,9 @@ export default function Products() {
     handleImageChange,
     handleRemoveImage,
     categoryItems,
-    fornecedorItems
+    fornecedorItems,
+    precoInput,
+    handlePrecoChange
   } = usePecas();
 
   return (
@@ -75,13 +76,13 @@ export default function Products() {
           isOpen={isAddOpen}
           onSubmit={handleSubmit}
           isLoading={isLoading}
-          categories={categories}
-          fornecedores={fornecedores}
           handleOpenChange={handleOpenChange}
           handleImageChange={handleImageChange}
           handleRemoveImage={handleRemoveImage}
           categoryItems={categoryItems}
           fornecedorItems={fornecedorItems}
+          precoInput={precoInput}
+          handlePrecoChange={handlePrecoChange}
           trigger={
             <Button className='bg-primary text-primary-foreground hover:bg-primary/90'>
               <Plus className='mr-2 h-4 w-4' />

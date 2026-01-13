@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import type { Categorias, Fornecedor, Peca } from '@/db/schema';
+import type { Peca } from '@/db/schema';
 
 import { CloudDownload, Trash2 } from 'lucide-react';
 
@@ -29,14 +29,14 @@ interface ModalPecasProps {
   isOpen: boolean;
   onSubmit: (e: FormEvent) => Promise<void>;
   isLoading: boolean;
-  categories: Categorias[];
-  fornecedores: Fornecedor[];
   handleOpenChange: (open: boolean) => void;
   trigger?: React.ReactNode;
   handleImageChange: (e: ChangeEvent<HTMLInputElement>) => void;
   handleRemoveImage: () => void;
   categoryItems: ComboItem[];
   fornecedorItems: ComboItem[];
+  precoInput: string;
+  handlePrecoChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
 export function ModalPecas({
@@ -51,7 +51,9 @@ export function ModalPecas({
   handleImageChange,
   handleRemoveImage,
   categoryItems,
-  fornecedorItems
+  fornecedorItems,
+  precoInput,
+  handlePrecoChange
 }: ModalPecasProps) {
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
@@ -274,24 +276,8 @@ export function ModalPecas({
                     <Input
                       id='price'
                       inputMode='decimal'
-                      value={
-                        newPeca.preco
-                          ? (newPeca.preco / 100).toString().replace('.', ',')
-                          : ''
-                      }
-                      onChange={(e) => {
-                        const raw = e.target.value
-                          .replace(/[^\d,]/g, '')
-                          .replace(',', '.');
-                        const num = parseFloat(raw);
-                        if (!isNaN(num))
-                          setNewPeca({
-                            ...newPeca,
-                            preco: Math.round(num * 100)
-                          });
-                        else if (raw === '')
-                          setNewPeca({ ...newPeca, preco: undefined });
-                      }}
+                      value={precoInput}
+                      onChange={handlePrecoChange}
                       placeholder='0,00'
                       className='bg-input border-border h-12 text-lg font-mono'
                     />
