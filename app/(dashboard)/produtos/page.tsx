@@ -34,8 +34,11 @@ export default function Products() {
     isDeleteOpen,
     setIsDeleteOpen,
     categories,
+    fornecedores,
     categoryFilter,
     setCategoryFilter,
+    fornecedorFilter,
+    setFornecedorFilter,
     getCategoryName,
     getFornecedorName,
     formatPrice,
@@ -50,9 +53,7 @@ export default function Products() {
 
   return (
     <div className='flex flex-1 flex-col gap-8 p-4 lg:p-8 min-h-screen'>
-      {/* Header + Filtros Compactos */}
       <div className='flex flex-col gap-6'>
-        {/* Título e Botão Novo */}
         <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
           <div>
             <h2 className='text-3xl font-bold text-foreground tracking-tight'>
@@ -84,7 +85,6 @@ export default function Products() {
           />
         </div>
 
-        {/* Filtros Limpos (Sem Card em volta) */}
         <div className='flex flex-col sm:flex-row gap-3 items-start sm:items-center'>
           <div className='relative w-full sm:max-w-md'>
             <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
@@ -109,10 +109,23 @@ export default function Products() {
               ))}
             </SelectContent>
           </Select>
+
+          <Select value={fornecedorFilter} onValueChange={setFornecedorFilter}>
+            <SelectTrigger className='w-full sm:w-[200px] bg-card border-border h-10 shadow-sm'>
+              <SelectValue placeholder='Fornecedor' />
+            </SelectTrigger>
+            <SelectContent className='bg-popover border-border'>
+              <SelectItem value='all'>Todos os fornecedores</SelectItem>
+              {fornecedores.map((f) => (
+                <SelectItem key={f.id} value={f.id.toString()}>
+                  {f.name_empresa}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
-      {/* Grid de Produtos Largos */}
       <div className='flex-1'>
         {isLoading ? (
           <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4'>
@@ -132,7 +145,6 @@ export default function Products() {
             <p className='text-sm text-muted-foreground'>Tente outra busca.</p>
           </div>
         ) : (
-          /* GRID RESPONSIVO: 1 coluna no mobile, 2 colunas em telas grandes */
           <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 pb-10'>
             {filteredProducts.map((peca) => (
               <CardPecas
