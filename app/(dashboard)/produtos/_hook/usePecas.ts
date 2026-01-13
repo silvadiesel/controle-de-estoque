@@ -47,6 +47,8 @@ export interface UsePecasReturn {
   handleRemoveImage: () => void;
   categoryItems: ComboItem[];
   fornecedorItems: ComboItem[];
+  precoInput: string;
+  handlePrecoChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
 const pecaVazia: Partial<Peca> = {
@@ -72,6 +74,7 @@ export function usePecas(): UsePecasReturn {
   const [categories, setCategories] = useState<Categorias[]>([]);
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [precoInput, setPrecoInput] = useState('');
 
   // GET: Listar
   const fetchPecas = useCallback(async () => {
@@ -330,6 +333,39 @@ export function usePecas(): UsePecasReturn {
     }
   }, []);
 
+  useEffect(() => {
+    if (isAddOpen) {
+      const initialValue = newPeca.preco
+        ? (newPeca.preco / 100).toString().replace('.', ',')
+        : '';
+      setPrecoInput(initialValue);
+    } else {
+      setPrecoInput('');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAddOpen, editingPeca?.id]);
+
+  const handlePrecoChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value;
+    const sanitized = input.replace(/[^\d.,]/g, '');
+    const parts = sanitized.split(/[.,]/);
+    const formatted =
+      parts.length > 2
+        ? parts[0] + ',' + parts.slice(1).join('')
+        : sanitized.replace('.', ',');
+
+    setPrecoInput(formatted);
+
+    const normalized = formatted.replace(',', '.');
+    const num = parseFloat(normalized);
+
+    if (!isNaN(num)) {
+      setNewPeca({ ...newPeca, preco: Math.round(num * 100) });
+    } else if (formatted === '') {
+      setNewPeca({ ...newPeca, preco: undefined });
+    }
+  };
+
   return {
     pecas,
     isLoading,
@@ -364,6 +400,8 @@ export function usePecas(): UsePecasReturn {
     handleImageChange,
     handleRemoveImage,
     categoryItems,
-    fornecedorItems
+    fornecedorItems,
+    precoInput,
+    handlePrecoChange
   };
 }
