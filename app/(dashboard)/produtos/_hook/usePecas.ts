@@ -38,6 +38,8 @@ export interface UsePecasReturn {
   fornecedores: Fornecedor[];
   categoryFilter: string;
   setCategoryFilter: (filter: string) => void;
+  fornecedorFilter: string;
+  setFornecedorFilter: (filter: string) => void;
   getCategoryName: (categoriaId?: number | null) => string;
   getFornecedorName: (fornecedorId?: number | null) => string;
   formatPrice: (price: number) => string;
@@ -74,6 +76,7 @@ export function usePecas(): UsePecasReturn {
   const [categories, setCategories] = useState<Categorias[]>([]);
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [fornecedorFilter, setFornecedorFilter] = useState<string>('all');
   const [precoInput, setPrecoInput] = useState('');
 
   // GET: Listar
@@ -136,12 +139,14 @@ export function usePecas(): UsePecasReturn {
       peca.codigo.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Filtered products (com filtro de categoria)
   const filteredProducts = filteredPecas.filter((peca) => {
     const matchesCategory =
       categoryFilter === 'all' ||
       peca.categoria_id?.toString() === categoryFilter;
-    return matchesCategory;
+    const matchesFornecedor =
+      fornecedorFilter === 'all' ||
+      peca.fornecedor_id?.toString() === fornecedorFilter;
+    return matchesCategory && matchesFornecedor;
   });
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -150,7 +155,6 @@ export function usePecas(): UsePecasReturn {
       const reader = new FileReader();
 
       reader.onloadend = () => {
-        // Atualiza o estado newPeca com a string Base64
         setNewPeca((prev) => ({
           ...prev,
           imagem: reader.result as string
@@ -392,6 +396,8 @@ export function usePecas(): UsePecasReturn {
     fornecedores,
     categoryFilter,
     setCategoryFilter,
+    fornecedorFilter,
+    setFornecedorFilter,
     getCategoryName,
     getFornecedorName,
     formatPrice,

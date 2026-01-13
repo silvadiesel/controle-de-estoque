@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/tooltip';
 import type { Peca } from '@/db/schema';
 
-import { Edit, Layers, MapPin, Package, Trash2, Truck } from 'lucide-react';
+import { Edit, Layers, MapPin, Trash2, Truck } from 'lucide-react';
 
 interface CardPecasProps {
   peca: Peca;
@@ -35,26 +35,15 @@ export function CardPecas({
     : null;
   return (
     <Card className='group overflow-hidden flex flex-col sm:flex-row hover:border-primary/50 bg-card border-border'>
-      {/* LADO ESQUERDO: Imagem (Largura fixa ou proporcional) */}
       <div className='relative w-full sm:w-48 h-48 sm:h-auto bg-muted/20 border-b sm:border-b-0 sm:border-r border-border shrink-0'>
-        {peca.imagem ? (
-          <Image
-            src={peca.imagem}
-            alt={peca.name_peca}
-            fill
-            className='object-contain p-3'
-            unoptimized
-          />
-        ) : (
-          <div className='flex flex-col items-center justify-center h-full text-muted-foreground gap-2'>
-            <Package className='h-10 w-10 opacity-20' />
-            <span className='text-[10px] font-medium opacity-40 uppercase tracking-wide'>
-              Sem foto
-            </span>
-          </div>
-        )}
+        <Image
+          src={peca.imagem || '/img/fallback-peca.png'}
+          alt={peca.name_peca}
+          fill
+          className='object-contain p-3'
+          unoptimized
+        />
 
-        {/* Badge de Quantidade Flutuante */}
         <div className='absolute top-2 left-2'>
           <Badge
             variant={peca.quantidade > 0 ? 'secondary' : 'destructive'}
@@ -64,7 +53,6 @@ export function CardPecas({
         </div>
       </div>
 
-      {/* LADO DIREITO: Informações */}
       <div className='flex-col flex-1 p-4 justify-between flex gap-4'>
         <div className='flex flex-col justify-between items-start gap-2'>
           <div>
@@ -80,7 +68,6 @@ export function CardPecas({
           </h3>
         </div>
 
-        {/* Grade de Detalhes Compacta */}
         <div className='flex flex-col gap-2 text-sm text-muted-foreground'>
           <div className='flex items-center gap-2'>
             <Tooltip>
@@ -114,7 +101,6 @@ export function CardPecas({
           </div>
         </div>
 
-        {/* Ações */}
         <div className='flex gap-2 mt-1 pt-3 border-t border-border/50'>
           <Button
             variant='outline'
