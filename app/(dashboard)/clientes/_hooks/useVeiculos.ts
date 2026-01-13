@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { veiculoSchema } from '@/app/utils/validators';
 import type { Veiculo } from '@/db/schema';
@@ -11,6 +11,7 @@ import { ZodError } from 'zod';
 export interface UseVeiculosReturn {
   veiculosByCliente: Map<number, Veiculo[]>;
   loadingClientes: Set<number>;
+  isInitialLoading: boolean;
   isAddOpen: boolean;
   setIsAddOpen: (isOpen: boolean) => void;
   editingVeiculo: Veiculo | null;
@@ -45,6 +46,7 @@ export function useVeiculos(): UseVeiculosReturn {
   const [loadingClientes, setLoadingClientes] = useState<Set<number>>(
     new Set()
   );
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingVeiculo, setEditingVeiculo] = useState<Veiculo | null>(null);
   const [newVeiculo, setNewVeiculo] = useState<Partial<Veiculo>>(veiculoVazio);
@@ -52,6 +54,35 @@ export function useVeiculos(): UseVeiculosReturn {
   const [deleteVeiculoId, setDeleteVeiculoId] = useState<number | null>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Buscar TODOS os veículos ao inicializar e agrupar por cliente_id
+  const fetchAllVeiculos = useCallback(async () => {
+    setIsInitialLoading(true);
+    try {
+      const res = await fetch('/api/veiculos');
+      const data: Veiculo[] = await res.json();
+
+      // Agrupar por cliente_id
+      const grouped = new Map<number, Veiculo[]>();
+      data.forEach((veiculo) => {
+        if (veiculo.cliente_id) {
+          const existing = grouped.get(veiculo.cliente_id) || [];
+          grouped.set(veiculo.cliente_id, [...existing, veiculo]);
+        }
+      });
+
+      setVeiculosByCliente(grouped);
+    } catch (error) {
+      console.error('Erro ao buscar veículos:', error);
+    } finally {
+      setIsInitialLoading(false);
+    }
+  }, []);
+
+  // Carregar todos os veículos ao montar o componente
+  useEffect(() => {
+    fetchAllVeiculos();
+  }, [fetchAllVeiculos]);
 
   // GET: Buscar veículos de um cliente
   const fetchVeiculosByCliente = useCallback(async (clienteId: number) => {
@@ -203,6 +234,7 @@ export function useVeiculos(): UseVeiculosReturn {
   return {
     veiculosByCliente,
     loadingClientes,
+    isInitialLoading,
     isAddOpen,
     setIsAddOpen,
     editingVeiculo,

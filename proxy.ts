@@ -6,7 +6,7 @@ const publicRoutes = ['/login', '/register'];
 // Rotas da API de autenticação
 const authApiRoutes = ['/api/auth'];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Permitir rotas da API de autenticação
