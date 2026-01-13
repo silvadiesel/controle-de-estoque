@@ -198,3 +198,26 @@ export const veiculoSchema = z.object({
       message: 'Modelo não pode ser vazio'
     })
 });
+
+export const pecaSchema = z.object({
+  name_peca: z
+    .string()
+    .min(1, 'Nome da peça é obrigatório')
+    .refine((name) => name.trim().length > 0, {
+      message: 'Nome não pode ser vazio'
+    }),
+  codigo: z
+    .string()
+    .min(1, 'Código é obrigatório')
+    .refine((code) => code.trim().length > 0, {
+      message: 'Código não pode ser vazio'
+    }),
+  categoria_id: z.number().min(1, 'Categoria é obrigatória'),
+  quantidade: z
+    .number()
+    .min(0, 'Quantidade não pode ser negativa')
+    .int('Quantidade deve ser um número inteiro'),
+  preco: z.number().min(0, 'Preço não pode ser negativo'),
+  fornecedor_id: z.number().optional().nullable(),
+  localizacao: z.array(z.string()).optional().nullable()
+});
