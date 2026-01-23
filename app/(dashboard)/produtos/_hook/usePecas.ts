@@ -61,7 +61,8 @@ const pecaVazia: Partial<Peca> = {
   preco: 0,
   fornecedor_id: null,
   localizacao: null,
-  imagem: null
+  imagem: null,
+  alerta: undefined
 };
 
 export function usePecas(): UsePecasReturn {
@@ -83,7 +84,7 @@ export function usePecas(): UsePecasReturn {
   const fetchPecas = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/pecas');
+      const res = await fetch('/api/produtos');
       if (!res.ok) throw new Error(`Erro ${res.status}`);
       const data: Peca[] = await res.json();
 
@@ -171,7 +172,7 @@ export function usePecas(): UsePecasReturn {
 
   // POST: Criar
   const createPeca = async (data: Partial<Peca>) => {
-    const res = await fetch('/api/pecas', {
+    const res = await fetch('/api/produtos', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -184,7 +185,8 @@ export function usePecas(): UsePecasReturn {
         preco: data.preco,
         fornecedor_id: data.fornecedor_id,
         localizacao: data.localizacao,
-        imagem: data.imagem
+        imagem: data.imagem,
+        alerta: data.alerta ?? 1
       })
     });
     if (res.ok) await fetchPecas();
@@ -193,7 +195,7 @@ export function usePecas(): UsePecasReturn {
 
   // PUT: Editar
   const updatePeca = async (id: number, data: Partial<Peca>) => {
-    const res = await fetch(`/api/pecas/${id}`, {
+    const res = await fetch(`/api/produtos/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -206,7 +208,8 @@ export function usePecas(): UsePecasReturn {
         preco: data.preco,
         fornecedor_id: data.fornecedor_id,
         localizacao: data.localizacao,
-        imagem: data.imagem
+        imagem: data.imagem,
+        alerta: data.alerta ?? 1
       })
     });
     if (res.ok) await fetchPecas();
@@ -215,7 +218,7 @@ export function usePecas(): UsePecasReturn {
 
   // DELETE: Remover
   const deletePeca = async (id: number) => {
-    const res = await fetch(`/api/pecas/${id}`, { method: 'DELETE' });
+    const res = await fetch(`/api/produtos/${id}`, { method: 'DELETE' });
     if (res.ok) await fetchPecas();
     else throw new Error('Erro ao deletar peça');
   };
@@ -298,7 +301,8 @@ export function usePecas(): UsePecasReturn {
       preco: peca.preco,
       fornecedor_id: peca.fornecedor_id,
       localizacao: peca.localizacao,
-      imagem: peca.imagem || null
+      imagem: peca.imagem || null,
+      alerta: peca.alerta ?? 1
     });
     setIsAddOpen(true);
   };

@@ -12,7 +12,8 @@ export const pecas = pgTable('pecas', {
   preco: integer('preco').notNull(),
   fornecedor_id: integer('fornecedor_id').references(() => fornecedor.id),
   localizacao: text('localizacao').array(),
-  imagem: text('imagem')
+  imagem: text('imagem'),
+  alerta: integer('alerta').notNull().default(1)
 });
 
 export type Peca = typeof pecas.$inferSelect;

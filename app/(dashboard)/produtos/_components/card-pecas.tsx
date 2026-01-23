@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/tooltip';
 import type { Peca } from '@/db/schema';
 
-import { Edit, Layers, MapPin, Trash2, Truck } from 'lucide-react';
+import { Edit, Layers, MapPin, Trash2, Truck, Wrench } from 'lucide-react';
 
 interface CardPecasProps {
   peca: Peca;
@@ -36,20 +36,33 @@ export function CardPecas({
   return (
     <Card className='group overflow-hidden flex flex-col sm:flex-row hover:border-primary/50 bg-card border-border'>
       <div className='relative w-full sm:w-48 h-48 sm:h-auto bg-muted/20 border-b sm:border-b-0 sm:border-r border-border shrink-0'>
-        <Image
-          src={peca.imagem || '/img/fallback-peca.png'}
-          alt={peca.name_peca}
-          fill
-          className='object-contain p-3'
-          unoptimized
-        />
+        {peca.imagem ? (
+          <Image
+            src={peca.imagem}
+            alt={peca.name_peca}
+            fill
+            className='object-contain p-3'
+            unoptimized
+          />
+        ) : (
+          <div className='absolute inset-0 bg-muted m-3 flex items-center justify-center'>
+            <Wrench className='h-20 w-20 text-muted-foreground/50' />
+          </div>
+        )}
 
-        <div className='absolute top-2 left-2'>
+        <div className='absolute top-2 left-2 flex flex-col gap-1'>
           <Badge
             variant={peca.quantidade > 0 ? 'secondary' : 'destructive'}
             className='font-bold shadow-sm text-xs bg-background/80 backdrop-blur-sm border-border'>
             {peca.quantidade} un.
           </Badge>
+          {peca.quantidade <= (peca.alerta ?? 1) && (
+            <Badge
+              variant='destructive'
+              className='font-bold shadow-sm text-xs bg-destructive/90 backdrop-blur-sm border-border'>
+              ⚠️ Estoque Baixo
+            </Badge>
+          )}
         </div>
       </div>
 
@@ -95,7 +108,7 @@ export function CardPecas({
               )}
             </span>
           </div>
-          <div className='flex items-center gap-2 text-sm text-muted-foreground/70 truncate mt-1'>
+          <div className='flex items-center gap-2 text-sm truncate mt-1'>
             <Truck className='h-4 w-4 text-primary/60' />
             <span>Fornecedor: {supplierName}</span>
           </div>
