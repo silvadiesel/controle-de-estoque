@@ -34,7 +34,8 @@ export async function POST(request: Request) {
         preco: data.preco,
         fornecedor_id: data.fornecedor_id,
         localizacao: data.localizacao,
-        imagem: data.imagem || null
+        imagem: data.imagem || null,
+        alerta: data.alerta ?? 1
       })
       .returning();
 

@@ -34,7 +34,8 @@ export async function PUT(request: Request, { params }: Params) {
       preco: data.preco,
       fornecedor_id: data.fornecedor_id,
       localizacao: data.localizacao,
-      imagem: data.imagem
+      imagem: data.imagem,
+      alerta: data.alerta ?? 1
     })
     .where(eq(schema.pecas.id, id))
     .returning();
