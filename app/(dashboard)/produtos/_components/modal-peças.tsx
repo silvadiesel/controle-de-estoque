@@ -283,6 +283,32 @@ export function ModalPecas({
                     />
                   </div>
                 </div>
+
+                <div className='flex flex-col gap-2'>
+                  <Label htmlFor='alerta' className='text-base'>
+                    Quantidade para Alerta
+                  </Label>
+                  <Input
+                    id='alerta'
+                    type='number'
+                    value={newPeca.alerta ?? ''}
+                    onChange={(e) =>
+                      setNewPeca({
+                        ...newPeca,
+                        alerta: e.target.value
+                          ? Number(e.target.value)
+                          : undefined
+                      })
+                    }
+                    placeholder='1'
+                    min='0'
+                    className='bg-input border-border h-12 text-lg font-mono'
+                  />
+                  <p className='text-sm text-muted-foreground'>
+                    Alerta será exibido quando a quantidade estiver abaixo deste
+                    valor
+                  </p>
+                </div>
               </form>
             </div>
           </div>
