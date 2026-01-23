@@ -20,6 +20,7 @@ export const ordemVenda = pgTable('ordem_venda', {
   id: serial('id').primaryKey(),
   data_criacao: timestamp('data_criacao').notNull().defaultNow(),
   data_pagamento: timestamp('data_pagamento'),
+  data_previsao_pagamento: timestamp('data_previsao_pagamento'),
   status: statusOrdemVendaEnum('status').notNull().default('ativa'),
   cliente_id: integer('cliente_id')
     .notNull()
