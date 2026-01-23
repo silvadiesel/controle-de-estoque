@@ -219,5 +219,19 @@ export const pecaSchema = z.object({
     .int('Quantidade deve ser um número inteiro'),
   preco: z.number().min(0, 'Preço não pode ser negativo'),
   fornecedor_id: z.number().optional().nullable(),
-  localizacao: z.array(z.string()).optional().nullable()
+  localizacao: z.array(z.string()).optional().nullable(),
+  alerta: z
+    .number()
+    .min(0, 'Alerta não pode ser negativo')
+    .int('Alerta deve ser um número inteiro')
+    .default(1)
+    .optional()
+}).superRefine((data, ctx) => {
+  if (data.quantidade < (data.alerta ?? 1)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Quantidade não pode ser menor que o alerta. Ajuste a quantidade ou o alerta.',
+      path: ['quantidade']
+    });
+  }
 });
