@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
+import { ModalDelete } from '@/components/modal-delete';
+import { PaginationControls } from '@/components/pagination-controls';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,16 +14,13 @@ import {
   CardTitle
 } from '@/components/ui/card';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -29,6 +28,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -37,36 +37,49 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import { Textarea } from '@/components/ui/textarea';
-import { type Order, type OrderItem, useStockStore } from '@/lib/store';
+import { usePagination } from '@/hooks/usePagination';
 
+import {
+  ModalDetalhesOrdem,
+  ModalOrdemServico,
+  ModalOrdemVenda
+} from './_components';
+import {
+  type NovaOrdemServico,
+  type NovaOrdemVenda,
+  type OrdemServicoCompleta,
+  type OrdemVendaCompleta,
+  useOrdens
+} from './_hooks';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import {
   CheckCircle,
   Clock,
-  Package,
-  PlayCircle,
+  Eye,
+  MoreHorizontal,
+  Pencil,
   Plus,
   Search,
   ShoppingCart,
   Trash2,
   Wrench,
-  X,
   XCircle
 } from 'lucide-react';
+import { Peca } from '@/db/schema/pecas';
+
+type OrdemUnificada =
+  | (OrdemServicoCompleta & { tipo: 'servico' })
+  | (OrdemVendaCompleta & { tipo: 'venda' });
 
 const statusConfig = {
-  aberta: {
-    label: 'Aberta',
+  ativa: {
+    label: 'Ativa',
     icon: Clock,
     className: 'bg-secondary text-secondary-foreground'
   },
-  em_andamento: {
-    label: 'Em Andamento',
-    icon: PlayCircle,
-    className: 'bg-primary/20 text-primary'
-  },
-  finalizada: {
-    label: 'Finalizada',
+  fechada: {
+    label: 'Fechada',
     icon: CheckCircle,
     className: 'bg-emerald-500/20 text-emerald-400'
   },
@@ -77,146 +90,191 @@ const statusConfig = {
   }
 };
 
+const formatCurrency = (value: number) => {
+  return (value / 100).toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  });
+};
+
+const formatDate = (date: string) => {
+  return format(new Date(date), 'dd/MM/yyyy HH:mm', { locale: ptBR });
+};
+
 export default function Ordens() {
   const {
-    orders,
-    clients,
-    products,
-    addOrder,
-    updateOrder,
-    deleteOrder,
-    finalizeOrder
-  } = useStockStore();
-  const [search, setSearch] = useState('');
-  const [filterType, setFilterType] = useState<'all' | 'servico' | 'venda'>(
-    'all'
-  );
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [isAddOpen, setIsAddOpen] = useState(false);
-  const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
+    ordensServico,
+    ordensVenda,
+    clientes,
+    veiculos,
+    pecas,
+    isLoading,
+    search,
+    setSearch,
+    filterType,
+    setFilterType,
+    filterStatus,
+    setFilterStatus,
+    isAddServicoOpen,
+    setIsAddServicoOpen,
+    editingServico,
+    setEditingServico,
+    viewingServico,
+    setViewingServico,
+    isAddVendaOpen,
+    setIsAddVendaOpen,
+    editingVenda,
+    setEditingVenda,
+    viewingVenda,
+    setViewingVenda,
+    deleteId,
+    setDeleteId,
+    isDeleteOpen,
+    setIsDeleteOpen,
+    handleAddOrdemServico,
+    handleUpdateOrdemServico,
+    handleAddOrdemVenda,
+    handleUpdateOrdemVenda,
+    handleDelete,
+    stats,
+    getVeiculosByCliente
+  } = useOrdens();
 
-  const [newOrder, setNewOrder] = useState({
-    type: 'servico' as 'servico' | 'venda',
-    clientId: '',
-    vehiclePlate: '',
-    vehicleModel: '',
-    description: '',
-    laborCost: 0,
-    status: 'aberta' as const
-  });
-  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
-  const [selectedProductId, setSelectedProductId] = useState('');
-  const [itemQuantity, setItemQuantity] = useState(1);
+  // Estado para controle do dropdown de nova ordem
+  const [isNewOrderMenuOpen, setIsNewOrderMenuOpen] = useState(false);
 
-  const filteredOrders = orders.filter((order) => {
-    const matchesSearch =
-      order.clientName.toLowerCase().includes(search.toLowerCase()) ||
-      order.vehiclePlate.toLowerCase().includes(search.toLowerCase()) ||
-      order.id.includes(search);
-    const matchesType = filterType === 'all' || order.type === filterType;
-    const matchesStatus =
-      filterStatus === 'all' || order.status === filterStatus;
-    return matchesSearch && matchesType && matchesStatus;
-  });
+  // Combinar e filtrar ordens
+  const ordensUnificadas = useMemo(() => {
+    const servicos: OrdemUnificada[] = ordensServico.map((o) => ({
+      ...o,
+      tipo: 'servico' as const
+    }));
+    const vendas: OrdemUnificada[] = ordensVenda.map((o) => ({
+      ...o,
+      tipo: 'venda' as const
+    }));
+    const todas = [...servicos, ...vendas];
 
-  const handleAddItem = () => {
-    const product = products.find((p) => p.id === selectedProductId);
-    if (product && itemQuantity > 0) {
-      const existingIndex = orderItems.findIndex(
-        (item) => item.productId === selectedProductId
-      );
-      if (existingIndex >= 0) {
-        const updated = [...orderItems];
-        updated[existingIndex].quantity += itemQuantity;
-        setOrderItems(updated);
-      } else {
-        setOrderItems([
-          ...orderItems,
-          {
-            productId: product.id,
-            productName: product.name,
-            quantity: itemQuantity,
-            unitPrice: product.price
-          }
-        ]);
-      }
-      setSelectedProductId('');
-      setItemQuantity(1);
-    }
-  };
-
-  const handleRemoveItem = (productId: string) => {
-    setOrderItems(orderItems.filter((item) => item.productId !== productId));
-  };
-
-  const handleAddOrder = () => {
-    const client = clients.find((c) => c.id === newOrder.clientId);
-    if (!client || orderItems.length === 0) {
-      alert('Selecione um cliente e adicione pelo menos um item');
-      return;
-    }
-
-    addOrder({
-      ...newOrder,
-      clientName: client.name,
-      vehiclePlate: newOrder.vehiclePlate || client.vehiclePlate,
-      vehicleModel: newOrder.vehicleModel || client.vehicleModel,
-      items: orderItems
-    });
-
-    setNewOrder({
-      type: 'servico',
-      clientId: '',
-      vehiclePlate: '',
-      vehicleModel: '',
-      description: '',
-      laborCost: 0,
-      status: 'aberta'
-    });
-    setOrderItems([]);
-    setIsAddOpen(false);
-  };
-
-  const handleClientChange = (clientId: string) => {
-    const client = clients.find((c) => c.id === clientId);
-    setNewOrder({
-      ...newOrder,
-      clientId,
-      vehiclePlate: client?.vehiclePlate || '',
-      vehicleModel: client?.vehicleModel || ''
-    });
-  };
-
-  const calculateTotal = () => {
-    const itemsTotal = orderItems.reduce(
-      (sum, item) => sum + item.quantity * item.unitPrice,
-      0
+    // Ordenar por data de criação (mais recentes primeiro)
+    todas.sort(
+      (a, b) =>
+        new Date(b.data_criacao).getTime() - new Date(a.data_criacao).getTime()
     );
-    return itemsTotal + (newOrder.laborCost || 0);
-  };
 
-  const formatCurrency = (value: number) => {
-    return value.toLocaleString('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
+    return todas;
+  }, [ordensServico, ordensVenda]);
+
+  const ordensFiltradas = useMemo(() => {
+    return ordensUnificadas.filter((ordem) => {
+      // Filtro de busca
+      const searchLower = search.toLowerCase();
+      const matchesSearch =
+        ordem.cliente?.name_cliente.toLowerCase().includes(searchLower) ||
+        ordem.cliente?.nome_empresa.toLowerCase().includes(searchLower) ||
+        ordem.id.toString().includes(search) ||
+        (ordem.tipo === 'servico' &&
+          (ordem as OrdemServicoCompleta).veiculo?.placa
+            .toLowerCase()
+            .includes(searchLower));
+
+      // Filtro de tipo
+      const matchesType = filterType === 'all' || ordem.tipo === filterType;
+
+      // Filtro de status
+      const matchesStatus =
+        filterStatus === 'all' || ordem.status === filterStatus;
+
+      return matchesSearch && matchesType && matchesStatus;
     });
+  }, [ordensUnificadas, search, filterType, filterStatus]);
+
+  const {
+    paginatedItems,
+    currentPage,
+    totalPages,
+    startItem,
+    endItem,
+    goToPage,
+    goToNextPage,
+    goToPreviousPage,
+    isFirstPage,
+    isLastPage,
+    pageItems
+  } = usePagination({ items: ordensFiltradas, itemsPerPage: 10 });
+
+  // Handlers para ações de status
+  const handleStatusChange = async (
+    tipo: 'servico' | 'venda',
+    id: number,
+    newStatus: 'ativa' | 'fechada' | 'cancelada'
+  ) => {
+    if (tipo === 'servico') {
+      await handleUpdateOrdemServico(id, { status: newStatus });
+    } else {
+      await handleUpdateOrdemVenda(id, { status: newStatus });
+    }
   };
 
-  const formatDate = (date: Date) => {
-    return new Date(date).toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  // Handler para abrir modal de edição
+  const handleEdit = (ordem: OrdemUnificada) => {
+    if (ordem.tipo === 'servico') {
+      setEditingServico(ordem as OrdemServicoCompleta);
+    } else {
+      setEditingVenda(ordem as OrdemVendaCompleta);
+    }
   };
 
-  const openOrdersCount = orders.filter(
-    (o) => o.status === 'aberta' || o.status === 'em_andamento'
-  ).length;
-  const servicosCount = orders.filter((o) => o.type === 'servico').length;
-  const vendasCount = orders.filter((o) => o.type === 'venda').length;
+  // Handler para abrir modal de visualização
+  const handleView = (ordem: OrdemUnificada) => {
+    if (ordem.tipo === 'servico') {
+      setViewingServico(ordem as OrdemServicoCompleta);
+    } else {
+      setViewingVenda(ordem as OrdemVendaCompleta);
+    }
+  };
+
+  // Handler para confirmar exclusão
+  const handleConfirmDelete = (tipo: 'servico' | 'venda', id: number) => {
+    setDeleteId({ type: tipo, id });
+    setIsDeleteOpen(true);
+  };
+
+  // Preparar dados para modais de edição
+  const getServicoInitialData = (ordem: OrdemServicoCompleta | null) => {
+    if (!ordem) return undefined;
+    return {
+      data_chegada: ordem.data_chegada.split('T')[0],
+      data_saida: ordem.data_saida?.split('T')[0] || '',
+      status: ordem.status,
+      cliente_id: ordem.cliente_id,
+      veiculo_id: ordem.veiculo_id,
+      funcionario_id: ordem.funcionario_id,
+      observacao: ordem.observacao || '',
+      valor_total: ordem.valor_total,
+      pecas: ordem.pecas.map((p) => ({
+        peca_id: p.peca_id,
+        quantidade: p.quantidade,
+        peca: p.peca ? ({ ...p.peca, preco: p.peca.preco } as Peca | null) : null
+      }))
+    };
+  };
+
+  const getVendaInitialData = (ordem: OrdemVendaCompleta | null) => {
+    if (!ordem) return undefined;
+    return {
+      data_pagamento: ordem.data_pagamento?.split('T')[0] || '',
+      status: ordem.status,
+      cliente_id: ordem.cliente_id,
+      observacao: ordem.observacao || '',
+      valor_total: ordem.valor_total,
+      metodo_pagamento: ordem.metodo_pagamento || undefined,
+      pecas: ordem.pecas.map((p) => ({
+        peca_id: p.peca_id,
+        quantidade: p.quantidade,
+        peca: p.peca ? ({ ...p.peca, preco: p.peca.preco } as Peca) : null
+      }))
+    };
+  };
 
   return (
     <div className='flex flex-1 flex-col gap-6 p-4 lg:p-8'>
@@ -230,241 +288,37 @@ export default function Ordens() {
             Gerencie serviços e vendas de peças
           </p>
         </div>
-        <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-          <DialogTrigger asChild>
-            <Button className='bg-primary hover:bg-primary/90'>
-              <Plus className='h-4 w-4 mr-2' />
+
+        <DropdownMenu
+          open={isNewOrderMenuOpen}
+          onOpenChange={setIsNewOrderMenuOpen}>
+          <DropdownMenuTrigger asChild>
+            <Button className='bg-primary hover:bg-primary/90 w-32'>
+              <Plus className='h-4 w-4 ' />
               Nova Ordem
             </Button>
-          </DialogTrigger>
-          <DialogContent className='bg-card border-border max-w-3xl max-h-[90vh] overflow-y-auto'>
-            <DialogHeader>
-              <DialogTitle className='text-foreground'>
-                Criar Nova Ordem
-              </DialogTitle>
-              <DialogDescription>
-                Crie uma ordem de serviço ou venda de peças
-              </DialogDescription>
-            </DialogHeader>
-            <div className='grid gap-4 py-4'>
-              {/* Tipo e Cliente */}
-              <div className='grid gap-4 sm:grid-cols-2'>
-                <div className='space-y-2'>
-                  <Label>Tipo de Ordem *</Label>
-                  <Select
-                    value={newOrder.type}
-                    onValueChange={(value: 'servico' | 'venda') =>
-                      setNewOrder({ ...newOrder, type: value })
-                    }>
-                    <SelectTrigger className='bg-input border-border'>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className='bg-card border-border'>
-                      <SelectItem value='servico'>
-                        <div className='flex items-center gap-2'>
-                          <Wrench className='h-4 w-4' />
-                          Ordem de Serviço
-                        </div>
-                      </SelectItem>
-                      <SelectItem value='venda'>
-                        <div className='flex items-center gap-2'>
-                          <ShoppingCart className='h-4 w-4' />
-                          Ordem de Venda
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className='space-y-2'>
-                  <Label>Cliente *</Label>
-                  <Select
-                    value={newOrder.clientId}
-                    onValueChange={handleClientChange}>
-                    <SelectTrigger className='bg-input border-border'>
-                      <SelectValue placeholder='Selecione um cliente' />
-                    </SelectTrigger>
-                    <SelectContent className='bg-card border-border'>
-                      {clients.map((client) => (
-                        <SelectItem key={client.id} value={client.id}>
-                          {client.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Veículo */}
-              <div className='grid gap-4 sm:grid-cols-2'>
-                <div className='space-y-2'>
-                  <Label>Placa do Veículo</Label>
-                  <Input
-                    value={newOrder.vehiclePlate}
-                    onChange={(e) =>
-                      setNewOrder({ ...newOrder, vehiclePlate: e.target.value })
-                    }
-                    placeholder='ABC-1234'
-                    className='bg-input border-border'
-                  />
-                </div>
-                <div className='space-y-2'>
-                  <Label>Modelo do Veículo</Label>
-                  <Input
-                    value={newOrder.vehicleModel}
-                    onChange={(e) =>
-                      setNewOrder({ ...newOrder, vehicleModel: e.target.value })
-                    }
-                    placeholder='Scania R450'
-                    className='bg-input border-border'
-                  />
-                </div>
-              </div>
-
-              {/* Descrição */}
-              <div className='space-y-2'>
-                <Label>Descrição do Serviço/Venda</Label>
-                <Textarea
-                  value={newOrder.description}
-                  onChange={(e) =>
-                    setNewOrder({ ...newOrder, description: e.target.value })
-                  }
-                  placeholder='Descreva o serviço a ser realizado ou detalhes da venda'
-                  className='bg-input border-border min-h-[80px]'
-                />
-              </div>
-
-              {/* Adicionar Peças */}
-              <div className='space-y-3'>
-                <Label>Peças Utilizadas</Label>
-                <div className='flex gap-2'>
-                  <Select
-                    value={selectedProductId}
-                    onValueChange={setSelectedProductId}>
-                    <SelectTrigger className='bg-input border-border flex-1'>
-                      <SelectValue placeholder='Selecione uma peça' />
-                    </SelectTrigger>
-                    <SelectContent className='bg-card border-border'>
-                      {products.map((product) => (
-                        <SelectItem key={product.id} value={product.id}>
-                          {product.name} - {formatCurrency(product.price)}{' '}
-                          (Estoque: {product.quantity})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    type='number'
-                    min={1}
-                    value={itemQuantity}
-                    onChange={(e) => setItemQuantity(Number(e.target.value))}
-                    className='bg-input border-border w-20'
-                  />
-                  <Button onClick={handleAddItem} variant='outline'>
-                    <Plus className='h-4 w-4' />
-                  </Button>
-                </div>
-
-                {/* Lista de itens */}
-                {orderItems.length > 0 && (
-                  <div className='rounded-lg border border-border overflow-hidden'>
-                    <Table>
-                      <TableHeader>
-                        <TableRow className='border-border hover:bg-transparent'>
-                          <TableHead className='text-muted-foreground'>
-                            Peça
-                          </TableHead>
-                          <TableHead className='text-muted-foreground text-center'>
-                            Qtd
-                          </TableHead>
-                          <TableHead className='text-muted-foreground text-right'>
-                            Preço Unit.
-                          </TableHead>
-                          <TableHead className='text-muted-foreground text-right'>
-                            Subtotal
-                          </TableHead>
-                          <TableHead className='text-muted-foreground w-10'></TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {orderItems.map((item) => (
-                          <TableRow
-                            key={item.productId}
-                            className='border-border'>
-                            <TableCell className='text-foreground'>
-                              {item.productName}
-                            </TableCell>
-                            <TableCell className='text-center text-foreground'>
-                              {item.quantity}
-                            </TableCell>
-                            <TableCell className='text-right text-muted-foreground'>
-                              {formatCurrency(item.unitPrice)}
-                            </TableCell>
-                            <TableCell className='text-right text-foreground font-medium'>
-                              {formatCurrency(item.quantity * item.unitPrice)}
-                            </TableCell>
-                            <TableCell>
-                              <Button
-                                variant='ghost'
-                                size='icon'
-                                onClick={() =>
-                                  handleRemoveItem(item.productId)
-                                }>
-                                <X className='h-4 w-4 text-destructive' />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
-              </div>
-
-              {/* Mão de Obra (só para serviço) */}
-              {newOrder.type === 'servico' && (
-                <div className='space-y-2'>
-                  <Label>Valor da Mão de Obra</Label>
-                  <Input
-                    type='number'
-                    min={0}
-                    step={0.01}
-                    value={newOrder.laborCost}
-                    onChange={(e) =>
-                      setNewOrder({
-                        ...newOrder,
-                        laborCost: Number(e.target.value)
-                      })
-                    }
-                    placeholder='0.00'
-                    className='bg-input border-border'
-                  />
-                </div>
-              )}
-
-              {/* Total */}
-              <div className='rounded-lg bg-secondary/50 p-4'>
-                <div className='flex items-center justify-between'>
-                  <span className='text-lg font-medium text-foreground'>
-                    Total da Ordem
-                  </span>
-                  <span className='text-2xl font-bold text-primary'>
-                    {formatCurrency(calculateTotal())}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant='outline' onClick={() => setIsAddOpen(false)}>
-                Cancelar
-              </Button>
-              <Button
-                onClick={handleAddOrder}
-                className='bg-primary hover:bg-primary/90'>
-                Criar Ordem
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end' className='bg-card border-border'>
+            <DropdownMenuItem
+              onClick={() => {
+                setIsNewOrderMenuOpen(false);
+                setIsAddServicoOpen(true);
+              }}
+              className='cursor-pointer'>
+              <Wrench className='h-4 w-4 mr-2 text-primary' />
+              Ordem de Serviço
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                setIsNewOrderMenuOpen(false);
+                setIsAddVendaOpen(true);
+              }}
+              className='cursor-pointer'>
+              <ShoppingCart className='h-4 w-4 mr-2 text-primary' />
+              Ordem de Venda
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Filters */}
@@ -496,16 +350,15 @@ export default function Ordens() {
           </SelectTrigger>
           <SelectContent className='bg-card border-border'>
             <SelectItem value='all'>Todos os Status</SelectItem>
-            <SelectItem value='aberta'>Aberta</SelectItem>
-            <SelectItem value='em_andamento'>Em Andamento</SelectItem>
-            <SelectItem value='finalizada'>Finalizada</SelectItem>
+            <SelectItem value='ativa'>Ativa</SelectItem>
+            <SelectItem value='fechada'>Fechada</SelectItem>
             <SelectItem value='cancelada'>Cancelada</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {/* Stats */}
-      <div className='grid gap-4 sm:grid-cols-3'>
+      <div className='grid gap-4 sm:grid-cols-4'>
         <Card className='bg-card border-border'>
           <CardContent className='p-4'>
             <div className='flex items-center gap-3'>
@@ -514,11 +367,24 @@ export default function Ordens() {
               </div>
               <div>
                 <p className='text-2xl font-bold text-foreground'>
-                  {openOrdersCount}
+                  {stats.ativas}
                 </p>
-                <p className='text-sm text-muted-foreground'>
-                  Ordens em Aberto
+                <p className='text-sm text-muted-foreground'>Ordens Ativas</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className='bg-card border-border'>
+          <CardContent className='p-4'>
+            <div className='flex items-center gap-3'>
+              <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10'>
+                <CheckCircle className='h-5 w-5 text-emerald-500' />
+              </div>
+              <div>
+                <p className='text-2xl font-bold text-foreground'>
+                  {stats.fechadas}
                 </p>
+                <p className='text-sm text-muted-foreground'>Ordens Fechadas</p>
               </div>
             </div>
           </CardContent>
@@ -531,7 +397,7 @@ export default function Ordens() {
               </div>
               <div>
                 <p className='text-2xl font-bold text-foreground'>
-                  {servicosCount}
+                  {stats.totalServico}
                 </p>
                 <p className='text-sm text-muted-foreground'>
                   Ordens de Serviço
@@ -548,7 +414,7 @@ export default function Ordens() {
               </div>
               <div>
                 <p className='text-2xl font-bold text-foreground'>
-                  {vendasCount}
+                  {stats.totalVenda}
                 </p>
                 <p className='text-sm text-muted-foreground'>Ordens de Venda</p>
               </div>
@@ -562,7 +428,7 @@ export default function Ordens() {
         <CardHeader>
           <CardTitle className='text-foreground'>Lista de Ordens</CardTitle>
           <CardDescription>
-            {filteredOrders.length} ordem(ns) encontrada(s)
+            {ordensFiltradas.length} ordem(ns) encontrada(s)
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -575,7 +441,7 @@ export default function Ordens() {
                     Cliente
                   </TableHead>
                   <TableHead className='text-muted-foreground hidden lg:table-cell'>
-                    Veículo
+                    Veículo/Itens
                   </TableHead>
                   <TableHead className='text-muted-foreground text-center'>
                     Status
@@ -589,253 +455,39 @@ export default function Ordens() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredOrders.map((order) => {
-                  const status = statusConfig[order.status];
-                  const StatusIcon = status.icon;
-                  return (
-                    <TableRow key={order.id} className='border-border'>
+                {isLoading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <TableRow key={i} className='border-border'>
                       <TableCell>
                         <div className='flex items-center gap-2'>
-                          {order.type === 'servico' ? (
-                            <Wrench className='h-4 w-4 text-primary' />
-                          ) : (
-                            <ShoppingCart className='h-4 w-4 text-primary' />
-                          )}
-                          <div>
-                            <p className='font-medium text-foreground'>
-                              #{order.id.slice(0, 8)}
-                            </p>
-                            <p className='text-xs text-muted-foreground'>
-                              {formatDate(order.createdAt)}
-                            </p>
+                          <Skeleton className='h-4 w-4' />
+                          <div className='space-y-1'>
+                            <Skeleton className='h-4 w-12' />
+                            <Skeleton className='h-3 w-24' />
                           </div>
                         </div>
                       </TableCell>
                       <TableCell className='hidden md:table-cell'>
-                        <p className='text-foreground'>{order.clientName}</p>
+                        <div className='space-y-1'>
+                          <Skeleton className='h-4 w-32' />
+                          <Skeleton className='h-3 w-24' />
+                        </div>
                       </TableCell>
                       <TableCell className='hidden lg:table-cell'>
-                        <div>
-                          <p className='text-foreground'>
-                            {order.vehiclePlate}
-                          </p>
-                          <p className='text-xs text-muted-foreground'>
-                            {order.vehicleModel}
-                          </p>
-                        </div>
+                        <Skeleton className='h-4 w-20' />
                       </TableCell>
                       <TableCell className='text-center'>
-                        <Badge variant='secondary' className={status.className}>
-                          <StatusIcon className='h-3 w-3 mr-1' />
-                          {status.label}
-                        </Badge>
+                        <Skeleton className='h-5 w-16 mx-auto' />
                       </TableCell>
                       <TableCell className='text-right hidden sm:table-cell'>
-                        <span className='font-medium text-foreground'>
-                          {formatCurrency(order.total)}
-                        </span>
+                        <Skeleton className='h-4 w-20 ml-auto' />
                       </TableCell>
                       <TableCell className='text-right'>
-                        <div className='flex justify-end gap-1'>
-                          <Dialog
-                            open={viewingOrder?.id === order.id}
-                            onOpenChange={(open) =>
-                              !open && setViewingOrder(null)
-                            }>
-                            <DialogTrigger asChild>
-                              <Button
-                                variant='ghost'
-                                size='icon'
-                                onClick={() => setViewingOrder(order)}>
-                                <Package className='h-4 w-4 text-muted-foreground' />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className='bg-card border-border max-w-2xl'>
-                              <DialogHeader>
-                                <DialogTitle className='text-foreground'>
-                                  Detalhes da Ordem #{order.id.slice(0, 8)}
-                                </DialogTitle>
-                                <DialogDescription>
-                                  {order.type === 'servico'
-                                    ? 'Ordem de Serviço'
-                                    : 'Ordem de Venda'}{' '}
-                                  - {order.clientName}
-                                </DialogDescription>
-                              </DialogHeader>
-                              <div className='space-y-4 py-4'>
-                                <div className='grid gap-4 sm:grid-cols-2'>
-                                  <div>
-                                    <p className='text-sm text-muted-foreground'>
-                                      Veículo
-                                    </p>
-                                    <p className='text-foreground'>
-                                      {order.vehiclePlate} -{' '}
-                                      {order.vehicleModel}
-                                    </p>
-                                  </div>
-                                  <div>
-                                    <p className='text-sm text-muted-foreground'>
-                                      Status
-                                    </p>
-                                    <Badge
-                                      variant='secondary'
-                                      className={
-                                        statusConfig[order.status].className
-                                      }>
-                                      {statusConfig[order.status].label}
-                                    </Badge>
-                                  </div>
-                                </div>
-                                {order.description && (
-                                  <div>
-                                    <p className='text-sm text-muted-foreground'>
-                                      Descrição
-                                    </p>
-                                    <p className='text-foreground'>
-                                      {order.description}
-                                    </p>
-                                  </div>
-                                )}
-                                <div>
-                                  <p className='text-sm text-muted-foreground mb-2'>
-                                    Itens
-                                  </p>
-                                  <div className='rounded-lg border border-border overflow-hidden'>
-                                    <Table>
-                                      <TableHeader>
-                                        <TableRow className='border-border hover:bg-transparent'>
-                                          <TableHead className='text-muted-foreground'>
-                                            Peça
-                                          </TableHead>
-                                          <TableHead className='text-muted-foreground text-center'>
-                                            Qtd
-                                          </TableHead>
-                                          <TableHead className='text-muted-foreground text-right'>
-                                            Subtotal
-                                          </TableHead>
-                                        </TableRow>
-                                      </TableHeader>
-                                      <TableBody>
-                                        {order.items.map((item, idx) => (
-                                          <TableRow
-                                            key={idx}
-                                            className='border-border'>
-                                            <TableCell className='text-foreground'>
-                                              {item.productName}
-                                            </TableCell>
-                                            <TableCell className='text-center text-foreground'>
-                                              {item.quantity}
-                                            </TableCell>
-                                            <TableCell className='text-right text-foreground'>
-                                              {formatCurrency(
-                                                item.quantity * item.unitPrice
-                                              )}
-                                            </TableCell>
-                                          </TableRow>
-                                        ))}
-                                        {order.laborCost > 0 && (
-                                          <TableRow className='border-border'>
-                                            <TableCell className='text-foreground'>
-                                              Mão de Obra
-                                            </TableCell>
-                                            <TableCell className='text-center'>
-                                              -
-                                            </TableCell>
-                                            <TableCell className='text-right text-foreground'>
-                                              {formatCurrency(order.laborCost)}
-                                            </TableCell>
-                                          </TableRow>
-                                        )}
-                                      </TableBody>
-                                    </Table>
-                                  </div>
-                                </div>
-                                <div className='rounded-lg bg-secondary/50 p-4'>
-                                  <div className='flex items-center justify-between'>
-                                    <span className='text-lg font-medium text-foreground'>
-                                      Total
-                                    </span>
-                                    <span className='text-2xl font-bold text-primary'>
-                                      {formatCurrency(order.total)}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                              <DialogFooter>
-                                <Button
-                                  variant='outline'
-                                  onClick={() => setViewingOrder(null)}>
-                                  Fechar
-                                </Button>
-                                {(order.status === 'aberta' ||
-                                  order.status === 'em_andamento') && (
-                                  <>
-                                    {order.status === 'aberta' && (
-                                      <Button
-                                        variant='outline'
-                                        onClick={() => {
-                                          updateOrder(order.id, {
-                                            status: 'em_andamento'
-                                          });
-                                          setViewingOrder(null);
-                                        }}>
-                                        <PlayCircle className='h-4 w-4 mr-2' />
-                                        Iniciar
-                                      </Button>
-                                    )}
-                                    <Button
-                                      className='bg-primary hover:bg-primary/90'
-                                      onClick={() => {
-                                        finalizeOrder(order.id);
-                                        setViewingOrder(null);
-                                      }}>
-                                      <CheckCircle className='h-4 w-4 mr-2' />
-                                      Finalizar
-                                    </Button>
-                                  </>
-                                )}
-                              </DialogFooter>
-                            </DialogContent>
-                          </Dialog>
-                          {order.status !== 'finalizada' &&
-                            order.status !== 'cancelada' && (
-                              <Button
-                                variant='ghost'
-                                size='icon'
-                                onClick={() => {
-                                  if (
-                                    confirm(
-                                      'Tem certeza que deseja cancelar esta ordem?'
-                                    )
-                                  ) {
-                                    updateOrder(order.id, {
-                                      status: 'cancelada'
-                                    });
-                                  }
-                                }}>
-                                <XCircle className='h-4 w-4 text-destructive' />
-                              </Button>
-                            )}
-                          <Button
-                            variant='ghost'
-                            size='icon'
-                            onClick={() => {
-                              if (
-                                confirm(
-                                  'Tem certeza que deseja excluir esta ordem?'
-                                )
-                              ) {
-                                deleteOrder(order.id);
-                              }
-                            }}>
-                            <Trash2 className='h-4 w-4 text-destructive' />
-                          </Button>
-                        </div>
+                        <Skeleton className='h-8 w-8 ml-auto' />
                       </TableCell>
                     </TableRow>
-                  );
-                })}
-                {filteredOrders.length === 0 && (
+                  ))
+                ) : paginatedItems.length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={6}
@@ -843,12 +495,275 @@ export default function Ordens() {
                       Nenhuma ordem encontrada
                     </TableCell>
                   </TableRow>
+                ) : (
+                  paginatedItems.map((ordem) => {
+                    const status = statusConfig[ordem.status];
+                    const StatusIcon = status.icon;
+                    const isServico = ordem.tipo === 'servico';
+
+                    return (
+                      <TableRow
+                        key={`${ordem.tipo}-${ordem.id}`}
+                        className='border-border'>
+                        <TableCell>
+                          <div className='flex items-center gap-2'>
+                            {isServico ? (
+                              <Wrench className='h-4 w-4 text-primary' />
+                            ) : (
+                              <ShoppingCart className='h-4 w-4 text-primary' />
+                            )}
+                            <div>
+                              <p className='font-medium text-foreground'>
+                                #{ordem.id}
+                              </p>
+                              <p className='text-xs text-muted-foreground'>
+                                {formatDate(ordem.data_criacao)}
+                              </p>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className='hidden md:table-cell'>
+                          <p className='text-foreground'>
+                            {ordem.cliente?.name_cliente || '-'}
+                          </p>
+                          {ordem.cliente?.nome_empresa && (
+                            <p className='text-xs text-muted-foreground'>
+                              {ordem.cliente.nome_empresa}
+                            </p>
+                          )}
+                        </TableCell>
+                        <TableCell className='hidden lg:table-cell'>
+                          {isServico ? (
+                            <div>
+                              <p className='text-foreground'>
+                                {(ordem as OrdemServicoCompleta).veiculo
+                                  ?.placa || '-'}
+                              </p>
+                              <p className='text-xs text-muted-foreground'>
+                                {(ordem as OrdemServicoCompleta).veiculo
+                                  ?.modelo || '-'}
+                              </p>
+                            </div>
+                          ) : (
+                            <p className='text-muted-foreground'>
+                              {ordem.pecas.length} item(ns)
+                            </p>
+                          )}
+                        </TableCell>
+                        <TableCell className='text-center'>
+                          <Badge
+                            variant='secondary'
+                            className={status.className}>
+                            <StatusIcon className='h-3 w-3 mr-1' />
+                            {status.label}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className='text-right hidden sm:table-cell'>
+                          <span className='font-medium text-foreground'>
+                            {formatCurrency(ordem.valor_total)}
+                          </span>
+                        </TableCell>
+                        <TableCell className='text-right'>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant='ghost' size='icon'>
+                                <MoreHorizontal className='h-4 w-4 text-muted-foreground' />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                              align='end'
+                              className='bg-card border-border w-40'>
+                              <DropdownMenuItem
+                                onClick={() => handleView(ordem)}
+                                className='cursor-pointer'>
+                                <Eye className='h-4 w-4 mr-2' />
+                                Ver Detalhes
+                              </DropdownMenuItem>
+                              {ordem.status === 'ativa' && (
+                                <DropdownMenuItem
+                                  onClick={() => handleEdit(ordem)}
+                                  className='cursor-pointer'>
+                                  <Pencil className='h-4 w-4 mr-2' />
+                                  Editar
+                                </DropdownMenuItem>
+                              )}
+
+                              {ordem.status === 'ativa' && (
+                                <>
+                                  <DropdownMenuSeparator className='bg-border' />
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      handleStatusChange(
+                                        ordem.tipo,
+                                        ordem.id,
+                                        'fechada'
+                                      )
+                                    }
+                                    className='cursor-pointer text-emerald-400'>
+                                    <CheckCircle className='h-4 w-4 mr-2' />
+                                    Finalizar
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      handleStatusChange(
+                                        ordem.tipo,
+                                        ordem.id,
+                                        'cancelada'
+                                      )
+                                    }
+                                    className='cursor-pointer text-destructive'>
+                                    <XCircle className='h-4 w-4 mr-2' />
+                                    Cancelar
+                                  </DropdownMenuItem>
+                                </>
+                              )}
+
+                              <DropdownMenuSeparator className='bg-border' />
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleConfirmDelete(ordem.tipo, ordem.id)
+                                }
+                                className='cursor-pointer text-destructive'>
+                                <Trash2 className='h-4 w-4 mr-2' />
+                                Excluir
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
                 )}
               </TableBody>
             </Table>
           </div>
         </CardContent>
       </Card>
+
+      {/* Pagination */}
+      {ordensFiltradas.length > 0 && (
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          startItem={startItem}
+          endItem={endItem}
+          totalItems={ordensFiltradas.length}
+          onPageChange={goToPage}
+          onNextPage={goToNextPage}
+          onPreviousPage={goToPreviousPage}
+          isFirstPage={isFirstPage}
+          isLastPage={isLastPage}
+          pageItems={pageItems}
+          itemLabel='ordens'
+        />
+      )}
+
+      {/* Modais */}
+      {/* Modal Nova Ordem de Serviço */}
+      <ModalOrdemServico
+        mode='create'
+        clientes={clientes}
+        veiculos={veiculos}
+        pecas={pecas}
+        isOpen={isAddServicoOpen}
+        setIsOpen={setIsAddServicoOpen}
+        onSubmit={async (data) => {
+          await handleAddOrdemServico(data as NovaOrdemServico);
+        }}
+        isLoading={isLoading}
+        getVeiculosByCliente={getVeiculosByCliente}
+      />
+
+      {/* Modal Editar Ordem de Serviço */}
+      <ModalOrdemServico
+        mode='edit'
+        initialData={getServicoInitialData(editingServico)}
+        clientes={clientes}
+        veiculos={veiculos}
+        pecas={pecas}
+        isOpen={!!editingServico}
+        setIsOpen={(open) => !open && setEditingServico(null)}
+        onSubmit={async (data) => {
+          if (editingServico) {
+            await handleUpdateOrdemServico(
+              editingServico.id,
+              data as NovaOrdemServico
+            );
+          }
+        }}
+        isLoading={isLoading}
+        getVeiculosByCliente={getVeiculosByCliente}
+      />
+
+      {/* Modal Nova Ordem de Venda */}
+      <ModalOrdemVenda
+        mode='create'
+        clientes={clientes}
+        pecas={pecas}
+        isOpen={isAddVendaOpen}
+        setIsOpen={setIsAddVendaOpen}
+        onSubmit={async (data) => {
+          await handleAddOrdemVenda(data as NovaOrdemVenda);
+        }}
+        isLoading={isLoading}
+      />
+
+      {/* Modal Editar Ordem de Venda */}
+      <ModalOrdemVenda
+        mode='edit'
+        initialData={getVendaInitialData(editingVenda)}
+        clientes={clientes}
+        pecas={pecas}
+        isOpen={!!editingVenda}
+        setIsOpen={(open) => !open && setEditingVenda(null)}
+        onSubmit={async (data) => {
+          if (editingVenda) {
+            await handleUpdateOrdemVenda(
+              editingVenda.id,
+              data as NovaOrdemVenda
+            );
+          }
+        }}
+        isLoading={isLoading}
+      />
+
+      {/* Modal Detalhes Ordem de Serviço */}
+      <ModalDetalhesOrdem
+        type='servico'
+        ordem={viewingServico}
+        isOpen={!!viewingServico}
+        setIsOpen={(open) => !open && setViewingServico(null)}
+        onUpdateStatus={(status) => {
+          if (viewingServico) {
+            handleUpdateOrdemServico(viewingServico.id, { status });
+          }
+        }}
+        isLoading={isLoading}
+      />
+
+      {/* Modal Detalhes Ordem de Venda */}
+      <ModalDetalhesOrdem
+        type='venda'
+        ordem={viewingVenda}
+        isOpen={!!viewingVenda}
+        setIsOpen={(open) => !open && setViewingVenda(null)}
+        onUpdateStatus={(status) => {
+          if (viewingVenda) {
+            handleUpdateOrdemVenda(viewingVenda.id, { status });
+          }
+        }}
+        isLoading={isLoading}
+      />
+
+      {/* Modal Delete */}
+      <ModalDelete
+        isOpen={isDeleteOpen}
+        setIsOpen={setIsDeleteOpen}
+        onConfirm={handleDelete}
+        isLoading={isLoading}
+        title='Excluir Ordem'
+        description='Tem certeza que deseja excluir esta ordem? Esta ação não pode ser desfeita.'
+      />
     </div>
   );
 }
