@@ -152,7 +152,7 @@ export default function Configuracoes() {
   };
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 lg:p-8'>
+    <div className='flex flex-1 flex-col gap-4 p-4 lg:p-4'>
       <div>
         <h2 className='text-2xl font-bold text-foreground'>Configurações</h2>
         <p className='text-muted-foreground'>
@@ -160,17 +160,17 @@ export default function Configuracoes() {
         </p>
       </div>
 
-      <Tabs defaultValue='general' className='w-full'>
-        <TabsList>
+      <Tabs defaultValue='general' className='w-full gap-0'>
+        <TabsList className='rounded-b-none'>
           <TabsTrigger
             value='general'
-            className='gap-2 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground'>
+            className='gap-2 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground rounded-b-none'>
             <Settings className='h-4 w-4' />
             Configurações Gerais
           </TabsTrigger>
           <TabsTrigger
             value='users'
-            className='gap-2 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground'>
+            className='gap-2 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground w-32 rounded-b-none'>
             <Users className='h-4 w-4' />
             Usuários
           </TabsTrigger>
@@ -179,7 +179,7 @@ export default function Configuracoes() {
         {/* Tab: Configurações Gerais */}
         <TabsContent value='general'>
           <div className='grid gap-6'>
-            <Card className='bg-card border-border h-150 flex flex-col'>
+            <Card className='bg-card border-border h-150 flex flex-col rounded-tl-none'>
               <CardHeader>
                 <div className='flex items-center justify-between'>
                   <div>
@@ -462,7 +462,7 @@ export default function Configuracoes() {
 
         {/* Tab: Usuários */}
         <TabsContent value='users'>
-          <Card className='bg-card border-border'>
+          <Card className='bg-card border-border rounded-tl-none'>
             <CardHeader>
               <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
                 <div>
