@@ -130,7 +130,7 @@ export default function Clientes() {
   });
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 lg:p-8'>
+    <div className='flex flex-1 flex-col gap-4 p-4 lg:p-4'>
       {/* Header */}
       <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
         <div>
@@ -148,8 +148,8 @@ export default function Clientes() {
           onSubmit={handleAddCliente}
           isLoading={isLoading}
           trigger={
-            <Button className='bg-primary hover:bg-primary/90'>
-              <Plus className='h-4 w-4 mr-2' />
+            <Button className='bg-primary hover:bg-primary/90 w-32'>
+              <Plus className='h-4 w-4' />
               Novo Cliente
             </Button>
           }
@@ -170,7 +170,7 @@ export default function Clientes() {
       {/* Stats */}
       <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
         <Card className='bg-card border-border'>
-          <CardContent className='p-4'>
+          <CardContent className='px-4'>
             <div className='flex items-center gap-3'>
               <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10'>
                 <Users className='h-5 w-5 text-primary' />
@@ -187,7 +187,7 @@ export default function Clientes() {
           </CardContent>
         </Card>
         <Card className='bg-card border-border'>
-          <CardContent className='p-4'>
+          <CardContent className='px-4'>
             <div className='flex items-center gap-3'>
               <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10'>
                 <Car className='h-5 w-5 text-emerald-500' />

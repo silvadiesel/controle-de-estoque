@@ -32,7 +32,7 @@ const stats = [
 
 export default function DashboardPage() {
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 lg:p-8'>
+    <div className='flex flex-1 flex-col gap-4 p-4 lg:p-4'>
       {/* Header da página */}
       <div>
         <h2 className='text-2xl font-bold text-foreground'>Dashboard</h2>
@@ -67,9 +67,9 @@ export default function DashboardPage() {
       </div>
 
       {/* Área de conteúdo principal */}
-      <div className='grid gap-6 lg:grid-cols-2'>
+      <div className='grid gap-4 lg:grid-cols-2'>
         <Card className='bg-card border-border'>
-          <CardContent className='p-6'>
+          <CardContent className='px-4'>
             <h3 className='text-lg font-semibold text-foreground mb-4'>
               Movimentações Recentes
             </h3>
@@ -108,7 +108,7 @@ export default function DashboardPage() {
         </Card>
 
         <Card className='bg-card border-border'>
-          <CardContent className='p-6'>
+          <CardContent className='px-4'>
             <h3 className='text-lg font-semibold text-foreground mb-4'>
               Alertas de Estoque
             </h3>

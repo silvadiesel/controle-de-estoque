@@ -23,7 +23,7 @@ export default function Alertas() {
   const warningProducts = lowStockProducts.filter((p) => p.quantity > 0);
 
   return (
-    <div className='flex flex-1 flex-col gap-6 p-4 lg:p-8'>
+    <div className='flex flex-1 flex-col gap-4 p-4 lg:p-4'>
       {/* Header */}
       <div>
         <h2 className='text-2xl font-bold text-foreground'>Alertas</h2>
@@ -34,8 +34,8 @@ export default function Alertas() {
 
       {/* Summary Cards */}
       <div className='grid gap-4 sm:grid-cols-3'>
-        <Card className='bg-destructive/10 border-destructive/30'>
-          <CardContent className='p-6'>
+        <Card className='bg-destructive/10 py-3 border-destructive/30'>
+          <CardContent className='px-6'>
             <div className='flex items-center justify-between'>
               <div>
                 <p className='text-sm text-destructive'>Crítico</p>
@@ -53,8 +53,8 @@ export default function Alertas() {
           </CardContent>
         </Card>
 
-        <Card className='bg-primary/10 border-primary/30'>
-          <CardContent className='p-6'>
+        <Card className='bg-primary/10 py-3 border-primary/30'>
+          <CardContent className='px-6'>
             <div className='flex items-center justify-between'>
               <div>
                 <p className='text-sm text-primary'>Atenção</p>
@@ -72,8 +72,8 @@ export default function Alertas() {
           </CardContent>
         </Card>
 
-        <Card className='bg-muted/50 border-border'>
-          <CardContent className='p-6'>
+        <Card className='bg-muted/50 py-3 border-border'>
+          <CardContent className='px-6'>
             <div className='flex items-center justify-between'>
               <div>
                 <p className='text-sm text-muted-foreground'>Normal</p>
@@ -158,8 +158,8 @@ export default function Alertas() {
 
           {/* Warning Alerts - Agora usa laranja (primary) */}
           {warningProducts.length > 0 && (
-            <Card className='bg-card border-border'>
-              <CardHeader className='pb-3'>
+            <Card className='bg-card border-border gap-3'>
+              <CardHeader >
                 <CardTitle className='text-foreground flex items-center gap-2'>
                   <Bell className='h-5 w-5 text-primary' />
                   Estoque Baixo - Atenção
@@ -207,9 +207,9 @@ export default function Alertas() {
                         <Button
                           size='sm'
                           variant='outline'
-                          className='border-primary text-primary hover:bg-primary/10 bg-transparent'
+                          className='border-primary text-primary hover:bg-primary/10 bg-transparent w-28'
                           onClick={() => router.push('/movimentacoes')}>
-                          <TrendingUp className='h-4 w-4 mr-1' />
+                          <TrendingUp className='h-4 w-4 ' />
                           Repor
                         </Button>
                       </div>
