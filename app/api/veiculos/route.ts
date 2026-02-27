@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server';
 
 import { db, schema } from '@/db';
+import { logAction } from '@/lib/log-action';
 
 import { asc, eq } from 'drizzle-orm';
 
@@ -34,5 +35,6 @@ export async function POST(request: Request) {
     })
     .returning();
 
+  await logAction(request, 'criacao', 'veiculo', String(newVeiculo[0].id), `Veículo '${newVeiculo[0].placa} - ${newVeiculo[0].modelo}' criado`);
   return new Response(JSON.stringify(newVeiculo));
 }

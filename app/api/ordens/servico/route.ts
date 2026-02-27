@@ -1,4 +1,5 @@
 import { db, schema } from '@/db';
+import { logAction } from '@/lib/log-action';
 
 import { desc, eq } from 'drizzle-orm';
 
@@ -90,5 +91,6 @@ export async function POST(request: Request) {
     );
   }
 
+  await logAction(request, 'criacao', 'ordem_servico', String(ordemId), `Ordem de serviço #${ordemId} criada`);
   return new Response(JSON.stringify(novaOrdem[0]));
 }

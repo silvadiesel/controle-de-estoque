@@ -1,4 +1,5 @@
 import { db, schema } from '@/db';
+import { logAction } from '@/lib/log-action';
 
 import { asc } from 'drizzle-orm';
 
@@ -25,5 +26,6 @@ export async function POST(request: Request) {
     })
     .returning();
 
+  await logAction(request, 'criacao', 'cliente', String(newCliente[0].id), `Cliente '${newCliente[0].name_cliente}' criado`);
   return new Response(JSON.stringify(newCliente));
 }

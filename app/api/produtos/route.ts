@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { db, schema } from '@/db';
+import { logAction } from '@/lib/log-action';
 
 import { asc } from 'drizzle-orm';
 
@@ -39,6 +40,7 @@ export async function POST(request: Request) {
       })
       .returning();
 
+    await logAction(request, 'criacao', 'produto', String(newPeca[0].id), `Produto '${newPeca[0].name_peca}' criado`);
     return NextResponse.json(newPeca, { status: 201 });
   } catch (error) {
     console.error('Erro ao criar peça:', error);
