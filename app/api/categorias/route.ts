@@ -26,6 +26,7 @@ import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
 import { categorias } from '@/db/schema';
+import { logAction } from '@/lib/log-action';
 
 /**
  * GET /api/categorias
@@ -94,6 +95,8 @@ export async function POST(request: Request) {
       .insert(categorias)
       .values({ name: body.name.trim() })
       .returning();
+
+    await logAction(request, 'criacao', 'categoria', String(newCategory.id), `Categoria '${newCategory.name}' criada`);
 
     // Retorna a categoria criada com status 201 (Created)
     return NextResponse.json(newCategory, { status: 201 });

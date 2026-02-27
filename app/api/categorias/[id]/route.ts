@@ -17,6 +17,7 @@ import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
 import { categorias } from '@/db/schema';
+import { logAction } from '@/lib/log-action';
 
 import { eq } from 'drizzle-orm';
 
@@ -36,7 +37,7 @@ type RouteParams = {
  * Busca uma categoria específica pelo ID.
  * Útil para: preencher formulário de edição, validações, etc.
  */
-export async function GET(request: Request, { params }: RouteParams) {
+export async function GET(_request: Request, { params }: RouteParams) {
   try {
     // Aguarda os parâmetros (Next.js 15+ requirement)
     const { id } = await params;
@@ -126,6 +127,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
       );
     }
 
+    await logAction(request, 'edicao', 'categoria', String(numericId), `Categoria '${updatedCategory.name}' atualizada`);
     return NextResponse.json(updatedCategory);
   } catch (error) {
     console.error('Erro ao atualizar categoria:', error);
@@ -172,6 +174,8 @@ export async function DELETE(request: Request, { params }: RouteParams) {
 
     // Deleta a categoria
     await db.delete(categorias).where(eq(categorias.id, numericId));
+
+    await logAction(request, 'exclusao', 'categoria', String(numericId), `Categoria '${existing.name}' excluída`);
 
     // Retorna sucesso (204 No Content é comum para DELETE)
     // Mas retornamos 200 com mensagem para facilitar debug

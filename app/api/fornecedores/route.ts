@@ -1,4 +1,5 @@
 import { db, schema } from '@/db';
+import { logAction } from '@/lib/log-action';
 
 import { asc } from 'drizzle-orm';
 
@@ -24,5 +25,6 @@ export async function POST(request: Request) {
     })
     .returning();
 
+  await logAction(request, 'criacao', 'fornecedor', String(newFornecedor[0].id), `Fornecedor '${newFornecedor[0].name_empresa}' criado`);
   return new Response(JSON.stringify(newFornecedor));
 }
