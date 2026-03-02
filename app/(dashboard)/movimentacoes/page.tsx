@@ -1,7 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-
 import { PaginationControls } from '@/components/pagination-controls';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,8 +21,12 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import { usePagination } from '@/hooks/usePagination';
 
+import {
+  type Entidade,
+  type TipoAcao,
+  useMovimentacoes
+} from './_hook/useMovimentacoes';
 import {
   Activity,
   Car,
@@ -43,202 +45,24 @@ import {
   X
 } from 'lucide-react';
 
-type TipoAcao = 'criacao' | 'edicao' | 'exclusao';
-type Entidade =
-  | 'produto'
-  | 'cliente'
-  | 'fornecedor'
-  | 'categoria'
-  | 'veiculo'
-  | 'ordem_venda'
-  | 'ordem_servico'
-  | 'usuario';
-
-interface Movimentacao {
-  id: number;
-  tipo_acao: TipoAcao;
-  entidade: Entidade;
-  entidade_id: string;
-  descricao: string;
-  autor: string;
-  created_at: string;
-}
-
-const MOCK_MOVIMENTACOES: Movimentacao[] = [
-  {
-    id: 1,
-    tipo_acao: 'criacao',
-    entidade: 'produto',
-    entidade_id: 'prd-001',
-    descricao:
-      'Produto "Filtro de Óleo Mann HU 718/5" foi cadastrado no sistema',
-    autor: 'Larissa Souza',
-    created_at: '2026-03-02T10:23:00Z'
-  },
-  {
-    id: 2,
-    tipo_acao: 'edicao',
-    entidade: 'cliente',
-    entidade_id: 'cli-012',
-    descricao:
-      'Dados do cliente "João Carlos Pereira" foram atualizados (telefone e endereço)',
-    autor: 'Marcos Alves',
-    created_at: '2026-03-02T09:55:00Z'
-  },
-  {
-    id: 3,
-    tipo_acao: 'exclusao',
-    entidade: 'fornecedor',
-    entidade_id: 'for-007',
-    descricao: 'Fornecedor "Auto Peças Brasil LTDA" foi removido do sistema',
-    autor: 'Larissa Souza',
-    created_at: '2026-03-02T09:10:00Z'
-  },
-  {
-    id: 4,
-    tipo_acao: 'criacao',
-    entidade: 'ordem_servico',
-    entidade_id: 'os-0234',
-    descricao:
-      'Ordem de Serviço #234 criada para veículo Toyota Corolla (ABC-1234)',
-    autor: 'Felipe Martins',
-    created_at: '2026-03-01T17:42:00Z'
-  },
-  {
-    id: 5,
-    tipo_acao: 'edicao',
-    entidade: 'produto',
-    entidade_id: 'prd-032',
-    descricao:
-      'Estoque do produto "Pastilha de Freio Bosch" atualizado de 15 para 28 unidades',
-    autor: 'Marcos Alves',
-    created_at: '2026-03-01T16:30:00Z'
-  },
-  {
-    id: 6,
-    tipo_acao: 'criacao',
-    entidade: 'cliente',
-    entidade_id: 'cli-089',
-    descricao:
-      'Novo cliente "Maria Fernanda Lima" cadastrado com veículo Honda Civic',
-    autor: 'Felipe Martins',
-    created_at: '2026-03-01T14:15:00Z'
-  },
-  {
-    id: 7,
-    tipo_acao: 'edicao',
-    entidade: 'ordem_venda',
-    entidade_id: 'ov-0198',
-    descricao: 'Ordem de Venda #198 teve status alterado para "Concluída"',
-    autor: 'Larissa Souza',
-    created_at: '2026-03-01T11:50:00Z'
-  },
-  {
-    id: 8,
-    tipo_acao: 'criacao',
-    entidade: 'veiculo',
-    entidade_id: 'vei-045',
-    descricao:
-      'Veículo Fiat Strada (DEF-5678) vinculado ao cliente "Roberto Santos"',
-    autor: 'Marcos Alves',
-    created_at: '2026-03-01T10:05:00Z'
-  },
-  {
-    id: 9,
-    tipo_acao: 'exclusao',
-    entidade: 'produto',
-    entidade_id: 'prd-018',
-    descricao:
-      'Produto "Correia Dentada Gates" removido por duplicidade no cadastro',
-    autor: 'Larissa Souza',
-    created_at: '2026-02-28T15:33:00Z'
-  },
-  {
-    id: 10,
-    tipo_acao: 'criacao',
-    entidade: 'categoria',
-    entidade_id: 'cat-011',
-    descricao: 'Nova categoria "Suspensão e Direção" adicionada ao sistema',
-    autor: 'Felipe Martins',
-    created_at: '2026-02-28T14:20:00Z'
-  },
-  {
-    id: 11,
-    tipo_acao: 'edicao',
-    entidade: 'usuario',
-    entidade_id: 'usr-003',
-    descricao:
-      'Permissões do usuário "Carlos Eduardo" atualizadas para nível Gerente',
-    autor: 'Larissa Souza',
-    created_at: '2026-02-28T11:00:00Z'
-  },
-  {
-    id: 12,
-    tipo_acao: 'criacao',
-    entidade: 'fornecedor',
-    entidade_id: 'for-021',
-    descricao:
-      'Fornecedor "Distribuidora Pneus Sul" cadastrado com CNPJ 12.456.789/0001-55',
-    autor: 'Marcos Alves',
-    created_at: '2026-02-28T09:45:00Z'
-  },
-  {
-    id: 13,
-    tipo_acao: 'edicao',
-    entidade: 'veiculo',
-    entidade_id: 'vei-031',
-    descricao:
-      'Quilometragem do veículo VW Gol (GHI-9012) atualizada para 87.500 km',
-    autor: 'Felipe Martins',
-    created_at: '2026-02-27T16:10:00Z'
-  },
-  {
-    id: 14,
-    tipo_acao: 'exclusao',
-    entidade: 'ordem_servico',
-    entidade_id: 'os-0211',
-    descricao: 'Ordem de Serviço #211 cancelada e removida a pedido do cliente',
-    autor: 'Larissa Souza',
-    created_at: '2026-02-27T14:55:00Z'
-  },
-  {
-    id: 15,
-    tipo_acao: 'criacao',
-    entidade: 'produto',
-    entidade_id: 'prd-067',
-    descricao:
-      'Produto "Amortecedor Dianteiro Monroe" cadastrado na categoria Suspensão',
-    autor: 'Marcos Alves',
-    created_at: '2026-02-27T10:30:00Z'
-  }
-];
-
 const tipoAcaoConfig: Record<
   TipoAcao,
-  {
-    label: string;
-    variant: 'default' | 'secondary' | 'destructive' | 'outline';
-    icon: React.ElementType;
-    className: string;
-  }
+  { label: string; icon: React.ElementType; className: string }
 > = {
   criacao: {
     label: 'Criação',
-    variant: 'default',
     icon: PackagePlus,
     className:
       'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/10'
   },
   edicao: {
     label: 'Edição',
-    variant: 'secondary',
     icon: FilePenLine,
     className:
       'bg-blue-500/10 text-blue-600 border-blue-500/20 hover:bg-blue-500/10'
   },
   exclusao: {
     label: 'Exclusão',
-    variant: 'destructive',
     icon: Trash2,
     className:
       'bg-red-500/10 text-red-600 border-red-500/20 hover:bg-red-500/10'
@@ -259,130 +83,55 @@ const entidadeConfig: Record<
   usuario: { label: 'Usuário', icon: UserCog }
 };
 
-function getInitials(name: string) {
-  return name
+// ---------------------------------------------------------------------------
+// Helpers de formatação visual
+// ---------------------------------------------------------------------------
+
+function obterIniciais(nomeCompleto: string): string {
+  return nomeCompleto
     .split(' ')
     .slice(0, 2)
-    .map((n) => n[0])
+    .map((parte) => parte[0])
     .join('')
     .toUpperCase();
 }
 
-function formatDateTime(iso: string) {
-  const date = new Date(iso);
+function formatarDataHora(isoDate: string): { data: string; hora: string } {
+  const date = new Date(isoDate);
   return {
-    date: date.toLocaleDateString('pt-BR'),
-    time: date.toLocaleTimeString('pt-BR', {
+    data: date.toLocaleDateString('pt-BR'),
+    hora: date.toLocaleTimeString('pt-BR', {
       hour: '2-digit',
       minute: '2-digit'
     })
   };
 }
 
-const MESES_ANOS = Array.from(
-  new Set(
-    MOCK_MOVIMENTACOES.map((m) => {
-      const d = new Date(m.created_at);
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    })
-  )
-)
-  .sort((a, b) => b.localeCompare(a))
-  .map((val) => {
-    const [year, month] = val.split('-');
-    const label = new Date(
-      Number(year),
-      Number(month) - 1,
-      1
-    ).toLocaleDateString('pt-BR', {
-      month: 'long',
-      year: 'numeric'
-    });
-    return {
-      value: val,
-      label: label.charAt(0).toUpperCase() + label.slice(1)
-    };
-  });
+// ---------------------------------------------------------------------------
+// Página
+// ---------------------------------------------------------------------------
 
 export default function Movimentacoes() {
-  const [search, setSearch] = useState('');
-  const [filterAcao, setFilterAcao] = useState<string>('todas');
-  const [filterEntidade, setFilterEntidade] = useState<string>('todas');
-  const [filterMesAno, setFilterMesAno] = useState<string>('todos');
-  const [filterDataDe, setFilterDataDe] = useState<Date | undefined>(undefined);
-  const [filterDataAte, setFilterDataAte] = useState<Date | undefined>(
-    undefined
-  );
-
-  function handleMesAnoChange(value: string) {
-    setFilterMesAno(value);
-    setFilterDataDe(undefined);
-    setFilterDataAte(undefined);
-  }
-
-  function handleDataDeChange(date: Date | undefined) {
-    setFilterDataDe(date);
-    setFilterMesAno('todos');
-  }
-
-  function handleDataAteChange(date: Date | undefined) {
-    setFilterDataAte(date);
-    setFilterMesAno('todos');
-  }
-
-  function clearDateFilters() {
-    setFilterMesAno('todos');
-    setFilterDataDe(undefined);
-    setFilterDataAte(undefined);
-  }
-
-  const hasDateFilter =
-    filterMesAno !== 'todos' ||
-    filterDataDe !== undefined ||
-    filterDataAte !== undefined;
-
-  const filtered = MOCK_MOVIMENTACOES.filter((mov) => {
-    const matchSearch =
-      mov.descricao.toLowerCase().includes(search.toLowerCase()) ||
-      mov.autor.toLowerCase().includes(search.toLowerCase());
-    const matchAcao = filterAcao === 'todas' || mov.tipo_acao === filterAcao;
-    const matchEntidade =
-      filterEntidade === 'todas' || mov.entidade === filterEntidade;
-
-    let matchData = true;
-    const movDate = new Date(mov.created_at);
-
-    if (filterMesAno !== 'todos') {
-      const [year, month] = filterMesAno.split('-');
-      matchData =
-        movDate.getFullYear() === Number(year) &&
-        movDate.getMonth() + 1 === Number(month);
-    } else if (filterDataDe || filterDataAte) {
-      const start = filterDataDe
-        ? new Date(filterDataDe.setHours(0, 0, 0, 0))
-        : null;
-      const end = filterDataAte
-        ? new Date(filterDataAte.setHours(23, 59, 59, 999))
-        : null;
-      if (start) matchData = matchData && movDate >= start;
-      if (end) matchData = matchData && movDate <= end;
-    }
-
-    return matchSearch && matchAcao && matchEntidade && matchData;
-  });
-
-  const totalCriacoes = MOCK_MOVIMENTACOES.filter(
-    (m) => m.tipo_acao === 'criacao'
-  ).length;
-  const totalEdicoes = MOCK_MOVIMENTACOES.filter(
-    (m) => m.tipo_acao === 'edicao'
-  ).length;
-  const totalExclusoes = MOCK_MOVIMENTACOES.filter(
-    (m) => m.tipo_acao === 'exclusao'
-  ).length;
-
   const {
-    paginatedItems,
+    movimentacoesFiltradas,
+    movimentacoesPaginadas,
+    estatisticas,
+    opcoesMessAno,
+    isLoading,
+    temFiltroDeData,
+    termoBusca,
+    setTermoBusca,
+    filtroTipoAcao,
+    setFiltroTipoAcao,
+    filtroEntidade,
+    setFiltroEntidade,
+    filtroMesAno,
+    filtroDataInicial,
+    filtroDataFinal,
+    handleMesAnoChange,
+    handleDataInicialChange,
+    handleDataFinalChange,
+    limparFiltrosDeData,
     currentPage,
     totalPages,
     totalItems,
@@ -394,7 +143,7 @@ export default function Movimentacoes() {
     goToPage,
     goToNextPage,
     goToPreviousPage
-  } = usePagination({ items: filtered, itemsPerPage: 8 });
+  } = useMovimentacoes();
 
   return (
     <div className='flex flex-1 flex-col gap-4 p-4 lg:p-4'>
@@ -406,7 +155,7 @@ export default function Movimentacoes() {
         </p>
       </div>
 
-      {/* Stats */}
+      {/* Cards de estatísticas */}
       <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
         <Card className='bg-card border-border'>
           <CardContent className='px-4'>
@@ -416,7 +165,7 @@ export default function Movimentacoes() {
               </div>
               <div>
                 <p className='text-2xl font-bold text-foreground'>
-                  {MOCK_MOVIMENTACOES.length}
+                  {isLoading ? '—' : estatisticas.totalRegistros}
                 </p>
                 <p className='text-sm text-muted-foreground'>
                   Total de Registros
@@ -434,7 +183,7 @@ export default function Movimentacoes() {
               </div>
               <div>
                 <p className='text-2xl font-bold text-foreground'>
-                  {totalCriacoes}
+                  {isLoading ? '—' : estatisticas.totalCriacoes}
                 </p>
                 <p className='text-sm text-muted-foreground'>Criações</p>
               </div>
@@ -450,7 +199,7 @@ export default function Movimentacoes() {
               </div>
               <div>
                 <p className='text-2xl font-bold text-foreground'>
-                  {totalEdicoes}
+                  {isLoading ? '—' : estatisticas.totalEdicoes}
                 </p>
                 <p className='text-sm text-muted-foreground'>Edições</p>
               </div>
@@ -466,7 +215,7 @@ export default function Movimentacoes() {
               </div>
               <div>
                 <p className='text-2xl font-bold text-foreground'>
-                  {totalExclusoes}
+                  {isLoading ? '—' : estatisticas.totalExclusoes}
                 </p>
                 <p className='text-sm text-muted-foreground'>Exclusões</p>
               </div>
@@ -475,21 +224,22 @@ export default function Movimentacoes() {
         </Card>
       </div>
 
-      {/* Filters */}
+      {/* Filtros */}
       <div className='flex flex-col gap-3'>
-        {/* Row 1: search + action + entity */}
+        {/* Linha 1: busca + tipo de ação + entidade */}
         <div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
           <div className='relative flex-1 max-w-md'>
             <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
             <Input
               placeholder='Buscar por descrição ou autor...'
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              value={termoBusca}
+              onChange={(e) => setTermoBusca(e.target.value)}
               className='pl-10 bg-input border-border'
             />
           </div>
+
           <div className='flex gap-2 flex-wrap'>
-            <Select value={filterAcao} onValueChange={setFilterAcao}>
+            <Select value={filtroTipoAcao} onValueChange={setFiltroTipoAcao}>
               <SelectTrigger className='w-37.5 bg-input border-border'>
                 <SelectValue placeholder='Tipo de ação' />
               </SelectTrigger>
@@ -501,7 +251,7 @@ export default function Movimentacoes() {
               </SelectContent>
             </Select>
 
-            <Select value={filterEntidade} onValueChange={setFilterEntidade}>
+            <Select value={filtroEntidade} onValueChange={setFiltroEntidade}>
               <SelectTrigger className='w-42.5 bg-input border-border'>
                 <SelectValue placeholder='Entidade' />
               </SelectTrigger>
@@ -518,48 +268,57 @@ export default function Movimentacoes() {
               </SelectContent>
             </Select>
           </div>
+        </div>
+
+        {/* Linha 2: filtros de data */}
+        <div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
+          {/* Mês / Ano */}
           <div className='flex items-center gap-2'>
             <span className='text-sm text-muted-foreground whitespace-nowrap'>
               Mês/Ano:
             </span>
-            <Select value={filterMesAno} onValueChange={handleMesAnoChange}>
+            <Select value={filtroMesAno} onValueChange={handleMesAnoChange}>
               <SelectTrigger className='w-44 bg-input border-border'>
                 <SelectValue placeholder='Filtrar por mês' />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value='todos'>Todos os meses</SelectItem>
-                {MESES_ANOS.map((op) => (
-                  <SelectItem key={op.value} value={op.value}>
-                    {op.label}
+                {opcoesMessAno.map((opcao) => (
+                  <SelectItem key={opcao.value} value={opcao.value}>
+                    {opcao.label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
+
+          <div className='hidden sm:block h-5 w-px bg-border' />
+
+          {/* Período personalizado */}
           <div className='flex items-center gap-2 flex-wrap'>
             <span className='text-sm text-muted-foreground whitespace-nowrap'>
               Período:
             </span>
             <DatePicker
-              value={filterDataDe}
-              onChange={handleDataDeChange}
+              value={filtroDataInicial}
+              onChange={handleDataInicialChange}
               placeholder='Data inicial'
               className='w-40'
             />
             <span className='text-sm text-muted-foreground'>até</span>
             <DatePicker
-              value={filterDataAte}
-              onChange={handleDataAteChange}
+              value={filtroDataFinal}
+              onChange={handleDataFinalChange}
               placeholder='Data final'
               className='w-40'
             />
           </div>
 
-          {hasDateFilter && (
+          {temFiltroDeData && (
             <Button
               variant='ghost'
               size='sm'
-              onClick={clearDateFilters}
+              onClick={limparFiltrosDeData}
               className='gap-1.5 text-muted-foreground hover:text-foreground'>
               <X className='h-3.5 w-3.5' />
               Limpar datas
@@ -567,7 +326,8 @@ export default function Movimentacoes() {
           )}
         </div>
       </div>
-      {/* Table */}
+
+      {/* Tabela */}
       <Card className='bg-card border-border'>
         <CardHeader>
           <CardTitle className='text-foreground'>
@@ -595,7 +355,15 @@ export default function Movimentacoes() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filtered.length === 0 ? (
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      className='h-24 text-center text-muted-foreground'>
+                      Carregando...
+                    </TableCell>
+                  </TableRow>
+                ) : movimentacoesFiltradas.length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={5}
@@ -604,36 +372,39 @@ export default function Movimentacoes() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  paginatedItems.map((mov) => {
-                    const acaoConfig = tipoAcaoConfig[mov.tipo_acao];
-                    const entConfig = entidadeConfig[mov.entidade];
-                    const EntIcon = entConfig.icon;
-                    const { date, time } = formatDateTime(mov.created_at);
+                  movimentacoesPaginadas.map((movimentacao) => {
+                    const configAcao = tipoAcaoConfig[movimentacao.tipo_acao];
+                    const configEntidade =
+                      entidadeConfig[movimentacao.entidade];
+                    const IconeEntidade = configEntidade.icon;
+                    const { data, hora } = formatarDataHora(
+                      movimentacao.created_at
+                    );
 
                     return (
-                      <TableRow key={mov.id} className='border-border'>
-                        {/* Ação */}
+                      <TableRow key={movimentacao.id} className='border-border'>
+                        {/* Tipo de ação */}
                         <TableCell>
                           <Badge
                             variant='outline'
-                            className={`gap-1 font-medium whitespace-nowrap ${acaoConfig.className}`}>
-                            <acaoConfig.icon className='h-3 w-3' />
-                            {acaoConfig.label}
+                            className={`gap-1 font-medium whitespace-nowrap ${configAcao.className}`}>
+                            <configAcao.icon className='h-3 w-3' />
+                            {configAcao.label}
                           </Badge>
                         </TableCell>
 
                         {/* Entidade */}
                         <TableCell className='hidden sm:table-cell'>
                           <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-                            <EntIcon className='h-3.5 w-3.5 shrink-0' />
-                            <span>{entConfig.label}</span>
+                            <IconeEntidade className='h-3.5 w-3.5 shrink-0' />
+                            <span>{configEntidade.label}</span>
                           </div>
                         </TableCell>
 
                         {/* Descrição */}
                         <TableCell>
                           <p className='text-sm text-foreground leading-snug max-w-90'>
-                            {mov.descricao}
+                            {movimentacao.descricao}
                           </p>
                         </TableCell>
 
@@ -641,22 +412,22 @@ export default function Movimentacoes() {
                         <TableCell className='hidden md:table-cell'>
                           <div className='flex items-center gap-2'>
                             <div className='flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary shrink-0'>
-                              {getInitials(mov.autor)}
+                              {obterIniciais(movimentacao.autor)}
                             </div>
                             <span className='text-sm text-foreground whitespace-nowrap'>
-                              {mov.autor}
+                              {movimentacao.autor}
                             </span>
                           </div>
                         </TableCell>
 
-                        {/* Data / Hora */}
+                        {/* Data e hora */}
                         <TableCell className='hidden lg:table-cell text-right'>
                           <div className='flex flex-col items-end gap-0.5'>
                             <span className='text-sm text-foreground'>
-                              {date}
+                              {data}
                             </span>
                             <span className='text-xs text-muted-foreground'>
-                              {time}
+                              {hora}
                             </span>
                           </div>
                         </TableCell>
