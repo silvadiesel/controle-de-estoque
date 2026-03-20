@@ -49,8 +49,27 @@ export async function DELETE(request: Request, { params }: Params) {
   const { id: idParam } = await params;
   const id = Number(idParam);
 
+  const referenciada = await db
+    .select()
+    .from(schema.ordemServicoPecas)
+    .where(eq(schema.ordemServicoPecas.peca_id, id))
+    .limit(1);
+
+  if (referenciada.length > 0) {
+    return new Response(
+      JSON.stringify({ error: 'Não é possível excluir esta peça pois ela está vinculada a uma ou mais ordens de serviço.' }),
+      { status: 409 }
+    );
+  }
+
+  const peca = await db
+    .select()
+    .from(schema.pecas)
+    .where(eq(schema.pecas.id, id))
+    .limit(1);
+
   await db.delete(schema.pecas).where(eq(schema.pecas.id, id));
 
-  await logAction(request, 'exclusao', 'produto', String(id), `Produto #${id} excluído`);
+  await logAction(request, 'exclusao', 'produto', String(id), `Produto '${peca[0]?.name_peca}' excluído`);
   return new Response(JSON.stringify({ message: 'Peca deleted successfully' }));
 }
