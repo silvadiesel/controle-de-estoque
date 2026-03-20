@@ -219,8 +219,12 @@ export function usePecas(): UsePecasReturn {
   // DELETE: Remover
   const deletePeca = async (id: number) => {
     const res = await fetch(`/api/produtos/${id}`, { method: 'DELETE' });
-    if (res.ok) await fetchPecas();
-    else throw new Error('Erro ao deletar peça');
+    if (res.ok) {
+      await fetchPecas();
+    } else {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body?.error ?? 'Erro ao deletar peça');
+    }
   };
 
   // Handlers
@@ -275,8 +279,8 @@ export function usePecas(): UsePecasReturn {
       setDeleteId(null);
       toast.success('Peça deletada com sucesso!');
     } catch (error) {
-      console.error('Erro ao deletar:', error);
-      toast.error('Erro ao deletar peça');
+      const message = error instanceof Error ? error.message : 'Erro ao deletar peça';
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
