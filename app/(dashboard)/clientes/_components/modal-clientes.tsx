@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import type { Cliente } from '@/db/schema';
 
 interface ModalClientesProps {
@@ -56,8 +57,8 @@ export function ModalClientes({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className='bg-card border-border max-w-2xl'>
-        <DialogHeader>
+      <DialogContent className='bg-card border-border max-w-2xl p-0'>
+        <DialogHeader className='p-6 pb-0'>
           <DialogTitle className='text-foreground'>
             {isEdit ? 'Editar Cliente' : 'Adicionar Cliente'}
           </DialogTitle>
@@ -67,68 +68,70 @@ export function ModalClientes({
               : 'Cadastre um novo cliente no sistema'}
           </DialogDescription>
         </DialogHeader>
-        <div className='grid gap-4 py-4'>
-          <div className='grid gap-4 sm:grid-cols-2'>
-            <div className='space-y-2'>
-              <Label>Nome do Cliente *</Label>
-              <Input
-                value={data.name_cliente || ''}
-                onChange={(e) =>
-                  setData({ ...data, name_cliente: e.target.value })
-                }
-                placeholder='João Silva'
-                className='bg-input border-border'
-              />
+        <ScrollArea className='max-h-[60vh]'>
+          <div className='grid gap-4 p-6 pt-4'>
+            <div className='grid gap-4 sm:grid-cols-2'>
+              <div className='space-y-2'>
+                <Label>Nome do Cliente *</Label>
+                <Input
+                  value={data.name_cliente || ''}
+                  onChange={(e) =>
+                    setData({ ...data, name_cliente: e.target.value })
+                  }
+                  placeholder='João Silva'
+                  className='bg-input border-border'
+                />
+              </div>
+              <div className='space-y-2'>
+                <Label>Nome da Empresa *</Label>
+                <Input
+                  value={data.nome_empresa || ''}
+                  onChange={(e) =>
+                    setData({ ...data, nome_empresa: e.target.value })
+                  }
+                  placeholder='Transportadora Silva'
+                  className='bg-input border-border'
+                />
+              </div>
+            </div>
+            <div className='grid gap-4 sm:grid-cols-2'>
+              <div className='space-y-2'>
+                <Label>CPF (ou informe CNPJ)</Label>
+                <Input
+                  value={data.cpf || ''}
+                  onChange={(e) => handleCPFChange(e.target.value)}
+                  placeholder='000.000.000-00'
+                  className='bg-input border-border'
+                />
+              </div>
+              <div className='space-y-2'>
+                <Label>CNPJ (ou informe CPF)</Label>
+                <Input
+                  value={data.cnpj || ''}
+                  onChange={(e) => handleCNPJChange(e.target.value)}
+                  placeholder='00.000.000/0001-00'
+                  className='bg-input border-border'
+                />
+              </div>
             </div>
             <div className='space-y-2'>
-              <Label>Nome da Empresa *</Label>
+              <Label>Telefone *</Label>
               <Input
-                value={data.nome_empresa || ''}
-                onChange={(e) =>
-                  setData({ ...data, nome_empresa: e.target.value })
-                }
-                placeholder='Transportadora Silva'
+                value={data.telefone || ''}
+                onChange={(e) => handlePhoneChange(e.target.value)}
+                placeholder='(11) 99999-9999'
                 className='bg-input border-border'
               />
             </div>
           </div>
-          <div className='grid gap-4 sm:grid-cols-2'>
-            <div className='space-y-2'>
-              <Label>CPF (ou informe CNPJ)</Label>
-              <Input
-                value={data.cpf || ''}
-                onChange={(e) => handleCPFChange(e.target.value)}
-                placeholder='000.000.000-00'
-                className='bg-input border-border'
-              />
-            </div>
-            <div className='space-y-2'>
-              <Label>CNPJ (ou informe CPF)</Label>
-              <Input
-                value={data.cnpj || ''}
-                onChange={(e) => handleCNPJChange(e.target.value)}
-                placeholder='00.000.000/0001-00'
-                className='bg-input border-border'
-              />
-            </div>
-          </div>
-          <div className='space-y-2'>
-            <Label>Telefone *</Label>
-            <Input
-              value={data.telefone || ''}
-              onChange={(e) => handlePhoneChange(e.target.value)}
-              placeholder='(11) 99999-9999'
-              className='bg-input border-border'
-            />
-          </div>
-        </div>
-        <DialogFooter>
-          <Button variant='outline' onClick={() => setIsOpen(false)}>
+        </ScrollArea>
+        <DialogFooter className='px-6 py-4 border-t border-border'>
+          <Button variant='outline' onClick={() => setIsOpen(false)} className='w-32'>
             Cancelar
           </Button>
           <Button
             onClick={onSubmit}
-            className='bg-primary hover:bg-primary/90'
+            className='bg-primary hover:bg-primary/90 w-32'
             disabled={isLoading}>
             {isLoading ? 'Salvando...' : isEdit ? 'Salvar' : 'Adicionar'}
           </Button>

@@ -1,4 +1,5 @@
 import { db, schema } from '@/db';
+import { logAction } from '@/lib/log-action';
 
 import { eq } from 'drizzle-orm';
 
@@ -41,10 +42,11 @@ export async function PUT(request: Request, { params }: Params) {
     .where(eq(schema.user.id, id))
     .returning();
 
+  await logAction(request, 'edicao', 'usuario', id, `Usuário '${updatedUser[0]?.name}' atualizado`);
   return new Response(JSON.stringify(updatedUser));
 }
 
-export async function DELETE(_request: Request, { params }: Params) {
+export async function DELETE(request: Request, { params }: Params) {
   const { id } = await params;
 
   // Delete user sessions first (cascade should handle this, but being explicit)
@@ -56,5 +58,6 @@ export async function DELETE(_request: Request, { params }: Params) {
   // Delete the user
   await db.delete(schema.user).where(eq(schema.user.id, id));
 
+  await logAction(request, 'exclusao', 'usuario', id, `Usuário #${id} excluído`);
   return new Response(JSON.stringify({ message: 'User deleted successfully' }));
 }

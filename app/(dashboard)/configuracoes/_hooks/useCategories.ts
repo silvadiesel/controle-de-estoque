@@ -66,7 +66,15 @@ export function useCategories(): UseCategoriesReturn {
 
   const handleAddCategory = useCallback(async () => {
     if (!newCategoryName.trim()) {
-      toast.warning('O nome da categoria é obrigatório');
+      toast.error('O nome da categoria é obrigatório');
+      return;
+    }
+
+    const duplicada = categories.some(
+      (cat) => cat.name.trim().toLowerCase() === newCategoryName.trim().toLowerCase()
+    );
+    if (duplicada) {
+      toast.error(`Já existe uma categoria com o nome '${newCategoryName.trim()}'`);
       return;
     }
 
@@ -95,11 +103,21 @@ export function useCategories(): UseCategoriesReturn {
     } finally {
       setIsSaving(false);
     }
-  }, [newCategoryName, fetchCategories]);
+  }, [newCategoryName, fetchCategories, categories]);
 
   const handleUpdateCategory = useCallback(async () => {
     if (!editingCategory?.name.trim()) {
-      toast.warning('O nome da categoria é obrigatório');
+      toast.error('O nome da categoria é obrigatório');
+      return;
+    }
+
+    const duplicada = categories.some(
+      (cat) =>
+        cat.id !== editingCategory.id &&
+        cat.name.trim().toLowerCase() === editingCategory.name.trim().toLowerCase()
+    );
+    if (duplicada) {
+      toast.error(`Já existe outra categoria com o nome '${editingCategory.name.trim()}'`);
       return;
     }
 
@@ -127,7 +145,7 @@ export function useCategories(): UseCategoriesReturn {
     } finally {
       setIsSaving(false);
     }
-  }, [editingCategory, fetchCategories]);
+  }, [editingCategory, fetchCategories, categories]);
 
   const confirmDeleteCategory = useCallback(async (): Promise<boolean> => {
     if (!deletingCategoryId) {
