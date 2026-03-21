@@ -282,11 +282,14 @@ export default function Ordens() {
     <div className='flex flex-1 flex-col gap-4 p-4 lg:p-4'>
       {/* Header */}
       <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-        <div>
-          <h2 className='text-2xl font-bold text-foreground'>
-            Ordens de Serviço e Venda
-          </h2>
-          <p className='text-muted-foreground'>
+        <div className='flex flex-col gap-1'>
+          <div className='flex items-center gap-2.5'>
+            <div className='h-7 w-1 rounded-full bg-primary' />
+            <h2 className='text-2xl font-bold text-foreground'>
+              Ordens de Serviço e Venda
+            </h2>
+          </div>
+          <p className='pl-3.5 text-sm text-muted-foreground'>
             Gerencie serviços e vendas de peças
           </p>
         </div>
