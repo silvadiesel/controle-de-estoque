@@ -265,7 +265,7 @@ export default function Movimentacoes() {
         </div>
         <div className='flex gap-3 flex-wrap'>
           <Select value={filtroTipoAcao} onValueChange={setFiltroTipoAcao}>
-            <SelectTrigger className='w-37.5 bg-input border-border'>
+            <SelectTrigger className='w-44 bg-input border-border'>
               <SelectValue placeholder='Tipo de ação' />
             </SelectTrigger>
             <SelectContent>
@@ -276,7 +276,7 @@ export default function Movimentacoes() {
             </SelectContent>
           </Select>
           <Select value={filtroEntidade} onValueChange={setFiltroEntidade}>
-            <SelectTrigger className='w-42.5 bg-input border-border'>
+            <SelectTrigger className='w-44 bg-input border-border'>
               <SelectValue placeholder='Entidade' />
             </SelectTrigger>
             <SelectContent>
@@ -304,7 +304,7 @@ export default function Movimentacoes() {
               ))}
             </SelectContent>
           </Select>
-          <div className='flex items-center gap-2 flex-wrap'>
+          <div className='md:flex items-center gap-2 flex-wrap hidden'>
             <span className='text-sm text-muted-foreground whitespace-nowrap'>
               Período:
             </span>
@@ -312,14 +312,14 @@ export default function Movimentacoes() {
               value={filtroDataInicial}
               onChange={handleDataInicialChange}
               placeholder='Data inicial'
-              className='w-40'
+              className='w-44'
             />
             <span className='text-sm text-muted-foreground'>até</span>
             <DatePicker
               value={filtroDataFinal}
               onChange={handleDataFinalChange}
               placeholder='Data final'
-              className='w-40'
+              className='w-44'
             />
           </div>
           {temFiltroDeData && (
@@ -424,7 +424,7 @@ export default function Movimentacoes() {
                     return (
                       <TableRow
                         key={movimentacao.id}
-                        className={`border-border  transition-colors hover:bg-muted/40 group`}>
+                        className={`border-border md:h-14 h-16 transition-colors hover:bg-muted/40 group`}>
                         {/* Tipo de ação */}
                         <TableCell className='pl-3'>
                           <Badge
