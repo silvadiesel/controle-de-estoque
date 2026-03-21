@@ -673,7 +673,12 @@ export default function Ordens() {
         isOpen={isAddServicoOpen}
         setIsOpen={setIsAddServicoOpen}
         onSubmit={async (data) => {
-          await handleAddOrdemServico(data as NovaOrdemServico);
+          try {
+            await handleAddOrdemServico(data as NovaOrdemServico);
+            setIsAddServicoOpen(false);
+          } catch {
+            // erro já tratado pelo hook
+          }
         }}
         isLoading={isLoading}
         getVeiculosByCliente={getVeiculosByCliente}
@@ -708,7 +713,12 @@ export default function Ordens() {
         isOpen={isAddVendaOpen}
         setIsOpen={setIsAddVendaOpen}
         onSubmit={async (data) => {
-          await handleAddOrdemVenda(data as NovaOrdemVenda);
+          try {
+            await handleAddOrdemVenda(data as NovaOrdemVenda);
+            setIsAddVendaOpen(false);
+          } catch {
+            // erro já tratado pelo hook
+          }
         }}
         isLoading={isLoading}
       />
