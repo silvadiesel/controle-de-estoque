@@ -25,11 +25,16 @@ import {
 import {
   type Entidade,
   type TipoAcao,
+  formatarDataHora,
+  obterCorAvatar,
+  obterIniciais,
   useMovimentacoes
 } from './_hook/useMovimentacoes';
 import {
   Activity,
+  Calendar,
   Car,
+  Clock,
   Factory,
   FilePenLine,
   Package,
@@ -47,69 +52,81 @@ import {
 
 const tipoAcaoConfig: Record<
   TipoAcao,
-  { label: string; icon: React.ElementType; className: string }
+  {
+    label: string;
+    icon: React.ElementType;
+    className: string;
+    bar: string;
+    pct: string;
+  }
 > = {
   criacao: {
     label: 'Criação',
     icon: PackagePlus,
     className:
-      'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/10'
+      'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/10',
+    bar: 'bg-emerald-500',
+    pct: 'text-emerald-600 bg-emerald-500/10'
   },
   edicao: {
     label: 'Edição',
     icon: FilePenLine,
     className:
-      'bg-blue-500/10 text-blue-600 border-blue-500/20 hover:bg-blue-500/10'
+      'bg-blue-500/10 text-blue-600 border-blue-500/20 hover:bg-blue-500/10',
+    bar: 'bg-blue-500',
+    pct: 'text-blue-600 bg-blue-500/10'
   },
   exclusao: {
     label: 'Exclusão',
     icon: Trash2,
     className:
-      'bg-red-500/10 text-red-600 border-red-500/20 hover:bg-red-500/10'
+      'bg-red-500/10 text-red-600 border-red-500/20 hover:bg-red-500/10',
+    bar: 'bg-red-500',
+    pct: 'text-red-600 bg-red-500/10'
   }
 };
 
 const entidadeConfig: Record<
   Entidade,
-  { label: string; icon: React.ElementType }
+  { label: string; icon: React.ElementType; color: string }
 > = {
-  produto: { label: 'Produto', icon: Package },
-  cliente: { label: 'Cliente', icon: Users },
-  fornecedor: { label: 'Fornecedor', icon: Factory },
-  categoria: { label: 'Categoria', icon: Tag },
-  veiculo: { label: 'Veículo', icon: Car },
-  ordem_venda: { label: 'Ordem de Venda', icon: ShoppingCart },
-  ordem_servico: { label: 'Ordem de Serviço', icon: Wrench },
-  usuario: { label: 'Usuário', icon: UserCog }
+  produto: {
+    label: 'Produto',
+    icon: Package,
+    color: 'text-orange-600 bg-orange-500/10'
+  },
+  cliente: {
+    label: 'Cliente',
+    icon: Users,
+    color: 'text-violet-600 bg-violet-500/10'
+  },
+  fornecedor: {
+    label: 'Fornecedor',
+    icon: Factory,
+    color: 'text-amber-700 bg-amber-500/10'
+  },
+  categoria: {
+    label: 'Categoria',
+    icon: Tag,
+    color: 'text-pink-600 bg-pink-500/10'
+  },
+  veiculo: { label: 'Veículo', icon: Car, color: 'text-sky-600 bg-sky-500/10' },
+  ordem_venda: {
+    label: 'Ordem de Venda',
+    icon: ShoppingCart,
+    color: 'text-teal-600 bg-teal-500/10'
+  },
+  ordem_servico: {
+    label: 'Ordem de Serviço',
+    icon: Wrench,
+    color: 'text-indigo-600 bg-indigo-500/10'
+  },
+  usuario: {
+    label: 'Usuário',
+    icon: UserCog,
+    color: 'text-rose-600 bg-rose-500/10'
+  }
 };
-
-// ---------------------------------------------------------------------------
-// Helpers de formatação visual
-// ---------------------------------------------------------------------------
-
-function obterIniciais(nomeCompleto: string): string {
-  return nomeCompleto
-    .split(' ')
-    .slice(0, 2)
-    .map((parte) => parte[0])
-    .join('')
-    .toUpperCase();
-}
-
-function formatarDataHora(isoDate: string): { data: string; hora: string } {
-  const date = new Date(isoDate);
-  return {
-    data: date.toLocaleDateString('pt-BR'),
-    hora: date.toLocaleTimeString('pt-BR', {
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  };
-}
-
-// ---------------------------------------------------------------------------
-// Página
-// ---------------------------------------------------------------------------
 
 export default function Movimentacoes() {
   const {
@@ -146,28 +163,33 @@ export default function Movimentacoes() {
   } = useMovimentacoes();
 
   return (
-    <div className='flex flex-1 flex-col gap-4 p-4 lg:p-4'>
+    <div className='flex flex-1 flex-col gap-6 p-4'>
       {/* Header */}
       <div className='flex flex-col gap-1'>
-        <h2 className='text-2xl font-bold text-foreground'>Movimentações</h2>
-        <p className='text-muted-foreground'>
+        <div className='flex items-center gap-2.5'>
+          <div className='h-7 w-1 rounded-full bg-primary' />
+          <h2 className='text-2xl font-bold text-foreground'>Movimentações</h2>
+        </div>
+        <p className='pl-3.5 text-sm text-muted-foreground'>
           Histórico de ações realizadas no sistema
         </p>
       </div>
 
       {/* Cards de estatísticas */}
-      <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-        <Card className='bg-card border-border'>
-          <CardContent className='px-4'>
+      <div className='flex gap-4 w-full md:flex-row flex-col'>
+        {/* Total */}
+        <Card className='bg-card w-full border-border relative overflow-hidden'>
+          <div className='absolute inset-x-0 top-0 h-0.5 bg-primary/50' />
+          <CardContent className='px-4 py-4'>
             <div className='flex items-center gap-3'>
-              <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10'>
+              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 shrink-0'>
                 <Activity className='h-5 w-5 text-primary' />
               </div>
-              <div>
+              <div className='min-w-0'>
                 <p className='text-2xl font-bold text-foreground'>
                   {isLoading ? '—' : estatisticas.totalRegistros}
                 </p>
-                <p className='text-sm text-muted-foreground'>
+                <p className='text-xs text-muted-foreground'>
                   Total de Registros
                 </p>
               </div>
@@ -175,49 +197,55 @@ export default function Movimentacoes() {
           </CardContent>
         </Card>
 
-        <Card className='bg-card border-border'>
-          <CardContent className='px-4'>
+        {/* Criações */}
+        <Card className='bg-card w-full border-border relative overflow-hidden'>
+          <div className='absolute inset-x-0 top-0 h-0.5 bg-emerald-500/60' />
+          <CardContent className='px-4 py-4'>
             <div className='flex items-center gap-3'>
-              <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10'>
+              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 shrink-0'>
                 <PackagePlus className='h-5 w-5 text-emerald-600' />
               </div>
-              <div>
+              <div className='min-w-0 flex-1'>
                 <p className='text-2xl font-bold text-foreground'>
                   {isLoading ? '—' : estatisticas.totalCriacoes}
                 </p>
-                <p className='text-sm text-muted-foreground'>Criações</p>
+                <p className='text-xs text-muted-foreground'>Criações</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className='bg-card border-border'>
-          <CardContent className='px-4'>
+        {/* Edições */}
+        <Card className='bg-card w-full border-border relative overflow-hidden'>
+          <div className='absolute inset-x-0 top-0 h-0.5 bg-blue-500/60' />
+          <CardContent className='px-4 py-4'>
             <div className='flex items-center gap-3'>
-              <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10'>
+              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 shrink-0'>
                 <TrendingUp className='h-5 w-5 text-blue-600' />
               </div>
-              <div>
+              <div className='min-w-0 flex-1'>
                 <p className='text-2xl font-bold text-foreground'>
                   {isLoading ? '—' : estatisticas.totalEdicoes}
                 </p>
-                <p className='text-sm text-muted-foreground'>Edições</p>
+                <p className='text-xs text-muted-foreground'>Edições</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className='bg-card border-border'>
-          <CardContent className='px-4'>
+        {/* Exclusões */}
+        <Card className='bg-card w-full border-border relative overflow-hidden'>
+          <div className='absolute inset-x-0 top-0 h-0.5 bg-red-500/60' />
+          <CardContent className='px-4 py-4'>
             <div className='flex items-center gap-3'>
-              <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-red-500/10'>
+              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/10 shrink-0'>
                 <Trash2 className='h-5 w-5 text-red-600' />
               </div>
-              <div>
+              <div className='min-w-0 flex-1'>
                 <p className='text-2xl font-bold text-foreground'>
                   {isLoading ? '—' : estatisticas.totalExclusoes}
                 </p>
-                <p className='text-sm text-muted-foreground'>Exclusões</p>
+                <p className='text-xs text-muted-foreground'>Exclusões</p>
               </div>
             </div>
           </CardContent>
@@ -225,76 +253,57 @@ export default function Movimentacoes() {
       </div>
 
       {/* Filtros */}
-      <div className='flex flex-col gap-3'>
-        {/* Linha 1: busca + tipo de ação + entidade */}
-        <div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
-          <div className='relative flex-1 max-w-md'>
-            <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
-            <Input
-              placeholder='Buscar por descrição ou autor...'
-              value={termoBusca}
-              onChange={(e) => setTermoBusca(e.target.value)}
-              className='pl-10 bg-input border-border'
-            />
-          </div>
-
-          <div className='flex gap-2 flex-wrap'>
-            <Select value={filtroTipoAcao} onValueChange={setFiltroTipoAcao}>
-              <SelectTrigger className='w-37.5 bg-input border-border'>
-                <SelectValue placeholder='Tipo de ação' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='todas'>Todas as ações</SelectItem>
-                <SelectItem value='criacao'>Criação</SelectItem>
-                <SelectItem value='edicao'>Edição</SelectItem>
-                <SelectItem value='exclusao'>Exclusão</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={filtroEntidade} onValueChange={setFiltroEntidade}>
-              <SelectTrigger className='w-42.5 bg-input border-border'>
-                <SelectValue placeholder='Entidade' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='todas'>Todas as entidades</SelectItem>
-                <SelectItem value='produto'>Produto</SelectItem>
-                <SelectItem value='cliente'>Cliente</SelectItem>
-                <SelectItem value='fornecedor'>Fornecedor</SelectItem>
-                <SelectItem value='categoria'>Categoria</SelectItem>
-                <SelectItem value='veiculo'>Veículo</SelectItem>
-                <SelectItem value='ordem_venda'>Ordem de Venda</SelectItem>
-                <SelectItem value='ordem_servico'>Ordem de Serviço</SelectItem>
-                <SelectItem value='usuario'>Usuário</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+      <div className='flex flex-col w-full gap-3'>
+        <div className='relative flex-1 w-full'>
+          <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+          <Input
+            placeholder='Buscar por descrição ou autor...'
+            value={termoBusca}
+            onChange={(e) => setTermoBusca(e.target.value)}
+            className='pl-10 bg-input border-border'
+          />
         </div>
-
-        {/* Linha 2: filtros de data */}
-        <div className='flex flex-col gap-3 sm:flex-row sm:items-center'>
-          {/* Mês / Ano */}
-          <div className='flex items-center gap-2'>
-            <span className='text-sm text-muted-foreground whitespace-nowrap'>
-              Mês/Ano:
-            </span>
-            <Select value={filtroMesAno} onValueChange={handleMesAnoChange}>
-              <SelectTrigger className='w-44 bg-input border-border'>
-                <SelectValue placeholder='Filtrar por mês' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='todos'>Todos os meses</SelectItem>
-                {opcoesMessAno.map((opcao) => (
-                  <SelectItem key={opcao.value} value={opcao.value}>
-                    {opcao.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className='hidden sm:block h-5 w-px bg-border' />
-
-          {/* Período personalizado */}
+        <div className='flex gap-3 flex-wrap'>
+          <Select value={filtroTipoAcao} onValueChange={setFiltroTipoAcao}>
+            <SelectTrigger className='w-37.5 bg-input border-border'>
+              <SelectValue placeholder='Tipo de ação' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='todas'>Todas as ações</SelectItem>
+              <SelectItem value='criacao'>Criação</SelectItem>
+              <SelectItem value='edicao'>Edição</SelectItem>
+              <SelectItem value='exclusao'>Exclusão</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={filtroEntidade} onValueChange={setFiltroEntidade}>
+            <SelectTrigger className='w-42.5 bg-input border-border'>
+              <SelectValue placeholder='Entidade' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='todas'>Todas as entidades</SelectItem>
+              <SelectItem value='produto'>Produto</SelectItem>
+              <SelectItem value='cliente'>Cliente</SelectItem>
+              <SelectItem value='fornecedor'>Fornecedor</SelectItem>
+              <SelectItem value='categoria'>Categoria</SelectItem>
+              <SelectItem value='veiculo'>Veículo</SelectItem>
+              <SelectItem value='ordem_venda'>Ordem de Venda</SelectItem>
+              <SelectItem value='ordem_servico'>Ordem de Serviço</SelectItem>
+              <SelectItem value='usuario'>Usuário</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={filtroMesAno} onValueChange={handleMesAnoChange}>
+            <SelectTrigger className='w-44 bg-input border-border'>
+              <SelectValue placeholder='Filtrar por mês' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='todos'>Todos os meses</SelectItem>
+              {opcoesMessAno.map((opcao) => (
+                <SelectItem key={opcao.value} value={opcao.value}>
+                  {opcao.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <div className='flex items-center gap-2 flex-wrap'>
             <span className='text-sm text-muted-foreground whitespace-nowrap'>
               Período:
@@ -313,7 +322,6 @@ export default function Movimentacoes() {
               className='w-40'
             />
           </div>
-
           {temFiltroDeData && (
             <Button
               variant='ghost'
@@ -330,45 +338,76 @@ export default function Movimentacoes() {
       {/* Tabela */}
       <Card className='bg-card border-border'>
         <CardHeader>
-          <CardTitle className='text-foreground'>
-            Histórico de Atividades
-          </CardTitle>
+          <div className='flex items-center justify-between'>
+            <CardTitle className='text-base text-foreground'>
+              Histórico de Atividades
+            </CardTitle>
+            {!isLoading && (
+              <span className='text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full'>
+                {movimentacoesFiltradas.length}{' '}
+                {movimentacoesFiltradas.length !== 1 ? 'registros' : 'registro'}
+              </span>
+            )}
+          </div>
         </CardHeader>
-        <CardContent>
-          <div className='rounded-lg border border-border overflow-hidden'>
+        <CardContent className='p-0'>
+          <div className='overflow-hidden'>
             <Table>
               <TableHeader>
-                <TableRow className='border-border hover:bg-transparent'>
-                  <TableHead className='text-muted-foreground'>Ação</TableHead>
-                  <TableHead className='text-muted-foreground hidden sm:table-cell'>
+                <TableRow className='border-border hover:bg-transparent bg-muted/40'>
+                  <TableHead className='text-muted-foreground font-medium text-xs uppercase tracking-wide pl-4 w-[110px]'>
+                    Ação
+                  </TableHead>
+                  <TableHead className='text-muted-foreground font-medium text-xs uppercase tracking-wide hidden sm:table-cell w-[150px]'>
                     Entidade
                   </TableHead>
-                  <TableHead className='text-muted-foreground'>
+                  <TableHead className='text-muted-foreground font-medium text-xs uppercase tracking-wide'>
                     Descrição
                   </TableHead>
-                  <TableHead className='text-muted-foreground hidden md:table-cell'>
+                  <TableHead className='text-muted-foreground font-medium text-xs uppercase tracking-wide hidden md:table-cell w-[160px]'>
                     Autor
                   </TableHead>
-                  <TableHead className='text-muted-foreground hidden lg:table-cell text-right'>
+                  <TableHead className='text-muted-foreground font-medium text-xs uppercase tracking-wide hidden lg:table-cell text-right pr-4 w-[120px]'>
                     Data / Hora
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={5}
-                      className='h-24 text-center text-muted-foreground'>
-                      Carregando...
-                    </TableCell>
-                  </TableRow>
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <TableRow key={i} className='border-border border-l-muted'>
+                      <TableCell className='pl-4'>
+                        <div className='h-6 w-20 rounded-full bg-muted animate-pulse' />
+                      </TableCell>
+                      <TableCell className='hidden sm:table-cell'>
+                        <div className='h-6 w-28 rounded-md bg-muted animate-pulse' />
+                      </TableCell>
+                      <TableCell>
+                        <div className='h-4 w-full max-w-xs rounded bg-muted animate-pulse' />
+                      </TableCell>
+                      <TableCell className='hidden md:table-cell'>
+                        <div className='flex items-center gap-2'>
+                          <div className='h-7 w-7 rounded-full bg-muted animate-pulse shrink-0' />
+                          <div className='h-4 w-24 rounded bg-muted animate-pulse' />
+                        </div>
+                      </TableCell>
+                      <TableCell className='hidden lg:table-cell'>
+                        <div className='flex flex-col items-end gap-1.5'>
+                          <div className='h-4 w-20 rounded bg-muted animate-pulse' />
+                          <div className='h-3 w-12 rounded bg-muted animate-pulse' />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
                 ) : movimentacoesFiltradas.length === 0 ? (
                   <TableRow>
-                    <TableCell
-                      colSpan={5}
-                      className='h-24 text-center text-muted-foreground'>
-                      Nenhuma movimentação encontrada
+                    <TableCell colSpan={5} className='h-32 text-center'>
+                      <div className='flex flex-col items-center gap-2 text-muted-foreground'>
+                        <Activity className='h-8 w-8 opacity-25' />
+                        <p className='text-sm'>
+                          Nenhuma movimentação encontrada
+                        </p>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -380,14 +419,17 @@ export default function Movimentacoes() {
                     const { data, hora } = formatarDataHora(
                       movimentacao.created_at
                     );
+                    const corAvatar = obterCorAvatar(movimentacao.autor);
 
                     return (
-                      <TableRow key={movimentacao.id} className='border-border'>
+                      <TableRow
+                        key={movimentacao.id}
+                        className={`border-border  transition-colors hover:bg-muted/40 group`}>
                         {/* Tipo de ação */}
-                        <TableCell>
+                        <TableCell className='pl-3'>
                           <Badge
                             variant='outline'
-                            className={`gap-1 font-medium whitespace-nowrap ${configAcao.className}`}>
+                            className={`gap-1.5 font-medium whitespace-nowrap text-xs ${configAcao.className}`}>
                             <configAcao.icon className='h-3 w-3' />
                             {configAcao.label}
                           </Badge>
@@ -395,8 +437,9 @@ export default function Movimentacoes() {
 
                         {/* Entidade */}
                         <TableCell className='hidden sm:table-cell'>
-                          <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-                            <IconeEntidade className='h-3.5 w-3.5 shrink-0' />
+                          <div
+                            className={`flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded-md w-fit ${configEntidade.color}`}>
+                            <IconeEntidade className='h-3 w-3 shrink-0' />
                             <span>{configEntidade.label}</span>
                           </div>
                         </TableCell>
@@ -411,7 +454,8 @@ export default function Movimentacoes() {
                         {/* Autor */}
                         <TableCell className='hidden md:table-cell'>
                           <div className='flex items-center gap-2'>
-                            <div className='flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary shrink-0'>
+                            <div
+                              className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold shrink-0 ${corAvatar}`}>
                               {obterIniciais(movimentacao.autor)}
                             </div>
                             <span className='text-sm text-foreground whitespace-nowrap'>
@@ -421,14 +465,16 @@ export default function Movimentacoes() {
                         </TableCell>
 
                         {/* Data e hora */}
-                        <TableCell className='hidden lg:table-cell text-right'>
-                          <div className='flex flex-col items-end gap-0.5'>
-                            <span className='text-sm text-foreground'>
-                              {data}
-                            </span>
-                            <span className='text-xs text-muted-foreground'>
-                              {hora}
-                            </span>
+                        <TableCell className='hidden lg:table-cell text-right pr-4'>
+                          <div className='flex flex-col items-end gap-1'>
+                            <div className='flex items-center gap-1 text-xs text-foreground'>
+                              <Calendar className='h-3 w-3 text-muted-foreground shrink-0' />
+                              <span>{data}</span>
+                            </div>
+                            <div className='flex items-center gap-1 text-xs text-muted-foreground'>
+                              <Clock className='h-3 w-3 shrink-0' />
+                              <span>{hora}</span>
+                            </div>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -438,21 +484,22 @@ export default function Movimentacoes() {
               </TableBody>
             </Table>
           </div>
-
-          <PaginationControls
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalItems={totalItems}
-            startItem={startItem}
-            endItem={endItem}
-            pageItems={pageItems}
-            isFirstPage={isFirstPage}
-            isLastPage={isLastPage}
-            onPageChange={goToPage}
-            onNextPage={goToNextPage}
-            onPreviousPage={goToPreviousPage}
-            itemLabel='movimentações'
-          />
+          <div className='border-t border-border px-4'>
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              startItem={startItem}
+              endItem={endItem}
+              pageItems={pageItems}
+              isFirstPage={isFirstPage}
+              isLastPage={isLastPage}
+              onPageChange={goToPage}
+              onNextPage={goToNextPage}
+              onPreviousPage={goToPreviousPage}
+              itemLabel='movimentações'
+            />
+          </div>
         </CardContent>
       </Card>
     </div>

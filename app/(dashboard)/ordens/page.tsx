@@ -37,6 +37,7 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
+import { Peca } from '@/db/schema/pecas';
 import { usePagination } from '@/hooks/usePagination';
 
 import {
@@ -66,7 +67,6 @@ import {
   Wrench,
   XCircle
 } from 'lucide-react';
-import { Peca } from '@/db/schema/pecas';
 
 type OrdemUnificada =
   | (OrdemServicoCompleta & { tipo: 'servico' })
@@ -76,7 +76,7 @@ const statusConfig = {
   ativa: {
     label: 'Ativa',
     icon: Clock,
-    className: 'bg-secondary text-secondary-foreground'
+    className: 'bg-yellow-700/20 text-yellow-500'
   },
   fechada: {
     label: 'Fechada',
@@ -254,7 +254,9 @@ export default function Ordens() {
       pecas: ordem.pecas.map((p) => ({
         peca_id: p.peca_id,
         quantidade: p.quantidade,
-        peca: p.peca ? ({ ...p.peca, preco: p.peca.preco } as Peca | null) : null
+        peca: p.peca
+          ? ({ ...p.peca, preco: p.peca.preco } as Peca | null)
+          : null
       }))
     };
   };

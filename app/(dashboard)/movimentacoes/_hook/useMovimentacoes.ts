@@ -91,6 +91,41 @@ export interface UseMovimentacoesReturn {
 const ITENS_POR_PAGINA = 8;
 const AUTOR_DESCONHECIDO = 'Usuário removido';
 
+const AVATAR_COLORS = [
+  'bg-orange-400 text-white',
+  'bg-violet-400 text-white',
+  'bg-teal-500 text-white',
+  'bg-rose-400 text-white',
+  'bg-sky-400 text-white',
+  'bg-amber-500 text-white',
+  'bg-indigo-400 text-white',
+  'bg-emerald-500 text-white'
+];
+
+export function obterIniciais(nomeCompleto: string): string {
+  return nomeCompleto
+    .split(' ')
+    .slice(0, 2)
+    .map((parte) => parte[0])
+    .join('')
+    .toUpperCase();
+}
+
+export function obterCorAvatar(nome: string): string {
+  const index =
+    nome.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) %
+    AVATAR_COLORS.length;
+  return AVATAR_COLORS[index];
+}
+
+export function formatarDataHora(isoDate: string): { data: string; hora: string } {
+  const date = new Date(isoDate);
+  return {
+    data: date.toLocaleDateString('pt-BR'),
+    hora: date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+  };
+}
+
 /** Converte o formato da API para o formato normalizado da página */
 function normalizarMovimentacao(mov: MovimentacaoAPI): Movimentacao {
   return {
