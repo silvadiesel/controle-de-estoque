@@ -257,11 +257,11 @@ export function useOrdens(): UseOrdensReturn {
       if (!res.ok) throw new Error('Erro ao criar ordem de serviço');
 
       await fetchOrdensServico();
-      setIsAddServicoOpen(false);
       toast.success('Ordem de serviço criada com sucesso!');
     } catch (error) {
       console.error('Erro:', error);
       toast.error('Erro ao criar ordem de serviço');
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -322,11 +322,11 @@ export function useOrdens(): UseOrdensReturn {
       if (!res.ok) throw new Error('Erro ao criar ordem de venda');
 
       await fetchOrdensVenda();
-      setIsAddVendaOpen(false);
       toast.success('Ordem de venda criada com sucesso!');
     } catch (error) {
       console.error('Erro:', error);
       toast.error('Erro ao criar ordem de venda');
+      throw error;
     } finally {
       setIsLoading(false);
     }

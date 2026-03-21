@@ -55,11 +55,12 @@ export default function Products() {
     <div className='flex flex-1 flex-col gap-4 p-4 lg:p-4'>
       <div className='flex flex-col gap-6'>
         <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
-          <div>
-            <h2 className='text-3xl font-bold text-foreground tracking-tight'>
-              Produtos
-            </h2>
-            <p className='text-muted-foreground'>Gerencie o estoque</p>
+          <div className='flex flex-col gap-1'>
+            <div className='flex items-center gap-2.5'>
+              <div className='h-7 w-1 rounded-full bg-primary' />
+              <h2 className='text-2xl font-bold text-foreground'>Produtos</h2>
+            </div>
+            <p className='pl-3.5 text-sm text-muted-foreground'>Gerencie o estoque</p>
           </div>
 
           <ModalPecas

@@ -37,6 +37,7 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
+import { Peca } from '@/db/schema/pecas';
 import { usePagination } from '@/hooks/usePagination';
 
 import {
@@ -66,7 +67,6 @@ import {
   Wrench,
   XCircle
 } from 'lucide-react';
-import { Peca } from '@/db/schema/pecas';
 
 type OrdemUnificada =
   | (OrdemServicoCompleta & { tipo: 'servico' })
@@ -76,7 +76,7 @@ const statusConfig = {
   ativa: {
     label: 'Ativa',
     icon: Clock,
-    className: 'bg-secondary text-secondary-foreground'
+    className: 'bg-yellow-700/20 text-yellow-500'
   },
   fechada: {
     label: 'Fechada',
@@ -254,7 +254,9 @@ export default function Ordens() {
       pecas: ordem.pecas.map((p) => ({
         peca_id: p.peca_id,
         quantidade: p.quantidade,
-        peca: p.peca ? ({ ...p.peca, preco: p.peca.preco } as Peca | null) : null
+        peca: p.peca
+          ? ({ ...p.peca, preco: p.peca.preco } as Peca | null)
+          : null
       }))
     };
   };
@@ -280,11 +282,14 @@ export default function Ordens() {
     <div className='flex flex-1 flex-col gap-4 p-4 lg:p-4'>
       {/* Header */}
       <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-        <div>
-          <h2 className='text-2xl font-bold text-foreground'>
-            Ordens de Serviço e Venda
-          </h2>
-          <p className='text-muted-foreground'>
+        <div className='flex flex-col gap-1'>
+          <div className='flex items-center gap-2.5'>
+            <div className='h-7 w-1 rounded-full bg-primary' />
+            <h2 className='text-2xl font-bold text-foreground'>
+              Ordens de Serviço e Venda
+            </h2>
+          </div>
+          <p className='pl-3.5 text-sm text-muted-foreground'>
             Gerencie serviços e vendas de peças
           </p>
         </div>
@@ -668,7 +673,12 @@ export default function Ordens() {
         isOpen={isAddServicoOpen}
         setIsOpen={setIsAddServicoOpen}
         onSubmit={async (data) => {
-          await handleAddOrdemServico(data as NovaOrdemServico);
+          try {
+            await handleAddOrdemServico(data as NovaOrdemServico);
+            setIsAddServicoOpen(false);
+          } catch {
+            // erro já tratado pelo hook
+          }
         }}
         isLoading={isLoading}
         getVeiculosByCliente={getVeiculosByCliente}
@@ -703,7 +713,12 @@ export default function Ordens() {
         isOpen={isAddVendaOpen}
         setIsOpen={setIsAddVendaOpen}
         onSubmit={async (data) => {
-          await handleAddOrdemVenda(data as NovaOrdemVenda);
+          try {
+            await handleAddOrdemVenda(data as NovaOrdemVenda);
+            setIsAddVendaOpen(false);
+          } catch {
+            // erro já tratado pelo hook
+          }
         }}
         isLoading={isLoading}
       />

@@ -1,4 +1,5 @@
 import { db, schema } from '@/db';
+import { logAction } from '@/lib/log-action';
 
 import { eq } from 'drizzle-orm';
 
@@ -34,15 +35,17 @@ export async function PUT(request: Request, { params }: Params) {
     .where(eq(schema.veiculo.id, id))
     .returning();
 
+  await logAction(request, 'edicao', 'veiculo', String(id), `Veículo '${updatedVeiculo[0]?.placa} - ${updatedVeiculo[0]?.modelo}' atualizado`);
   return new Response(JSON.stringify(updatedVeiculo));
 }
 
-export async function DELETE(_request: Request, { params }: Params) {
+export async function DELETE(request: Request, { params }: Params) {
   const { id: idParam } = await params;
   const id = Number(idParam);
 
   await db.delete(schema.veiculo).where(eq(schema.veiculo.id, id));
 
+  await logAction(request, 'exclusao', 'veiculo', String(id), `Veículo #${id} excluído`);
   return new Response(
     JSON.stringify({ message: 'Veiculo deleted successfully' })
   );

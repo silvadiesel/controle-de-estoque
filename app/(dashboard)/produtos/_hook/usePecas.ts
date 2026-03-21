@@ -189,8 +189,12 @@ export function usePecas(): UsePecasReturn {
         alerta: data.alerta ?? 1
       })
     });
-    if (res.ok) await fetchPecas();
-    else throw new Error('Erro ao criar peça');
+    if (res.status === 409) {
+      const body = await res.json();
+      throw new Error(body.error);
+    }
+    if (!res.ok) throw new Error('Erro ao criar peça');
+    await fetchPecas();
   };
 
   // PUT: Editar
@@ -219,8 +223,12 @@ export function usePecas(): UsePecasReturn {
   // DELETE: Remover
   const deletePeca = async (id: number) => {
     const res = await fetch(`/api/produtos/${id}`, { method: 'DELETE' });
-    if (res.ok) await fetchPecas();
-    else throw new Error('Erro ao deletar peça');
+    if (res.ok) {
+      await fetchPecas();
+    } else {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body?.error ?? 'Erro ao deletar peça');
+    }
   };
 
   // Handlers
@@ -229,6 +237,15 @@ export function usePecas(): UsePecasReturn {
     try {
       pecaSchema.parse(newPeca);
 
+      const codigoNovo = newPeca.codigo?.trim().toUpperCase();
+      const duplicado = pecas.some(
+        (p) => p.codigo.trim().toUpperCase() === codigoNovo
+      );
+      if (duplicado) {
+        toast.error(`Já existe uma peça cadastrada com o código '${newPeca.codigo}'`);
+        return;
+      }
+
       await createPeca(newPeca);
       setNewPeca(pecaVazia);
       setIsAddOpen(false);
@@ -236,6 +253,8 @@ export function usePecas(): UsePecasReturn {
     } catch (error) {
       if (error instanceof ZodError) {
         toast.error(error.issues[0].message);
+      } else if (error instanceof Error) {
+        toast.error(error.message);
       } else {
         toast.error('Erro ao adicionar peça');
       }
@@ -251,6 +270,15 @@ export function usePecas(): UsePecasReturn {
     try {
       pecaSchema.parse(newPeca);
 
+      const codigoEditado = newPeca.codigo?.trim().toUpperCase();
+      const duplicado = pecas.some(
+        (p) => p.id !== editingPeca.id && p.codigo.trim().toUpperCase() === codigoEditado
+      );
+      if (duplicado) {
+        toast.error(`Já existe outra peça cadastrada com o código '${newPeca.codigo}'`);
+        return;
+      }
+
       await updatePeca(editingPeca.id, newPeca);
       setEditingPeca(null);
       setIsAddOpen(false);
@@ -259,6 +287,8 @@ export function usePecas(): UsePecasReturn {
       console.error('Erro ao atualizar:', error);
       if (error instanceof ZodError) {
         toast.error(error.issues[0].message);
+      } else if (error instanceof Error) {
+        toast.error(error.message);
       } else {
         toast.error('Erro ao atualizar peça');
       }
@@ -275,8 +305,8 @@ export function usePecas(): UsePecasReturn {
       setDeleteId(null);
       toast.success('Peça deletada com sucesso!');
     } catch (error) {
-      console.error('Erro ao deletar:', error);
-      toast.error('Erro ao deletar peça');
+      const message = error instanceof Error ? error.message : 'Erro ao deletar peça';
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }

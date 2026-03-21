@@ -6,3 +6,4 @@ export * from './veiculo';
 export * from './pecas';
 export * from './ordem-servico';
 export * from './ordem-venda';
+export * from './movimentacoes';

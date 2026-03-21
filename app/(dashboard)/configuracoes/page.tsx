@@ -153,9 +153,12 @@ export default function Configuracoes() {
 
   return (
     <div className='flex flex-1 flex-col gap-4 p-4 lg:p-4'>
-      <div>
-        <h2 className='text-2xl font-bold text-foreground'>Configurações</h2>
-        <p className='text-muted-foreground'>
+      <div className='flex flex-col gap-1'>
+        <div className='flex items-center gap-2.5'>
+          <div className='h-7 w-1 rounded-full bg-primary' />
+          <h2 className='text-2xl font-bold text-foreground'>Configurações</h2>
+        </div>
+        <p className='pl-3.5 text-sm text-muted-foreground'>
           Personalize o sistema conforme sua necessidade
         </p>
       </div>

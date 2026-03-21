@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 
 import { db, schema } from '@/db';
+import { logAction } from '@/lib/log-action';
 
-import { asc } from 'drizzle-orm';
+import { asc, eq } from 'drizzle-orm';
 
 export async function GET() {
   try {
@@ -24,6 +25,29 @@ export async function POST(request: Request) {
   try {
     const data = await request.json();
 
+    if (!data.name_peca?.trim()) {
+      return NextResponse.json({ error: 'Nome da peça é obrigatório' }, { status: 400 });
+    }
+    if (!data.codigo?.trim()) {
+      return NextResponse.json({ error: 'Código é obrigatório' }, { status: 400 });
+    }
+    if (!data.categoria_id) {
+      return NextResponse.json({ error: 'Categoria é obrigatória' }, { status: 400 });
+    }
+
+    const existing = await db
+      .select()
+      .from(schema.pecas)
+      .where(eq(schema.pecas.codigo, data.codigo.trim().toUpperCase()))
+      .limit(1);
+
+    if (existing.length > 0) {
+      return NextResponse.json(
+        { error: `Já existe uma peça cadastrada com o código '${data.codigo}'` },
+        { status: 409 }
+      );
+    }
+
     const newPeca = await db
       .insert(schema.pecas)
       .values({
@@ -39,6 +63,7 @@ export async function POST(request: Request) {
       })
       .returning();
 
+    await logAction(request, 'criacao', 'produto', String(newPeca[0].id), `Produto '${newPeca[0].name_peca}' criado`);
     return NextResponse.json(newPeca, { status: 201 });
   } catch (error) {
     console.error('Erro ao criar peça:', error);

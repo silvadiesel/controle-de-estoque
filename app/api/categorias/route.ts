@@ -26,6 +26,9 @@ import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
 import { categorias } from '@/db/schema';
+import { logAction } from '@/lib/log-action';
+
+import { sql } from 'drizzle-orm';
 
 /**
  * GET /api/categorias
@@ -88,12 +91,25 @@ export async function POST(request: Request) {
       );
     }
 
-    // Insere a nova categoria no banco
-    // .returning() retorna os dados inseridos (incluindo o ID gerado)
+    const existing = await db
+      .select()
+      .from(categorias)
+      .where(sql`lower(${categorias.name}) = lower(${body.name.trim()})`)
+      .limit(1);
+
+    if (existing.length > 0) {
+      return NextResponse.json(
+        { error: `Já existe uma categoria com o nome '${body.name.trim()}'` },
+        { status: 409 }
+      );
+    }
+
     const [newCategory] = await db
       .insert(categorias)
       .values({ name: body.name.trim() })
       .returning();
+
+    await logAction(request, 'criacao', 'categoria', String(newCategory.id), `Categoria '${newCategory.name}' criada`);
 
     // Retorna a categoria criada com status 201 (Created)
     return NextResponse.json(newCategory, { status: 201 });

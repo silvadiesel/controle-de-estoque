@@ -1,4 +1,5 @@
 import { db, schema } from '@/db';
+import { logAction } from '@/lib/log-action';
 
 import { eq } from 'drizzle-orm';
 
@@ -37,10 +38,11 @@ export async function PUT(request: Request, { params }: Params) {
     .where(eq(schema.cliente.id, id))
     .returning();
 
+  await logAction(request, 'edicao', 'cliente', String(id), `Cliente '${updatedCliente[0]?.name_cliente}' atualizado`);
   return new Response(JSON.stringify(updatedCliente));
 }
 
-export async function DELETE(_request: Request, { params }: Params) {
+export async function DELETE(request: Request, { params }: Params) {
   const { id: idParam } = await params;
   const id = Number(idParam);
 
@@ -50,6 +52,7 @@ export async function DELETE(_request: Request, { params }: Params) {
   // Then delete the client
   await db.delete(schema.cliente).where(eq(schema.cliente.id, id));
 
+  await logAction(request, 'exclusao', 'cliente', String(id), `Cliente #${id} excluído`);
   return new Response(
     JSON.stringify({ message: 'Cliente deleted successfully' })
   );
