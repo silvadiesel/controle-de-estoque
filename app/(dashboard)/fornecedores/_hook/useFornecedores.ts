@@ -98,7 +98,12 @@ export function useFornecedores(): UseFornecedoresReturn {
         status: true
       })
     });
-    if (res.ok) await fetchFornecedores();
+    if (res.status === 409) {
+      const body = await res.json();
+      throw new Error(body.error);
+    }
+    if (!res.ok) throw new Error('Erro ao adicionar fornecedor');
+    await fetchFornecedores();
   };
 
   // PUT: Editar
@@ -128,14 +133,24 @@ export function useFornecedores(): UseFornecedoresReturn {
     try {
       fornecedorSchema.parse(newFornecedor);
 
+      const cnpjNovo = newFornecedor.cnpj?.replace(/\D/g, '');
+      const duplicado = fornecedores.some(
+        (f) => f.cnpj.replace(/\D/g, '') === cnpjNovo
+      );
+      if (duplicado) {
+        toast.error('Já existe um fornecedor cadastrado com este CNPJ');
+        return;
+      }
+
       await createFornecedor(newFornecedor);
       setNewFornecedor(fornecedorVazio);
       setIsAddOpen(false);
       toast.success('Fornecedor adicionado com sucesso!');
     } catch (error) {
       if (error instanceof ZodError) {
-        // Exibe o primeiro erro de validação
         toast.error(error.issues[0].message);
+      } else if (error instanceof Error) {
+        toast.error(error.message);
       } else {
         toast.error('Erro ao adicionar fornecedor');
       }
@@ -151,6 +166,15 @@ export function useFornecedores(): UseFornecedoresReturn {
     try {
       fornecedorSchema.parse(editingFornecedor);
 
+      const cnpjEditado = editingFornecedor.cnpj?.replace(/\D/g, '');
+      const duplicado = fornecedores.some(
+        (f) => f.id !== editingFornecedor.id && f.cnpj.replace(/\D/g, '') === cnpjEditado
+      );
+      if (duplicado) {
+        toast.error('Já existe outro fornecedor cadastrado com este CNPJ');
+        return;
+      }
+
       await updateFornecedor(editingFornecedor.id, editingFornecedor);
       setEditingFornecedor(null);
       toast.success('Fornecedor atualizado com sucesso!');
@@ -158,6 +182,8 @@ export function useFornecedores(): UseFornecedoresReturn {
       console.error('Erro ao atualizar:', error);
       if (error instanceof ZodError) {
         toast.error(error.issues[0].message);
+      } else if (error instanceof Error) {
+        toast.error(error.message);
       } else {
         toast.error('Erro ao atualizar fornecedor');
       }

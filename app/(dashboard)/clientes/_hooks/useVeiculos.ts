@@ -119,7 +119,12 @@ export function useVeiculos(): UseVeiculosReturn {
         cliente_id: clienteId
       })
     });
-    if (res.ok) await fetchVeiculosByCliente(clienteId);
+    if (res.status === 409) {
+      const body = await res.json();
+      throw new Error(body.error);
+    }
+    if (!res.ok) throw new Error('Erro ao adicionar veículo');
+    await fetchVeiculosByCliente(clienteId);
   };
 
   // PUT: Editar veículo
@@ -145,6 +150,13 @@ export function useVeiculos(): UseVeiculosReturn {
     if (res.ok) await fetchVeiculosByCliente(clienteId);
   };
 
+  // Helpers para verificar duplicata de placa globalmente
+  const getAllVeiculos = (): Veiculo[] => {
+    const all: Veiculo[] = [];
+    veiculosByCliente.forEach((veiculos) => all.push(...veiculos));
+    return all;
+  };
+
   // Handlers
   const handleAddVeiculo = async () => {
     if (!currentClienteId) {
@@ -156,6 +168,15 @@ export function useVeiculos(): UseVeiculosReturn {
     try {
       veiculoSchema.parse(newVeiculo);
 
+      const placaNova = newVeiculo.placa?.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+      const duplicada = getAllVeiculos().some(
+        (v) => v.placa.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() === placaNova
+      );
+      if (duplicada) {
+        toast.error(`Já existe um veículo cadastrado com a placa '${newVeiculo.placa}'`);
+        return;
+      }
+
       await createVeiculo(newVeiculo, currentClienteId);
       setNewVeiculo(veiculoVazio);
       setIsAddOpen(false);
@@ -163,6 +184,8 @@ export function useVeiculos(): UseVeiculosReturn {
     } catch (error) {
       if (error instanceof ZodError) {
         toast.error(error.issues[0].message);
+      } else if (error instanceof Error) {
+        toast.error(error.message);
       } else {
         toast.error('Erro ao adicionar veículo');
       }
@@ -178,6 +201,17 @@ export function useVeiculos(): UseVeiculosReturn {
     try {
       veiculoSchema.parse(editingVeiculo);
 
+      const placaEditada = editingVeiculo.placa?.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+      const duplicada = getAllVeiculos().some(
+        (v) =>
+          v.id !== editingVeiculo.id &&
+          v.placa.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() === placaEditada
+      );
+      if (duplicada) {
+        toast.error(`Já existe outro veículo cadastrado com a placa '${editingVeiculo.placa}'`);
+        return;
+      }
+
       await updateVeiculo(
         editingVeiculo.id,
         editingVeiculo,
@@ -189,6 +223,8 @@ export function useVeiculos(): UseVeiculosReturn {
       console.error('Erro ao atualizar:', error);
       if (error instanceof ZodError) {
         toast.error(error.issues[0].message);
+      } else if (error instanceof Error) {
+        toast.error(error.message);
       } else {
         toast.error('Erro ao atualizar veículo');
       }

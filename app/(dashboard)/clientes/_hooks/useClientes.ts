@@ -101,7 +101,12 @@ export function useClientes(): UseClientesReturn {
         status: true
       })
     });
-    if (res.ok) await fetchClientes();
+    if (res.status === 409) {
+      const body = await res.json();
+      throw new Error(body.error);
+    }
+    if (!res.ok) throw new Error('Erro ao adicionar cliente');
+    await fetchClientes();
   };
 
   // PUT: Editar
@@ -132,6 +137,29 @@ export function useClientes(): UseClientesReturn {
     try {
       clienteSchema.parse(newCliente);
 
+      const cpfNovo = newCliente.cpf?.replace(/\D/g, '');
+      const cnpjNovo = newCliente.cnpj?.replace(/\D/g, '');
+
+      if (cpfNovo) {
+        const cpfDuplicado = clientes.some(
+          (c) => c.cpf?.replace(/\D/g, '') === cpfNovo
+        );
+        if (cpfDuplicado) {
+          toast.error('Já existe um cliente cadastrado com este CPF');
+          return;
+        }
+      }
+
+      if (cnpjNovo) {
+        const cnpjDuplicado = clientes.some(
+          (c) => c.cnpj?.replace(/\D/g, '') === cnpjNovo
+        );
+        if (cnpjDuplicado) {
+          toast.error('Já existe um cliente cadastrado com este CNPJ');
+          return;
+        }
+      }
+
       await createCliente(newCliente);
       setNewCliente(clienteVazio);
       setIsAddOpen(false);
@@ -139,6 +167,8 @@ export function useClientes(): UseClientesReturn {
     } catch (error) {
       if (error instanceof ZodError) {
         toast.error(error.issues[0].message);
+      } else if (error instanceof Error) {
+        toast.error(error.message);
       } else {
         toast.error('Erro ao adicionar cliente');
       }
@@ -154,6 +184,29 @@ export function useClientes(): UseClientesReturn {
     try {
       clienteSchema.parse(editingCliente);
 
+      const cpfEditado = editingCliente.cpf?.replace(/\D/g, '');
+      const cnpjEditado = editingCliente.cnpj?.replace(/\D/g, '');
+
+      if (cpfEditado) {
+        const cpfDuplicado = clientes.some(
+          (c) => c.id !== editingCliente.id && c.cpf?.replace(/\D/g, '') === cpfEditado
+        );
+        if (cpfDuplicado) {
+          toast.error('Já existe outro cliente cadastrado com este CPF');
+          return;
+        }
+      }
+
+      if (cnpjEditado) {
+        const cnpjDuplicado = clientes.some(
+          (c) => c.id !== editingCliente.id && c.cnpj?.replace(/\D/g, '') === cnpjEditado
+        );
+        if (cnpjDuplicado) {
+          toast.error('Já existe outro cliente cadastrado com este CNPJ');
+          return;
+        }
+      }
+
       await updateCliente(editingCliente.id, editingCliente);
       setEditingCliente(null);
       toast.success('Cliente atualizado com sucesso!');
@@ -161,6 +214,8 @@ export function useClientes(): UseClientesReturn {
       console.error('Erro ao atualizar:', error);
       if (error instanceof ZodError) {
         toast.error(error.issues[0].message);
+      } else if (error instanceof Error) {
+        toast.error(error.message);
       } else {
         toast.error('Erro ao atualizar cliente');
       }
