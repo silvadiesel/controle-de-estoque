@@ -1,11 +1,12 @@
+// app/(dashboard)/alertas/page.tsx
 'use client';
 
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useStockStore } from '@/lib/store';
 
+import { useAlerta } from './_hooks/useAlerta';
 import {
   AlertTriangle,
   Bell,
@@ -16,11 +17,15 @@ import {
 
 export default function Alertas() {
   const router = useRouter();
-  const { getLowStockProducts, products } = useStockStore();
-  const lowStockProducts = getLowStockProducts();
+  const { pecasCriticas, pecasAtencao, pecasEmAlerta, isLoading } = useAlerta();
 
-  const criticalProducts = lowStockProducts.filter((p) => p.quantity === 0);
-  const warningProducts = lowStockProducts.filter((p) => p.quantity > 0);
+  if (isLoading) {
+    return (
+      <div className='flex flex-1 items-center justify-center p-4'>
+        <p className='text-muted-foreground'>Carregando alertas...</p>
+      </div>
+    );
+  }
 
   return (
     <div className='flex flex-1 flex-col gap-4 p-4 lg:p-4'>
@@ -43,7 +48,7 @@ export default function Alertas() {
               <div>
                 <p className='text-sm text-destructive'>Crítico</p>
                 <p className='text-3xl font-bold text-destructive'>
-                  {criticalProducts.length}
+                  {pecasCriticas.length}
                 </p>
                 <p className='text-xs text-muted-foreground mt-1'>
                   Estoque zerado
@@ -62,7 +67,7 @@ export default function Alertas() {
               <div>
                 <p className='text-sm text-primary'>Atenção</p>
                 <p className='text-3xl font-bold text-primary'>
-                  {warningProducts.length}
+                  {pecasAtencao.length}
                 </p>
                 <p className='text-xs text-muted-foreground mt-1'>
                   Abaixo do mínimo
@@ -79,11 +84,13 @@ export default function Alertas() {
           <CardContent className='px-6'>
             <div className='flex items-center justify-between'>
               <div>
-                <p className='text-sm text-muted-foreground'>Normal</p>
+                <p className='text-sm text-muted-foreground'>Total em alerta</p>
                 <p className='text-3xl font-bold text-foreground'>
-                  {products.length - lowStockProducts.length}
+                  {pecasEmAlerta.length}
                 </p>
-                <p className='text-xs text-muted-foreground mt-1'>Estoque OK</p>
+                <p className='text-xs text-muted-foreground mt-1'>
+                  Peças monitoradas
+                </p>
               </div>
               <div className='h-12 w-12 rounded-lg bg-muted flex items-center justify-center'>
                 <Package className='h-6 w-6 text-muted-foreground' />
@@ -94,7 +101,7 @@ export default function Alertas() {
       </div>
 
       {/* Alerts List */}
-      {lowStockProducts.length === 0 ? (
+      {pecasEmAlerta.length === 0 ? (
         <Card className='bg-card border-border'>
           <CardContent className='flex flex-col items-center justify-center py-16'>
             <div className='h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4'>
@@ -111,18 +118,18 @@ export default function Alertas() {
       ) : (
         <div className='space-y-4'>
           {/* Critical Alerts */}
-          {criticalProducts.length > 0 && (
+          {pecasCriticas.length > 0 && (
             <Card className='bg-card border-border'>
               <CardHeader className='pb-3'>
                 <CardTitle className='text-foreground flex items-center gap-2'>
                   <AlertTriangle className='h-5 w-5 text-destructive' />
-                  Estoque Zerado - Crítico
+                  Estoque Zerado — Crítico
                 </CardTitle>
               </CardHeader>
               <CardContent className='space-y-3'>
-                {criticalProducts.map((product) => (
+                {pecasCriticas.map((peca) => (
                   <div
-                    key={product.id}
+                    key={peca.id}
                     className='flex items-center justify-between rounded-lg bg-destructive/10 border border-destructive/30 p-4'>
                     <div className='flex items-center gap-4'>
                       <div className='h-10 w-10 rounded-lg bg-destructive/20 flex items-center justify-center'>
@@ -130,11 +137,10 @@ export default function Alertas() {
                       </div>
                       <div>
                         <p className='font-medium text-foreground'>
-                          {product.name}
+                          {peca.name_peca}
                         </p>
                         <p className='text-sm text-muted-foreground'>
-                          {product.code} • {product.category} •{' '}
-                          {product.location}
+                          {peca.codigo}
                         </p>
                       </div>
                     </div>
@@ -142,7 +148,7 @@ export default function Alertas() {
                       <div className='text-right'>
                         <p className='text-lg font-bold text-destructive'>0</p>
                         <p className='text-xs text-muted-foreground'>
-                          Mín: {product.minQuantity}
+                          Mín: {peca.alerta}
                         </p>
                       </div>
                       <Button
@@ -159,23 +165,22 @@ export default function Alertas() {
             </Card>
           )}
 
-          {/* Warning Alerts - Agora usa laranja (primary) */}
-          {warningProducts.length > 0 && (
+          {/* Warning Alerts */}
+          {pecasAtencao.length > 0 && (
             <Card className='bg-card border-border gap-3'>
-              <CardHeader >
+              <CardHeader>
                 <CardTitle className='text-foreground flex items-center gap-2'>
                   <Bell className='h-5 w-5 text-primary' />
-                  Estoque Baixo - Atenção
+                  Estoque Baixo — Atenção
                 </CardTitle>
               </CardHeader>
               <CardContent className='space-y-3'>
-                {warningProducts.map((product) => {
-                  const percentage =
-                    (product.quantity / product.minQuantity) * 100;
+                {pecasAtencao.map((peca) => {
+                  const percentage = (peca.quantidade / peca.alerta) * 100;
 
                   return (
                     <div
-                      key={product.id}
+                      key={peca.id}
                       className='flex items-center justify-between rounded-lg bg-primary/10 border border-primary/30 p-4'>
                       <div className='flex items-center gap-4'>
                         <div className='h-10 w-10 rounded-lg bg-primary/20 flex items-center justify-center'>
@@ -183,13 +188,11 @@ export default function Alertas() {
                         </div>
                         <div>
                           <p className='font-medium text-foreground'>
-                            {product.name}
+                            {peca.name_peca}
                           </p>
                           <p className='text-sm text-muted-foreground'>
-                            {product.code} • {product.category} •{' '}
-                            {product.location}
+                            {peca.codigo}
                           </p>
-                          {/* Progress bar */}
                           <div className='mt-2 w-32 h-2 bg-secondary rounded-full overflow-hidden'>
                             <div
                               className='h-full bg-primary rounded-full transition-all'
@@ -201,10 +204,10 @@ export default function Alertas() {
                       <div className='flex items-center gap-4'>
                         <div className='text-right'>
                           <p className='text-lg font-bold text-primary'>
-                            {product.quantity}
+                            {peca.quantidade}
                           </p>
                           <p className='text-xs text-muted-foreground'>
-                            Mín: {product.minQuantity}
+                            Mín: {peca.alerta}
                           </p>
                         </div>
                         <Button
@@ -212,7 +215,7 @@ export default function Alertas() {
                           variant='outline'
                           className='border-primary text-primary hover:bg-primary/10 bg-transparent w-28'
                           onClick={() => router.push('/movimentacoes')}>
-                          <TrendingUp className='h-4 w-4 ' />
+                          <TrendingUp className='h-4 w-4' />
                           Repor
                         </Button>
                       </div>
