@@ -146,7 +146,9 @@ export default function Alertas() {
                     </div>
                     <div className='flex items-center gap-4'>
                       <div className='text-right'>
-                        <p className='text-lg font-bold text-destructive'>0</p>
+                        <p className='text-lg font-bold text-destructive'>
+                          {peca.quantidade}
+                        </p>
                         <p className='text-xs text-muted-foreground'>
                           Mín: {peca.alerta}
                         </p>
