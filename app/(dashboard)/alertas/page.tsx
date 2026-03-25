@@ -3,17 +3,12 @@
 
 import { useRouter } from 'next/navigation';
 
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 
 import { useAlerta } from './_hooks/useAlerta';
-import {
-  AlertTriangle,
-  Bell,
-  CheckCircle,
-  Package,
-  TrendingUp
-} from 'lucide-react';
+import { AlertTriangle, Bell, CheckCircle, Package } from 'lucide-react';
 
 export default function Alertas() {
   const router = useRouter();
@@ -28,7 +23,7 @@ export default function Alertas() {
   }
 
   return (
-    <div className='flex flex-1 flex-col gap-4 p-4 lg:p-4'>
+    <div className='flex flex-1 flex-col gap-4 p-4  '>
       {/* Header */}
       <div className='flex flex-col gap-1'>
         <div className='flex items-center gap-2.5'>
@@ -41,191 +36,223 @@ export default function Alertas() {
       </div>
 
       {/* Summary Cards */}
-      <div className='grid gap-4 sm:grid-cols-3'>
-        <Card className='bg-destructive/10 py-3 border-destructive/30'>
-          <CardContent className='px-6'>
-            <div className='flex items-center justify-between'>
+      <div className='flex gap-3 w-full'>
+        <Card className='border-t-2 border-t-destructive py-3 w-full md:w-1/3'>
+          <CardContent className='w-full py-0'>
+            <div className='flex items-start gap-3'>
+              <span className='mt-1 h-2 w-2 shrink-0 rounded-full bg-destructive' />
               <div>
-                <p className='text-sm text-destructive'>Crítico</p>
-                <p className='text-3xl font-bold text-destructive'>
+                <p className='text-xs font-semibold uppercase tracking-wider text-muted-foreground'>
+                  Crítico
+                </p>
+                <p className='mt-1 text-3xl font-bold text-destructive'>
                   {pecasCriticas.length}
                 </p>
-                <p className='text-xs text-muted-foreground mt-1'>
-                  Estoque zerado
+                <p className='mt-1 text-xs text-muted-foreground/60'>
+                  estoque zerado
                 </p>
-              </div>
-              <div className='h-12 w-12 rounded-lg bg-destructive/20 flex items-center justify-center'>
-                <AlertTriangle className='h-6 w-6 text-destructive' />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className='bg-primary/10 py-3 border-primary/30'>
-          <CardContent className='px-6'>
-            <div className='flex items-center justify-between'>
+        <Card className='border-t-2 border-t-primary py-3 w-full md:w-1/3'>
+          <CardContent className='w-full py-0'>
+            <div className='flex items-start gap-3'>
+              <span className='mt-1 h-2 w-2 shrink-0 rounded-full bg-primary' />
               <div>
-                <p className='text-sm text-primary'>Atenção</p>
-                <p className='text-3xl font-bold text-primary'>
+                <p className='text-xs font-semibold uppercase tracking-wider text-muted-foreground'>
+                  Atenção
+                </p>
+                <p className='mt-1 text-3xl font-bold text-primary'>
                   {pecasAtencao.length}
                 </p>
-                <p className='text-xs text-muted-foreground mt-1'>
-                  Abaixo do mínimo
+                <p className='mt-1 text-xs text-muted-foreground/60'>
+                  abaixo do mínimo
                 </p>
-              </div>
-              <div className='h-12 w-12 rounded-lg bg-primary/20 flex items-center justify-center'>
-                <Bell className='h-6 w-6 text-primary' />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className='bg-muted/50 py-3 border-border'>
-          <CardContent className='px-6'>
-            <div className='flex items-center justify-between'>
+        <Card className='border-t-2 border-t-muted-foreground/30 py-3 w-full md:w-1/3'>
+          <CardContent className='w-full py-0'>
+            <div className='flex items-start gap-3'>
+              <span className='mt-1 h-2 w-2 shrink-0 rounded-full bg-muted-foreground/40' />
               <div>
-                <p className='text-sm text-muted-foreground'>Total em alerta</p>
-                <p className='text-3xl font-bold text-foreground'>
+                <p className='text-xs font-semibold uppercase tracking-wider text-muted-foreground'>
+                  Total
+                </p>
+                <p className='mt-1 text-3xl font-bold text-muted-foreground'>
                   {pecasEmAlerta.length}
                 </p>
-                <p className='text-xs text-muted-foreground mt-1'>
-                  Peças monitoradas
+                <p className='mt-1 text-xs text-muted-foreground/60'>
+                  peças monitoradas
                 </p>
-              </div>
-              <div className='h-12 w-12 rounded-lg bg-muted flex items-center justify-center'>
-                <Package className='h-6 w-6 text-muted-foreground' />
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Alerts List */}
+      {/* Alertas */}
       {pecasEmAlerta.length === 0 ? (
-        <Card className='bg-card border-border'>
+        <Card>
           <CardContent className='flex flex-col items-center justify-center py-16'>
-            <div className='h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4'>
-              <CheckCircle className='h-8 w-8 text-muted-foreground' />
+            <div className='mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-green-500/20 bg-green-500/8'>
+              <CheckCircle className='h-8 w-8 text-green-500' />
             </div>
-            <h3 className='text-xl font-semibold text-foreground mb-2'>
-              Tudo certo!
+            <h3 className='mb-2 text-lg font-bold text-foreground'>
+              Tudo em dia!
             </h3>
-            <p className='text-muted-foreground text-center'>
+            <p className='text-center text-sm text-muted-foreground'>
               Todos os produtos estão com estoque acima do nível mínimo.
             </p>
           </CardContent>
         </Card>
       ) : (
-        <div className='space-y-4'>
-          {/* Critical Alerts */}
+        <div className='flex gap-4 flex-wrap justify-center w-full'>
+          {/* Seção Crítico */}
           {pecasCriticas.length > 0 && (
-            <Card className='bg-card border-border'>
-              <CardHeader className='pb-3'>
-                <CardTitle className='text-foreground flex items-center gap-2'>
-                  <AlertTriangle className='h-5 w-5 text-destructive' />
+            <div className='space-y-2'>
+              <div className='flex items-center gap-2 px-0.5'>
+                <div className='flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-destructive/20 bg-destructive/8'>
+                  <AlertTriangle className='h-3.5 w-3.5 text-destructive' />
+                </div>
+                <span className='text-xs font-semibold uppercase tracking-wider text-muted-foreground'>
                   Estoque Zerado — Crítico
-                </CardTitle>
-              </CardHeader>
-              <CardContent className='space-y-3'>
-                {pecasCriticas.map((peca) => (
-                  <div
-                    key={peca.id}
-                    className='flex items-center justify-between rounded-lg bg-destructive/10 border border-destructive/30 p-4'>
-                    <div className='flex items-center gap-4'>
-                      <div className='h-10 w-10 rounded-lg bg-destructive/20 flex items-center justify-center'>
-                        <Package className='h-5 w-5 text-destructive' />
-                      </div>
-                      <div>
-                        <p className='font-medium text-foreground'>
-                          {peca.name_peca}
-                        </p>
-                        <p className='text-sm text-muted-foreground'>
-                          {peca.codigo}
+                </span>
+                <Badge
+                  variant='outline'
+                  className='border-border text-muted-foreground'>
+                  {pecasCriticas.length}
+                </Badge>
+              </div>
+
+              {pecasCriticas.map((peca) => (
+                <Card key={peca.id} className='border-l-2 border-l-destructive'>
+                  <CardContent className='flex items-center gap-4 px-5 py-4'>
+                    <div className='flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-muted'>
+                      <Package className='h-5 w-5 text-muted-foreground' />
+                    </div>
+
+                    <div className='flex-1 min-w-0'>
+                      <p className='font-semibold text-foreground'>
+                        {peca.name_peca}
+                      </p>
+                      <p className='text-xs text-muted-foreground mt-0.5'>
+                        {peca.codigo}
+                      </p>
+                      <div className='mt-2'>
+                        <div className='h-1.5 w-40 overflow-hidden rounded-full bg-secondary'>
+                          <div
+                            className='h-full rounded-full bg-destructive'
+                            style={{ width: '0%' }}
+                          />
+                        </div>
+                        <p className='mt-1 text-xs text-muted-foreground/60'>
+                          0 / {peca.alerta} unidades mínimas
                         </p>
                       </div>
                     </div>
-                    <div className='flex items-center gap-4'>
-                      <div className='text-right'>
-                        <p className='text-lg font-bold text-destructive'>
-                          {peca.quantidade}
-                        </p>
-                        <p className='text-xs text-muted-foreground'>
-                          Mín: {peca.alerta}
-                        </p>
-                      </div>
-                      <Button
-                        size='sm'
-                        className='bg-primary text-primary-foreground hover:bg-primary/90'
-                        onClick={() => router.push('/movimentacoes')}>
-                        <TrendingUp className='h-4 w-4 mr-1' />
-                        Repor
-                      </Button>
+
+                    <div className='shrink-0 text-right'>
+                      <p className='text-xl font-bold text-destructive'>
+                        {peca.quantidade}
+                      </p>
+                      <p className='text-xs text-muted-foreground'>unid.</p>
+                      <p className='text-xs text-muted-foreground/60 mt-0.5'>
+                        mín: {peca.alerta}
+                      </p>
                     </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+
+                    <Button
+                      size='sm'
+                      variant='outline'
+                      className='shrink-0'
+                      onClick={() => router.push('/produtos')}>
+                      Repor
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           )}
 
-          {/* Warning Alerts */}
+          {/* Seção Atenção */}
           {pecasAtencao.length > 0 && (
-            <Card className='bg-card border-border gap-3'>
-              <CardHeader>
-                <CardTitle className='text-foreground flex items-center gap-2'>
-                  <Bell className='h-5 w-5 text-primary' />
+            <div className='flex flex-col gap-4 w-full'>
+              <div className='flex items-center gap-2 px-0.5'>
+                <div className='flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-primary/20 bg-primary/8'>
+                  <Bell className='h-3.5 w-3.5 text-primary' />
+                </div>
+                <span className='text-xs font-semibold uppercase tracking-wider text-muted-foreground'>
                   Estoque Baixo — Atenção
-                </CardTitle>
-              </CardHeader>
-              <CardContent className='space-y-3'>
+                </span>
+                <Badge
+                  variant='outline'
+                  className='border-border text-muted-foreground'>
+                  {pecasAtencao.length}
+                </Badge>
+              </div>
+
+              <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                 {pecasAtencao.map((peca) => {
-                  const percentage = (peca.quantidade / peca.alerta) * 100;
+                  const percentage = Math.min(
+                    (peca.quantidade / peca.alerta) * 100,
+                    100
+                  );
 
                   return (
-                    <div
-                      key={peca.id}
-                      className='flex items-center justify-between rounded-lg bg-primary/10 border border-primary/30 p-4'>
-                      <div className='flex items-center gap-4'>
-                        <div className='h-10 w-10 rounded-lg bg-primary/20 flex items-center justify-center'>
-                          <Package className='h-5 w-5 text-primary' />
+                    <Card key={peca.id} className='py-2 w-full'>
+                      <CardContent className='flex items-center gap-4 px-5 py-0'>
+                        <div className='flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-muted'>
+                          <Package className='h-5 w-5 text-muted-foreground' />
                         </div>
-                        <div>
-                          <p className='font-medium text-foreground'>
+
+                        <div className='flex-1 min-w-0'>
+                          <p className='font-semibold text-foreground'>
                             {peca.name_peca}
                           </p>
-                          <p className='text-sm text-muted-foreground'>
+                          <p className='text-xs text-muted-foreground mt-0.5'>
                             {peca.codigo}
                           </p>
-                          <div className='mt-2 w-32 h-2 bg-secondary rounded-full overflow-hidden'>
-                            <div
-                              className='h-full bg-primary rounded-full transition-all'
-                              style={{ width: `${Math.min(percentage, 100)}%` }}
-                            />
+                          <div className='mt-2'>
+                            <div className='h-1.5 w-40 overflow-hidden rounded-full bg-secondary'>
+                              <div
+                                className='h-full rounded-full bg-primary transition-all'
+                                style={{ width: `${percentage}%` }}
+                              />
+                            </div>
+                            <p className='mt-1 text-xs text-muted-foreground/60'>
+                              {peca.quantidade} / {peca.alerta} unidades mínimas
+                            </p>
                           </div>
                         </div>
-                      </div>
-                      <div className='flex items-center gap-4'>
-                        <div className='text-right'>
-                          <p className='text-lg font-bold text-primary'>
+
+                        <div className='shrink-0 text-right'>
+                          <p className='text-xl font-bold text-primary'>
                             {peca.quantidade}
                           </p>
-                          <p className='text-xs text-muted-foreground'>
-                            Mín: {peca.alerta}
+                          <p className='text-xs text-muted-foreground'>unid.</p>
+                          <p className='text-xs text-muted-foreground/60 mt-0.5'>
+                            mín: {peca.alerta}
                           </p>
                         </div>
+
                         <Button
                           size='sm'
                           variant='outline'
-                          className='border-primary text-primary hover:bg-primary/10 bg-transparent w-28'
-                          onClick={() => router.push('/movimentacoes')}>
-                          <TrendingUp className='h-4 w-4' />
+                          className='shrink-0'
+                          onClick={() => router.push('/produtos')}>
                           Repor
                         </Button>
-                      </div>
-                    </div>
+                      </CardContent>
+                    </Card>
                   );
                 })}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )}
         </div>
       )}
