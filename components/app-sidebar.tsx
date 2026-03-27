@@ -16,6 +16,7 @@ import {
   SidebarMenuItem,
   SidebarSeparator
 } from '@/components/ui/sidebar';
+import { useAlertaCount } from '@/hooks/useAlertaCount';
 import { signOut, useSession } from '@/lib/auth-client';
 
 import {
@@ -110,6 +111,7 @@ export function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session } = useSession();
+  const { totalAlertas } = useAlertaCount();
 
   const handleLogout = async () => {
     await signOut();
@@ -153,6 +155,11 @@ export function AppSidebar() {
                         <a href={item.href}>
                           <Icon className='h-4 w-4' />
                           <span>{item.label}</span>
+                          {item.id === 'alertas' && totalAlertas > 0 && (
+                            <span className='ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground'>
+                              {totalAlertas > 99 ? '99+' : totalAlertas}
+                            </span>
+                          )}
                         </a>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
