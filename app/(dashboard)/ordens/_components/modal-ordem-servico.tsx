@@ -95,6 +95,13 @@ const dataVazia: OrdemServicoFormData = {
   pecas: []
 };
 
+interface FieldErrors {
+  cliente_id?: string;
+  veiculo_id?: string;
+  data_chegada?: string;
+  funcionario_responsavel_id?: string;
+}
+
 export function ModalOrdemServico({
   mode,
   initialData,
@@ -120,6 +127,8 @@ export function ModalOrdemServico({
 
   const [selectedPecaId, setSelectedPecaId] = useState<string>('');
   const [pecaQuantidade, setPecaQuantidade] = useState(1);
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [submitted, setSubmitted] = useState(false);
 
   // Reset form when opening
   useEffect(() => {
@@ -131,6 +140,8 @@ export function ModalOrdemServico({
       });
       setSelectedPecaId('');
       setPecaQuantidade(1);
+      setErrors({});
+      setSubmitted(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
@@ -142,6 +153,23 @@ export function ModalOrdemServico({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
+
+  const validate = (data: OrdemServicoFormData): FieldErrors => {
+    const errs: FieldErrors = {};
+    if (!data.cliente_id) errs.cliente_id = 'Selecione um cliente';
+    if (!data.veiculo_id) errs.veiculo_id = 'Selecione um veículo';
+    if (!data.data_chegada) errs.data_chegada = 'Informe a data de chegada';
+    if (!data.funcionario_responsavel_id) errs.funcionario_responsavel_id = 'Selecione o funcionário responsável';
+    return errs;
+  };
+
+  // Re-validate on change after first submit attempt
+  useEffect(() => {
+    if (submitted) {
+      setErrors(validate(formData));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData, submitted]);
 
   const veiculosDisponiveis = formData.cliente_id
     ? getVeiculosByCliente(formData.cliente_id)
@@ -206,18 +234,18 @@ export function ModalOrdemServico({
   };
 
   const handleSubmit = async () => {
-    if (!formData.cliente_id || !formData.veiculo_id) {
-      toast.error('Selecione um cliente e um veículo.');
+    setSubmitted(true);
+    const errs = validate(formData);
+    setErrors(errs);
+
+    if (Object.keys(errs).length > 0) {
+      const campos = Object.values(errs);
+      toast.error(`Preencha os campos obrigatórios: ${campos.join(', ')}`);
       return;
     }
 
     if (!formData.funcionario_id) {
-      toast.error('Erro ao identificar o funcionário. Tente recarregar a página.');
-      return;
-    }
-
-    if (!formData.funcionario_responsavel_id) {
-      toast.error('Selecione o funcionário responsável pelo serviço.');
+      toast.error('Não foi possível identificar seu usuário. Recarregue a página e tente novamente.');
       return;
     }
 
@@ -232,6 +260,8 @@ export function ModalOrdemServico({
       }))
     });
   };
+
+  const hasError = (field: keyof FieldErrors) => submitted && !!errors[field];
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -252,107 +282,110 @@ export function ModalOrdemServico({
 
         <ScrollArea className='max-h-[60vh]'>
           <div className='grid gap-4 p-6 pt-4'>
-            {/* Cliente e Veículo */}
-            <div className='grid space-y-2 sm:grid-cols-1 '>
-                <Label>Cliente *</Label>
-                <Select
-                  value={
-                    formData.cliente_id ? formData.cliente_id.toString() : ''
-                  }
-                  onValueChange={handleClienteChange}>
-                
-                  <SelectTrigger className='bg-input border-border w-full'>
-                    <SelectValue placeholder='Selecione um cliente' />
-                  </SelectTrigger>
-                  <SelectContent className='bg-card border-border max-h-60 w-fit'>
-                    {clientes.map((cliente) => (
-                      <SelectItem
-                        key={cliente.id}
-                        value={cliente.id.toString()}>
-                        <span className='truncate w-full block'>
-                          {cliente.name_cliente}
-                          {cliente.nome_empresa && ` - ${cliente.nome_empresa}`}
-                        </span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-           
+            {/* Cliente */}
+            <div className='space-y-2'>
+              <Label>Cliente *</Label>
+              <Select
+                value={formData.cliente_id ? formData.cliente_id.toString() : ''}
+                onValueChange={handleClienteChange}>
+                <SelectTrigger className={`bg-input w-full ${hasError('cliente_id') ? 'border-destructive' : 'border-border'}`}>
+                  <SelectValue placeholder='Selecione um cliente' />
+                </SelectTrigger>
+                <SelectContent className='bg-card border-border max-h-60 w-fit'>
+                  {clientes.map((cliente) => (
+                    <SelectItem key={cliente.id} value={cliente.id.toString()}>
+                      <span className='truncate w-full block'>
+                        {cliente.name_cliente}
+                        {cliente.nome_empresa && ` - ${cliente.nome_empresa}`}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {hasError('cliente_id') && (
+                <p className='text-xs text-destructive'>{errors.cliente_id}</p>
+              )}
             </div>
-            <div className='grid gap-4 sm:grid-cols-2 '>
-            {/* Data de Chegada */}
-            <div className='space-y-2 w-full'>
-              <Label>Data de Chegada *</Label>
-              <DatePicker
-                value={
-                  formData.data_chegada
-                    ? new Date(formData.data_chegada + 'T12:00:00')
-                    : undefined
-                }
-                onChange={(date) =>
-                  setFormData({
-                    ...formData,
-                    data_chegada: date ? date.toISOString().split('T')[0] : ''
-                  })
-                }
-                placeholder='Selecione a data de chegada'
-              />
-            </div>
-      
-                   {/* Status */}
-              {isEdit && (
-              <div className='space-y-2'>
-                <Label>Status</Label>
-                <Select
-                  value={formData.status}
-                  onValueChange={(v: 'ativa' | 'fechada' | 'cancelada') =>
-                    setFormData({ ...formData, status: v })
-                  }>
-                  <SelectTrigger className='bg-input border-border w-full'>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className='bg-card border-border'>
-                    <SelectItem value='ativa'>Ativa</SelectItem>
-                    <SelectItem value='fechada'>Fechada</SelectItem>
-                    <SelectItem value='cancelada'>Cancelada</SelectItem>
-                  </SelectContent>
-                </Select>
+
+            <div className='grid gap-4 sm:grid-cols-2'>
+              {/* Data de Chegada */}
+              <div className='space-y-2 w-full'>
+                <Label>Data de Chegada *</Label>
+                <div className={hasError('data_chegada') ? '[&>button]:border-destructive' : ''}>
+                  <DatePicker
+                    value={
+                      formData.data_chegada
+                        ? new Date(formData.data_chegada + 'T12:00:00')
+                        : undefined
+                    }
+                    onChange={(date) =>
+                      setFormData({
+                        ...formData,
+                        data_chegada: date ? date.toISOString().split('T')[0] : ''
+                      })
+                    }
+                    placeholder='Selecione a data de chegada'
+                  />
+                </div>
+                {hasError('data_chegada') && (
+                  <p className='text-xs text-destructive'>{errors.data_chegada}</p>
+                )}
               </div>
-            )}
+
+              {/* Status */}
+              {isEdit && (
+                <div className='space-y-2'>
+                  <Label>Status</Label>
+                  <Select
+                    value={formData.status}
+                    onValueChange={(v: 'ativa' | 'fechada' | 'cancelada') =>
+                      setFormData({ ...formData, status: v })
+                    }>
+                    <SelectTrigger className='bg-input border-border w-full'>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className='bg-card border-border'>
+                      <SelectItem value='ativa'>Ativa</SelectItem>
+                      <SelectItem value='fechada'>Fechada</SelectItem>
+                      <SelectItem value='cancelada'>Cancelada</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
+
             {/* Veículo */}
             <div className='space-y-2 w-full'>
-                <Label>Veículo *</Label>
-                <Select
-                  value={
-                    formData.veiculo_id ? formData.veiculo_id.toString() : ''
-                  }
-                  onValueChange={(v) =>
-                    setFormData({ ...formData, veiculo_id: parseInt(v) })
-                  }
-                  disabled={!formData.cliente_id}>
-                  <SelectTrigger className='bg-input border-border w-full'>
-                    <SelectValue
-                      placeholder={
-                        formData.cliente_id
-                          ? 'Selecione um veículo'
-                          : 'Selecione um cliente primeiro'
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent className='bg-card border-border'>
-                    {veiculosDisponiveis.map((veiculo) => (
-                      <SelectItem
-                        key={veiculo.id}
-                        value={veiculo.id.toString()}>
-                        <span className='truncate block'>
-                          {veiculo.placa} - {veiculo.modelo}
-                        </span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <Label>Veículo *</Label>
+              <Select
+                value={formData.veiculo_id ? formData.veiculo_id.toString() : ''}
+                onValueChange={(v) =>
+                  setFormData({ ...formData, veiculo_id: parseInt(v) })
+                }
+                disabled={!formData.cliente_id}>
+                <SelectTrigger className={`bg-input w-full ${hasError('veiculo_id') ? 'border-destructive' : 'border-border'}`}>
+                  <SelectValue
+                    placeholder={
+                      formData.cliente_id
+                        ? 'Selecione um veículo'
+                        : 'Selecione um cliente primeiro'
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent className='bg-card border-border'>
+                  {veiculosDisponiveis.map((veiculo) => (
+                    <SelectItem key={veiculo.id} value={veiculo.id.toString()}>
+                      <span className='truncate block'>
+                        {veiculo.placa} - {veiculo.modelo}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {hasError('veiculo_id') && (
+                <p className='text-xs text-destructive'>{errors.veiculo_id}</p>
+              )}
+            </div>
 
             {/* Funcionário Responsável */}
             <div className='space-y-2 w-full'>
@@ -362,7 +395,7 @@ export function ModalOrdemServico({
                 onValueChange={(v) =>
                   setFormData({ ...formData, funcionario_responsavel_id: v })
                 }>
-                <SelectTrigger className='bg-input border-border w-full'>
+                <SelectTrigger className={`bg-input w-full ${hasError('funcionario_responsavel_id') ? 'border-destructive' : 'border-border'}`}>
                   <SelectValue placeholder='Selecione o funcionário responsável' />
                 </SelectTrigger>
                 <SelectContent className='bg-card border-border'>
@@ -373,6 +406,9 @@ export function ModalOrdemServico({
                   ))}
                 </SelectContent>
               </Select>
+              {hasError('funcionario_responsavel_id') && (
+                <p className='text-xs text-destructive'>{errors.funcionario_responsavel_id}</p>
+              )}
             </div>
 
             {/* Observação */}
@@ -395,7 +431,7 @@ export function ModalOrdemServico({
                 <Select
                   value={selectedPecaId}
                   onValueChange={setSelectedPecaId}>
-                  <SelectTrigger className='bg-input border-border flex-1 '>
+                  <SelectTrigger className='bg-input border-border flex-1'>
                     <SelectValue placeholder='Selecione uma peça' />
                   </SelectTrigger>
                   <SelectContent className='bg-card border-border max-h-60'>
@@ -410,10 +446,14 @@ export function ModalOrdemServico({
                 <Input
                   type='number'
                   min={1}
-                  value={pecaQuantidade}
-                  onChange={(e) =>
-                    setPecaQuantidade(parseInt(e.target.value) || 1)
-                  }
+                  value={pecaQuantidade || ''}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setPecaQuantidade(val === '' ? 0 : parseInt(val));
+                  }}
+                  onBlur={() => {
+                    if (!pecaQuantidade || pecaQuantidade < 1) setPecaQuantidade(1);
+                  }}
                   className='bg-input border-border w-20'
                 />
                 <Button type='button' onClick={handleAddPeca} variant='outline'>
@@ -427,26 +467,16 @@ export function ModalOrdemServico({
                   <Table>
                     <TableHeader>
                       <TableRow className='border-border hover:bg-transparent'>
-                        <TableHead className='text-muted-foreground'>
-                          Peça
-                        </TableHead>
-                        <TableHead className='text-muted-foreground text-center'>
-                          Qtd
-                        </TableHead>
-                        <TableHead className='text-muted-foreground text-right'>
-                          Preço Unit.
-                        </TableHead>
-                        <TableHead className='text-muted-foreground text-right'>
-                          Subtotal
-                        </TableHead>
+                        <TableHead className='text-muted-foreground'>Peça</TableHead>
+                        <TableHead className='text-muted-foreground text-center'>Qtd</TableHead>
+                        <TableHead className='text-muted-foreground text-right'>Preço Unit.</TableHead>
+                        <TableHead className='text-muted-foreground text-right'>Subtotal</TableHead>
                         <TableHead className='text-muted-foreground w-10'></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {formData.pecas.map((item) => (
-                        <TableRow
-                          key={item.peca_id}
-                          className='border-border hover:bg-muted/30'>
+                        <TableRow key={item.peca_id} className='border-border hover:bg-muted/30'>
                           <TableCell className='text-foreground'>
                             {item.peca?.name_peca || 'Peça não encontrada'}
                           </TableCell>
@@ -457,16 +487,10 @@ export function ModalOrdemServico({
                             {formatCurrency(item.peca?.preco || 0)}
                           </TableCell>
                           <TableCell className='text-right text-foreground font-medium'>
-                            {formatCurrency(
-                              (item.peca?.preco || 0) * item.quantidade
-                            )}
+                            {formatCurrency((item.peca?.preco || 0) * item.quantidade)}
                           </TableCell>
                           <TableCell>
-                            <Button
-                              type='button'
-                              variant='ghost'
-                              size='icon'
-                              onClick={() => handleRemovePeca(item.peca_id)}>
+                            <Button type='button' variant='ghost' size='icon' onClick={() => handleRemovePeca(item.peca_id)}>
                               <X className='h-4 w-4 text-destructive' />
                             </Button>
                           </TableCell>
@@ -481,9 +505,7 @@ export function ModalOrdemServico({
             {/* Total */}
             <div className='rounded-lg bg-secondary/50 p-4'>
               <div className='flex items-center justify-between'>
-                <span className='text-lg font-medium text-foreground'>
-                  Total da Ordem
-                </span>
+                <span className='text-lg font-medium text-foreground'>Total da Ordem</span>
                 <span className='text-2xl font-bold text-primary'>
                   {formatCurrency(calcularTotal())}
                 </span>
@@ -498,7 +520,7 @@ export function ModalOrdemServico({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={isLoading || !formData.cliente_id || !formData.veiculo_id || !formData.funcionario_id || !formData.funcionario_responsavel_id}
+            disabled={isLoading}
             className='bg-primary hover:bg-primary/90 w-32'>
             {isLoading ? 'Salvando...' : isEdit ? 'Atualizar' : 'Criar Ordem'}
           </Button>
