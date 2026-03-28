@@ -43,6 +43,7 @@ import {
   Wallet,
   X
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface PecaItem {
   peca_id: number;
@@ -146,6 +147,14 @@ export function ModalOrdemVenda({
     if (!peca) return;
 
     const existingIndex = formData.pecas.findIndex((p) => p.peca_id === pecaId);
+    const quantidadeJaAdicionada = existingIndex >= 0 ? formData.pecas[existingIndex].quantidade : 0;
+    const totalSolicitado = quantidadeJaAdicionada + pecaQuantidade;
+
+    if (totalSolicitado > peca.quantidade) {
+      toast.error(`Estoque insuficiente para "${peca.name_peca}". Disponível: ${peca.quantidade}, Solicitado: ${totalSolicitado}`);
+      return;
+    }
+
     if (existingIndex >= 0) {
       const updated = [...formData.pecas];
       updated[existingIndex].quantidade += pecaQuantidade;

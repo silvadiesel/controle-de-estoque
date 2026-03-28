@@ -1,5 +1,6 @@
 import { db, schema } from '@/db';
 import { logAction } from '@/lib/log-action';
+import { validateAndDecrementStock } from '@/lib/stock';
 
 import { desc, eq } from 'drizzle-orm';
 
@@ -14,6 +15,7 @@ export async function GET() {
       cliente_id: schema.ordemServico.cliente_id,
       veiculo_id: schema.ordemServico.veiculo_id,
       funcionario_id: schema.ordemServico.funcionario_id,
+      funcionario_responsavel_id: schema.ordemServico.funcionario_responsavel_id,
       observacao: schema.ordemServico.observacao,
       valor_total: schema.ordemServico.valor_total,
       cliente: {
@@ -65,32 +67,73 @@ export async function GET() {
 export async function POST(request: Request) {
   const data = await request.json();
 
-  const novaOrdem = await db
-    .insert(schema.ordemServico)
-    .values({
-      data_chegada: new Date(data.data_chegada),
-      data_saida: data.data_saida ? new Date(data.data_saida) : null,
-      status: data.status || 'ativa',
-      cliente_id: data.cliente_id,
-      veiculo_id: data.veiculo_id,
-      funcionario_id: data.funcionario_id,
-      observacao: data.observacao || null,
-      valor_total: data.valor_total || 0
-    })
-    .returning();
-
-  const ordemId = novaOrdem[0].id;
-
-  if (data.pecas && data.pecas.length > 0) {
-    await db.insert(schema.ordemServicoPecas).values(
-      data.pecas.map((peca: { peca_id: number; quantidade: number }) => ({
-        ordem_servico_id: ordemId,
-        peca_id: peca.peca_id,
-        quantidade: peca.quantidade
-      }))
+  // Validação de campos obrigatórios
+  if (!data.funcionario_id || !data.funcionario_responsavel_id || !data.cliente_id || !data.veiculo_id || !data.data_chegada) {
+    return new Response(
+      JSON.stringify({ error: 'Campos obrigatórios faltando (cliente, veículo, funcionários ou data de chegada)' }),
+      { status: 400 }
     );
   }
 
-  await logAction(request, 'criacao', 'ordem_servico', String(ordemId), `Ordem de serviço #${ordemId} criada`);
-  return new Response(JSON.stringify(novaOrdem[0]));
+  // Validar que veículo pertence ao cliente
+  const [veiculo] = await db
+    .select({ cliente_id: schema.veiculo.cliente_id })
+    .from(schema.veiculo)
+    .where(eq(schema.veiculo.id, data.veiculo_id))
+    .limit(1);
+
+  if (!veiculo || veiculo.cliente_id !== data.cliente_id) {
+    return new Response(
+      JSON.stringify({ error: 'Veículo não pertence ao cliente selecionado' }),
+      { status: 400 }
+    );
+  }
+
+  try {
+    const result = await db.transaction(async (tx) => {
+      // Validar e decrementar estoque
+      if (data.pecas && data.pecas.length > 0) {
+        await validateAndDecrementStock(tx, data.pecas);
+      }
+
+      // Criar ordem
+      const novaOrdem = await tx
+        .insert(schema.ordemServico)
+        .values({
+          data_chegada: new Date(data.data_chegada),
+          data_saida: data.data_saida ? new Date(data.data_saida) : null,
+          status: data.status || 'ativa',
+          cliente_id: data.cliente_id,
+          veiculo_id: data.veiculo_id,
+          funcionario_id: data.funcionario_id,
+          funcionario_responsavel_id: data.funcionario_responsavel_id,
+          observacao: data.observacao || null,
+          valor_total: data.valor_total || 0
+        })
+        .returning();
+
+      const ordemId = novaOrdem[0].id;
+
+      // Inserir peças na tabela de junção
+      if (data.pecas && data.pecas.length > 0) {
+        await tx.insert(schema.ordemServicoPecas).values(
+          data.pecas.map((peca: { peca_id: number; quantidade: number }) => ({
+            ordem_servico_id: ordemId,
+            peca_id: peca.peca_id,
+            quantidade: peca.quantidade
+          }))
+        );
+      }
+
+      return novaOrdem[0];
+    });
+
+    await logAction(request, 'criacao', 'ordem_servico', String(result.id), `Ordem de serviço #${result.id} criada`);
+    return new Response(JSON.stringify(result));
+  } catch (error: unknown) {
+    console.error('Erro ao criar ordem de serviço:', error);
+    const pgError = error as { message?: string; detail?: string; code?: string; severity?: string };
+    const message = pgError.detail || pgError.message || 'Erro ao criar ordem de serviço';
+    return new Response(JSON.stringify({ error: message, code: pgError.code }), { status: 400 });
+  }
 }

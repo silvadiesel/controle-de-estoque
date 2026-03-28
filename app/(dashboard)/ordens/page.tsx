@@ -108,6 +108,7 @@ export default function Ordens() {
     clientes,
     veiculos,
     pecas,
+    funcionarios,
     isLoading,
     search,
     setSearch,
@@ -249,6 +250,7 @@ export default function Ordens() {
       cliente_id: ordem.cliente_id,
       veiculo_id: ordem.veiculo_id,
       funcionario_id: ordem.funcionario_id,
+      funcionario_responsavel_id: ordem.funcionario_responsavel_id,
       observacao: ordem.observacao || '',
       valor_total: ordem.valor_total,
       pecas: ordem.pecas.map((p) => ({
@@ -670,6 +672,7 @@ export default function Ordens() {
         clientes={clientes}
         veiculos={veiculos}
         pecas={pecas}
+        funcionarios={funcionarios}
         isOpen={isAddServicoOpen}
         setIsOpen={setIsAddServicoOpen}
         onSubmit={async (data) => {
@@ -691,6 +694,7 @@ export default function Ordens() {
         clientes={clientes}
         veiculos={veiculos}
         pecas={pecas}
+        funcionarios={funcionarios}
         isOpen={!!editingServico}
         setIsOpen={(open) => !open && setEditingServico(null)}
         onSubmit={async (data) => {
