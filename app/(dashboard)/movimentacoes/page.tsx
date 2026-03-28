@@ -26,7 +26,6 @@ import {
   type Entidade,
   type TipoAcao,
   formatarDataHora,
-  obterCorAvatar,
   obterIniciais,
   useMovimentacoes
 } from './_hook/useMovimentacoes';
@@ -64,7 +63,7 @@ const tipoAcaoConfig: Record<
     label: 'Criação',
     icon: PackagePlus,
     className:
-      'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 hover:bg-emerald-500/10',
+      'bg-transparent text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/5',
     bar: 'bg-emerald-500',
     pct: 'text-emerald-600 bg-emerald-500/10'
   },
@@ -72,7 +71,7 @@ const tipoAcaoConfig: Record<
     label: 'Edição',
     icon: FilePenLine,
     className:
-      'bg-blue-500/10 text-blue-600 border-blue-500/20 hover:bg-blue-500/10',
+      'bg-transparent text-blue-300 border-blue-500/40 hover:bg-blue-500/5',
     bar: 'bg-blue-500',
     pct: 'text-blue-600 bg-blue-500/10'
   },
@@ -80,7 +79,7 @@ const tipoAcaoConfig: Record<
     label: 'Exclusão',
     icon: Trash2,
     className:
-      'bg-red-500/10 text-red-600 border-red-500/20 hover:bg-red-500/10',
+      'bg-transparent text-red-300 border-red-500/40 hover:bg-red-500/5',
     bar: 'bg-red-500',
     pct: 'text-red-600 bg-red-500/10'
   }
@@ -93,38 +92,42 @@ const entidadeConfig: Record<
   produto: {
     label: 'Produto',
     icon: Package,
-    color: 'text-orange-600 bg-orange-500/10'
+    color: 'text-orange-300 bg-orange-500/10 border border-orange-500/20'
   },
   cliente: {
     label: 'Cliente',
     icon: Users,
-    color: 'text-violet-600 bg-violet-500/10'
+    color: 'text-violet-300 bg-violet-500/10 border border-violet-500/20'
   },
   fornecedor: {
     label: 'Fornecedor',
     icon: Factory,
-    color: 'text-amber-700 bg-amber-500/10'
+    color: 'text-amber-300 bg-amber-500/10 border border-amber-500/20'
   },
   categoria: {
     label: 'Categoria',
     icon: Tag,
-    color: 'text-pink-600 bg-pink-500/10'
+    color: 'text-pink-300 bg-pink-500/10 border border-pink-500/20'
   },
-  veiculo: { label: 'Veículo', icon: Car, color: 'text-sky-600 bg-sky-500/10' },
+  veiculo: {
+    label: 'Veículo',
+    icon: Car,
+    color: 'text-muted-foreground bg-sky-500/10 border border-sky-500/20'
+  },
   ordem_venda: {
     label: 'Ordem de Venda',
     icon: ShoppingCart,
-    color: 'text-teal-600 bg-teal-500/10'
+    color: 'text-muted-foreground bg-teal-500/10 border border-teal-500/20'
   },
   ordem_servico: {
     label: 'Ordem de Serviço',
     icon: Wrench,
-    color: 'text-indigo-600 bg-indigo-500/10'
+    color: 'text-muted-foreground bg-indigo-500/10 border border-indigo-500/20'
   },
   usuario: {
     label: 'Usuário',
     icon: UserCog,
-    color: 'text-rose-600 bg-rose-500/10'
+    color: 'text-muted-foreground bg-rose-500/10 border border-rose-500/20'
   }
 };
 
@@ -342,12 +345,6 @@ export default function Movimentacoes() {
             <CardTitle className='text-base text-foreground'>
               Histórico de Atividades
             </CardTitle>
-            {!isLoading && (
-              <span className='text-xs text-muted-foreground bg-muted px-2.5 py-1 rounded-full'>
-                {movimentacoesFiltradas.length}{' '}
-                {movimentacoesFiltradas.length !== 1 ? 'registros' : 'registro'}
-              </span>
-            )}
           </div>
         </CardHeader>
         <CardContent className='p-0'>
@@ -419,7 +416,6 @@ export default function Movimentacoes() {
                     const { data, hora } = formatarDataHora(
                       movimentacao.created_at
                     );
-                    const corAvatar = obterCorAvatar(movimentacao.autor);
 
                     return (
                       <TableRow
@@ -454,8 +450,7 @@ export default function Movimentacoes() {
                         {/* Autor */}
                         <TableCell className='hidden md:table-cell'>
                           <div className='flex items-center gap-2'>
-                            <div
-                              className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold shrink-0 ${corAvatar}`}>
+                            <div className='flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold shrink-0 bg-muted text-white'>
                               {obterIniciais(movimentacao.autor)}
                             </div>
                             <span className='text-sm text-foreground whitespace-nowrap'>

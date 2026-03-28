@@ -73,7 +73,7 @@ export function CardPecas({
               {peca.name_peca}
             </h3>
             <p className='text-sm text-muted-foreground font-mono'>
-              #{peca.codigo}
+              Cód:{peca.codigo}
             </p>
           </div>
           <h3 className='text-xl font-bold text-primary whitespace-nowrap'>
