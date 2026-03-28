@@ -23,6 +23,9 @@ export const ordemServico = pgTable('ordem_servico', {
   funcionario_id: text('funcionario_id')
     .notNull()
     .references(() => user.id),
+  funcionario_responsavel_id: text('funcionario_responsavel_id')
+    .notNull()
+    .references(() => user.id),
   observacao: text('observacao'),
   valor_total: integer('valor_total').notNull().default(0)
 });

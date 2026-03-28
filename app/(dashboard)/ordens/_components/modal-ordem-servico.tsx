@@ -36,6 +36,7 @@ import type { Cliente, Peca, Veiculo } from '@/db/schema';
 import { useUser } from '@/hooks/useUser';
 
 import { Plus, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface PecaItem {
   peca_id: number;
@@ -49,9 +50,15 @@ interface OrdemServicoFormData {
   cliente_id: number;
   veiculo_id: number;
   funcionario_id: string;
+  funcionario_responsavel_id: string;
   observacao: string;
   valor_total: number;
   pecas: PecaItem[];
+}
+
+interface Funcionario {
+  id: string;
+  name: string;
 }
 
 interface ModalOrdemServicoProps {
@@ -60,6 +67,7 @@ interface ModalOrdemServicoProps {
   clientes: Cliente[];
   veiculos: Veiculo[];
   pecas: Peca[];
+  funcionarios: Funcionario[];
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   onSubmit: (data: OrdemServicoFormData) => Promise<void>;
@@ -81,6 +89,7 @@ const dataVazia: OrdemServicoFormData = {
   cliente_id: 0,
   veiculo_id: 0,
   funcionario_id: '',
+  funcionario_responsavel_id: '',
   observacao: '',
   valor_total: 0,
   pecas: []
@@ -92,6 +101,7 @@ export function ModalOrdemServico({
   clientes,
   veiculos,
   pecas,
+  funcionarios,
   isOpen,
   setIsOpen,
   onSubmit,
@@ -125,6 +135,14 @@ export function ModalOrdemServico({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
+  // Atualiza funcionario_id quando user carrega após o modal abrir
+  useEffect(() => {
+    if (user?.id && !formData.funcionario_id) {
+      setFormData((prev) => ({ ...prev, funcionario_id: user.id }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
   const veiculosDisponiveis = formData.cliente_id
     ? getVeiculosByCliente(formData.cliente_id)
     : veiculos;
@@ -147,6 +165,14 @@ export function ModalOrdemServico({
     if (!peca) return;
 
     const existingIndex = formData.pecas.findIndex((p) => p.peca_id === pecaId);
+    const quantidadeJaAdicionada = existingIndex >= 0 ? formData.pecas[existingIndex].quantidade : 0;
+    const totalSolicitado = quantidadeJaAdicionada + pecaQuantidade;
+
+    if (totalSolicitado > peca.quantidade) {
+      toast.error(`Estoque insuficiente para "${peca.name_peca}". Disponível: ${peca.quantidade}, Solicitado: ${totalSolicitado}`);
+      return;
+    }
+
     if (existingIndex >= 0) {
       const updated = [...formData.pecas];
       updated[existingIndex].quantidade += pecaQuantidade;
@@ -181,6 +207,17 @@ export function ModalOrdemServico({
 
   const handleSubmit = async () => {
     if (!formData.cliente_id || !formData.veiculo_id) {
+      toast.error('Selecione um cliente e um veículo.');
+      return;
+    }
+
+    if (!formData.funcionario_id) {
+      toast.error('Erro ao identificar o funcionário. Tente recarregar a página.');
+      return;
+    }
+
+    if (!formData.funcionario_responsavel_id) {
+      toast.error('Selecione o funcionário responsável pelo serviço.');
       return;
     }
 
@@ -316,7 +353,27 @@ export function ModalOrdemServico({
                   </SelectContent>
                 </Select>
               </div>
-       
+
+            {/* Funcionário Responsável */}
+            <div className='space-y-2 w-full'>
+              <Label>Funcionário Responsável *</Label>
+              <Select
+                value={formData.funcionario_responsavel_id || ''}
+                onValueChange={(v) =>
+                  setFormData({ ...formData, funcionario_responsavel_id: v })
+                }>
+                <SelectTrigger className='bg-input border-border w-full'>
+                  <SelectValue placeholder='Selecione o funcionário responsável' />
+                </SelectTrigger>
+                <SelectContent className='bg-card border-border'>
+                  {funcionarios.map((func) => (
+                    <SelectItem key={func.id} value={func.id}>
+                      {func.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
             {/* Observação */}
             <div className='space-y-2'>
@@ -441,7 +498,7 @@ export function ModalOrdemServico({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={isLoading || !formData.cliente_id || !formData.veiculo_id}
+            disabled={isLoading || !formData.cliente_id || !formData.veiculo_id || !formData.funcionario_id || !formData.funcionario_responsavel_id}
             className='bg-primary hover:bg-primary/90 w-32'>
             {isLoading ? 'Salvando...' : isEdit ? 'Atualizar' : 'Criar Ordem'}
           </Button>
