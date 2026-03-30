@@ -4,6 +4,14 @@ import { useCallback, useEffect, useState } from 'react';
 
 import type { Cliente, Peca, Veiculo } from '@/db/schema';
 
+export interface Funcionario {
+  id: string;
+  name: string;
+  email: string;
+  cargo: string | null;
+  status: boolean | null;
+}
+
 import { toast } from 'sonner';
 
 // Tipos para as ordens com dados relacionados
@@ -28,6 +36,7 @@ export interface OrdemServicoCompleta {
   cliente_id: number;
   veiculo_id: number;
   funcionario_id: string;
+  funcionario_responsavel_id: string;
   observacao: string | null;
   valor_total: number;
   cliente: {
@@ -41,6 +50,10 @@ export interface OrdemServicoCompleta {
     modelo: string;
   } | null;
   funcionario: {
+    id: string;
+    name: string;
+  } | null;
+  funcionario_responsavel: {
     id: string;
     name: string;
   } | null;
@@ -71,6 +84,7 @@ export interface NovaOrdemServico {
   cliente_id: number;
   veiculo_id: number;
   funcionario_id: string;
+  funcionario_responsavel_id: string;
   observacao?: string;
   valor_total: number;
   pecas: { peca_id: number; quantidade: number }[];
@@ -93,6 +107,7 @@ export interface UseOrdensReturn {
   clientes: Cliente[];
   veiculos: Veiculo[];
   pecas: Peca[];
+  funcionarios: Funcionario[];
   isLoading: boolean;
 
   // Filtros
@@ -102,6 +117,8 @@ export interface UseOrdensReturn {
   setFilterType: (type: 'all' | 'servico' | 'venda') => void;
   filterStatus: string;
   setFilterStatus: (status: string) => void;
+  filterMonth: string;
+  setFilterMonth: (month: string) => void;
 
   // Modal Ordem Serviço
   isAddServicoOpen: boolean;
@@ -154,12 +171,14 @@ export function useOrdens(): UseOrdensReturn {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const [pecas, setPecas] = useState<Peca[]>([]);
+  const [funcionarios, setFuncionarios] = useState<Funcionario[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   // Filtros
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'servico' | 'venda'>('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [filterMonth, setFilterMonth] = useState('all');
 
   // Modais Ordem Serviço
   const [isAddServicoOpen, setIsAddServicoOpen] = useState(false);
@@ -228,6 +247,16 @@ export function useOrdens(): UseOrdensReturn {
     }
   }, []);
 
+  const fetchFuncionarios = useCallback(async () => {
+    try {
+      const res = await fetch('/api/users');
+      const data: Funcionario[] = await res.json();
+      setFuncionarios(data);
+    } catch (error) {
+      console.error('Erro ao buscar funcionários:', error);
+    }
+  }, []);
+
   const refreshData = useCallback(async () => {
     setIsLoading(true);
     await Promise.all([
@@ -235,10 +264,11 @@ export function useOrdens(): UseOrdensReturn {
       fetchOrdensVenda(),
       fetchClientes(),
       fetchVeiculos(),
-      fetchPecas()
+      fetchPecas(),
+      fetchFuncionarios()
     ]);
     setIsLoading(false);
-  }, [fetchOrdensServico, fetchOrdensVenda, fetchClientes, fetchVeiculos, fetchPecas]);
+  }, [fetchOrdensServico, fetchOrdensVenda, fetchClientes, fetchVeiculos, fetchPecas, fetchFuncionarios]);
 
   useEffect(() => {
     refreshData();
@@ -254,13 +284,16 @@ export function useOrdens(): UseOrdensReturn {
         body: JSON.stringify(data)
       });
 
-      if (!res.ok) throw new Error('Erro ao criar ordem de serviço');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Erro ao criar ordem de serviço');
+      }
 
-      await fetchOrdensServico();
+      await refreshData();
       toast.success('Ordem de serviço criada com sucesso!');
     } catch (error) {
       console.error('Erro:', error);
-      toast.error('Erro ao criar ordem de serviço');
+      toast.error(error instanceof Error ? error.message : 'Erro ao criar ordem de serviço');
       throw error;
     } finally {
       setIsLoading(false);
@@ -276,15 +309,18 @@ export function useOrdens(): UseOrdensReturn {
         body: JSON.stringify(data)
       });
 
-      if (!res.ok) throw new Error('Erro ao atualizar ordem de serviço');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Erro ao atualizar ordem de serviço');
+      }
 
-      await fetchOrdensServico();
+      await refreshData();
       setEditingServico(null);
       setViewingServico(null);
       toast.success('Ordem de serviço atualizada com sucesso!');
     } catch (error) {
       console.error('Erro:', error);
-      toast.error('Erro ao atualizar ordem de serviço');
+      toast.error(error instanceof Error ? error.message : 'Erro ao atualizar ordem de serviço');
     } finally {
       setIsLoading(false);
     }
@@ -295,15 +331,18 @@ export function useOrdens(): UseOrdensReturn {
     try {
       const res = await fetch(`/api/ordens/servico/${id}`, { method: 'DELETE' });
 
-      if (!res.ok) throw new Error('Erro ao excluir ordem de serviço');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Erro ao excluir ordem de serviço');
+      }
 
-      await fetchOrdensServico();
+      await refreshData();
       setIsDeleteOpen(false);
       setDeleteId(null);
       toast.success('Ordem de serviço excluída com sucesso!');
     } catch (error) {
       console.error('Erro:', error);
-      toast.error('Erro ao excluir ordem de serviço');
+      toast.error(error instanceof Error ? error.message : 'Erro ao excluir ordem de serviço');
     } finally {
       setIsLoading(false);
     }
@@ -319,13 +358,16 @@ export function useOrdens(): UseOrdensReturn {
         body: JSON.stringify(data)
       });
 
-      if (!res.ok) throw new Error('Erro ao criar ordem de venda');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Erro ao criar ordem de venda');
+      }
 
-      await fetchOrdensVenda();
+      await refreshData();
       toast.success('Ordem de venda criada com sucesso!');
     } catch (error) {
       console.error('Erro:', error);
-      toast.error('Erro ao criar ordem de venda');
+      toast.error(error instanceof Error ? error.message : 'Erro ao criar ordem de venda');
       throw error;
     } finally {
       setIsLoading(false);
@@ -341,15 +383,18 @@ export function useOrdens(): UseOrdensReturn {
         body: JSON.stringify(data)
       });
 
-      if (!res.ok) throw new Error('Erro ao atualizar ordem de venda');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Erro ao atualizar ordem de venda');
+      }
 
-      await fetchOrdensVenda();
+      await refreshData();
       setEditingVenda(null);
       setViewingVenda(null);
       toast.success('Ordem de venda atualizada com sucesso!');
     } catch (error) {
       console.error('Erro:', error);
-      toast.error('Erro ao atualizar ordem de venda');
+      toast.error(error instanceof Error ? error.message : 'Erro ao atualizar ordem de venda');
     } finally {
       setIsLoading(false);
     }
@@ -360,15 +405,18 @@ export function useOrdens(): UseOrdensReturn {
     try {
       const res = await fetch(`/api/ordens/venda/${id}`, { method: 'DELETE' });
 
-      if (!res.ok) throw new Error('Erro ao excluir ordem de venda');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Erro ao excluir ordem de venda');
+      }
 
-      await fetchOrdensVenda();
+      await refreshData();
       setIsDeleteOpen(false);
       setDeleteId(null);
       toast.success('Ordem de venda excluída com sucesso!');
     } catch (error) {
       console.error('Erro:', error);
-      toast.error('Erro ao excluir ordem de venda');
+      toast.error(error instanceof Error ? error.message : 'Erro ao excluir ordem de venda');
     } finally {
       setIsLoading(false);
     }
@@ -407,6 +455,7 @@ export function useOrdens(): UseOrdensReturn {
     clientes,
     veiculos,
     pecas,
+    funcionarios,
     isLoading,
 
     search,
@@ -415,6 +464,8 @@ export function useOrdens(): UseOrdensReturn {
     setFilterType,
     filterStatus,
     setFilterStatus,
+    filterMonth,
+    setFilterMonth,
 
     isAddServicoOpen,
     setIsAddServicoOpen,
