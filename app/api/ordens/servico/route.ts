@@ -2,9 +2,11 @@ import { db, schema } from '@/db';
 import { logAction } from '@/lib/log-action';
 import { validateAndDecrementStock } from '@/lib/stock';
 
-import { desc, eq } from 'drizzle-orm';
+import { aliasedTable, desc, eq } from 'drizzle-orm';
 
 export async function GET() {
+  const funcionarioResponsavel = aliasedTable(schema.user, 'funcionario_responsavel');
+
   const ordens = await db
     .select({
       id: schema.ordemServico.id,
@@ -31,12 +33,17 @@ export async function GET() {
       funcionario: {
         id: schema.user.id,
         name: schema.user.name
+      },
+      funcionario_responsavel: {
+        id: funcionarioResponsavel.id,
+        name: funcionarioResponsavel.name
       }
     })
     .from(schema.ordemServico)
     .leftJoin(schema.cliente, eq(schema.ordemServico.cliente_id, schema.cliente.id))
     .leftJoin(schema.veiculo, eq(schema.ordemServico.veiculo_id, schema.veiculo.id))
     .leftJoin(schema.user, eq(schema.ordemServico.funcionario_id, schema.user.id))
+    .leftJoin(funcionarioResponsavel, eq(schema.ordemServico.funcionario_responsavel_id, funcionarioResponsavel.id))
     .orderBy(desc(schema.ordemServico.data_criacao));
 
   const ordensComPecas = await Promise.all(

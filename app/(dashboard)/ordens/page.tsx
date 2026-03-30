@@ -79,7 +79,7 @@ const formatCurrency = (value: number) => {
 };
 
 const formatDateShort = (date: string) => {
-  return format(new Date(date), 'dd/MM', { locale: ptBR });
+  return format(new Date(date), 'dd/MM/yy', { locale: ptBR });
 };
 
 const formatDateFull = (date: string) => {
@@ -101,6 +101,8 @@ export default function Ordens() {
     setFilterType,
     filterStatus,
     setFilterStatus,
+    filterMonth,
+    setFilterMonth,
     isAddServicoOpen,
     setIsAddServicoOpen,
     editingServico,
@@ -144,6 +146,17 @@ export default function Ordens() {
     return todas;
   }, [ordensServico, ordensVenda]);
 
+  const mesesDisponiveis = useMemo(() => {
+    const meses = new Set<string>();
+    ordensUnificadas.forEach((ordem) => {
+      const date = new Date(ordem.data_criacao);
+      meses.add(
+        `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+      );
+    });
+    return Array.from(meses).sort().reverse();
+  }, [ordensUnificadas]);
+
   const ordensFiltradas = useMemo(() => {
     return ordensUnificadas.filter((ordem) => {
       const searchLower = search.toLowerCase();
@@ -154,13 +167,27 @@ export default function Ordens() {
         (ordem.tipo === 'servico' &&
           (ordem as OrdemServicoCompleta).veiculo?.placa
             .toLowerCase()
-            .includes(searchLower));
+            .includes(searchLower)) ||
+        (ordem.tipo === 'servico' &&
+          ((ordem as OrdemServicoCompleta).funcionario?.name
+            ?.toLowerCase()
+            .includes(searchLower) ||
+            (ordem as OrdemServicoCompleta).funcionario_responsavel?.name
+              ?.toLowerCase()
+              .includes(searchLower)));
       const matchesType = filterType === 'all' || ordem.tipo === filterType;
       const matchesStatus =
         filterStatus === 'all' || ordem.status === filterStatus;
-      return matchesSearch && matchesType && matchesStatus;
+      const matchesMonth =
+        filterMonth === 'all' ||
+        (() => {
+          const date = new Date(ordem.data_criacao);
+          const ordemMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+          return ordemMonth === filterMonth;
+        })();
+      return matchesSearch && matchesType && matchesStatus && matchesMonth;
     });
-  }, [ordensUnificadas, search, filterType, filterStatus]);
+  }, [ordensUnificadas, search, filterType, filterStatus, filterMonth]);
 
   const {
     paginatedItems,
@@ -268,7 +295,7 @@ export default function Ordens() {
           </p>
         </div>
 
-        <div className='flex gap-2'>
+        <div className='flex flex-col md:flex-row gap-2'>
           <Button
             onClick={() => setIsAddServicoOpen(true)}
             className='bg-primary hover:bg-primary/90'>
@@ -283,71 +310,75 @@ export default function Ordens() {
       </div>
 
       {/* Stats */}
-      <div className='grid gap-4 sm:grid-cols-4'>
-        <Card className='bg-card border-border relative overflow-hidden'>
-          <div className='absolute inset-x-0 top-0 h-0.5 bg-yellow-500/50' />
-          <CardContent className='px-4 py-4'>
-            <div className='flex items-center gap-3'>
-              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-500/10'>
-                <Clock className='h-5 w-5 text-yellow-500' />
+      <div className='flex flex-col md:flex-row w-full gap-4'>
+        <div className='flex gap-4 w-full'>
+          <Card className='bg-card w-full border-border relative overflow-hidden'>
+            <div className='absolute inset-x-0 top-0 h-0.5 bg-yellow-500/50' />
+            <CardContent className='px-4 py-4'>
+              <div className='flex items-center gap-3'>
+                <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-500/10'>
+                  <Clock className='h-5 w-5 text-yellow-500' />
+                </div>
+                <div>
+                  <p className='text-2xl font-bold text-foreground'>
+                    {stats.ativas}
+                  </p>
+                  <p className='text-sm text-muted-foreground'>Ativas</p>
+                </div>
               </div>
-              <div>
-                <p className='text-2xl font-bold text-foreground'>
-                  {stats.ativas}
-                </p>
-                <p className='text-sm text-muted-foreground'>Ativas</p>
+            </CardContent>
+          </Card>
+          <Card className='bg-card w-full border-border relative overflow-hidden'>
+            <div className='absolute inset-x-0 top-0 h-0.5 bg-emerald-500/50' />
+            <CardContent className='px-4 py-4'>
+              <div className='flex items-center gap-3'>
+                <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10'>
+                  <CheckCircle className='h-5 w-5 text-emerald-500' />
+                </div>
+                <div>
+                  <p className='text-2xl font-bold text-foreground'>
+                    {stats.fechadas}
+                  </p>
+                  <p className='text-sm text-muted-foreground'>Fechadas</p>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className='bg-card border-border relative overflow-hidden'>
-          <div className='absolute inset-x-0 top-0 h-0.5 bg-emerald-500/50' />
-          <CardContent className='px-4 py-4'>
-            <div className='flex items-center gap-3'>
-              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10'>
-                <CheckCircle className='h-5 w-5 text-emerald-500' />
+            </CardContent>
+          </Card>
+        </div>
+        <div className='flex gap-4 w-full'>
+          <Card className='bg-card w-full border-border relative overflow-hidden'>
+            <div className='absolute inset-x-0 top-0 h-0.5 bg-primary/40' />
+            <CardContent className='px-4 py-4'>
+              <div className='flex items-center gap-3'>
+                <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10'>
+                  <Wrench className='h-5 w-5 text-primary' />
+                </div>
+                <div>
+                  <p className='text-2xl font-bold text-foreground'>
+                    {stats.totalServico}
+                  </p>
+                  <p className='text-sm text-muted-foreground'>Serviço</p>
+                </div>
               </div>
-              <div>
-                <p className='text-2xl font-bold text-foreground'>
-                  {stats.fechadas}
-                </p>
-                <p className='text-sm text-muted-foreground'>Fechadas</p>
+            </CardContent>
+          </Card>
+          <Card className='bg-card w-full border-border relative overflow-hidden'>
+            <div className='absolute inset-x-0 top-0 h-0.5 bg-primary/40' />
+            <CardContent className='px-4 py-4'>
+              <div className='flex items-center gap-3'>
+                <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10'>
+                  <ShoppingCart className='h-5 w-5 text-primary' />
+                </div>
+                <div>
+                  <p className='text-2xl font-bold text-foreground'>
+                    {stats.totalVenda}
+                  </p>
+                  <p className='text-sm text-muted-foreground'>Venda</p>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className='bg-card border-border relative overflow-hidden'>
-          <div className='absolute inset-x-0 top-0 h-0.5 bg-primary/40' />
-          <CardContent className='px-4 py-4'>
-            <div className='flex items-center gap-3'>
-              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10'>
-                <Wrench className='h-5 w-5 text-primary' />
-              </div>
-              <div>
-                <p className='text-2xl font-bold text-foreground'>
-                  {stats.totalServico}
-                </p>
-                <p className='text-sm text-muted-foreground'>Serviço</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className='bg-card border-border relative overflow-hidden'>
-          <div className='absolute inset-x-0 top-0 h-0.5 bg-primary/40' />
-          <CardContent className='px-4 py-4'>
-            <div className='flex items-center gap-3'>
-              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10'>
-                <ShoppingCart className='h-5 w-5 text-primary' />
-              </div>
-              <div>
-                <p className='text-2xl font-bold text-foreground'>
-                  {stats.totalVenda}
-                </p>
-                <p className='text-sm text-muted-foreground'>Venda</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Filters */}
@@ -355,7 +386,7 @@ export default function Ordens() {
         <div className='relative flex-1 max-w-md'>
           <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
           <Input
-            placeholder='Buscar por cliente, placa ou ID...'
+            placeholder='Buscar por cliente, funcionário, placa ou ID...'
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className='pl-10 bg-input border-border'
@@ -364,7 +395,7 @@ export default function Ordens() {
         <Select
           value={filterType}
           onValueChange={(v: 'all' | 'servico' | 'venda') => setFilterType(v)}>
-          <SelectTrigger className='bg-input border-border w-full sm:w-40'>
+          <SelectTrigger className='bg-input md:flex hidden zborder-border w-full sm:w-40'>
             <SelectValue />
           </SelectTrigger>
           <SelectContent className='bg-card border-border'>
@@ -382,6 +413,24 @@ export default function Ordens() {
             <SelectItem value='ativa'>Ativa</SelectItem>
             <SelectItem value='fechada'>Fechada</SelectItem>
             <SelectItem value='cancelada'>Cancelada</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={filterMonth} onValueChange={setFilterMonth}>
+          <SelectTrigger className='bg-input border-border w-full sm:w-48'>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className='bg-card border-border'>
+            <SelectItem value='all'>Todos os Meses</SelectItem>
+            {mesesDisponiveis.map((mes) => {
+              const [year, month] = mes.split('-');
+              const date = new Date(Number(year), Number(month) - 1);
+              const label = format(date, 'MMMM yyyy', { locale: ptBR });
+              return (
+                <SelectItem key={mes} value={mes}>
+                  {label.charAt(0).toUpperCase() + label.slice(1)}
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
       </div>
@@ -492,7 +541,10 @@ export default function Ordens() {
                     <User className='h-4 w-4 text-muted-foreground shrink-0' />
                     <span className='text-sm text-muted-foreground truncate'>
                       {isServico
-                        ? funcionarios.find((f) => f.id === ordemServico?.funcionario_responsavel_id)?.name || '-'
+                        ? funcionarios.find(
+                            (f) =>
+                              f.id === ordemServico?.funcionario_responsavel_id
+                          )?.name || '-'
                         : ordem.cliente?.name_cliente || '-'}
                     </span>
                   </div>
