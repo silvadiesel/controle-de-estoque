@@ -1,5 +1,6 @@
 import { db, schema } from '@/db';
 import { logAction } from '@/lib/log-action';
+import { validateAndDecrementStock } from '@/lib/stock';
 
 import { desc, eq } from 'drizzle-orm';
 
@@ -59,35 +60,59 @@ export async function GET() {
 export async function POST(request: Request) {
   const data = await request.json();
 
-  const novaOrdem = await db
-    .insert(schema.ordemVenda)
-    .values({
-      data_pagamento: data.data_pagamento
-        ? new Date(data.data_pagamento)
-        : null,
-      data_previsao_pagamento: data.data_previsao_pagamento
-        ? new Date(data.data_previsao_pagamento)
-        : null,
-      status: data.status || 'ativa',
-      cliente_id: data.cliente_id,
-      observacao: data.observacao || null,
-      valor_total: data.valor_total || 0,
-      metodo_pagamento: data.metodo_pagamento || null
-    })
-    .returning();
-
-  const ordemId = novaOrdem[0].id;
-
-  if (data.pecas && data.pecas.length > 0) {
-    await db.insert(schema.ordemVendaPecas).values(
-      data.pecas.map((peca: { peca_id: number; quantidade: number }) => ({
-        ordem_venda_id: ordemId,
-        peca_id: peca.peca_id,
-        quantidade: peca.quantidade
-      }))
+  // Validação de campos obrigatórios
+  if (!data.cliente_id) {
+    return new Response(
+      JSON.stringify({ error: 'Cliente é obrigatório' }),
+      { status: 400 }
     );
   }
 
-  await logAction(request, 'criacao', 'ordem_venda', String(ordemId), `Ordem de venda #${ordemId} criada`);
-  return new Response(JSON.stringify(novaOrdem[0]));
+  try {
+    const result = await db.transaction(async (tx) => {
+      // Validar e decrementar estoque
+      if (data.pecas && data.pecas.length > 0) {
+        await validateAndDecrementStock(tx, data.pecas);
+      }
+
+      // Criar ordem
+      const novaOrdem = await tx
+        .insert(schema.ordemVenda)
+        .values({
+          data_pagamento: data.data_pagamento
+            ? new Date(data.data_pagamento)
+            : null,
+          data_previsao_pagamento: data.data_previsao_pagamento
+            ? new Date(data.data_previsao_pagamento)
+            : null,
+          status: data.status || 'ativa',
+          cliente_id: data.cliente_id,
+          observacao: data.observacao || null,
+          valor_total: data.valor_total || 0,
+          metodo_pagamento: data.metodo_pagamento || null
+        })
+        .returning();
+
+      const ordemId = novaOrdem[0].id;
+
+      // Inserir peças na tabela de junção
+      if (data.pecas && data.pecas.length > 0) {
+        await tx.insert(schema.ordemVendaPecas).values(
+          data.pecas.map((peca: { peca_id: number; quantidade: number }) => ({
+            ordem_venda_id: ordemId,
+            peca_id: peca.peca_id,
+            quantidade: peca.quantidade
+          }))
+        );
+      }
+
+      return novaOrdem[0];
+    });
+
+    await logAction(request, 'criacao', 'ordem_venda', String(result.id), `Ordem de venda #${result.id} criada`);
+    return new Response(JSON.stringify(result));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Erro ao criar ordem de venda';
+    return new Response(JSON.stringify({ error: message }), { status: 400 });
+  }
 }
