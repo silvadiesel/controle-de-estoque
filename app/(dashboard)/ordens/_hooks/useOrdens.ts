@@ -117,6 +117,8 @@ export interface UseOrdensReturn {
   setFilterType: (type: 'all' | 'servico' | 'venda') => void;
   filterStatus: string;
   setFilterStatus: (status: string) => void;
+  filterMonth: string;
+  setFilterMonth: (month: string) => void;
 
   // Modal Ordem Serviço
   isAddServicoOpen: boolean;
@@ -176,6 +178,7 @@ export function useOrdens(): UseOrdensReturn {
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'servico' | 'venda'>('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [filterMonth, setFilterMonth] = useState('all');
 
   // Modais Ordem Serviço
   const [isAddServicoOpen, setIsAddServicoOpen] = useState(false);
@@ -461,6 +464,8 @@ export function useOrdens(): UseOrdensReturn {
     setFilterType,
     filterStatus,
     setFilterStatus,
+    filterMonth,
+    setFilterMonth,
 
     isAddServicoOpen,
     setIsAddServicoOpen,

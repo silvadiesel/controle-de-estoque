@@ -2,13 +2,15 @@ import { db, schema } from '@/db';
 import { logAction } from '@/lib/log-action';
 import { adjustStock, restoreStock, validateAndDecrementStock } from '@/lib/stock';
 
-import { eq } from 'drizzle-orm';
+import { aliasedTable, eq } from 'drizzle-orm';
 
 type Params = { params: Promise<{ id: string }> };
 
 export async function GET(_request: Request, { params }: Params) {
   const { id } = await params;
   const ordemId = parseInt(id);
+
+  const funcionarioResponsavel = aliasedTable(schema.user, 'funcionario_responsavel');
 
   const ordem = await db
     .select({
@@ -36,12 +38,17 @@ export async function GET(_request: Request, { params }: Params) {
       funcionario: {
         id: schema.user.id,
         name: schema.user.name
+      },
+      funcionario_responsavel: {
+        id: funcionarioResponsavel.id,
+        name: funcionarioResponsavel.name
       }
     })
     .from(schema.ordemServico)
     .leftJoin(schema.cliente, eq(schema.ordemServico.cliente_id, schema.cliente.id))
     .leftJoin(schema.veiculo, eq(schema.ordemServico.veiculo_id, schema.veiculo.id))
     .leftJoin(schema.user, eq(schema.ordemServico.funcionario_id, schema.user.id))
+    .leftJoin(funcionarioResponsavel, eq(schema.ordemServico.funcionario_responsavel_id, funcionarioResponsavel.id))
     .where(eq(schema.ordemServico.id, ordemId))
     .limit(1);
 
