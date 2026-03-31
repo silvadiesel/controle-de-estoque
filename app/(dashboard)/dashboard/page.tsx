@@ -12,7 +12,7 @@ import { ActivityFeed, type MovimentacaoAPI } from './_components/activity-feed'
 import { buildLast7Days, MovementsChart } from './_components/movements-chart';
 import { LastOrders, type OrdemServicoItem, type OrdemVendaItem } from './_components/last-orders';
 import { StatCard } from './_components/stat-card';
-import { deriveDashboardState, type DashboardBuckets, type RequestBucket } from './_lib/dashboard-state';
+import { deriveDashboardState, type RequestBucket } from './_lib/dashboard-state';
 
 export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -50,7 +50,7 @@ export default function DashboardPage() {
       data: result.status === 'fulfilled' && Array.isArray(result.value) ? (result.value as T[]) : []
     });
 
-    const buckets: DashboardBuckets = {
+    const buckets = {
       produtos: toBucket<Peca>(results[0]),
       clientes: toBucket<Cliente>(results[1]),
       servico: toBucket<OrdemServicoItem>(results[2]),
