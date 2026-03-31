@@ -90,7 +90,7 @@ export default function RegisterPage() {
       }>
       <form onSubmit={handleSubmit} className='space-y-5'>
         <div className='space-y-2'>
-          <Label htmlFor='name' className='text-base font-medium text-zinc-100'>
+          <Label htmlFor='name' className='text-base font-medium text-foreground'>
             Nome completo
           </Label>
           <Input
@@ -103,14 +103,14 @@ export default function RegisterPage() {
             aria-invalid={Boolean(error)}
             required
             disabled={loading}
-            className='h-14 rounded-2xl border-white/8 bg-white/3 px-4 text-base text-white placeholder:text-zinc-500'
+            className='h-14 rounded-2xl border-border bg-input px-4 text-base text-foreground placeholder:text-muted-foreground'
           />
         </div>
 
         <div className='space-y-2'>
           <Label
             htmlFor='email'
-            className='text-base font-medium text-zinc-100'>
+            className='text-base font-medium text-foreground'>
             Email
           </Label>
           <Input
@@ -123,14 +123,14 @@ export default function RegisterPage() {
             aria-invalid={Boolean(error)}
             required
             disabled={loading}
-            className='h-14 rounded-2xl border-white/8 bg-white/3 px-4 text-base text-white placeholder:text-zinc-500'
+            className='h-14 rounded-2xl border-border bg-input px-4 text-base text-foreground placeholder:text-muted-foreground'
           />
         </div>
 
         <div className='space-y-2'>
           <Label
             htmlFor='password'
-            className='text-base font-medium text-zinc-100'>
+            className='text-base font-medium text-foreground'>
             Senha
           </Label>
           <div className='relative'>
@@ -145,13 +145,13 @@ export default function RegisterPage() {
               required
               minLength={8}
               disabled={loading}
-              className='h-14 rounded-2xl border-white/8 bg-white/3 px-4 pr-12 text-base text-white placeholder:text-zinc-500'
+              className='h-14 rounded-2xl border-border bg-input px-4 pr-12 text-base text-foreground placeholder:text-muted-foreground'
             />
             <button
               type='button'
               onClick={() => setShowPassword(!showPassword)}
               aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-              className='absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 transition-colors hover:text-zinc-100'>
+              className='absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground'>
               {showPassword ? (
                 <EyeOff className='h-5 w-5' />
               ) : (
@@ -159,7 +159,7 @@ export default function RegisterPage() {
               )}
             </button>
           </div>
-          <p className='text-sm leading-6 text-zinc-500'>
+          <p className='text-sm leading-6 text-muted-foreground'>
             Minimo de 8 caracteres.
           </p>
         </div>
@@ -167,7 +167,7 @@ export default function RegisterPage() {
         <div className='space-y-2'>
           <Label
             htmlFor='codigoVerificacao'
-            className='text-base font-medium text-zinc-100'>
+            className='text-base font-medium text-foreground'>
             Codigo de verificacao
           </Label>
           <Input
@@ -180,9 +180,9 @@ export default function RegisterPage() {
             aria-invalid={Boolean(error)}
             required
             disabled={loading}
-            className='h-14 rounded-2xl border-white/8 bg-white/3 px-4 text-base text-white placeholder:text-zinc-500'
+            className='h-14 rounded-2xl border-border bg-input px-4 text-base text-foreground placeholder:text-muted-foreground'
           />
-          <p className='text-sm leading-6 text-zinc-500'>
+          <p className='text-sm leading-6 text-muted-foreground'>
             Solicite o codigo ao administrador para liberar o cadastro.
           </p>
         </div>
@@ -199,7 +199,7 @@ export default function RegisterPage() {
 
         <Button
           type='submit'
-          className='group h-14 w-full rounded-2xl bg-[linear-gradient(180deg,#7b9cc0,#5b7fa5)] text-base font-semibold text-[#081019] shadow-[0_20px_40px_rgba(91,127,165,0.24)] hover:opacity-95'
+          className='group h-14 w-full rounded-2xl bg-primary text-base font-semibold text-primary-foreground hover:bg-primary/90'
           disabled={loading}>
           {loading ? (
             <>

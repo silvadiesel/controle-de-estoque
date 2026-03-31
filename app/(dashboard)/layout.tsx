@@ -26,7 +26,7 @@ export default async function DashboardLayout({
     <SidebarProvider defaultOpen={defaultOpen}>
       <AppSidebar />
       <SidebarInset>
-        <AlertaToastProvider toastClassName='w-fulltext-base ' />
+        <AlertaToastProvider toastClassName='w-full text-base' />
         <main id='main-content'>{children}</main>
       </SidebarInset>
     </SidebarProvider>

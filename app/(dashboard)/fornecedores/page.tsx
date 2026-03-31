@@ -62,8 +62,8 @@ export default function Fornecedores() {
       <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
         <div className='flex flex-col gap-1'>
           <div className='flex items-center gap-2.5'>
-            <div className='h-7 w-1 rounded-full bg-[#5b7fa5]' />
-            <h1 className='text-2xl font-bold text-[#e4e4e7]'>Fornecedores</h1>
+            <div className='h-7 w-1 rounded-full bg-primary' />
+            <h1 className='text-2xl font-bold text-foreground'>Fornecedores</h1>
           </div>
           <p className='pl-3.5 text-sm text-[#71717a]'>
             Gerencie os fornecedores de peças
@@ -78,7 +78,7 @@ export default function Fornecedores() {
           onSubmit={handleAddFornecedor}
           isLoading={isLoading}
           trigger={
-            <Button className='bg-[#5b7fa5] hover:bg-[#5b7fa5]/90 text-[#09090B]'>
+            <Button>
               <Plus className='h-4 w-4' />
               Novo Fornecedor
             </Button>
@@ -101,16 +101,14 @@ export default function Fornecedores() {
       <div className='grid gap-4 sm:grid-cols-3'>
         <div className='bg-[#18181b] border border-[#27272a] rounded-[10px] px-4 py-3'>
           <div className='flex items-center gap-3'>
-            <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-[rgba(91,127,165,0.12)]'>
-              <Factory className='h-5 w-5 text-[#5b7fa5]' />
+            <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/12'>
+              <Factory className='h-5 w-5 text-primary' />
             </div>
             <div>
-              <p className='text-2xl font-bold text-[#e4e4e7]'>
+              <p className='text-2xl font-bold text-foreground'>
                 {fornecedores.length}
               </p>
-              <p className='text-sm text-[#71717a]'>
-                Total de Fornecedores
-              </p>
+              <p className='text-sm text-[#71717a]'>Total de Fornecedores</p>
             </div>
           </div>
         </div>
@@ -137,27 +135,25 @@ export default function Fornecedores() {
               className='bg-[#18181b] border border-[#27272a] rounded-[10px] p-4'>
               <div className='flex items-center gap-4'>
                 {/* Avatar */}
-                <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgba(91,127,165,0.12)]'>
-                  <Factory className='h-5 w-5 text-[#5b7fa5]' />
+                <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/12'>
+                  <Factory className='h-5 w-5 text-primary' />
                 </div>
 
                 {/* Name + CNPJ */}
                 <div className='flex-1 min-w-0'>
-                  <p className='font-medium text-[#e4e4e7] truncate'>
+                  <p className='font-medium text-foreground truncate'>
                     {fornecedor.name_empresa}
                   </p>
-                  <p className='text-sm text-[#71717a]'>
-                    {fornecedor.cnpj}
-                  </p>
+                  <p className='text-sm text-[#71717a]'>{fornecedor.cnpj}</p>
                 </div>
 
                 {/* Contact */}
                 <div className='hidden md:flex items-center gap-4'>
-                  <div className='flex items-center gap-1.5 text-sm text-[#5b7fa5] font-medium'>
+                  <div className='flex items-center gap-1.5 text-sm text-primary font-medium'>
                     <Phone className='h-3.5 w-3.5' />
                     {fornecedor.telefone || '-'}
                   </div>
-                  <div className='flex items-center gap-1.5 text-sm text-[#5b7fa5] font-medium'>
+                  <div className='flex items-center gap-1.5 text-sm text-primary font-medium'>
                     <Mail className='h-3.5 w-3.5' />
                     {fornecedor.email || '-'}
                   </div>
@@ -172,9 +168,7 @@ export default function Fornecedores() {
                       setEditingFornecedor(data as typeof fornecedor)
                     }
                     isOpen={editingFornecedor?.id === fornecedor.id}
-                    setIsOpen={(open) =>
-                      !open && setEditingFornecedor(null)
-                    }
+                    setIsOpen={(open) => !open && setEditingFornecedor(null)}
                     onSubmit={handleUpdateFornecedor}
                     isLoading={isLoading}
                     trigger={
@@ -182,9 +176,7 @@ export default function Fornecedores() {
                         variant='ghost'
                         size='icon'
                         aria-label={`Editar fornecedor ${fornecedor.name_empresa}`}
-                        onClick={() =>
-                          setEditingFornecedor(fornecedor)
-                        }>
+                        onClick={() => setEditingFornecedor(fornecedor)}>
                         <Pencil className='h-4 w-4 text-[#71717a]' />
                       </Button>
                     }
@@ -195,9 +187,7 @@ export default function Fornecedores() {
                       setIsDeleteOpen(open);
                       if (!open) setDeleteId(null);
                     }}
-                    onConfirm={() =>
-                      handleDeleteFornecedor(fornecedor.id)
-                    }
+                    onConfirm={() => handleDeleteFornecedor(fornecedor.id)}
                     isLoading={isLoading}
                     title='Excluir Fornecedor'
                     description={`Tem certeza que deseja excluir o fornecedor "${fornecedor.name_empresa}"? Esta ação não pode ser desfeita.`}
@@ -219,11 +209,11 @@ export default function Fornecedores() {
 
               {/* Mobile contact info */}
               <div className='flex md:hidden items-center gap-4 mt-3 pt-3 border-t border-[#27272a]'>
-                <div className='flex items-center gap-1.5 text-sm text-[#5b7fa5] font-medium'>
+                <div className='flex items-center gap-1.5 text-sm text-primary font-medium'>
                   <Phone className='h-3.5 w-3.5' />
                   {fornecedor.telefone || '-'}
                 </div>
-                <div className='flex items-center gap-1.5 text-sm text-[#5b7fa5] font-medium'>
+                <div className='flex items-center gap-1.5 text-sm text-primary font-medium'>
                   <Mail className='h-3.5 w-3.5' />
                   {fornecedor.email || '-'}
                 </div>

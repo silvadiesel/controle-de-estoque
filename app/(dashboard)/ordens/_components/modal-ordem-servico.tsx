@@ -158,8 +158,7 @@ export function ModalOrdemServico({
     if (!data.cliente_id) errs.cliente_id = 'Selecione um cliente';
     if (!data.veiculo_id) errs.veiculo_id = 'Selecione um veículo';
     if (!data.data_chegada) errs.data_chegada = 'Informe a data de chegada';
-    if (!data.funcionario_responsavel_id)
-      errs.funcionario_responsavel_id = 'Selecione o funcionário responsável';
+    if (!data.funcionario_responsavel_id) errs.funcionario_responsavel_id = 'Selecione o funcionário responsável';
     return errs;
   };
 
@@ -192,14 +191,11 @@ export function ModalOrdemServico({
     if (!peca) return;
 
     const existingIndex = formData.pecas.findIndex((p) => p.peca_id === pecaId);
-    const quantidadeJaAdicionada =
-      existingIndex >= 0 ? formData.pecas[existingIndex].quantidade : 0;
+    const quantidadeJaAdicionada = existingIndex >= 0 ? formData.pecas[existingIndex].quantidade : 0;
     const totalSolicitado = quantidadeJaAdicionada + pecaQuantidade;
 
     if (totalSolicitado > peca.quantidade) {
-      toast.error(
-        `Estoque insuficiente para "${peca.name_peca}". Disponível: ${peca.quantidade}, Solicitado: ${totalSolicitado}`
-      );
+      toast.error(`Estoque insuficiente para "${peca.name_peca}". Disponível: ${peca.quantidade}, Solicitado: ${totalSolicitado}`);
       return;
     }
 
@@ -247,9 +243,7 @@ export function ModalOrdemServico({
     }
 
     if (!formData.funcionario_id) {
-      toast.error(
-        'Não foi possível identificar seu usuário. Recarregue a página e tente novamente.'
-      );
+      toast.error('Não foi possível identificar seu usuário. Recarregue a página e tente novamente.');
       return;
     }
 
@@ -275,11 +269,11 @@ export function ModalOrdemServico({
         className='bg-[#18181b] border-[#27272a] rounded-[12px] max-w-[680px] p-0 overflow-y-auto'>
         <DialogHeader className='p-6 pb-4 border-b border-[#27272a]'>
           <div className='flex items-center gap-3 mb-1'>
-            <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(91,127,165,0.12)]'>
-              <Wrench className='h-4.5 w-4.5 text-[#5b7fa5]' />
+            <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-primary/12'>
+              <Wrench className='h-4.5 w-4.5 text-primary' />
             </div>
             <div>
-              <DialogTitle className='text-[#e4e4e7]'>
+              <DialogTitle className='text-foreground'>
                 {isEdit ? 'Editar Ordem de Serviço' : 'Nova Ordem de Serviço'}
               </DialogTitle>
               <DialogDescription className='text-[#71717a]'>
@@ -295,18 +289,12 @@ export function ModalOrdemServico({
           <div className='grid gap-4 p-6 pt-4'>
             {/* Cliente */}
             <div className='space-y-2'>
-              <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>
-                Cliente *
-              </Label>
+              <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Cliente *</Label>
               <Select
-                value={
-                  formData.cliente_id ? formData.cliente_id.toString() : ''
-                }
+                value={formData.cliente_id ? formData.cliente_id.toString() : ''}
                 onValueChange={handleClienteChange}>
                 <SelectTrigger
-                  aria-describedby={
-                    hasError('cliente_id') ? 'error-cliente-servico' : undefined
-                  }
+                  aria-describedby={hasError('cliente_id') ? 'error-cliente-servico' : undefined}
                   className={`bg-[#131316] w-full ${hasError('cliente_id') ? 'border-destructive' : 'border-[#27272a]'}`}>
                   <SelectValue placeholder='Selecione um cliente' />
                 </SelectTrigger>
@@ -322,26 +310,15 @@ export function ModalOrdemServico({
                 </SelectContent>
               </Select>
               {hasError('cliente_id') && (
-                <p
-                  id='error-cliente-servico'
-                  className='text-xs text-destructive'>
-                  {errors.cliente_id}
-                </p>
+                <p id='error-cliente-servico' className='text-xs text-destructive'>{errors.cliente_id}</p>
               )}
             </div>
 
             <div className='grid gap-4 sm:grid-cols-2'>
               {/* Data de Chegada */}
               <div className='space-y-2 w-full'>
-                <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>
-                  Data de Chegada *
-                </Label>
-                <div
-                  className={
-                    hasError('data_chegada')
-                      ? '[&>button]:border-destructive'
-                      : ''
-                  }>
+                <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Data de Chegada *</Label>
+                <div className={hasError('data_chegada') ? '[&>button]:border-destructive' : ''}>
                   <DatePicker
                     value={
                       formData.data_chegada
@@ -351,29 +328,21 @@ export function ModalOrdemServico({
                     onChange={(date) =>
                       setFormData({
                         ...formData,
-                        data_chegada: date
-                          ? date.toISOString().split('T')[0]
-                          : ''
+                        data_chegada: date ? date.toISOString().split('T')[0] : ''
                       })
                     }
                     placeholder='Selecione a data de chegada'
                   />
                 </div>
                 {hasError('data_chegada') && (
-                  <p
-                    id='error-data-chegada'
-                    className='text-xs text-destructive'>
-                    {errors.data_chegada}
-                  </p>
+                  <p id='error-data-chegada' className='text-xs text-destructive'>{errors.data_chegada}</p>
                 )}
               </div>
 
               {/* Status */}
               {isEdit && (
                 <div className='space-y-2'>
-                  <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>
-                    Status
-                  </Label>
+                  <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Status</Label>
                   <Select
                     value={formData.status}
                     onValueChange={(v: 'ativa' | 'fechada' | 'cancelada') =>
@@ -394,21 +363,15 @@ export function ModalOrdemServico({
 
             {/* Veículo */}
             <div className='space-y-2 w-full'>
-              <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>
-                Veículo *
-              </Label>
+              <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Veículo *</Label>
               <Select
-                value={
-                  formData.veiculo_id ? formData.veiculo_id.toString() : ''
-                }
+                value={formData.veiculo_id ? formData.veiculo_id.toString() : ''}
                 onValueChange={(v) =>
                   setFormData({ ...formData, veiculo_id: parseInt(v) })
                 }
                 disabled={!formData.cliente_id}>
                 <SelectTrigger
-                  aria-describedby={
-                    hasError('veiculo_id') ? 'error-veiculo-servico' : undefined
-                  }
+                  aria-describedby={hasError('veiculo_id') ? 'error-veiculo-servico' : undefined}
                   className={`bg-[#131316] w-full ${hasError('veiculo_id') ? 'border-destructive' : 'border-[#27272a]'}`}>
                   <SelectValue
                     placeholder={
@@ -429,30 +392,20 @@ export function ModalOrdemServico({
                 </SelectContent>
               </Select>
               {hasError('veiculo_id') && (
-                <p
-                  id='error-veiculo-servico'
-                  className='text-xs text-destructive'>
-                  {errors.veiculo_id}
-                </p>
+                <p id='error-veiculo-servico' className='text-xs text-destructive'>{errors.veiculo_id}</p>
               )}
             </div>
 
             {/* Funcionário Responsável */}
             <div className='space-y-2 w-full'>
-              <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>
-                Funcionário Responsável *
-              </Label>
+              <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Funcionário Responsável *</Label>
               <Select
                 value={formData.funcionario_responsavel_id || ''}
                 onValueChange={(v) =>
                   setFormData({ ...formData, funcionario_responsavel_id: v })
                 }>
                 <SelectTrigger
-                  aria-describedby={
-                    hasError('funcionario_responsavel_id')
-                      ? 'error-funcionario-servico'
-                      : undefined
-                  }
+                  aria-describedby={hasError('funcionario_responsavel_id') ? 'error-funcionario-servico' : undefined}
                   className={`bg-[#131316] w-full ${hasError('funcionario_responsavel_id') ? 'border-destructive' : 'border-[#27272a]'}`}>
                   <SelectValue placeholder='Selecione o funcionário responsável' />
                 </SelectTrigger>
@@ -465,19 +418,13 @@ export function ModalOrdemServico({
                 </SelectContent>
               </Select>
               {hasError('funcionario_responsavel_id') && (
-                <p
-                  id='error-funcionario-servico'
-                  className='text-xs text-destructive'>
-                  {errors.funcionario_responsavel_id}
-                </p>
+                <p id='error-funcionario-servico' className='text-xs text-destructive'>{errors.funcionario_responsavel_id}</p>
               )}
             </div>
 
             {/* Observação */}
             <div className='space-y-2'>
-              <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>
-                Observação / Descrição do Serviço
-              </Label>
+              <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Observação / Descrição do Serviço</Label>
               <Textarea
                 value={formData.observacao}
                 onChange={(e) =>
@@ -490,9 +437,7 @@ export function ModalOrdemServico({
 
             {/* Adicionar Peças */}
             <div className='space-y-3'>
-              <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>
-                Peças Utilizadas
-              </Label>
+              <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Peças Utilizadas</Label>
               <div className='flex gap-2'>
                 <Select
                   value={selectedPecaId}
@@ -518,8 +463,7 @@ export function ModalOrdemServico({
                     setPecaQuantidade(val === '' ? 0 : parseInt(val));
                   }}
                   onBlur={() => {
-                    if (!pecaQuantidade || pecaQuantidade < 1)
-                      setPecaQuantidade(1);
+                    if (!pecaQuantidade || pecaQuantidade < 1) setPecaQuantidade(1);
                   }}
                   className='bg-[#131316] border-[#27272a] w-20'
                 />
@@ -535,44 +479,29 @@ export function ModalOrdemServico({
                     <TableHeader>
                       <TableRow className='border-[#27272a] hover:bg-transparent'>
                         <TableHead className='text-[#71717a]'>Peça</TableHead>
-                        <TableHead className='text-[#71717a] text-center'>
-                          Qtd
-                        </TableHead>
-                        <TableHead className='text-[#71717a] text-right'>
-                          Preço Unit.
-                        </TableHead>
-                        <TableHead className='text-[#71717a] text-right'>
-                          Subtotal
-                        </TableHead>
+                        <TableHead className='text-[#71717a] text-center'>Qtd</TableHead>
+                        <TableHead className='text-[#71717a] text-right'>Preço Unit.</TableHead>
+                        <TableHead className='text-[#71717a] text-right'>Subtotal</TableHead>
                         <TableHead className='text-[#71717a] w-10'></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {formData.pecas.map((item) => (
-                        <TableRow
-                          key={item.peca_id}
-                          className='border-[#27272a] hover:bg-[#1c1c22]/30'>
-                          <TableCell className='text-[#e4e4e7]'>
+                        <TableRow key={item.peca_id} className='border-[#27272a] hover:bg-[#1c1c22]/30'>
+                          <TableCell className='text-foreground'>
                             {item.peca?.name_peca || 'Peça não encontrada'}
                           </TableCell>
-                          <TableCell className='text-center text-[#e4e4e7]'>
+                          <TableCell className='text-center text-foreground'>
                             {item.quantidade}
                           </TableCell>
                           <TableCell className='text-right text-[#71717a]'>
                             {formatCurrency(item.peca?.preco || 0)}
                           </TableCell>
-                          <TableCell className='text-right text-[#e4e4e7] font-medium'>
-                            {formatCurrency(
-                              (item.peca?.preco || 0) * item.quantidade
-                            )}
+                          <TableCell className='text-right text-foreground font-medium'>
+                            {formatCurrency((item.peca?.preco || 0) * item.quantidade)}
                           </TableCell>
                           <TableCell>
-                            <Button
-                              type='button'
-                              variant='ghost'
-                              size='icon'
-                              aria-label={`Remover peça ${item.peca?.name_peca || ''}`}
-                              onClick={() => handleRemovePeca(item.peca_id)}>
+                            <Button type='button' variant='ghost' size='icon' aria-label={`Remover peça ${item.peca?.name_peca || ''}`} onClick={() => handleRemovePeca(item.peca_id)}>
                               <X className='h-4 w-4 text-destructive' />
                             </Button>
                           </TableCell>
@@ -587,10 +516,8 @@ export function ModalOrdemServico({
             {/* Total */}
             <div className='rounded-lg bg-[#131316] border border-[#27272a] p-4'>
               <div className='flex items-center justify-between'>
-                <span className='text-sm font-medium text-[#71717a] uppercase tracking-wider'>
-                  Total da Ordem
-                </span>
-                <span className='text-[22px] font-bold text-[#5b7fa5]'>
+                <span className='text-sm font-medium text-[#71717a] uppercase tracking-wider'>Total da Ordem</span>
+                <span className='text-[22px] font-bold text-primary'>
                   {formatCurrency(calcularTotal())}
                 </span>
               </div>
@@ -599,16 +526,13 @@ export function ModalOrdemServico({
         </ScrollArea>
 
         <DialogFooter className='px-6 py-4 border-t border-[#27272a]'>
-          <Button
-            variant='outline'
-            onClick={() => setIsOpen(false)}
-            className='w-32'>
+          <Button variant='outline' onClick={() => setIsOpen(false)} className='w-32'>
             Cancelar
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={isLoading}
-            className='bg-[#5b7fa5] hover:bg-[#5b7fa5]/90 text-[#09090B] w-32'>
+            className='bg-primary hover:bg-primary/90 text-primary-foreground w-32'>
             {isLoading ? 'Salvando...' : isEdit ? 'Atualizar' : 'Criar Ordem'}
           </Button>
         </DialogFooter>

@@ -3,12 +3,19 @@
 
 import { useState } from 'react';
 
+import Link from 'next/link';
+
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle
+} from '@/components/ui/empty';
+import { Skeleton } from '@/components/ui/skeleton';
+
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ArrowRight } from 'lucide-react';
-import Link from 'next/link';
-
-import { Skeleton } from '@/components/ui/skeleton';
 
 export interface OrdemServicoItem {
   id: number;
@@ -34,9 +41,9 @@ export interface OrdemVendaItem {
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  ativa: 'bg-[#14532d] text-[#86efac]',
-  fechada: 'bg-[#1e3a5f] text-[#93c5fd]',
-  cancelada: 'bg-[#431407] text-[#fdba74]'
+  ativa: 'bg-success/15 text-success',
+  fechada: 'bg-primary/15 text-primary',
+  cancelada: 'bg-destructive/15 text-destructive'
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -69,6 +76,8 @@ interface LastOrdersProps {
   ordensServico: OrdemServicoItem[];
   ordensVenda: OrdemVendaItem[];
   isLoading: boolean;
+  servicoState?: 'ready' | 'unavailable';
+  vendaState?: 'ready' | 'unavailable';
 }
 
 type Tab = 'servico' | 'venda';
@@ -83,126 +92,128 @@ const COL_ARROW = 'w-7 flex-shrink-0' as const;
 export function LastOrders({
   ordensServico,
   ordensVenda,
-  isLoading
+  isLoading,
+  servicoState = 'ready',
+  vendaState = 'ready'
 }: LastOrdersProps) {
   const [tab, setTab] = useState<Tab>('servico');
 
   const servicoItems = ordensServico.slice(0, 5);
   const vendaItems = ordensVenda.slice(0, 5);
 
+  const activeState = tab === 'servico' ? servicoState : vendaState;
+
   return (
-    <div className="bg-card border border-border rounded-[10px] p-5">
+    <div className='bg-card border border-border rounded-xl p-5'>
       {/* Header */}
-      <div className="flex items-start justify-between mb-4">
+      <div className='flex items-start justify-between mb-4'>
         <div>
-          <h2 className="text-heading" style={{ color: 'var(--text-bright)' }}>
-            Últimas Ordens
-          </h2>
-          <p className="text-muted-sm mt-0.5">5 mais recentes</p>
+          <h2 className='text-heading text-foreground'>Últimas Ordens</h2>
+          <p className='text-muted-sm mt-0.5'>5 mais recentes</p>
         </div>
         <Link
-          href="/ordens"
-          className="text-body text-primary hover:underline flex items-center gap-1"
-        >
+          href='/ordens'
+          className='text-body text-primary hover:underline flex items-center gap-1'>
           Ver todas
           <ArrowRight size={12} />
         </Link>
       </div>
 
       {/* Tabs */}
-      <div role="tablist" className="flex gap-1 border-b border-border mb-4">
+      <div role='tablist' className='flex gap-1 border-b border-border mb-4'>
         <button
-          type="button"
-          role="tab"
+          type='button'
+          role='tab'
           aria-selected={tab === 'servico'}
           onClick={() => setTab('servico')}
           className={`px-4 py-2 text-body font-medium transition-colors -mb-px border-b-2 ${
             tab === 'servico'
               ? 'text-primary border-primary'
-              : 'border-transparent hover:text-primary'
-          }`}
-          style={{
-            color:
-              tab === 'servico' ? 'var(--primary)' : 'var(--text-muted)'
-          }}
-        >
+              : 'text-muted-foreground border-transparent hover:text-primary'
+          }`}>
           Serviço
         </button>
         <button
-          type="button"
-          role="tab"
+          type='button'
+          role='tab'
           aria-selected={tab === 'venda'}
           onClick={() => setTab('venda')}
           className={`px-4 py-2 text-body font-medium transition-colors -mb-px border-b-2 ${
             tab === 'venda'
               ? 'text-primary border-primary'
-              : 'border-transparent hover:text-primary'
-          }`}
-          style={{
-            color:
-              tab === 'venda' ? 'var(--primary)' : 'var(--text-muted)'
-          }}
-        >
+              : 'text-muted-foreground border-transparent hover:text-primary'
+          }`}>
           Venda
         </button>
       </div>
 
       {/* Table Header */}
-      <div
-        className={`flex gap-3 px-1 mb-1`}
-        style={{ color: 'var(--text-muted)' }}
-      >
-        <span className={`${HEADER_CELL} ${COL_CLIENTE}`}>Cliente</span>
-        <span className={`${HEADER_CELL} ${COL_CONTEXT}`}>
-          {tab === 'servico' ? 'Veículo' : 'Pagamento'}
-        </span>
-        <span className={`${HEADER_CELL} ${COL_DATA}`}>Data</span>
-        <span className={`${HEADER_CELL} ${COL_STATUS}`}>Status</span>
-        <span className={COL_ARROW} />
-      </div>
+      {activeState === 'ready' &&
+        (tab === 'servico'
+          ? servicoItems.length > 0
+          : vendaItems.length > 0) && (
+          <div className='flex gap-3 px-2.5 mb-1 text-muted-foreground'>
+            <span className={`${HEADER_CELL} ${COL_CLIENTE}`}>Cliente</span>
+            <span className={`${HEADER_CELL} ${COL_CONTEXT}`}>
+              {tab === 'servico' ? 'Veículo' : 'Pagamento'}
+            </span>
+            <span className={`${HEADER_CELL} ${COL_DATA}`}>Data</span>
+            <span className={`${HEADER_CELL} ${COL_STATUS}`}>Status</span>
+            <span className={COL_ARROW} />
+          </div>
+        )}
 
       {/* Rows */}
       {isLoading ? (
-        <div className="flex flex-col gap-2">
+        <div className='flex flex-col gap-2'>
           {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-9 w-full rounded-[6px]" />
+            <Skeleton key={i} className='h-9 w-full rounded-[6px]' />
           ))}
         </div>
+      ) : activeState === 'unavailable' ? (
+        <Empty className='border-border bg-card'>
+          <EmptyHeader>
+            <EmptyTitle>Dados indisponíveis</EmptyTitle>
+            <EmptyDescription>
+              Esse bloco não pode ser carregado agora.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : tab === 'servico' ? (
         servicoItems.length === 0 ? (
-          <p className="text-muted-sm py-8 text-center">
+          <p className='text-muted-sm py-8 text-center'>
             Nenhuma ordem de serviço encontrada
           </p>
         ) : (
-          <div className="flex flex-col">
+          <div className='flex flex-col'>
             {servicoItems.map((ordem) => (
               <Link
                 key={ordem.id}
-                href="/ordens"
-                className="flex items-center gap-3 px-1 py-2.5 rounded-[6px] hover:bg-[#1f1f23] transition-colors group"
-              >
-                <span className={`${COL_CLIENTE} text-body truncate`} style={{ color: 'var(--text-bright)' }}>
+                href='/ordens'
+                className='flex items-center gap-3 px-2 py-2.5 rounded-lg hover:bg-accent transition-colors group'>
+                <span
+                  className={`${COL_CLIENTE} text-body text-foreground truncate`}>
                   {getClientName(ordem.cliente)}
                 </span>
-                <span className={`${COL_CONTEXT} text-body truncate`} style={{ color: 'var(--text-secondary)' }}>
+                <span
+                  className={`${COL_CONTEXT} text-body text-muted-foreground truncate`}>
                   {ordem.veiculo
                     ? `${ordem.veiculo.modelo} · ${ordem.veiculo.placa}`
                     : '—'}
                 </span>
-                <span className={`${COL_DATA} text-body`} style={{ color: 'var(--text-muted)' }}>
+                <span className={`${COL_DATA} text-body text-muted-foreground`}>
                   {formatDate(ordem.data_criacao)}
                 </span>
                 <span className={COL_STATUS}>
                   <span
-                    className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-medium ${STATUS_STYLES[ordem.status] ?? ''}`}
-                  >
+                    className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-medium ${STATUS_STYLES[ordem.status] ?? ''}`}>
                     {STATUS_LABELS[ordem.status] ?? ordem.status}
                   </span>
                 </span>
                 <span className={`${COL_ARROW} flex justify-end`}>
                   <ArrowRight
                     size={13}
-                    className="text-primary opacity-0 group-hover:opacity-100 transition-opacity"
+                    className='text-primary opacity-0 group-hover:opacity-100 transition-opacity'
                   />
                 </span>
               </Link>
@@ -210,40 +221,40 @@ export function LastOrders({
           </div>
         )
       ) : vendaItems.length === 0 ? (
-        <p className="text-muted-sm py-8 text-center">
+        <p className='text-muted-sm py-8 text-center'>
           Nenhuma ordem de venda encontrada
         </p>
       ) : (
-        <div className="flex flex-col">
+        <div className='flex flex-col'>
           {vendaItems.map((ordem) => (
             <Link
               key={ordem.id}
-              href="/ordens"
-              className="flex items-center gap-3 px-1 py-2.5 rounded-[6px] hover:bg-[#1f1f23] transition-colors group"
-            >
-              <span className={`${COL_CLIENTE} text-body truncate`} style={{ color: 'var(--text-bright)' }}>
+              href='/ordens'
+              className='flex items-center gap-3 p-2.5 rounded-lg hover:bg-accent transition-colors group'>
+              <span
+                className={`${COL_CLIENTE} text-body text-foreground truncate`}>
                 {getClientName(ordem.cliente)}
               </span>
-              <span className={`${COL_CONTEXT} text-body truncate`} style={{ color: 'var(--text-secondary)' }}>
+              <span
+                className={`${COL_CONTEXT} text-body text-muted-foreground truncate`}>
                 {ordem.metodo_pagamento
-                  ? PAGAMENTO_LABELS[ordem.metodo_pagamento] ??
-                    ordem.metodo_pagamento
+                  ? (PAGAMENTO_LABELS[ordem.metodo_pagamento] ??
+                    ordem.metodo_pagamento)
                   : '—'}
               </span>
-              <span className={`${COL_DATA} text-body`} style={{ color: 'var(--text-muted)' }}>
+              <span className={`${COL_DATA} text-body text-muted-foreground`}>
                 {formatDate(ordem.data_criacao)}
               </span>
               <span className={COL_STATUS}>
                 <span
-                  className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-medium ${STATUS_STYLES[ordem.status] ?? ''}`}
-                >
+                  className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-medium ${STATUS_STYLES[ordem.status] ?? ''}`}>
                   {STATUS_LABELS[ordem.status] ?? ordem.status}
                 </span>
               </span>
               <span className={`${COL_ARROW} flex justify-end`}>
                 <ArrowRight
                   size={13}
-                  className="text-primary opacity-0 group-hover:opacity-100 transition-opacity"
+                  className='text-primary opacity-0 group-hover:opacity-100 transition-opacity'
                 />
               </span>
             </Link>
