@@ -152,15 +152,17 @@ export function LastOrders({
       </div>
 
       {/* Table Header */}
-      <div className="flex gap-3 px-1 mb-1 text-muted-foreground">
-        <span className={`${HEADER_CELL} ${COL_CLIENTE}`}>Cliente</span>
-        <span className={`${HEADER_CELL} ${COL_CONTEXT}`}>
-          {tab === 'servico' ? 'Veículo' : 'Pagamento'}
-        </span>
-        <span className={`${HEADER_CELL} ${COL_DATA}`}>Data</span>
-        <span className={`${HEADER_CELL} ${COL_STATUS}`}>Status</span>
-        <span className={COL_ARROW} />
-      </div>
+      {activeState === 'ready' && (tab === 'servico' ? servicoItems.length > 0 : vendaItems.length > 0) && (
+        <div className="flex gap-3 px-1 mb-1 text-muted-foreground">
+          <span className={`${HEADER_CELL} ${COL_CLIENTE}`}>Cliente</span>
+          <span className={`${HEADER_CELL} ${COL_CONTEXT}`}>
+            {tab === 'servico' ? 'Veículo' : 'Pagamento'}
+          </span>
+          <span className={`${HEADER_CELL} ${COL_DATA}`}>Data</span>
+          <span className={`${HEADER_CELL} ${COL_STATUS}`}>Status</span>
+          <span className={COL_ARROW} />
+        </div>
+      )}
 
       {/* Rows */}
       {isLoading ? (

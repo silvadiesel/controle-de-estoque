@@ -56,14 +56,15 @@ export function buildLast7Days(
   return days;
 }
 
-function ChartBarShape(props: Record<string, unknown>) {
-  const { x, y, width, height, payload } = props as {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    payload: ChartDay;
-  };
+interface ChartBarShapeProps {
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  payload?: ChartDay;
+}
+
+function ChartBarShape({ x = 0, y = 0, width = 0, height = 0, payload }: ChartBarShapeProps) {
   return (
     <rect
       x={x}
