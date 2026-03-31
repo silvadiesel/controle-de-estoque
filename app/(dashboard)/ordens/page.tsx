@@ -4,9 +4,7 @@ import { useMemo, useState } from 'react';
 
 import { ModalDelete } from '@/components/modal-delete';
 import { PaginationControls } from '@/components/pagination-controls';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -34,7 +32,6 @@ import {
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
-  Car,
   CheckCircle,
   ChevronDown,
   ChevronUp,
@@ -44,7 +41,6 @@ import {
   Search,
   ShoppingCart,
   Trash2,
-  User,
   Wrench,
   XCircle
 } from 'lucide-react';
@@ -52,24 +48,6 @@ import {
 type OrdemUnificada =
   | (OrdemServicoCompleta & { tipo: 'servico' })
   | (OrdemVendaCompleta & { tipo: 'venda' });
-
-const statusConfig = {
-  ativa: {
-    label: 'Ativa',
-    icon: Clock,
-    className: 'bg-yellow-700/20 text-yellow-500'
-  },
-  fechada: {
-    label: 'Fechada',
-    icon: CheckCircle,
-    className: 'bg-emerald-500/20 text-emerald-400'
-  },
-  cancelada: {
-    label: 'Cancelada',
-    icon: XCircle,
-    className: 'bg-destructive/20 text-destructive'
-  }
-};
 
 const formatCurrency = (value: number) => {
   return (value / 100).toLocaleString('pt-BR', {
@@ -280,17 +258,17 @@ export default function Ordens() {
   };
 
   return (
-    <div className='flex flex-1 flex-col gap-4 p-4 lg:p-4'>
+    <div className='flex flex-1 flex-col gap-4 p-4'>
       {/* Header */}
       <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
         <div className='flex flex-col gap-1'>
           <div className='flex items-center gap-2.5'>
-            <div className='h-7 w-1 rounded-full bg-primary' />
-            <h2 className='text-2xl font-bold text-foreground'>
+            <div className='h-7 w-1 rounded-full bg-[#5b7fa5]' />
+            <h1 className='text-2xl font-bold text-[#e4e4e7]'>
               Ordens de Serviço e Venda
-            </h2>
+            </h1>
           </div>
-          <p className='pl-3.5 text-sm text-muted-foreground'>
+          <p className='pl-3.5 text-sm text-[#71717a]'>
             Gerencie serviços e vendas de peças
           </p>
         </div>
@@ -298,7 +276,7 @@ export default function Ordens() {
         <div className='flex flex-col md:flex-row gap-2'>
           <Button
             onClick={() => setIsAddServicoOpen(true)}
-            className='bg-primary hover:bg-primary/90'>
+            className='bg-[#5b7fa5] hover:bg-[#5b7fa5]/90 text-[#09090B]'>
             <Wrench className='h-4 w-4' />
             Nova Ordem de Serviço
           </Button>
@@ -309,106 +287,54 @@ export default function Ordens() {
         </div>
       </div>
 
-      {/* Stats */}
-      <div className='flex flex-col md:flex-row w-full gap-4'>
-        <div className='flex gap-4 w-full'>
-          <Card className='bg-card w-full border-border relative overflow-hidden'>
-            <div className='absolute inset-x-0 top-0 h-0.5 bg-yellow-500/50' />
-            <CardContent className='px-4 py-4'>
-              <div className='flex items-center gap-3'>
-                <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-500/10'>
-                  <Clock className='h-5 w-5 text-yellow-500' />
-                </div>
-                <div>
-                  <p className='text-2xl font-bold text-foreground'>
-                    {stats.ativas}
-                  </p>
-                  <p className='text-sm text-muted-foreground'>Ativas</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className='bg-card w-full border-border relative overflow-hidden'>
-            <div className='absolute inset-x-0 top-0 h-0.5 bg-emerald-500/50' />
-            <CardContent className='px-4 py-4'>
-              <div className='flex items-center gap-3'>
-                <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10'>
-                  <CheckCircle className='h-5 w-5 text-emerald-500' />
-                </div>
-                <div>
-                  <p className='text-2xl font-bold text-foreground'>
-                    {stats.fechadas}
-                  </p>
-                  <p className='text-sm text-muted-foreground'>Fechadas</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      {/* Stats - 4 cols, simple label+number */}
+      <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+        <div className='bg-[#18181b] border border-[#27272a] rounded-[10px] px-4 py-3'>
+          <p className='text-sm text-[#71717a]'>Ativas</p>
+          <p className='text-2xl font-bold text-[#e4e4e7]'>{stats.ativas}</p>
         </div>
-        <div className='flex gap-4 w-full'>
-          <Card className='bg-card w-full border-border relative overflow-hidden'>
-            <div className='absolute inset-x-0 top-0 h-0.5 bg-primary/40' />
-            <CardContent className='px-4 py-4'>
-              <div className='flex items-center gap-3'>
-                <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10'>
-                  <Wrench className='h-5 w-5 text-primary' />
-                </div>
-                <div>
-                  <p className='text-2xl font-bold text-foreground'>
-                    {stats.totalServico}
-                  </p>
-                  <p className='text-sm text-muted-foreground'>Serviço</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className='bg-card w-full border-border relative overflow-hidden'>
-            <div className='absolute inset-x-0 top-0 h-0.5 bg-primary/40' />
-            <CardContent className='px-4 py-4'>
-              <div className='flex items-center gap-3'>
-                <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10'>
-                  <ShoppingCart className='h-5 w-5 text-primary' />
-                </div>
-                <div>
-                  <p className='text-2xl font-bold text-foreground'>
-                    {stats.totalVenda}
-                  </p>
-                  <p className='text-sm text-muted-foreground'>Venda</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <div className='bg-[#18181b] border border-[#27272a] rounded-[10px] px-4 py-3'>
+          <p className='text-sm text-[#71717a]'>Fechadas</p>
+          <p className='text-2xl font-bold text-[#e4e4e7]'>{stats.fechadas}</p>
+        </div>
+        <div className='bg-[#18181b] border border-[#27272a] rounded-[10px] px-4 py-3'>
+          <p className='text-sm text-[#71717a]'>Serviço</p>
+          <p className='text-2xl font-bold text-[#e4e4e7]'>{stats.totalServico}</p>
+        </div>
+        <div className='bg-[#18181b] border border-[#27272a] rounded-[10px] px-4 py-3'>
+          <p className='text-sm text-[#71717a]'>Venda</p>
+          <p className='text-2xl font-bold text-[#e4e4e7]'>{stats.totalVenda}</p>
         </div>
       </div>
 
       {/* Filters */}
-      <div className='flex flex-col gap-3 sm:flex-row'>
+      <div className='flex flex-col gap-3 sm:flex-row sm:flex-wrap'>
         <div className='relative flex-1 max-w-md'>
-          <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+          <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#71717a]' />
           <Input
             placeholder='Buscar por cliente, funcionário, placa ou ID...'
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className='pl-10 bg-input border-border'
+            className='pl-10 bg-[#131316] border-[#27272a]'
           />
         </div>
         <Select
           value={filterType}
           onValueChange={(v: 'all' | 'servico' | 'venda') => setFilterType(v)}>
-          <SelectTrigger className='bg-input md:flex hidden zborder-border w-full sm:w-40'>
+          <SelectTrigger className='bg-[#131316] md:flex hidden border-[#27272a] w-full sm:w-40'>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className='bg-card border-border'>
+          <SelectContent className='bg-[#18181b] border-[#27272a]'>
             <SelectItem value='all'>Todos os Tipos</SelectItem>
             <SelectItem value='servico'>Serviços</SelectItem>
             <SelectItem value='venda'>Vendas</SelectItem>
           </SelectContent>
         </Select>
         <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className='bg-input border-border w-full sm:w-40'>
+          <SelectTrigger className='bg-[#131316] border-[#27272a] w-full sm:w-40'>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className='bg-card border-border'>
+          <SelectContent className='bg-[#18181b] border-[#27272a]'>
             <SelectItem value='all'>Todos os Status</SelectItem>
             <SelectItem value='ativa'>Ativa</SelectItem>
             <SelectItem value='fechada'>Fechada</SelectItem>
@@ -416,10 +342,10 @@ export default function Ordens() {
           </SelectContent>
         </Select>
         <Select value={filterMonth} onValueChange={setFilterMonth}>
-          <SelectTrigger className='bg-input border-border w-full sm:w-48'>
+          <SelectTrigger className='bg-[#131316] border-[#27272a] w-full sm:w-48'>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className='bg-card border-border'>
+          <SelectContent className='bg-[#18181b] border-[#27272a]'>
             <SelectItem value='all'>Todos os Meses</SelectItem>
             {mesesDisponiveis.map((mes) => {
               const [year, month] = mes.split('-');
@@ -441,7 +367,7 @@ export default function Ordens() {
           Array.from({ length: 5 }).map((_, i) => (
             <div
               key={i}
-              className='bg-card border border-border rounded-lg p-4'>
+              className='bg-[#18181b] border border-[#27272a] rounded-[10px] p-4'>
               <div className='flex items-center gap-4'>
                 <Skeleton className='h-4 w-4' />
                 <Skeleton className='h-5 w-12' />
@@ -454,7 +380,7 @@ export default function Ordens() {
             </div>
           ))
         ) : paginatedItems.length === 0 ? (
-          <div className='flex flex-col items-center justify-center py-16 text-muted-foreground'>
+          <div className='flex flex-col items-center justify-center py-16 text-[#71717a]'>
             <Package className='h-8 w-8 mb-2 opacity-25' />
             <p className='text-sm'>Nenhuma ordem encontrada</p>
           </div>
@@ -462,100 +388,72 @@ export default function Ordens() {
           paginatedItems.map((ordem) => {
             const key = `${ordem.tipo}-${ordem.id}`;
             const isExpanded = expandedId === key;
-            const status = statusConfig[ordem.status];
-            const StatusIcon = status.icon;
             const isServico = ordem.tipo === 'servico';
             const ordemServico = isServico
               ? (ordem as OrdemServicoCompleta)
               : null;
+            const isCancelada = ordem.status === 'cancelada';
 
             return (
               <div
                 key={key}
-                className='bg-card border border-border rounded-lg overflow-hidden'>
+                className={`bg-[#18181b] border border-[#27272a] rounded-[10px] overflow-hidden ${isCancelada ? 'opacity-50' : ''}`}>
                 {/* Card header */}
                 <div
-                  className='flex items-center gap-4 px-5 py-4 cursor-pointer hover:bg-muted/30 transition-colors'
+                  className='flex items-center gap-4 px-5 py-4 cursor-pointer hover:bg-[#1c1c22]/50 transition-colors'
                   onClick={() => toggleExpand(key)}>
-                  {/* Tipo + Numero */}
-                  <div className='flex items-center gap-2.5 min-w-[85px]'>
-                    {isServico ? (
-                      <Wrench className='h-5 w-5 text-primary shrink-0' />
-                    ) : (
-                      <ShoppingCart className='h-5 w-5 text-teal-400 shrink-0' />
-                    )}
-                    <div>
-                      <p className='text-base font-semibold text-foreground'>
-                        #{ordem.id}
-                      </p>
-                      <p className='text-xs text-muted-foreground'>
-                        {formatDateShort(ordem.data_criacao)}
-                      </p>
-                    </div>
-                  </div>
+                  {/* Left side bar + Type badge */}
+                  <div className={`self-stretch w-[3px] rounded-full shrink-0 ${isServico ? 'bg-[#5b7fa5]' : 'bg-[#71717a]'}`} />
+
+                  {/* Type badge */}
+                  {isServico ? (
+                    <span className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-[rgba(91,127,165,0.10)] text-[#5b7fa5] shrink-0'>
+                      <Clock className='h-3 w-3' />
+                      Serviço
+                    </span>
+                  ) : (
+                    <span className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-[rgba(113,113,122,0.15)] text-[#a1a1aa] shrink-0'>
+                      <ShoppingCart className='h-3 w-3' />
+                      Venda
+                    </span>
+                  )}
+
+                  {/* Number */}
+                  <span className={`text-[15px] font-bold text-[#e4e4e7] shrink-0 ${isCancelada ? 'line-through' : ''}`}>
+                    #{ordem.id}
+                  </span>
 
                   {/* Cliente */}
                   <div className='flex-1 min-w-0'>
-                    <p className='text-sm text-foreground truncate'>
+                    <p className={`text-sm text-[#e4e4e7] truncate ${isCancelada ? 'line-through' : ''}`}>
                       {ordem.cliente?.name_cliente || '-'}
                     </p>
-                    <p className='text-xs text-muted-foreground truncate'>
-                      {ordem.cliente?.nome_empresa || '—'}
-                    </p>
-                  </div>
-
-                  {/* Veiculo (OS) ou Itens (OV) */}
-                  <div className='hidden lg:flex items-center gap-2 min-w-[140px]'>
-                    {isServico && ordemServico ? (
-                      <>
-                        <Car className='h-4 w-4 text-muted-foreground shrink-0' />
-                        <div>
-                          <p className='text-sm text-muted-foreground'>
-                            {ordemServico.veiculo?.placa || '-'}
-                          </p>
-                          <p className='text-xs text-muted-foreground'>
-                            {ordemServico.veiculo?.modelo || '-'}
-                          </p>
-                        </div>
-                      </>
-                    ) : (
-                      <span className='text-sm text-muted-foreground'>
-                        {ordem.pecas.length}{' '}
-                        {ordem.pecas.length === 1 ? 'item' : 'itens'}
-                        {(ordem as OrdemVendaCompleta).metodo_pagamento &&
-                          ` · ${(ordem as OrdemVendaCompleta).metodo_pagamento?.toUpperCase()}`}
-                      </span>
-                    )}
                   </div>
 
                   {/* Status */}
-                  <Badge
-                    variant='secondary'
-                    className={`${status.className} text-xs gap-1.5 shrink-0 py-1 px-2.5`}>
-                    <StatusIcon className='h-3.5 w-3.5' />
-                    {status.label}
-                  </Badge>
-
-                  {/* Responsavel */}
-                  <div className='hidden md:flex items-center gap-2 min-w-[120px]'>
-                    <User className='h-4 w-4 text-muted-foreground shrink-0' />
-                    <span className='text-sm text-muted-foreground truncate'>
-                      {isServico
-                        ? funcionarios.find(
-                            (f) =>
-                              f.id === ordemServico?.funcionario_responsavel_id
-                          )?.name || '-'
-                        : ordem.cliente?.name_cliente || '-'}
+                  {ordem.status === 'ativa' && (
+                    <span className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-[#27272a] text-[#a1a1aa] shrink-0'>
+                      Ativa
                     </span>
-                  </div>
+                  )}
+                  {ordem.status === 'fechada' && (
+                    <span className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-[#1c1c22] text-[#71717a] shrink-0'>
+                      Fechada
+                    </span>
+                  )}
+                  {ordem.status === 'cancelada' && (
+                    <span className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-[#1c1c22] text-[#71717a] shrink-0 line-through'>
+                      Cancelada
+                    </span>
+                  )}
 
                   {/* Valor */}
                   <div className='min-w-[100px] text-right'>
                     <span
-                      className={`text-base font-semibold ${
-                        ordem.status === 'cancelada'
-                          ? 'text-muted-foreground line-through'
-                          : 'text-foreground'
+                      className={`text-[18px] font-bold ${
+                        isCancelada
+                          ? 'text-[#71717a] line-through'
+                          : 'text-[#5b7fa5]'
                       }`}>
                       {formatCurrency(ordem.valor_total)}
                     </span>
@@ -563,56 +461,134 @@ export default function Ordens() {
 
                   {/* Chevron */}
                   {isExpanded ? (
-                    <ChevronUp className='h-5 w-5 text-muted-foreground shrink-0' />
+                    <ChevronUp className='h-5 w-5 text-[#71717a] shrink-0' />
                   ) : (
-                    <ChevronDown className='h-5 w-5 text-muted-foreground shrink-0' />
+                    <ChevronDown className='h-5 w-5 text-[#71717a] shrink-0' />
                   )}
                 </div>
 
-                {/* Expanded content */}
-                {isExpanded && (
-                  <div className='border-t border-border px-5 py-4 bg-muted/20'>
-                    {/* Info row */}
-                    <div className='flex gap-6 mb-4 flex-wrap'>
-                      {isServico && ordemServico && (
+                {/* Info grid below header */}
+                {!isExpanded && (
+                  <div className='px-5 pb-3 -mt-1'>
+                    <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
+                      {isServico && ordemServico ? (
                         <>
                           <div>
-                            <p className='text-xs text-muted-foreground uppercase tracking-wider mb-1'>
-                              Data Chegada
-                            </p>
-                            <p className='text-sm text-foreground'>
-                              {formatDateFull(ordemServico.data_chegada)}
+                            <p className='text-[10px] uppercase tracking-wider text-[#3f3f46] font-medium'>Cliente</p>
+                            <p className='text-xs text-[#a1a1aa] truncate'>{ordem.cliente?.name_cliente || '-'}</p>
+                          </div>
+                          <div>
+                            <p className='text-[10px] uppercase tracking-wider text-[#3f3f46] font-medium'>Veículo</p>
+                            <p className='text-xs text-[#a1a1aa] truncate'>{ordemServico.veiculo?.placa || '-'} {ordemServico.veiculo?.modelo ? `- ${ordemServico.veiculo.modelo}` : ''}</p>
+                          </div>
+                          <div>
+                            <p className='text-[10px] uppercase tracking-wider text-[#3f3f46] font-medium'>Responsável</p>
+                            <p className='text-xs text-[#a1a1aa] truncate'>
+                              {funcionarios.find((f) => f.id === ordemServico?.funcionario_responsavel_id)?.name || '-'}
                             </p>
                           </div>
-                          <div className='lg:hidden'>
-                            <p className='text-xs text-muted-foreground uppercase tracking-wider mb-1'>
-                              Veículo
+                          <div>
+                            <p className='text-[10px] uppercase tracking-wider text-[#3f3f46] font-medium'>Data</p>
+                            <p className='text-xs text-[#a1a1aa]'>{formatDateShort(ordem.data_criacao)}</p>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div>
+                            <p className='text-[10px] uppercase tracking-wider text-[#3f3f46] font-medium'>Cliente</p>
+                            <p className='text-xs text-[#a1a1aa] truncate'>{ordem.cliente?.name_cliente || '-'}</p>
+                          </div>
+                          <div>
+                            <p className='text-[10px] uppercase tracking-wider text-[#3f3f46] font-medium'>Pagamento</p>
+                            <p className='text-xs text-[#a1a1aa] truncate'>
+                              {(ordem as OrdemVendaCompleta).metodo_pagamento?.toUpperCase() || '-'}
                             </p>
-                            <p className='text-sm text-foreground'>
-                              {ordemServico.veiculo?.placa || '-'}{' '}
-                              {ordemServico.veiculo?.modelo
-                                ? `- ${ordemServico.veiculo.modelo}`
-                                : ''}
-                            </p>
+                          </div>
+                          <div>
+                            <p className='text-[10px] uppercase tracking-wider text-[#3f3f46] font-medium'>Responsável</p>
+                            <p className='text-xs text-[#a1a1aa] truncate'>{ordem.cliente?.name_cliente || '-'}</p>
+                          </div>
+                          <div>
+                            <p className='text-[10px] uppercase tracking-wider text-[#3f3f46] font-medium'>Data</p>
+                            <p className='text-xs text-[#a1a1aa]'>{formatDateShort(ordem.data_criacao)}</p>
                           </div>
                         </>
                       )}
-                      <div>
-                        <p className='text-xs text-muted-foreground uppercase tracking-wider mb-1'>
-                          Criado por
-                        </p>
-                        <p className='text-sm text-foreground'>
-                          {isServico
-                            ? ordemServico?.funcionario?.name || '-'
-                            : '-'}
-                        </p>
-                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Expanded content */}
+                {isExpanded && (
+                  <div className='border-t border-[#27272a] px-5 py-4 bg-[#131316]/50'>
+                    {/* Info row */}
+                    <div className='grid grid-cols-2 md:grid-cols-4 gap-4 mb-4'>
+                      {isServico && ordemServico ? (
+                        <>
+                          <div>
+                            <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-1'>Cliente</p>
+                            <p className='text-sm text-[#e4e4e7]'>{ordem.cliente?.name_cliente || '-'}</p>
+                          </div>
+                          <div>
+                            <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-1'>Veículo</p>
+                            <p className='text-sm text-[#e4e4e7]'>
+                              {ordemServico.veiculo?.placa || '-'}{' '}
+                              {ordemServico.veiculo?.modelo ? `- ${ordemServico.veiculo.modelo}` : ''}
+                            </p>
+                          </div>
+                          <div>
+                            <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-1'>Responsável</p>
+                            <p className='text-sm text-[#e4e4e7]'>
+                              {funcionarios.find((f) => f.id === ordemServico?.funcionario_responsavel_id)?.name || '-'}
+                            </p>
+                          </div>
+                          <div>
+                            <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-1'>Data Chegada</p>
+                            <p className='text-sm text-[#e4e4e7]'>{formatDateFull(ordemServico.data_chegada)}</p>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div>
+                            <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-1'>Cliente</p>
+                            <p className='text-sm text-[#e4e4e7]'>{ordem.cliente?.name_cliente || '-'}</p>
+                          </div>
+                          <div>
+                            <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-1'>Pagamento</p>
+                            <p className='text-sm text-[#e4e4e7]'>
+                              {(ordem as OrdemVendaCompleta).metodo_pagamento?.toUpperCase() || '-'}
+                            </p>
+                          </div>
+                          <div>
+                            <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-1'>Responsável</p>
+                            <p className='text-sm text-[#e4e4e7]'>{ordem.cliente?.name_cliente || '-'}</p>
+                          </div>
+                          <div>
+                            <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-1'>Data</p>
+                            <p className='text-sm text-[#e4e4e7]'>{formatDateFull(ordem.data_criacao)}</p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Criado por + Observação */}
+                    <div className='flex gap-6 mb-4 flex-wrap'>
+                      {isServico && ordemServico && (
+                        <div>
+                          <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-1'>
+                            Criado por
+                          </p>
+                          <p className='text-sm text-[#e4e4e7]'>
+                            {ordemServico.funcionario?.name || '-'}
+                          </p>
+                        </div>
+                      )}
                       {ordem.observacao && (
                         <div className='flex-1 min-w-[200px]'>
-                          <p className='text-xs text-muted-foreground uppercase tracking-wider mb-1'>
+                          <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-1'>
                             Observação
                           </p>
-                          <p className='text-sm text-foreground'>
+                          <p className='text-sm text-[#e4e4e7]'>
                             {ordem.observacao}
                           </p>
                         </div>
@@ -622,7 +598,7 @@ export default function Ordens() {
                     {/* Pecas */}
                     {ordem.pecas.length > 0 && (
                       <div>
-                        <p className='text-xs text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5'>
+                        <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-2 flex items-center gap-1.5'>
                           <Package className='h-3.5 w-3.5' />
                           Peças ({ordem.pecas.length})
                         </p>
@@ -630,15 +606,15 @@ export default function Ordens() {
                           {ordem.pecas.slice(0, 2).map((item) => (
                             <div
                               key={item.id}
-                              className='flex justify-between items-center bg-background/60 px-4 py-2.5 rounded-md'>
-                              <span className='text-sm text-foreground'>
+                              className='flex justify-between items-center bg-[#09090B]/60 px-4 py-2.5 rounded-md'>
+                              <span className='text-sm text-[#e4e4e7]'>
                                 {item.peca?.name_peca || 'Peça não encontrada'}
                               </span>
                               <div className='flex gap-5'>
-                                <span className='text-xs text-muted-foreground'>
+                                <span className='text-xs text-[#71717a]'>
                                   x{item.quantidade}
                                 </span>
-                                <span className='text-sm text-foreground font-medium min-w-[80px] text-right'>
+                                <span className='text-sm text-[#e4e4e7] font-medium min-w-[80px] text-right'>
                                   {formatCurrency(
                                     (item.peca?.preco || 0) * item.quantidade
                                   )}
@@ -652,7 +628,7 @@ export default function Ordens() {
                                 e.stopPropagation();
                                 handleView(ordem);
                               }}
-                              className='text-xs text-primary py-2 border border-dashed border-border rounded-md hover:bg-muted/30 transition-colors'>
+                              className='text-xs text-[#5b7fa5] py-2 border border-dashed border-[#27272a] rounded-md hover:bg-[#1c1c22]/30 transition-colors'>
                               +{ordem.pecas.length - 2}{' '}
                               {ordem.pecas.length - 2 === 1 ? 'peça' : 'peças'}{' '}
                               — Ver detalhes completos
@@ -690,7 +666,7 @@ export default function Ordens() {
                                 'fechada'
                               );
                             }}>
-                            <CheckCircle className='h-4 w-4 text-emerald-500' />
+                            <CheckCircle className='h-4 w-4 text-success' />
                             Finalizar
                           </Button>
                           <Button

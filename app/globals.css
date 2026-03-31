@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --radius: 0.65rem;
+  --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(1 0 0);
@@ -28,6 +28,10 @@
   --chart-3: oklch(0.646 0.222 41.116);
   --chart-4: oklch(0.553 0.195 38.402);
   --chart-5: oklch(0.47 0.157 37.304);
+  --success: oklch(0.648 0.15 160);
+  --success-foreground: oklch(0.985 0 0);
+  --warning: oklch(0.75 0.183 55.934);
+  --warning-foreground: oklch(0.21 0.006 285.885);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.141 0.005 285.823);
   --sidebar-primary: oklch(0.646 0.222 41.116);
@@ -39,37 +43,49 @@
 }
 
 .dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.705 0.213 47.604);
-  --primary-foreground: oklch(0.98 0.016 73.684);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.408 0.123 38.172);
-  --chart-1: oklch(0.837 0.128 66.29);
-  --chart-2: oklch(0.705 0.213 47.604);
-  --chart-3: oklch(0.646 0.222 41.116);
-  --chart-4: oklch(0.553 0.195 38.402);
-  --chart-5: oklch(0.47 0.157 37.304);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.705 0.213 47.604);
-  --sidebar-primary-foreground: oklch(0.98 0.016 73.684);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.408 0.123 38.172);
+  --background: #09090B;
+  --foreground: #e4e4e7;
+  --card: #18181b;
+  --card-foreground: #e4e4e7;
+  --popover: #18181b;
+  --popover-foreground: #e4e4e7;
+  --primary: #5b7fa5;
+  --primary-foreground: #09090B;
+  --secondary: #27272a;
+  --secondary-foreground: #e4e4e7;
+  --muted: #1c1c22;
+  --muted-foreground: #52525b;
+  --accent: #1c1c22;
+  --accent-foreground: #e4e4e7;
+  --destructive: #ef4444;
+  --destructive-foreground: #e4e4e7;
+  --border: #27272a;
+  --input: #131316;
+  --ring: #5b7fa5;
+  --chart-1: #5b7fa5;
+  --chart-2: rgba(91, 127, 165, 0.7);
+  --chart-3: rgba(91, 127, 165, 0.5);
+  --chart-4: rgba(91, 127, 165, 0.3);
+  --chart-5: rgba(91, 127, 165, 0.15);
+  --success: #22c55e;
+  --success-foreground: #09090B;
+  --warning: #eab308;
+  --warning-foreground: #09090B;
+  --sidebar: #09090B;
+  --sidebar-foreground: #e4e4e7;
+  --sidebar-primary: #5b7fa5;
+  --sidebar-primary-foreground: #09090B;
+  --sidebar-accent: #18181b;
+  --sidebar-accent-foreground: #e4e4e7;
+  --sidebar-border: #1c1c22;
+  --sidebar-ring: #5b7fa5;
+  --elevated: #131316;
+  --border-hover: #3f3f46;
+  --text-muted: #52525b;
+  --text-secondary: #71717a;
+  --text-tertiary: #a1a1aa;
+  --text-primary: #d4d4d8;
+  --text-bright: #e4e4e7;
 }
 
 @theme inline {
@@ -115,6 +131,13 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-elevated: var(--elevated);
+  --color-border-hover: var(--border-hover);
+  --color-text-muted: var(--text-muted);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-primary: var(--text-primary);
+  --color-text-bright: var(--text-bright);
 }
 
 @layer base {
@@ -131,5 +154,25 @@
   input[type='number']::-webkit-outer-spin-button {
     appearance: none;
     margin: 0;
+  }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Ensure minimum 44px touch targets on touch devices */
+@media (pointer: coarse) {
+  [data-slot='button'] {
+    min-height: 44px;
+    min-width: 44px;
   }
 }
