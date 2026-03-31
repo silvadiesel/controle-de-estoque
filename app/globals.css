@@ -40,6 +40,7 @@
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.75 0.183 55.934);
+  --text-muted: oklch(0.552 0.016 285.938);
 }
 
 .dark {
@@ -175,4 +176,34 @@
     min-height: 44px;
     min-width: 44px;
   }
+}
+
+/* ── Typography utilities ───────────────────────────────────────────────── */
+.text-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.text-data {
+  font-size: 30px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.text-heading {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.text-body {
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.text-muted-sm {
+  font-size: 12px;
+  color: var(--text-muted);
 }
