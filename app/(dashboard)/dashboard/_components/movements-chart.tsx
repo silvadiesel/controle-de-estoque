@@ -12,6 +12,12 @@ import {
 } from 'recharts';
 
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle
+} from '@/components/ui/empty';
 
 export interface ChartDay {
   label: string;
@@ -68,8 +74,8 @@ function ChartBarShape(props: Record<string, unknown>) {
       ry={4}
       fill={
         payload?.isToday
-          ? 'rgba(70,86,179,0.7)'
-          : 'rgba(70,86,179,0.3)'
+          ? 'color-mix(in srgb, var(--primary) 70%, transparent)'
+          : 'color-mix(in srgb, var(--primary) 30%, transparent)'
       }
     />
   );
@@ -78,11 +84,12 @@ function ChartBarShape(props: Record<string, unknown>) {
 interface MovementsChartProps {
   data: ChartDay[];
   isLoading: boolean;
+  state?: 'ready' | 'unavailable';
 }
 
-export function MovementsChart({ data, isLoading }: MovementsChartProps) {
+export function MovementsChart({ data, isLoading, state = 'ready' }: MovementsChartProps) {
   return (
-    <div className="flex-[1.5] bg-card border border-border rounded-[10px] p-5">
+    <div className="flex-[1.5] bg-card border border-border rounded-xl p-5">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-heading text-foreground">
@@ -95,7 +102,14 @@ export function MovementsChart({ data, isLoading }: MovementsChartProps) {
         </div>
       </div>
 
-      {isLoading ? (
+      {state === 'unavailable' ? (
+        <Empty className="border-border bg-card h-[200px]">
+          <EmptyHeader>
+            <EmptyTitle>Dados indisponíveis</EmptyTitle>
+            <EmptyDescription>Esse bloco não pode ser carregado agora.</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : isLoading ? (
         <Skeleton className="h-[200px] w-full rounded-[8px]" />
       ) : data.every((d) => d.count === 0) ? (
         <div className="flex items-center justify-center h-[200px]">
@@ -147,7 +161,7 @@ export function MovementsChart({ data, isLoading }: MovementsChartProps) {
                 tickLine={false}
               />
               <Tooltip
-                cursor={{ fill: 'rgba(70,86,179,0.06)' }}
+                cursor={{ fill: 'color-mix(in srgb, var(--primary) 6%, transparent)' }}
                 contentStyle={{
                   backgroundColor: 'var(--popover)',
                   border: '1px solid var(--border)',

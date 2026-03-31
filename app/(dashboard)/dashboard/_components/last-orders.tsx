@@ -9,6 +9,12 @@ import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle
+} from '@/components/ui/empty';
 
 export interface OrdemServicoItem {
   id: number;
@@ -34,9 +40,9 @@ export interface OrdemVendaItem {
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  ativa: 'bg-[#14532d] text-[#86efac]',
-  fechada: 'bg-[#1e3a5f] text-[#93c5fd]',
-  cancelada: 'bg-[#431407] text-[#fdba74]'
+  ativa: 'bg-success/15 text-success',
+  fechada: 'bg-primary/15 text-primary',
+  cancelada: 'bg-destructive/15 text-destructive'
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -69,6 +75,8 @@ interface LastOrdersProps {
   ordensServico: OrdemServicoItem[];
   ordensVenda: OrdemVendaItem[];
   isLoading: boolean;
+  servicoState?: 'ready' | 'unavailable';
+  vendaState?: 'ready' | 'unavailable';
 }
 
 type Tab = 'servico' | 'venda';
@@ -83,15 +91,19 @@ const COL_ARROW = 'w-7 flex-shrink-0' as const;
 export function LastOrders({
   ordensServico,
   ordensVenda,
-  isLoading
+  isLoading,
+  servicoState = 'ready',
+  vendaState = 'ready'
 }: LastOrdersProps) {
   const [tab, setTab] = useState<Tab>('servico');
 
   const servicoItems = ordensServico.slice(0, 5);
   const vendaItems = ordensVenda.slice(0, 5);
 
+  const activeState = tab === 'servico' ? servicoState : vendaState;
+
   return (
-    <div className="bg-card border border-border rounded-[10px] p-5">
+    <div className="bg-card border border-border rounded-xl p-5">
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div>
@@ -157,6 +169,13 @@ export function LastOrders({
             <Skeleton key={i} className="h-9 w-full rounded-[6px]" />
           ))}
         </div>
+      ) : activeState === 'unavailable' ? (
+        <Empty className="border-border bg-card">
+          <EmptyHeader>
+            <EmptyTitle>Dados indisponíveis</EmptyTitle>
+            <EmptyDescription>Esse bloco não pode ser carregado agora.</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : tab === 'servico' ? (
         servicoItems.length === 0 ? (
           <p className="text-muted-sm py-8 text-center">
