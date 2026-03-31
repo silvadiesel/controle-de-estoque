@@ -11,8 +11,8 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog';
+import { Field, FieldContent, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { Cliente } from '@/db/schema';
 import { Users } from 'lucide-react';
@@ -58,10 +58,10 @@ export function ModalClientes({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className='bg-[#18181b] border-[#27272a] rounded-[12px] max-w-[540px] p-0'>
-        <DialogHeader className='p-6 pb-4 border-b border-[#27272a]'>
+      <DialogContent className='bg-card border-border rounded-xl max-w-[540px] p-0'>
+        <DialogHeader className='p-6 pb-4 border-b border-border'>
           <div className='flex items-center gap-3'>
-            <div className='flex h-8 w-8 items-center justify-center rounded-[8px] bg-primary/12'>
+            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-primary/12'>
               <Users className='h-4 w-4 text-primary' />
             </div>
             <div>
@@ -77,76 +77,69 @@ export function ModalClientes({
           </div>
         </DialogHeader>
         <ScrollArea className='max-h-[60vh]'>
-          <div className='grid gap-4 p-6 pt-4'>
-            <p className='text-[10px] uppercase tracking-[0.8px] text-muted-foreground font-semibold mb-3'>DADOS DO CLIENTE</p>
-            <div className='grid gap-4 sm:grid-cols-2'>
-              <div className='space-y-2'>
-                <Label className='text-[12px] text-[#a1a1aa]'>
-                  Nome do Cliente *
-                </Label>
+          <div className='p-6 pt-4'>
+            <FieldGroup>
+              <Field orientation='responsive'>
+                <FieldContent>
+                  <FieldLabel htmlFor='name_cliente'>Nome do Cliente *</FieldLabel>
+                  <Input
+                    id='name_cliente'
+                    value={data.name_cliente || ''}
+                    onChange={(e) =>
+                      setData({ ...data, name_cliente: e.target.value })
+                    }
+                    placeholder='João Silva'
+                  />
+                </FieldContent>
+                <FieldContent>
+                  <FieldLabel htmlFor='nome_empresa'>Nome da Empresa *</FieldLabel>
+                  <Input
+                    id='nome_empresa'
+                    value={data.nome_empresa || ''}
+                    onChange={(e) =>
+                      setData({ ...data, nome_empresa: e.target.value })
+                    }
+                    placeholder='Transportadora Silva'
+                  />
+                </FieldContent>
+              </Field>
+              <Field orientation='responsive'>
+                <FieldContent>
+                  <FieldLabel htmlFor='cpf'>CPF (ou informe CNPJ)</FieldLabel>
+                  <Input
+                    id='cpf'
+                    value={data.cpf || ''}
+                    onChange={(e) => handleCPFChange(e.target.value)}
+                    placeholder='000.000.000-00'
+                  />
+                </FieldContent>
+                <FieldContent>
+                  <FieldLabel htmlFor='cnpj'>CNPJ (ou informe CPF)</FieldLabel>
+                  <Input
+                    id='cnpj'
+                    value={data.cnpj || ''}
+                    onChange={(e) => handleCNPJChange(e.target.value)}
+                    placeholder='00.000.000/0001-00'
+                  />
+                </FieldContent>
+              </Field>
+              <Field>
+                <FieldLabel htmlFor='telefone'>Telefone *</FieldLabel>
                 <Input
-                  value={data.name_cliente || ''}
-                  onChange={(e) =>
-                    setData({ ...data, name_cliente: e.target.value })
-                  }
-                  placeholder='João Silva'
-                  className='bg-[#131316] border-[#27272a] rounded-[8px]'
+                  id='telefone'
+                  value={data.telefone || ''}
+                  onChange={(e) => handlePhoneChange(e.target.value)}
+                  placeholder='(11) 99999-9999'
                 />
-              </div>
-              <div className='space-y-2'>
-                <Label className='text-[12px] text-[#a1a1aa]'>
-                  Nome da Empresa *
-                </Label>
-                <Input
-                  value={data.nome_empresa || ''}
-                  onChange={(e) =>
-                    setData({ ...data, nome_empresa: e.target.value })
-                  }
-                  placeholder='Transportadora Silva'
-                  className='bg-[#131316] border-[#27272a] rounded-[8px]'
-                />
-              </div>
-            </div>
-            <div className='grid gap-4 sm:grid-cols-2'>
-              <div className='space-y-2'>
-                <Label className='text-[12px] text-[#a1a1aa]'>
-                  CPF (ou informe CNPJ)
-                </Label>
-                <Input
-                  value={data.cpf || ''}
-                  onChange={(e) => handleCPFChange(e.target.value)}
-                  placeholder='000.000.000-00'
-                  className='bg-[#131316] border-[#27272a] rounded-[8px]'
-                />
-              </div>
-              <div className='space-y-2'>
-                <Label className='text-[12px] text-[#a1a1aa]'>
-                  CNPJ (ou informe CPF)
-                </Label>
-                <Input
-                  value={data.cnpj || ''}
-                  onChange={(e) => handleCNPJChange(e.target.value)}
-                  placeholder='00.000.000/0001-00'
-                  className='bg-[#131316] border-[#27272a] rounded-[8px]'
-                />
-              </div>
-            </div>
-            <div className='space-y-2'>
-              <Label className='text-[12px] text-[#a1a1aa]'>Telefone *</Label>
-              <Input
-                value={data.telefone || ''}
-                onChange={(e) => handlePhoneChange(e.target.value)}
-                placeholder='(11) 99999-9999'
-                className='bg-[#131316] border-[#27272a] rounded-[8px]'
-              />
-            </div>
+              </Field>
+            </FieldGroup>
           </div>
         </ScrollArea>
-        <DialogFooter className='px-6 py-4 border-t border-[#27272a]'>
+        <DialogFooter className='px-6 py-4 border-t border-border'>
           <Button
             variant='outline'
             onClick={() => setIsOpen(false)}
-            className='w-32 border-[#27272a] text-[#a1a1aa]'>
+            className='w-32 border-border text-muted-foreground'>
             Cancelar
           </Button>
           <Button

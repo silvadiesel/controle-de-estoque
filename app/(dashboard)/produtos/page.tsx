@@ -12,6 +12,8 @@ import {
 } from '@/components/ui/select';
 
 import { CardPecas } from './_components/card-pecas';
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
+
 import { ModalPecas } from './_components/modal-peças';
 import { usePecas } from './_hook/usePecas';
 import { PackageOpen, Plus, Search } from 'lucide-react';
@@ -90,15 +92,15 @@ export default function Products() {
               placeholder='Buscar produto...'
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className='bg-[#18181b] border-[#27272a] pl-9 h-10 w-full rounded-[8px]'
+              className='pl-9'
             />
           </div>
 
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className='w-full sm:w-[200px] bg-[#18181b] border-[#27272a] h-10 rounded-[8px]'>
+            <SelectTrigger className='w-full sm:w-[200px]'>
               <SelectValue placeholder='Categoria' />
             </SelectTrigger>
-            <SelectContent className='bg-popover border-border'>
+            <SelectContent>
               <SelectItem value='all'>Todas as categorias</SelectItem>
               {categories.map((cat) => (
                 <SelectItem key={cat.id} value={cat.id.toString()}>
@@ -109,10 +111,10 @@ export default function Products() {
           </Select>
 
           <Select value={fornecedorFilter} onValueChange={setFornecedorFilter}>
-            <SelectTrigger className='w-full sm:w-[200px] bg-[#18181b] border-[#27272a] h-10 rounded-[8px]'>
+            <SelectTrigger className='w-full sm:w-[200px]'>
               <SelectValue placeholder='Fornecedor' />
             </SelectTrigger>
-            <SelectContent className='bg-popover border-border'>
+            <SelectContent>
               <SelectItem value='all'>Todos os fornecedores</SelectItem>
               {fornecedores.map((f) => (
                 <SelectItem key={f.id} value={f.id.toString()}>
@@ -130,18 +132,20 @@ export default function Products() {
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
-                className='h-[300px] bg-[#18181b]/50 rounded-[10px] border border-[#27272a] animate-pulse'
+                className='h-[300px] bg-card/50 rounded-xl border border-border animate-pulse'
               />
             ))}
           </div>
         ) : filteredProducts.length === 0 ? (
-          <div className='flex flex-col items-center justify-center py-20 rounded-[10px] border border-dashed border-[#27272a]'>
-            <PackageOpen className='h-16 w-16 text-muted-foreground mb-4' />
-            <h3 className='text-lg font-semibold text-muted-foreground'>
-              Nada encontrado
-            </h3>
-            <p className='text-sm text-muted-foreground'>Tente outra busca.</p>
-          </div>
+          <Empty className='border-border bg-card'>
+            <EmptyMedia variant='icon'>
+              <PackageOpen />
+            </EmptyMedia>
+            <EmptyHeader>
+              <EmptyTitle>Nada encontrado</EmptyTitle>
+              <EmptyDescription>Tente outra busca ou revise os filtros aplicados.</EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         ) : (
           <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-3 pb-10'>
             {filteredProducts.map((peca) => (
