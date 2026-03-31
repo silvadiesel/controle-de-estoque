@@ -39,10 +39,10 @@ export function ModalDelete({
               <AlertTriangle className='h-4 w-4 text-destructive' />
             </div>
             <div>
-              <DialogTitle className='text-[16px] font-bold text-[#e4e4e7]'>
+              <DialogTitle className='text-[16px] font-bold text-foreground'>
                 {title}
               </DialogTitle>
-              <DialogDescription className='text-[12px] text-[#52525b]'>
+              <DialogDescription className='text-[12px] text-muted-foreground'>
                 {description}
               </DialogDescription>
             </div>

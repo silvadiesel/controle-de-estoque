@@ -20,10 +20,7 @@ export function StatCard({
   return (
     <div className="bg-card border border-border rounded-[10px] p-4">
       <div className="flex items-start justify-between mb-3">
-        <span
-          className="text-label"
-          style={{ color: 'var(--text-tertiary)' }}
-        >
+        <span className="text-label text-muted-foreground">
           {label}
         </span>
         <div className="h-8 w-8 rounded-[6px] flex items-center justify-center bg-[rgba(91,127,165,0.12)]">
@@ -38,10 +35,7 @@ export function StatCard({
         </div>
       ) : (
         <>
-          <p
-            className="text-data"
-            style={{ color: 'var(--text-bright)' }}
-          >
+          <p className="text-data text-foreground">
             {value}
           </p>
           <p className="text-muted-sm mt-1">{subtitle}</p>

@@ -16,7 +16,7 @@ export default function Alertas() {
   if (isLoading) {
     return (
       <div className='flex flex-1 items-center justify-center p-4'>
-        <p className='text-[#52525b]'>Carregando alertas...</p>
+        <p className='text-muted-foreground'>Carregando alertas...</p>
       </div>
     );
   }
@@ -25,8 +25,8 @@ export default function Alertas() {
     <div className='flex flex-1 flex-col gap-6 p-4'>
       {/* Header */}
       <div className='flex flex-col gap-1'>
-        <h1 className='text-2xl font-bold text-[#e4e4e7]'>Alertas</h1>
-        <p className='text-sm text-[#52525b]'>
+        <h1 className='text-2xl font-bold text-foreground'>Alertas</h1>
+        <p className='text-sm text-muted-foreground'>
           Monitore os níveis críticos de estoque
         </p>
       </div>
@@ -43,7 +43,7 @@ export default function Alertas() {
                 <p className='text-2xl font-bold text-destructive'>
                   {pecasCriticas.length}
                 </p>
-                <p className='text-xs text-[#52525b]'>
+                <p className='text-xs text-muted-foreground'>
                   Sem estoque
                 </p>
               </div>
@@ -54,14 +54,14 @@ export default function Alertas() {
         <Card className='bg-[#18181b] border-[#27272a]'>
           <CardContent className='px-5 py-4'>
             <div className='flex items-center gap-3'>
-              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-[rgba(91,127,165,0.12)] shrink-0'>
-                <Bell className='h-5 w-5 text-[#5b7fa5]' />
+              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-primary/12 shrink-0'>
+                <Bell className='h-5 w-5 text-primary' />
               </div>
               <div>
-                <p className='text-2xl font-bold text-[#5b7fa5]'>
+                <p className='text-2xl font-bold text-primary'>
                   {pecasAtencao.length}
                 </p>
-                <p className='text-xs text-[#52525b]'>
+                <p className='text-xs text-muted-foreground'>
                   Estoque baixo
                 </p>
               </div>
@@ -79,7 +79,7 @@ export default function Alertas() {
                 <p className='text-2xl font-bold text-[#a1a1aa]'>
                   {pecasEmAlerta.length}
                 </p>
-                <p className='text-xs text-[#52525b]'>
+                <p className='text-xs text-muted-foreground'>
                   Total monitorado
                 </p>
               </div>
@@ -95,10 +95,10 @@ export default function Alertas() {
             <div className='mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-success/20 bg-success/8'>
               <CheckCircle className='h-8 w-8 text-success' />
             </div>
-            <h3 className='mb-2 text-lg font-bold text-[#e4e4e7]'>
+            <h3 className='mb-2 text-lg font-bold text-foreground'>
               Tudo em dia!
             </h3>
-            <p className='text-center text-sm text-[#52525b]'>
+            <p className='text-center text-sm text-muted-foreground'>
               Todos os produtos estão com estoque acima do nível mínimo.
             </p>
           </CardContent>
@@ -110,7 +110,7 @@ export default function Alertas() {
             {pecasCriticas.length > 0 && (
               <>
                 <div className='bg-[#131316] px-5 py-3 flex items-center gap-2'>
-                  <span className='text-[11px] font-semibold uppercase tracking-widest text-[#52525b]'>
+                  <span className='text-[11px] font-semibold uppercase tracking-widest text-muted-foreground'>
                     Sem Estoque
                   </span>
                   <span className='text-[11px] font-medium text-destructive bg-destructive/10 px-1.5 py-0.5 rounded'>
@@ -122,27 +122,27 @@ export default function Alertas() {
                   <div
                     key={peca.id}
                     className={`px-5 py-4 flex items-center gap-4 ${index < pecasCriticas.length - 1 || pecasAtencao.length > 0 ? 'border-b border-[#27272a]' : ''}`}>
-                    {/* Dot - critical = #5b7fa5 */}
-                    <span className='block h-2 w-2 rounded-full bg-[#5b7fa5] shrink-0' />
+                    {/* Dot - critical = primary */}
+                    <span className='block h-2 w-2 rounded-full bg-primary shrink-0' />
 
                     {/* Icon */}
                     <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#27272a]'>
-                      <Package className='h-4 w-4 text-[#52525b]' />
+                      <Package className='h-4 w-4 text-muted-foreground' />
                     </div>
 
                     {/* Info */}
                     <div className='flex-1 min-w-0'>
-                      <p className='font-medium text-sm text-[#e4e4e7]'>
+                      <p className='font-medium text-sm text-foreground'>
                         {peca.name_peca}
                       </p>
-                      <p className='text-xs text-[#52525b] mt-0.5'>
+                      <p className='text-xs text-muted-foreground mt-0.5'>
                         {peca.codigo}
                       </p>
                       {/* Progress bar */}
                       <div className='mt-2 max-w-[200px]'>
                         <div className='h-1 w-full overflow-hidden rounded-full bg-[#27272a]'>
                           <div
-                            className='h-full rounded-full bg-[#5b7fa5]'
+                            className='h-full rounded-full bg-primary'
                             style={{ width: '0%' }}
                           />
                         </div>
@@ -152,15 +152,15 @@ export default function Alertas() {
                     {/* Count */}
                     <div className='shrink-0 text-right'>
                       <p className='text-sm'>
-                        <span className='font-bold text-[#e4e4e7]'>{peca.quantidade}</span>
-                        <span className='text-[#52525b]'> / {peca.alerta}</span>
+                        <span className='font-bold text-foreground'>{peca.quantidade}</span>
+                        <span className='text-muted-foreground'> / {peca.alerta}</span>
                       </p>
                     </div>
 
                     {/* Repor button */}
                     <Button
                       size='sm'
-                      className='shrink-0 bg-[rgba(91,127,165,0.12)] border border-[rgba(91,127,165,0.25)] text-[#5b7fa5] hover:bg-[rgba(91,127,165,0.2)]'
+                      className='shrink-0 bg-primary/12 border border-primary/25 text-primary hover:bg-primary/20'
                       onClick={() => router.push('/produtos')}>
                       Repor
                     </Button>
@@ -173,10 +173,10 @@ export default function Alertas() {
             {pecasAtencao.length > 0 && (
               <>
                 <div className='bg-[#131316] px-5 py-3 flex items-center gap-2'>
-                  <span className='text-[11px] font-semibold uppercase tracking-widest text-[#52525b]'>
+                  <span className='text-[11px] font-semibold uppercase tracking-widest text-muted-foreground'>
                     Estoque Baixo
                   </span>
-                  <span className='text-[11px] font-medium text-[#5b7fa5] bg-[rgba(91,127,165,0.12)] px-1.5 py-0.5 rounded'>
+                  <span className='text-[11px] font-medium text-primary bg-primary/12 px-1.5 py-0.5 rounded'>
                     {pecasAtencao.length}
                   </span>
                 </div>
@@ -196,22 +196,22 @@ export default function Alertas() {
 
                       {/* Icon */}
                       <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#27272a]'>
-                        <Package className='h-4 w-4 text-[#52525b]' />
+                        <Package className='h-4 w-4 text-muted-foreground' />
                       </div>
 
                       {/* Info */}
                       <div className='flex-1 min-w-0'>
-                        <p className='font-medium text-sm text-[#e4e4e7]'>
+                        <p className='font-medium text-sm text-foreground'>
                           {peca.name_peca}
                         </p>
-                        <p className='text-xs text-[#52525b] mt-0.5'>
+                        <p className='text-xs text-muted-foreground mt-0.5'>
                           {peca.codigo}
                         </p>
                         {/* Progress bar */}
                         <div className='mt-2 max-w-[200px]'>
                           <div className='h-1 w-full overflow-hidden rounded-full bg-[#27272a]'>
                             <div
-                              className='h-full rounded-full bg-[#5b7fa5] transition-all'
+                              className='h-full rounded-full bg-primary transition-all'
                               style={{ width: `${percentage}%` }}
                             />
                           </div>
@@ -221,15 +221,15 @@ export default function Alertas() {
                       {/* Count */}
                       <div className='shrink-0 text-right'>
                         <p className='text-sm'>
-                          <span className='font-bold text-[#e4e4e7]'>{peca.quantidade}</span>
-                          <span className='text-[#52525b]'> / {peca.alerta}</span>
+                          <span className='font-bold text-foreground'>{peca.quantidade}</span>
+                          <span className='text-muted-foreground'> / {peca.alerta}</span>
                         </p>
                       </div>
 
                       {/* Repor button */}
                       <Button
                         size='sm'
-                        className='shrink-0 bg-[rgba(91,127,165,0.12)] border border-[rgba(91,127,165,0.25)] text-[#5b7fa5] hover:bg-[rgba(91,127,165,0.2)]'
+                        className='shrink-0 bg-primary/12 border border-primary/25 text-primary hover:bg-primary/20'
                         onClick={() => router.push('/produtos')}>
                         Repor
                       </Button>

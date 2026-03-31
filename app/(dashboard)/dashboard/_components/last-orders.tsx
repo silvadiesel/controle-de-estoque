@@ -95,7 +95,7 @@ export function LastOrders({
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h2 className="text-heading" style={{ color: 'var(--text-bright)' }}>
+          <h2 className="text-heading text-foreground">
             Últimas Ordens
           </h2>
           <p className="text-muted-sm mt-0.5">5 mais recentes</p>
@@ -119,12 +119,8 @@ export function LastOrders({
           className={`px-4 py-2 text-body font-medium transition-colors -mb-px border-b-2 ${
             tab === 'servico'
               ? 'text-primary border-primary'
-              : 'border-transparent hover:text-primary'
+              : 'text-muted-foreground border-transparent hover:text-primary'
           }`}
-          style={{
-            color:
-              tab === 'servico' ? 'var(--primary)' : 'var(--text-muted)'
-          }}
         >
           Serviço
         </button>
@@ -136,22 +132,15 @@ export function LastOrders({
           className={`px-4 py-2 text-body font-medium transition-colors -mb-px border-b-2 ${
             tab === 'venda'
               ? 'text-primary border-primary'
-              : 'border-transparent hover:text-primary'
+              : 'text-muted-foreground border-transparent hover:text-primary'
           }`}
-          style={{
-            color:
-              tab === 'venda' ? 'var(--primary)' : 'var(--text-muted)'
-          }}
         >
           Venda
         </button>
       </div>
 
       {/* Table Header */}
-      <div
-        className={`flex gap-3 px-1 mb-1`}
-        style={{ color: 'var(--text-muted)' }}
-      >
+      <div className="flex gap-3 px-1 mb-1 text-muted-foreground">
         <span className={`${HEADER_CELL} ${COL_CLIENTE}`}>Cliente</span>
         <span className={`${HEADER_CELL} ${COL_CONTEXT}`}>
           {tab === 'servico' ? 'Veículo' : 'Pagamento'}
@@ -179,17 +168,17 @@ export function LastOrders({
               <Link
                 key={ordem.id}
                 href="/ordens"
-                className="flex items-center gap-3 px-1 py-2.5 rounded-[6px] hover:bg-[#1f1f23] transition-colors group"
+                className="flex items-center gap-3 px-1 py-2.5 rounded-[6px] hover:bg-accent transition-colors group"
               >
-                <span className={`${COL_CLIENTE} text-body truncate`} style={{ color: 'var(--text-bright)' }}>
+                <span className={`${COL_CLIENTE} text-body text-foreground truncate`}>
                   {getClientName(ordem.cliente)}
                 </span>
-                <span className={`${COL_CONTEXT} text-body truncate`} style={{ color: 'var(--text-secondary)' }}>
+                <span className={`${COL_CONTEXT} text-body text-muted-foreground truncate`}>
                   {ordem.veiculo
                     ? `${ordem.veiculo.modelo} · ${ordem.veiculo.placa}`
                     : '—'}
                 </span>
-                <span className={`${COL_DATA} text-body`} style={{ color: 'var(--text-muted)' }}>
+                <span className={`${COL_DATA} text-body text-muted-foreground`}>
                   {formatDate(ordem.data_criacao)}
                 </span>
                 <span className={COL_STATUS}>
@@ -219,18 +208,18 @@ export function LastOrders({
             <Link
               key={ordem.id}
               href="/ordens"
-              className="flex items-center gap-3 px-1 py-2.5 rounded-[6px] hover:bg-[#1f1f23] transition-colors group"
+              className="flex items-center gap-3 px-1 py-2.5 rounded-[6px] hover:bg-accent transition-colors group"
             >
-              <span className={`${COL_CLIENTE} text-body truncate`} style={{ color: 'var(--text-bright)' }}>
+              <span className={`${COL_CLIENTE} text-body text-foreground truncate`}>
                 {getClientName(ordem.cliente)}
               </span>
-              <span className={`${COL_CONTEXT} text-body truncate`} style={{ color: 'var(--text-secondary)' }}>
+              <span className={`${COL_CONTEXT} text-body text-muted-foreground truncate`}>
                 {ordem.metodo_pagamento
                   ? PAGAMENTO_LABELS[ordem.metodo_pagamento] ??
                     ordem.metodo_pagamento
                   : '—'}
               </span>
-              <span className={`${COL_DATA} text-body`} style={{ color: 'var(--text-muted)' }}>
+              <span className={`${COL_DATA} text-body text-muted-foreground`}>
                 {formatDate(ordem.data_criacao)}
               </span>
               <span className={COL_STATUS}>

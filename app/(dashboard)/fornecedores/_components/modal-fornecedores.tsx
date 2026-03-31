@@ -54,11 +54,11 @@ export function ModalFornecedores({
       <DialogContent className='bg-[#18181b] border-[#27272a] rounded-[12px] max-w-[540px] p-0'>
         <DialogHeader className='p-6 pb-4 border-b border-[#27272a]'>
           <div className='flex items-center gap-3 mb-1'>
-            <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(91,127,165,0.12)]'>
-              <Factory className='h-4.5 w-4.5 text-[#5b7fa5]' />
+            <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-primary/12'>
+              <Factory className='h-4.5 w-4.5 text-primary' />
             </div>
             <div>
-              <DialogTitle className='text-[#e4e4e7]'>
+              <DialogTitle className='text-foreground'>
                 {isEdit ? 'Editar Fornecedor' : 'Adicionar Fornecedor'}
               </DialogTitle>
               <DialogDescription className='text-[#71717a]'>
@@ -121,7 +121,7 @@ export function ModalFornecedores({
           </Button>
           <Button
             onClick={onSubmit}
-            className='bg-[#5b7fa5] hover:bg-[#5b7fa5]/90 text-[#09090B] w-32'
+            className='bg-primary hover:bg-primary/90 text-primary-foreground w-32'
             disabled={isLoading}>
             {isLoading ? 'Salvando...' : isEdit ? 'Salvar' : 'Adicionar'}
           </Button>

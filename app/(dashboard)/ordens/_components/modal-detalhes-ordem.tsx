@@ -117,11 +117,11 @@ export function ModalDetalhesOrdem({
           <>
             <DialogHeader className='p-6 pb-4 border-b border-[#27272a]'>
               <div className='flex items-center gap-3 mb-1'>
-                <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(91,127,165,0.12)]'>
-                  <ClipboardList className='h-4.5 w-4.5 text-[#5b7fa5]' />
+                <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-primary/12'>
+                  <ClipboardList className='h-4.5 w-4.5 text-primary' />
                 </div>
                 <div>
-                  <DialogTitle className='text-[#e4e4e7]'>
+                  <DialogTitle className='text-foreground'>
                     {isServico ? 'Ordem de Serviço' : 'Ordem de Venda'} #{ordem.id}
                   </DialogTitle>
                   <DialogDescription className='text-[#71717a]'>
@@ -136,8 +136,8 @@ export function ModalDetalhesOrdem({
                 {/* Info Grid */}
                 <div className='grid gap-4 sm:grid-cols-2'>
                   <div className='w-full'>
-                    <p className='text-[10px] text-[#52525b] uppercase tracking-wider font-medium mb-1'>Cliente</p>
-                    <p className='text-[#e4e4e7] font-medium'>
+                    <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>Cliente</p>
+                    <p className='text-foreground font-medium'>
                       {ordem.cliente?.name_cliente || 'Cliente não encontrado'}
                     </p>
                     {ordem.cliente?.nome_empresa && (
@@ -149,8 +149,8 @@ export function ModalDetalhesOrdem({
 
                   {isServico && ordemServico && (
                     <div className='w-full'>
-                      <p className='text-[10px] text-[#52525b] uppercase tracking-wider font-medium mb-1'>Veículo</p>
-                      <p className='text-[#e4e4e7] font-medium'>
+                      <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>Veículo</p>
+                      <p className='text-foreground font-medium'>
                         {ordemServico.veiculo?.placa || '-'}
                       </p>
                       <p className='text-sm text-[#71717a]'>
@@ -161,7 +161,7 @@ export function ModalDetalhesOrdem({
 
                   {!isServico && ordemVenda && (
                     <div>
-                      <p className='text-[10px] text-[#52525b] uppercase tracking-wider font-medium mb-1'>
+                      <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
                         Método de Pagamento
                       </p>
                       {ordemVenda.metodo_pagamento ? (
@@ -174,8 +174,8 @@ export function ModalDetalhesOrdem({
                             const Icon = config.icon;
                             return (
                               <>
-                                <Icon className='h-4 w-4 text-[#5b7fa5]' />
-                                <span className='text-[#e4e4e7]'>
+                                <Icon className='h-4 w-4 text-primary' />
+                                <span className='text-foreground'>
                                   {config.label}
                                 </span>
                               </>
@@ -191,7 +191,7 @@ export function ModalDetalhesOrdem({
 
                 <div className='grid gap-4 sm:grid-cols-2'>
                   <div>
-                    <p className='text-[10px] text-[#52525b] uppercase tracking-wider font-medium mb-1'>Status</p>
+                    <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>Status</p>
                     <Badge
                       variant='secondary'
                       className={status?.className || ''}>
@@ -202,10 +202,10 @@ export function ModalDetalhesOrdem({
 
                   {isServico && ordemServico && (
                     <div>
-                      <p className='text-[10px] text-[#52525b] uppercase tracking-wider font-medium mb-1'>
+                      <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
                         Funcionário
                       </p>
-                      <p className='text-[#e4e4e7]'>
+                      <p className='text-foreground'>
                         {ordemServico.funcionario?.name || 'Não informado'}
                       </p>
                     </div>
@@ -215,10 +215,10 @@ export function ModalDetalhesOrdem({
                 {/* Datas */}
                 {isServico && ordemServico && (
                   <div>
-                    <p className='text-[10px] text-[#52525b] uppercase tracking-wider font-medium mb-1'>
+                    <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
                       Data de Chegada
                     </p>
-                    <p className='text-[#e4e4e7]'>
+                    <p className='text-foreground'>
                       {formatDate(ordemServico.data_chegada)}
                     </p>
                   </div>
@@ -226,10 +226,10 @@ export function ModalDetalhesOrdem({
 
                 {!isServico && ordemVenda && ordemVenda.data_pagamento && (
                   <div>
-                    <p className='text-[10px] text-[#52525b] uppercase tracking-wider font-medium mb-1'>
+                    <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
                       Previsão de Pagamento
                     </p>
-                    <p className='text-[#e4e4e7]'>
+                    <p className='text-foreground'>
                       {formatDate(ordemVenda.data_pagamento)}
                     </p>
                   </div>
@@ -238,14 +238,14 @@ export function ModalDetalhesOrdem({
                 {/* Observação */}
                 {ordem.observacao && (
                   <div>
-                    <p className='text-[10px] text-[#52525b] uppercase tracking-wider font-medium mb-1'>Observação</p>
-                    <p className='text-[#e4e4e7]'>{ordem.observacao}</p>
+                    <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>Observação</p>
+                    <p className='text-foreground'>{ordem.observacao}</p>
                   </div>
                 )}
 
                 {/* Peças */}
                 <div>
-                  <p className='text-[10px] text-[#52525b] uppercase tracking-wider font-medium mb-2'>Itens</p>
+                  <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-2'>Itens</p>
                   <div className='rounded-lg border border-[#27272a] overflow-hidden'>
                     <Table>
                       <TableHeader>
@@ -266,7 +266,7 @@ export function ModalDetalhesOrdem({
                           <TableRow
                             key={idx}
                             className='border-[#27272a] hover:bg-[#1c1c22]/30'>
-                            <TableCell className='text-[#e4e4e7]'>
+                            <TableCell className='text-foreground'>
                               {item.peca?.name_peca || 'Peça não encontrada'}
                               {item.peca?.codigo && (
                                 <span className='text-xs text-[#71717a] ml-2'>
@@ -274,10 +274,10 @@ export function ModalDetalhesOrdem({
                                 </span>
                               )}
                             </TableCell>
-                            <TableCell className='text-center text-[#e4e4e7]'>
+                            <TableCell className='text-center text-foreground'>
                               {item.quantidade}
                             </TableCell>
-                            <TableCell className='text-right text-[#e4e4e7]'>
+                            <TableCell className='text-right text-foreground'>
                               {formatCurrency(
                                 (item.peca?.preco || 0) * item.quantidade
                               )}
@@ -295,7 +295,7 @@ export function ModalDetalhesOrdem({
                     <span className='text-sm font-medium text-[#71717a] uppercase tracking-wider'>
                       Total
                     </span>
-                    <span className='text-[22px] font-bold text-[#5b7fa5]'>
+                    <span className='text-[22px] font-bold text-primary'>
                       {formatCurrency(ordem.valor_total)}
                     </span>
                   </div>
