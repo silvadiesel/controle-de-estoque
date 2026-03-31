@@ -1,11 +1,4 @@
-import 'dotenv/config';
-
 import * as schema from './schema';
-import postgres from 'postgres';
-
-import { drizzle } from 'drizzle-orm/postgres-js';
-import { eq, sql } from 'drizzle-orm';
-
 import {
   RESET_TABLE_NAMES,
   SEED_COUNTS,
@@ -16,6 +9,10 @@ import {
   pickOne,
   randomInt
 } from './seed-config';
+import 'dotenv/config';
+import { eq, sql } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -119,7 +116,18 @@ const pieceNames = [
   'Motor de partida 12V'
 ] as const;
 
-const shelfLocations = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'C1', 'C2', 'D1', 'D2'] as const;
+const shelfLocations = [
+  'A1',
+  'A2',
+  'A3',
+  'B1',
+  'B2',
+  'B3',
+  'C1',
+  'C2',
+  'D1',
+  'D2'
+] as const;
 
 const saleNotes = [
   'Venda gerada para reposicao de estoque da frota.',
@@ -163,8 +171,12 @@ function buildPhone(index: number): string {
 
 function buildPlate(clientIndex: number, vehicleIndex: number): string {
   const letters = String.fromCharCode(65 + (clientIndex % 26));
-  const second = String.fromCharCode(65 + ((clientIndex + vehicleIndex + 3) % 26));
-  const third = String.fromCharCode(65 + ((clientIndex + vehicleIndex + 7) % 26));
+  const second = String.fromCharCode(
+    65 + ((clientIndex + vehicleIndex + 3) % 26)
+  );
+  const third = String.fromCharCode(
+    65 + ((clientIndex + vehicleIndex + 7) % 26)
+  );
   return `${letters}${second}${third}${clientIndex % 10}${vehicleIndex}2${(clientIndex + vehicleIndex) % 10}`;
 }
 
@@ -260,7 +272,8 @@ function buildAssignedUsers(userIds: string[]) {
   let responsavelId = pickExistingUserId(userIds, random);
 
   if (responsavelId === funcionarioId) {
-    responsavelId = userIds.find((userId) => userId !== funcionarioId) ?? funcionarioId;
+    responsavelId =
+      userIds.find((userId) => userId !== funcionarioId) ?? funcionarioId;
   }
 
   return {
@@ -270,7 +283,9 @@ function buildAssignedUsers(userIds: string[]) {
 }
 
 async function resetBusinessTables(tx: Tx) {
-  const tables = RESET_TABLE_NAMES.map((tableName) => `"${tableName}"`).join(', ');
+  const tables = RESET_TABLE_NAMES.map((tableName) => `"${tableName}"`).join(
+    ', '
+  );
   await tx.execute(sql.raw(`TRUNCATE ${tables} RESTART IDENTITY CASCADE;`));
 }
 
@@ -286,7 +301,9 @@ async function seedDatabase() {
     const userIds = users.map((user) => user.id);
 
     if (userIds.length === 0) {
-      throw new Error('Nao foi encontrado nenhum user para relacionar as ordens.');
+      throw new Error(
+        'Nao foi encontrado nenhum user para relacionar as ordens.'
+      );
     }
 
     const insertedCategories = await tx
@@ -310,7 +327,10 @@ async function seedDatabase() {
           email: `contato${index + 1}@${nameEmpresa.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.com.br`
         }))
       )
-      .returning({ id: schema.fornecedor.id, name_empresa: schema.fornecedor.name_empresa });
+      .returning({
+        id: schema.fornecedor.id,
+        name_empresa: schema.fornecedor.name_empresa
+      });
 
     const insertedClients = await tx
       .insert(schema.cliente)
@@ -325,22 +345,31 @@ async function seedDatabase() {
           id_veiculos: []
         }))
       )
-      .returning({ id: schema.cliente.id, name_cliente: schema.cliente.name_cliente });
+      .returning({
+        id: schema.cliente.id,
+        name_cliente: schema.cliente.name_cliente
+      });
 
     const vehicleTargets = buildVehicleTargets(insertedClients.length, random);
     const vehiclesToInsert = insertedClients.flatMap((clientRow, clientIndex) =>
-      Array.from({ length: vehicleTargets[clientIndex] ?? 2 }, (_, vehicleIndex) => ({
-        placa: buildPlate(clientIndex, vehicleIndex),
-        modelo: pickOne(vehicleModels, random),
-        status: vehicleIndex % 3 !== 0,
-        cliente_id: clientRow.id
-      }))
+      Array.from(
+        { length: vehicleTargets[clientIndex] ?? 2 },
+        (_, vehicleIndex) => ({
+          placa: buildPlate(clientIndex, vehicleIndex),
+          modelo: pickOne(vehicleModels, random),
+          status: vehicleIndex % 3 !== 0,
+          cliente_id: clientRow.id
+        })
+      )
     );
 
     const insertedVehicles = await tx
       .insert(schema.veiculo)
       .values(vehiclesToInsert)
-      .returning({ id: schema.veiculo.id, cliente_id: schema.veiculo.cliente_id });
+      .returning({
+        id: schema.veiculo.id,
+        cliente_id: schema.veiculo.cliente_id
+      });
 
     for (const clientRow of insertedClients) {
       const vehicleIds = insertedVehicles
@@ -402,7 +431,10 @@ async function seedDatabase() {
           observacao: pickOne(saleNotes, random),
           valor_total: totalValue,
           metodo_pagamento: isClosed
-            ? pickOne(['pix', 'boleto', 'debito', 'credito', 'dinheiro'] as const, random)
+            ? pickOne(
+                ['pix', 'boleto', 'debito', 'credito', 'dinheiro'] as const,
+                random
+              )
             : null
         })
         .returning({ id: schema.ordemVenda.id });
@@ -466,7 +498,9 @@ async function seedDatabase() {
   const businessAfter = await getBusinessCounts();
 
   if (JSON.stringify(protectedBefore) !== JSON.stringify(protectedAfter)) {
-    throw new Error('As tabelas protegidas de auth foram alteradas, abortando.');
+    throw new Error(
+      'As tabelas protegidas de auth foram alteradas, abortando.'
+    );
   }
 
   console.log('Contagem auth apos o reset:', protectedAfter);

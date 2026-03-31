@@ -56,7 +56,9 @@ export default function Products() {
       <div className='flex flex-col gap-6'>
         <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
           <div className='flex flex-col gap-1'>
-            <h1 className='text-[20px] font-semibold text-[#e4e4e7]'>Produtos</h1>
+            <h1 className='text-[20px] font-semibold text-[#e4e4e7]'>
+              Produtos
+            </h1>
             <p className='text-[13px] text-[#52525b]'>Gerencie o estoque</p>
           </div>
 
@@ -98,7 +100,7 @@ export default function Products() {
             <SelectTrigger className='w-full sm:w-[200px] bg-[#18181b] border-[#27272a] h-10 rounded-[8px]'>
               <SelectValue placeholder='Categoria' />
             </SelectTrigger>
-            <SelectContent className='bg-popover border-border'>
+            <SelectContent className='bg-popover border-border max-h-72'>
               <SelectItem value='all'>Todas as categorias</SelectItem>
               {categories.map((cat) => (
                 <SelectItem key={cat.id} value={cat.id.toString()}>

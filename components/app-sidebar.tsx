@@ -124,11 +124,13 @@ export function AppSidebar() {
       {/* Header com Logo */}
       <SidebarHeader className='border-b border-border px-4 py-4 bg-background'>
         <div className='flex items-center gap-3'>
-          <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#5b7fa5] to-[#4a6b8a]'>
+          <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-[#5b7fa5] to-[#4a6b8a]'>
             <Truck className='h-5 w-5 text-white' />
           </div>
           <div>
-            <h1 className='text-[15px] font-semibold text-[#e4e4e7]'>Igne System</h1>
+            <h1 className='text-[15px] font-semibold text-[#e4e4e7]'>
+              Igne System
+            </h1>
             <p className='text-[11px] text-[#52525b]'>Tudo em um so lugar</p>
           </div>
         </div>

@@ -45,10 +45,7 @@ export function randomInt(
   return Math.floor(random() * (max - min + 1)) + min;
 }
 
-export function pickOne<T>(
-  items: readonly T[],
-  random: RandomGenerator
-): T {
+export function pickOne<T>(items: readonly T[], random: RandomGenerator): T {
   return items[randomInt(0, items.length - 1, random)]!;
 }
 
@@ -83,7 +80,9 @@ export function pickExistingUserId(
   random: RandomGenerator
 ): string {
   if (userIds.length === 0) {
-    throw new Error('Nao foi encontrado nenhum user para relacionar as ordens.');
+    throw new Error(
+      'Nao foi encontrado nenhum user para relacionar as ordens.'
+    );
   }
 
   return pickOne(userIds, random);
