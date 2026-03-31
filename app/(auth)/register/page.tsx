@@ -6,9 +6,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { signUp } from '@/lib/auth-client';
 
 import {
@@ -119,121 +120,115 @@ export default function RegisterPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className='space-y-5'>
-            <div className='space-y-2'>
-              <Label htmlFor='name' className='text-sm font-medium'>
-                Nome completo
-              </Label>
-              <Input
-                id='name'
-                type='text'
-                placeholder='Seu nome'
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                disabled={loading}
-                className='h-12 px-4 bg-secondary/50 border-border/50 rounded-md'
-              />
-            </div>
-
-            <div className='space-y-2'>
-              <Label htmlFor='email' className='text-sm font-medium'>
-                Email
-              </Label>
-              <Input
-                id='email'
-                type='email'
-                placeholder='seu@email.com'
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
-                className='h-12 px-4 bg-secondary/50 border-border/50 rounded-md'
-              />
-            </div>
-
-            <div className='space-y-2'>
-              <Label htmlFor='password' className='text-sm font-medium'>
-                Senha
-              </Label>
-              <div className='relative'>
+          <form onSubmit={handleSubmit}>
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor='name'>Nome completo</FieldLabel>
                 <Input
-                  id='password'
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder='••••••••'
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  id='name'
+                  type='text'
+                  placeholder='Seu nome'
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   required
-                  minLength={8}
                   disabled={loading}
-                  className='h-12 px-4 pr-12 bg-secondary/50 border-border/50 rounded-md'
                 />
-                <button
-                  type='button'
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-                  className='absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors'>
-                  {showPassword ? (
-                    <EyeOff className='w-5 h-5' />
-                  ) : (
-                    <Eye className='w-5 h-5' />
-                  )}
-                </button>
-              </div>
-              <p className='text-xs text-muted-foreground'>
-                Mínimo de 8 caracteres
-              </p>
-            </div>
+              </Field>
 
-            <div className='space-y-2'>
-              <Label htmlFor='codigoVerificacao' className='text-sm font-medium'>
-                Código de verificação
-              </Label>
-              <Input
-                id='codigoVerificacao'
-                type='text'
-                placeholder='Digite o código da loja'
-                value={codigoVerificacao}
-                onChange={(e) => setCodigoVerificacao(e.target.value)}
-                required
-                disabled={loading}
-                className='h-12 px-4 bg-secondary/50 border-border/50 rounded-md'
-              />
-              <p className='text-xs text-muted-foreground'>
-                Solicite o código ao administrador
-              </p>
-            </div>
+              <Field>
+                <FieldLabel htmlFor='email'>Email</FieldLabel>
+                <Input
+                  id='email'
+                  type='email'
+                  placeholder='seu@email.com'
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+              </Field>
 
-            {error && (
-              <div className='flex items-center gap-3 text-destructive text-sm bg-destructive/10 border border-destructive/20 rounded-lg px-4 py-3'>
-                <AlertCircle className='w-5 h-5 shrink-0' />
-                <span>{error}</span>
-              </div>
-            )}
+              <Field>
+                <FieldLabel htmlFor='password'>Senha</FieldLabel>
+                <div className='relative'>
+                  <Input
+                    id='password'
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder='••••••••'
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={8}
+                    disabled={loading}
+                    className='pr-12'
+                  />
+                  <button
+                    type='button'
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                    className='absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors'>
+                    {showPassword ? (
+                      <EyeOff className='w-5 h-5' />
+                    ) : (
+                      <Eye className='w-5 h-5' />
+                    )}
+                  </button>
+                </div>
+                <FieldDescription>Mínimo de 8 caracteres</FieldDescription>
+              </Field>
 
-            <Button
-              type='submit'
-              className='w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-md group'
-              disabled={loading}>
-              {loading ? (
-                <>
-                  <Loader2 className='w-5 h-5 mr-2 animate-spin' />
-                  Criando conta...
-                </>
-              ) : (
-                <>
-                  Criar minha conta
-                  <ArrowRight className='w-4 h-4 ml-2 group-hover:translate-x-0.5 transition-transform' />
-                </>
-              )}
-            </Button>
+              <Field>
+                <FieldLabel htmlFor='codigoVerificacao'>
+                  Código de verificação
+                </FieldLabel>
+                <Input
+                  id='codigoVerificacao'
+                  type='text'
+                  placeholder='Digite o código da loja'
+                  value={codigoVerificacao}
+                  onChange={(e) => setCodigoVerificacao(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+                <FieldDescription>
+                  Solicite o código ao administrador
+                </FieldDescription>
+              </Field>
+
+              {error ? (
+                <Alert variant='destructive'>
+                  <AlertCircle />
+                  <AlertTitle>Falha ao criar conta</AlertTitle>
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              ) : null}
+
+              <Button
+                type='submit'
+                className='w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-md group'
+                disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className='w-5 h-5 mr-2 animate-spin' />
+                    Criando conta...
+                  </>
+                ) : (
+                  <>
+                    Criar minha conta
+                    <ArrowRight className='w-4 h-4 ml-2 group-hover:translate-x-0.5 transition-transform' />
+                  </>
+                )}
+              </Button>
+            </FieldGroup>
           </form>
 
           <p className='mt-8 text-center text-sm text-muted-foreground'>
             Já tem uma conta?{' '}
             <Link
               href='/login'
-              className='text-primary hover:underline font-medium'>
+              aria-disabled={loading}
+              tabIndex={loading ? -1 : undefined}
+              className={`text-primary font-medium ${loading ? 'pointer-events-none opacity-50' : 'hover:underline'}`}>
               Entrar
             </Link>
           </p>

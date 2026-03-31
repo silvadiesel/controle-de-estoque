@@ -6,9 +6,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { signIn } from '@/lib/auth-client';
 
 import {
@@ -111,82 +112,82 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className='space-y-5'>
-            <div className='space-y-2'>
-              <Label htmlFor='email' className='text-sm font-medium'>
-                Email
-              </Label>
-              <Input
-                id='email'
-                type='email'
-                placeholder='seu@email.com'
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={loading}
-                className='h-12 px-4 bg-secondary/50 border-border/50 rounded-md'
-              />
-            </div>
-
-            <div className='space-y-2'>
-              <Label htmlFor='password' className='text-sm font-medium'>
-                Senha
-              </Label>
-              <div className='relative'>
+          <form onSubmit={handleSubmit}>
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor='email'>Email</FieldLabel>
                 <Input
-                  id='password'
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder='••••••••'
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  id='email'
+                  type='email'
+                  placeholder='seu@email.com'
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                   disabled={loading}
-                  className='h-12 px-4 pr-12 bg-secondary/50 border-border/50 rounded-md'
                 />
-                <button
-                  type='button'
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-                  className='absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors'>
-                  {showPassword ? (
-                    <EyeOff className='w-5 h-5' />
-                  ) : (
-                    <Eye className='w-5 h-5' />
-                  )}
-                </button>
-              </div>
-            </div>
+              </Field>
 
-            {error && (
-              <div className='flex items-center gap-3 text-destructive text-sm bg-destructive/10 border border-destructive/20 rounded-lg px-4 py-3'>
-                <AlertCircle className='w-5 h-5 shrink-0' />
-                <span>{error}</span>
-              </div>
-            )}
+              <Field>
+                <FieldLabel htmlFor='password'>Senha</FieldLabel>
+                <div className='relative'>
+                  <Input
+                    id='password'
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder='••••••••'
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={loading}
+                    className='pr-12'
+                  />
+                  <button
+                    type='button'
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                    className='absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors'>
+                    {showPassword ? (
+                      <EyeOff className='w-5 h-5' />
+                    ) : (
+                      <Eye className='w-5 h-5' />
+                    )}
+                  </button>
+                </div>
+              </Field>
 
-            <Button
-              type='submit'
-              className='w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-md group'
-              disabled={loading}>
-              {loading ? (
-                <>
-                  <Loader2 className='w-5 h-5 mr-2 animate-spin' />
-                  Entrando...
-                </>
-              ) : (
-                <>
-                  Entrar
-                  <ArrowRight className='w-4 h-4 ml-2 group-hover:translate-x-0.5 transition-transform' />
-                </>
-              )}
-            </Button>
+              {error ? (
+                <Alert variant='destructive'>
+                  <AlertCircle />
+                  <AlertTitle>Falha ao entrar</AlertTitle>
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              ) : null}
+
+              <Button
+                type='submit'
+                className='w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-md group'
+                disabled={loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className='w-5 h-5 mr-2 animate-spin' />
+                    Entrando...
+                  </>
+                ) : (
+                  <>
+                    Entrar
+                    <ArrowRight className='w-4 h-4 ml-2 group-hover:translate-x-0.5 transition-transform' />
+                  </>
+                )}
+              </Button>
+            </FieldGroup>
           </form>
 
           <p className='mt-8 text-center text-sm text-muted-foreground'>
             Não tem uma conta?{' '}
             <Link
               href='/register'
-              className='text-primary hover:underline font-medium'>
+              aria-disabled={loading}
+              tabIndex={loading ? -1 : undefined}
+              className={`text-primary font-medium ${loading ? 'pointer-events-none opacity-50' : 'hover:underline'}`}>
               Criar conta
             </Link>
           </p>

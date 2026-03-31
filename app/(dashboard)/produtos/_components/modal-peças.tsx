@@ -62,7 +62,7 @@ export function ModalPecas({
       <DialogContent className='bg-card border-border rounded-xl sm:max-w-[720px] max-h-[90vh] overflow-y-auto p-0 gap-0'>
         <DialogHeader className='p-5 pb-4 border-b border-border'>
           <div className='flex items-center gap-3'>
-            <div className='h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center'>
+            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-primary/12'>
               <Package className='h-4 w-4 text-primary' />
             </div>
             <div>

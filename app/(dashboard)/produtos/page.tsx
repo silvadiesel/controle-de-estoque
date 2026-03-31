@@ -2,6 +2,13 @@
 
 import { ModalDelete } from '@/components/modal-delete';
 import { Button } from '@/components/ui/button';
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle
+} from '@/components/ui/empty';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -12,8 +19,6 @@ import {
 } from '@/components/ui/select';
 
 import { CardPecas } from './_components/card-pecas';
-import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
-
 import { ModalPecas } from './_components/modal-peças';
 import { usePecas } from './_hook/usePecas';
 import { PackageOpen, Plus, Search } from 'lucide-react';
@@ -58,8 +63,12 @@ export default function Products() {
       <div className='flex flex-col gap-6'>
         <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
           <div className='flex flex-col gap-1'>
-            <h1 className='text-[20px] font-semibold text-foreground'>Produtos</h1>
-            <p className='text-[13px] text-muted-foreground'>Gerencie o estoque</p>
+            <h1 className='text-[20px] font-semibold text-foreground'>
+              Produtos
+            </h1>
+            <p className='text-[13px] text-muted-foreground'>
+              Gerencie o estoque
+            </p>
           </div>
 
           <ModalPecas
@@ -143,7 +152,9 @@ export default function Products() {
             </EmptyMedia>
             <EmptyHeader>
               <EmptyTitle>Nada encontrado</EmptyTitle>
-              <EmptyDescription>Tente outra busca ou revise os filtros aplicados.</EmptyDescription>
+              <EmptyDescription>
+                Tente outra busca ou revise os filtros aplicados.
+              </EmptyDescription>
             </EmptyHeader>
           </Empty>
         ) : (

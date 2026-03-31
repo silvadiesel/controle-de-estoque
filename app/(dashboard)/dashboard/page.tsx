@@ -68,8 +68,8 @@ export default function DashboardPage() {
     setServicoState(buckets.servico.ok ? 'ready' : 'unavailable');
     setVendaState(buckets.venda.ok ? 'ready' : 'unavailable');
     setOrdensAtivas(
-      buckets.servico.data.filter((o) => o.status === 'ativa').length +
-        buckets.venda.data.filter((o) => o.status === 'ativa').length
+      (buckets.servico.ok ? buckets.servico.data.filter((o) => o.status === 'ativa').length : 0) +
+        (buckets.venda.ok ? buckets.venda.data.filter((o) => o.status === 'ativa').length : 0)
     );
     setAlertasEstoque(
       buckets.produtos.data.filter((p) => p.quantidade <= p.alerta).length
@@ -92,7 +92,7 @@ export default function DashboardPage() {
     <div className="flex flex-1 flex-col gap-4 p-4 lg:p-6" data-dashboard-state={dashboardState}>
       {/* Header */}
       <div className="flex flex-col gap-0.5">
-        <h1 className="text-[22px] font-bold" style={{ color: 'var(--text-bright)' }}>
+        <h1 className="text-[22px] font-bold text-foreground">
           Dashboard
         </h1>
         <p className="text-muted-sm">Visão geral do sistema</p>

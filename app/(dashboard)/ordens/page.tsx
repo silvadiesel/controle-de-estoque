@@ -263,7 +263,6 @@ export default function Ordens() {
       <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
         <div className='flex flex-col gap-1'>
           <div className='flex items-center gap-2.5'>
-            <div className='h-7 w-1 rounded-full bg-primary' />
             <h1 className='text-2xl font-bold text-foreground'>
               Ordens de Serviço e Venda
             </h1>
