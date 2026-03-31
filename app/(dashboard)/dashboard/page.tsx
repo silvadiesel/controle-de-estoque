@@ -5,21 +5,20 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import {
+  Activity,
   AlertTriangle,
   Package,
   ShoppingCart,
-  Users,
-  Activity
+  Users
 } from 'lucide-react';
-
 import {
-  BarChart,
   Bar,
-  XAxis,
-  YAxis,
+  BarChart,
   CartesianGrid,
   ResponsiveContainer,
-  Tooltip
+  Tooltip,
+  XAxis,
+  YAxis
 } from 'recharts';
 
 // ---------------------------------------------------------------------------
@@ -186,9 +185,8 @@ export default function DashboardPage() {
       const ordensVendaArr = Array.isArray(ordensVenda) ? ordensVenda : [];
 
       const ordensAtivas =
-        ordensServicoArr.filter(
-          (o: { status: string }) => o.status === 'ativa'
-        ).length +
+        ordensServicoArr.filter((o: { status: string }) => o.status === 'ativa')
+          .length +
         ordensVendaArr.filter((o: { status: string }) => o.status === 'ativa')
           .length;
 
@@ -236,7 +234,10 @@ export default function DashboardPage() {
   }, [fetchStats, fetchMovimentacoes]);
 
   // ---- derived data ----
-  const chartData = useMemo(() => buildLast7Days(movimentacoes), [movimentacoes]);
+  const chartData = useMemo(
+    () => buildLast7Days(movimentacoes),
+    [movimentacoes]
+  );
 
   const feedItems: FeedItem[] = useMemo(() => {
     return [...movimentacoes]
@@ -290,9 +291,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div className='flex flex-col gap-0.5'>
         <h1 className='text-[20px] font-semibold text-[#e4e4e7]'>Dashboard</h1>
-        <p className='text-[13px] text-[#52525b]'>
-          Visão geral do seu sistema
-        </p>
+        <p className='text-[13px] text-[#52525b]'>Visão geral do seu sistema</p>
       </div>
 
       {/* Stat Cards */}
@@ -303,8 +302,7 @@ export default function DashboardPage() {
           return (
             <div
               key={card.label}
-              className='bg-[#18181b] border border-[#27272a] rounded-[10px] p-4'
-            >
+              className='bg-[#18181b] border border-[#27272a] rounded-[10px] p-4'>
               <div className='flex items-center justify-between'>
                 <div className='flex flex-col gap-1'>
                   <p className='text-[11px] uppercase tracking-wide text-[#52525b]'>
@@ -316,8 +314,7 @@ export default function DashboardPage() {
                     <p
                       className={`text-[24px] font-bold ${
                         alertActive ? 'text-[#ef4444]' : 'text-[#e4e4e7]'
-                      }`}
-                    >
+                      }`}>
                       {card.value}
                     </p>
                   )}
@@ -327,8 +324,7 @@ export default function DashboardPage() {
                     alertActive
                       ? 'bg-[rgba(239,68,68,0.1)] text-[#ef4444]'
                       : 'bg-[rgba(91,127,165,0.1)] text-[#5b7fa5]'
-                  }`}
-                >
+                  }`}>
                   <Icon className='h-[18px] w-[18px]' />
                 </div>
               </div>
@@ -366,8 +362,7 @@ export default function DashboardPage() {
               <ResponsiveContainer width='100%' height='100%'>
                 <BarChart
                   data={chartData}
-                  margin={{ top: 4, right: 4, bottom: 0, left: -20 }}
-                >
+                  margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
                   <CartesianGrid
                     strokeDasharray='3 3'
                     stroke='#27272a'
@@ -375,15 +370,24 @@ export default function DashboardPage() {
                   />
                   <XAxis
                     dataKey='label'
-                    tick={({ x, y, payload, index }: { x: number; y: number; payload: { value: string }; index: number }) => (
+                    tick={({
+                      x,
+                      y,
+                      payload,
+                      index
+                    }: {
+                      x: number;
+                      y: number;
+                      payload: { value: string };
+                      index: number;
+                    }) => (
                       <text
                         x={x}
                         y={y + 12}
                         textAnchor='middle'
                         fontSize={11}
                         fill={chartData[index]?.isToday ? '#5b7fa5' : '#52525b'}
-                        fontWeight={chartData[index]?.isToday ? 700 : 400}
-                      >
+                        fontWeight={chartData[index]?.isToday ? 700 : 400}>
                         {payload.value}
                       </text>
                     )}
@@ -408,11 +412,7 @@ export default function DashboardPage() {
                     labelStyle={{ color: '#52525b' }}
                     formatter={(value: number) => [value, 'Movimentações']}
                   />
-                  <Bar
-                    dataKey='count'
-                    shape={<ChartBar />}
-                    maxBarSize={40}
-                  />
+                  <Bar dataKey='count' shape={<ChartBar />} maxBarSize={40} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -442,8 +442,7 @@ export default function DashboardPage() {
               {feedItems.map((item, idx) => (
                 <div
                   key={item.id}
-                  className='relative flex gap-3 pb-4 last:pb-0'
-                >
+                  className='relative flex gap-3 pb-4 last:pb-0'>
                   {/* Timeline line */}
                   {idx < feedItems.length - 1 && (
                     <div className='absolute left-[4.5px] top-[14px] bottom-0 w-px bg-[#27272a]' />
