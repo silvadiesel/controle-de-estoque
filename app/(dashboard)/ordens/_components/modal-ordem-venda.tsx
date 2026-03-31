@@ -161,7 +161,6 @@ export function ModalOrdemVenda({
     if (submitted) {
       setErrors(validate(formData));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData, submitted]);
 
   const handleAddPeca = () => {
