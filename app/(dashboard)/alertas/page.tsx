@@ -33,7 +33,7 @@ export default function Alertas() {
 
       {/* Summary Cards - 3 cols with icon+number+label */}
       <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-        <Card className='bg-[#18181b] border-[#27272a]'>
+        <Card className='bg-card border-border'>
           <CardContent className='px-5 py-4'>
             <div className='flex items-center gap-3'>
               <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/10 shrink-0'>
@@ -51,7 +51,7 @@ export default function Alertas() {
           </CardContent>
         </Card>
 
-        <Card className='bg-[#18181b] border-[#27272a]'>
+        <Card className='bg-card border-border'>
           <CardContent className='px-5 py-4'>
             <div className='flex items-center gap-3'>
               <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-primary/12 shrink-0'>
@@ -69,14 +69,14 @@ export default function Alertas() {
           </CardContent>
         </Card>
 
-        <Card className='bg-[#18181b] border-[#27272a]'>
+        <Card className='bg-card border-border'>
           <CardContent className='px-5 py-4'>
             <div className='flex items-center gap-3'>
-              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-[#27272a] shrink-0'>
-                <ShieldAlert className='h-5 w-5 text-[#71717a]' />
+              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-border shrink-0'>
+                <ShieldAlert className='h-5 w-5 text-muted-foreground' />
               </div>
               <div>
-                <p className='text-2xl font-bold text-[#a1a1aa]'>
+                <p className='text-2xl font-bold text-muted-foreground'>
                   {pecasEmAlerta.length}
                 </p>
                 <p className='text-xs text-muted-foreground'>
@@ -90,7 +90,7 @@ export default function Alertas() {
 
       {/* Alertas - ALL in ONE card */}
       {pecasEmAlerta.length === 0 ? (
-        <Card className='bg-[#18181b] border-[#27272a]'>
+        <Card className='bg-card border-border'>
           <CardContent className='flex flex-col items-center justify-center py-16'>
             <div className='mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-success/20 bg-success/8'>
               <CheckCircle className='h-8 w-8 text-success' />
@@ -104,12 +104,12 @@ export default function Alertas() {
           </CardContent>
         </Card>
       ) : (
-        <Card className='bg-[#18181b] border-[#27272a] overflow-hidden'>
+        <Card className='bg-card border-border overflow-hidden'>
           <CardContent className='p-0'>
             {/* SEM ESTOQUE section */}
             {pecasCriticas.length > 0 && (
               <>
-                <div className='bg-[#131316] px-5 py-3 flex items-center gap-2'>
+                <div className='bg-input px-5 py-3 flex items-center gap-2'>
                   <span className='text-[11px] font-semibold uppercase tracking-widest text-muted-foreground'>
                     Sem Estoque
                   </span>
@@ -121,12 +121,12 @@ export default function Alertas() {
                 {pecasCriticas.map((peca, index) => (
                   <div
                     key={peca.id}
-                    className={`px-5 py-4 flex items-center gap-4 ${index < pecasCriticas.length - 1 || pecasAtencao.length > 0 ? 'border-b border-[#27272a]' : ''}`}>
+                    className={`px-5 py-4 flex items-center gap-4 ${index < pecasCriticas.length - 1 || pecasAtencao.length > 0 ? 'border-b border-border' : ''}`}>
                     {/* Dot - critical = primary */}
                     <span className='block h-2 w-2 rounded-full bg-primary shrink-0' />
 
                     {/* Icon */}
-                    <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#27272a]'>
+                    <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-border'>
                       <Package className='h-4 w-4 text-muted-foreground' />
                     </div>
 
@@ -140,7 +140,7 @@ export default function Alertas() {
                       </p>
                       {/* Progress bar */}
                       <div className='mt-2 max-w-[200px]'>
-                        <div className='h-1 w-full overflow-hidden rounded-full bg-[#27272a]'>
+                        <div className='h-1 w-full overflow-hidden rounded-full bg-border'>
                           <div
                             className='h-full rounded-full bg-primary'
                             style={{ width: '0%' }}
@@ -172,7 +172,7 @@ export default function Alertas() {
             {/* ESTOQUE BAIXO section */}
             {pecasAtencao.length > 0 && (
               <>
-                <div className='bg-[#131316] px-5 py-3 flex items-center gap-2'>
+                <div className='bg-input px-5 py-3 flex items-center gap-2'>
                   <span className='text-[11px] font-semibold uppercase tracking-widest text-muted-foreground'>
                     Estoque Baixo
                   </span>
@@ -190,12 +190,12 @@ export default function Alertas() {
                   return (
                     <div
                       key={peca.id}
-                      className={`px-5 py-4 flex items-center gap-4 ${index < pecasAtencao.length - 1 ? 'border-b border-[#27272a]' : ''}`}>
+                      className={`px-5 py-4 flex items-center gap-4 ${index < pecasAtencao.length - 1 ? 'border-b border-border' : ''}`}>
                       {/* Dot - attention = #3f3f46 */}
-                      <span className='block h-2 w-2 rounded-full bg-[#3f3f46] shrink-0' />
+                      <span className='block h-2 w-2 rounded-full bg-border-hover shrink-0' />
 
                       {/* Icon */}
-                      <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#27272a]'>
+                      <div className='flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-border'>
                         <Package className='h-4 w-4 text-muted-foreground' />
                       </div>
 
@@ -209,7 +209,7 @@ export default function Alertas() {
                         </p>
                         {/* Progress bar */}
                         <div className='mt-2 max-w-[200px]'>
-                          <div className='h-1 w-full overflow-hidden rounded-full bg-[#27272a]'>
+                          <div className='h-1 w-full overflow-hidden rounded-full bg-border'>
                             <div
                               className='h-full rounded-full bg-primary transition-all'
                               style={{ width: `${percentage}%` }}

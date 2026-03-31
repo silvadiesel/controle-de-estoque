@@ -241,8 +241,8 @@ export function ModalOrdemVenda({
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent
         key={isOpen ? 'open' : 'closed'}
-        className='bg-[#18181b] border-[#27272a] rounded-[12px] max-w-[680px] p-0'>
-        <DialogHeader className='p-6 pb-4 border-b border-[#27272a]'>
+        className='bg-card border-border rounded-xl max-w-[680px] p-0'>
+        <DialogHeader className='p-6 pb-4 border-b border-border'>
           <div className='flex items-center gap-3 mb-1'>
             <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-primary/12'>
               <ShoppingCart className='h-4.5 w-4.5 text-primary' />
@@ -251,7 +251,7 @@ export function ModalOrdemVenda({
               <DialogTitle className='text-foreground'>
                 {isEdit ? 'Editar Ordem de Venda' : 'Nova Ordem de Venda'}
               </DialogTitle>
-              <DialogDescription className='text-[#71717a]'>
+              <DialogDescription className='text-muted-foreground'>
                 {isEdit
                   ? 'Atualize os dados da ordem de venda'
                   : 'Crie uma nova ordem de venda de peças'}
@@ -264,7 +264,7 @@ export function ModalOrdemVenda({
           <div className='grid gap-4 p-6 pt-4'>
             {/* Cliente */}
             <div className='space-y-2'>
-              <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Cliente *</Label>
+              <Label className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>Cliente *</Label>
               <Select
                 value={formData.cliente_id ? formData.cliente_id.toString() : ''}
                 onValueChange={(v) =>
@@ -272,10 +272,10 @@ export function ModalOrdemVenda({
                 }>
                 <SelectTrigger
                   aria-describedby={hasError('cliente_id') ? 'error-cliente-venda' : undefined}
-                  className={`bg-[#131316] w-full ${hasError('cliente_id') ? 'border-destructive' : 'border-[#27272a]'}`}>
+                  className={`bg-input w-full ${hasError('cliente_id') ? 'border-destructive' : 'border-border'}`}>
                   <SelectValue placeholder='Selecione um cliente' />
                 </SelectTrigger>
-                <SelectContent className='bg-[#18181b] border-[#27272a] w-fit'>
+                <SelectContent className='bg-card border-border w-fit'>
                   {clientes.map((cliente) => (
                     <SelectItem key={cliente.id} value={cliente.id.toString()}>
                       <span className='truncate max-w-[200px] block'>
@@ -294,7 +294,7 @@ export function ModalOrdemVenda({
             {/* Método de Pagamento e Data */}
             <div className='grid gap-4 sm:grid-cols-2'>
               <div className='space-y-2 w-full'>
-                <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Método de Pagamento</Label>
+                <Label className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>Método de Pagamento</Label>
                 <Select
                   value={formData.metodo_pagamento || ''}
                   onValueChange={(
@@ -306,7 +306,7 @@ export function ModalOrdemVenda({
                       | 'credito'
                       | 'dinheiro'
                   ) => setFormData({ ...formData, metodo_pagamento: v })}>
-                  <SelectTrigger className='bg-[#131316] border-[#27272a] w-full'>
+                  <SelectTrigger className='bg-input border-border w-full'>
                     <SelectValue placeholder='Selecione o método'>
                       {formData.metodo_pagamento && (
                         <div className='flex items-center gap-2'>
@@ -316,7 +316,7 @@ export function ModalOrdemVenda({
                       )}
                     </SelectValue>
                   </SelectTrigger>
-                  <SelectContent className='bg-[#18181b] border-[#27272a] w-full'>
+                  <SelectContent className='bg-card border-border w-full'>
                     {Object.entries(metodoPagamentoConfig).map(([key, config]) => {
                       const Icon = config.icon;
                       return (
@@ -332,7 +332,7 @@ export function ModalOrdemVenda({
                 </Select>
               </div>
               <div className='space-y-2 w-full'>
-                <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Previsão de Pagamento</Label>
+                <Label className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>Previsão de Pagamento</Label>
                 <DatePicker
                   value={
                     formData.data_previsao_pagamento
@@ -356,16 +356,16 @@ export function ModalOrdemVenda({
             {/* Status */}
             {isEdit && (
               <div className='space-y-2'>
-                <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Status</Label>
+                <Label className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>Status</Label>
                 <Select
                   value={formData.status}
                   onValueChange={(v: 'ativa' | 'fechada' | 'cancelada') =>
                     setFormData({ ...formData, status: v })
                   }>
-                  <SelectTrigger className='bg-[#131316] border-[#27272a]'>
+                  <SelectTrigger className='bg-input border-border'>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className='bg-[#18181b] border-[#27272a]'>
+                  <SelectContent className='bg-card border-border'>
                     <SelectItem value='ativa'>Ativa</SelectItem>
                     <SelectItem value='fechada'>Fechada</SelectItem>
                     <SelectItem value='cancelada'>Cancelada</SelectItem>
@@ -376,30 +376,30 @@ export function ModalOrdemVenda({
 
             {/* Observação */}
             <div className='space-y-2'>
-              <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Observação</Label>
+              <Label className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>Observação</Label>
               <Textarea
                 value={formData.observacao}
                 onChange={(e) =>
                   setFormData({ ...formData, observacao: e.target.value })
                 }
                 placeholder='Observações sobre a venda...'
-                className='bg-[#131316] border-[#27272a] min-h-[80px] resize-none'
+                className='bg-input border-border min-h-[80px] resize-none'
               />
             </div>
 
             {/* Adicionar Peças */}
             <div className='space-y-3'>
-              <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Peças *</Label>
+              <Label className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>Peças *</Label>
               <div className='flex gap-2'>
                 <Select
                   value={selectedPecaId}
                   onValueChange={setSelectedPecaId}>
                   <SelectTrigger
                     aria-describedby={hasError('pecas') ? 'error-pecas-venda' : undefined}
-                    className={`bg-[#131316] flex-1 ${hasError('pecas') ? 'border-destructive' : 'border-[#27272a]'}`}>
+                    className={`bg-input flex-1 ${hasError('pecas') ? 'border-destructive' : 'border-border'}`}>
                     <SelectValue placeholder='Selecione uma peça' />
                   </SelectTrigger>
-                  <SelectContent className='bg-[#18181b] border-[#27272a] max-h-60'>
+                  <SelectContent className='bg-card border-border max-h-60'>
                     {pecas.map((peca) => (
                       <SelectItem key={peca.id} value={peca.id.toString()}>
                         {peca.name_peca} - {formatCurrency(peca.preco)}{' '}
@@ -419,7 +419,7 @@ export function ModalOrdemVenda({
                   onBlur={() => {
                     if (!pecaQuantidade || pecaQuantidade < 1) setPecaQuantidade(1);
                   }}
-                  className='bg-[#131316] border-[#27272a] w-20'
+                  className='bg-input border-border w-20'
                 />
                 <Button type='button' onClick={handleAddPeca} variant='outline'>
                   <Plus className='h-4 w-4' />
@@ -431,27 +431,27 @@ export function ModalOrdemVenda({
 
               {/* Lista de Peças */}
               {formData.pecas.length > 0 && (
-                <div className='rounded-lg border border-[#27272a] overflow-hidden'>
+                <div className='rounded-lg border border-border overflow-hidden'>
                   <Table>
                     <TableHeader>
-                      <TableRow className='border-[#27272a] hover:bg-transparent'>
-                        <TableHead className='text-[#71717a]'>Peça</TableHead>
-                        <TableHead className='text-[#71717a] text-center'>Qtd</TableHead>
-                        <TableHead className='text-[#71717a] text-right'>Preço Unit.</TableHead>
-                        <TableHead className='text-[#71717a] text-right'>Subtotal</TableHead>
-                        <TableHead className='text-[#71717a] w-10'></TableHead>
+                      <TableRow className='border-border hover:bg-transparent'>
+                        <TableHead className='text-muted-foreground'>Peça</TableHead>
+                        <TableHead className='text-muted-foreground text-center'>Qtd</TableHead>
+                        <TableHead className='text-muted-foreground text-right'>Preço Unit.</TableHead>
+                        <TableHead className='text-muted-foreground text-right'>Subtotal</TableHead>
+                        <TableHead className='text-muted-foreground w-10'></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {formData.pecas.map((item) => (
-                        <TableRow key={item.peca_id} className='border-[#27272a] hover:bg-[#1c1c22]/30'>
+                        <TableRow key={item.peca_id} className='border-border hover:bg-accent/30'>
                           <TableCell className='text-foreground'>
                             {item.peca?.name_peca || 'Peça não encontrada'}
                           </TableCell>
                           <TableCell className='text-center text-foreground'>
                             {item.quantidade}
                           </TableCell>
-                          <TableCell className='text-right text-[#71717a]'>
+                          <TableCell className='text-right text-muted-foreground'>
                             {formatCurrency(item.peca?.preco || 0)}
                           </TableCell>
                           <TableCell className='text-right text-foreground font-medium'>
@@ -471,10 +471,10 @@ export function ModalOrdemVenda({
             </div>
 
             {/* Total */}
-            <div className='rounded-lg bg-[#131316] border border-[#27272a] p-4'>
+            <div className='rounded-lg bg-input border border-border p-4'>
               <div className='flex items-center justify-between'>
-                <span className='text-sm font-medium text-[#71717a] uppercase tracking-wider'>Total da Venda</span>
-                <span className='text-[22px] font-bold text-primary'>
+                <span className='text-sm font-medium text-muted-foreground uppercase tracking-wider'>Total da Venda</span>
+                <span className='text-xl font-bold text-primary'>
                   {formatCurrency(calcularTotal())}
                 </span>
               </div>
@@ -482,7 +482,7 @@ export function ModalOrdemVenda({
           </div>
         </ScrollArea>
 
-        <DialogFooter className='px-6 py-4 border-t border-[#27272a]'>
+        <DialogFooter className='px-6 py-4 border-t border-border'>
           <Button variant='outline' onClick={() => setIsOpen(false)} className='w-32'>
             Cancelar
           </Button>

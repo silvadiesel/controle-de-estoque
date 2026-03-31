@@ -83,10 +83,10 @@ export function AccordionVeiculos({
         <AccordionTrigger className='py-2 hover:no-underline'>
           <div className='flex items-center gap-2'>
             <Car className='h-4 w-4 text-primary' />
-            <span className='text-[13px] font-medium text-[#a1a1aa]'>
+            <span className='text-sm font-medium text-muted-foreground'>
               Veículos
             </span>
-            <span className='text-[12px] text-muted-foreground font-medium ml-1'>
+            <span className='text-xs text-muted-foreground font-medium ml-1'>
               {veiculos.length}
             </span>
           </div>
@@ -106,7 +106,7 @@ export function AccordionVeiculos({
                 <Button
                   variant='outline'
                   size='sm'
-                  className='w-full border-[#27272a] text-[#a1a1aa] hover:text-foreground'
+                  className='w-full border-border text-muted-foreground hover:text-foreground'
                   onClick={() => setCurrentClienteId(clienteId)}>
                   <Plus className='h-3 w-3 mr-1' />
                   Adicionar Veículo
@@ -118,7 +118,7 @@ export function AccordionVeiculos({
             {isLoading && (
               <div className='flex items-center justify-center py-4'>
                 <Loader2 className='h-4 w-4 animate-spin text-muted-foreground' />
-                <span className='ml-2 text-[13px] text-muted-foreground'>
+                <span className='ml-2 text-sm text-muted-foreground'>
                   Carregando veículos...
                 </span>
               </div>
@@ -126,7 +126,7 @@ export function AccordionVeiculos({
 
             {/* Empty State */}
             {!isLoading && veiculos.length === 0 && (
-              <div className='text-center py-4 text-[13px] text-muted-foreground'>
+              <div className='text-center py-4 text-sm text-muted-foreground'>
                 Nenhum veículo cadastrado
               </div>
             )}
@@ -137,16 +137,16 @@ export function AccordionVeiculos({
                 {veiculos.map((veiculo) => (
                   <div
                     key={veiculo.id}
-                    className='flex items-center justify-between p-3 rounded-[8px] bg-[#18181b] border border-[#27272a] hover:border-[#3f3f46] transition-colors'>
+                    className='flex items-center justify-between p-3 rounded-md bg-secondary border border-border hover:border-border-hover transition-colors'>
                     <div className='flex items-center gap-3'>
-                      <div className='flex h-8 w-8 items-center justify-center rounded-[8px] bg-primary/12'>
+                      <div className='flex h-8 w-8 items-center justify-center rounded-md bg-primary/12'>
                         <Car className='h-4 w-4 text-primary' />
                       </div>
                       <div>
-                        <p className='text-[13px] font-semibold text-foreground'>
+                        <p className='text-sm font-semibold text-foreground'>
                           {veiculo.placa}
                         </p>
-                        <p className='text-[12px] text-[#71717a]'>
+                        <p className='text-xs text-muted-foreground'>
                           {veiculo.modelo}
                         </p>
                       </div>

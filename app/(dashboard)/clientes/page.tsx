@@ -137,10 +137,10 @@ export default function Clientes() {
       {/* Header */}
       <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
         <div className='flex flex-col gap-1'>
-          <h1 className='text-[20px] font-semibold text-foreground'>
+          <h1 className='text-xl font-semibold text-foreground'>
             Clientes
           </h1>
-          <p className='text-[13px] text-muted-foreground'>
+          <p className='text-sm text-muted-foreground'>
             Gerencie os clientes e seus veículos
           </p>
         </div>
@@ -176,20 +176,20 @@ export default function Clientes() {
       <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
         <div className='bg-card border border-border rounded-xl p-4'>
           <div className='flex items-center gap-3'>
-            <div className='flex h-10 w-10 items-center justify-center rounded-[10px] bg-primary/12'>
+            <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/12'>
               <Users className='h-5 w-5 text-primary' />
             </div>
             <div>
               <p className='text-2xl font-bold text-foreground'>
                 {clientes.length}
               </p>
-              <p className='text-[12px] text-muted-foreground'>Total de Clientes</p>
+              <p className='text-xs text-muted-foreground'>Total de Clientes</p>
             </div>
           </div>
         </div>
         <div className='bg-card border border-border rounded-xl p-4'>
           <div className='flex items-center gap-3'>
-            <div className='flex h-10 w-10 items-center justify-center rounded-[10px] bg-success/12'>
+            <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-success/12'>
               <Car className='h-5 w-5 text-success' />
             </div>
             <div>
@@ -200,7 +200,7 @@ export default function Clientes() {
                   {getTotalVeiculos()}
                 </p>
               )}
-              <p className='text-[12px] text-muted-foreground'>
+              <p className='text-xs text-muted-foreground'>
                 Veículos Cadastrados
               </p>
             </div>
@@ -211,7 +211,7 @@ export default function Clientes() {
       {/* Clients List */}
       <div className='space-y-2'>
         <div className='flex items-center justify-between mb-2'>
-          <p className='text-[13px] text-muted-foreground'>
+          <p className='text-sm text-muted-foreground'>
             {searchFilteredClientes.length} cliente(s) encontrado(s)
           </p>
         </div>
@@ -277,10 +277,10 @@ export default function Clientes() {
                         <Button
                           variant='ghost'
                           size='sm'
-                          className='gap-1.5 text-[12px] text-muted-foreground font-medium hover:text-foreground'>
+                          className='gap-1.5 text-xs text-muted-foreground font-medium hover:text-foreground'>
                           <Car className='h-4 w-4' />
                           <span className='hidden sm:inline'>Veículos</span>
-                          <span className='text-[12px] text-muted-foreground font-medium'>
+                          <span className='text-xs text-muted-foreground font-medium'>
                             {veiculos.length}
                           </span>
                           <ChevronDown
@@ -344,7 +344,7 @@ export default function Clientes() {
                   <CollapsibleContent className='data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 overflow-hidden transition-all duration-300 ease-in-out'>
                     <div className='border-t border-border bg-background p-4'>
                       <div className='flex items-center justify-between mb-4'>
-                        <h4 className='text-[13px] font-medium text-muted-foreground flex items-center gap-2'>
+                        <h4 className='text-sm font-medium text-muted-foreground flex items-center gap-2'>
                           <Car className='h-4 w-4' />
                           Veículos do Cliente
                         </h4>
@@ -383,7 +383,7 @@ export default function Clientes() {
                               key={i}
                               className='flex items-center justify-between p-3 rounded-lg bg-card border border-border'>
                               <div className='flex items-center gap-3'>
-                                <Skeleton className='h-10 w-10 rounded-[8px]' />
+                                <Skeleton className='h-10 w-10 rounded-md' />
                                 <div className='space-y-2'>
                                   <Skeleton className='h-4 w-20' />
                                   <Skeleton className='h-3 w-16' />
@@ -420,7 +420,7 @@ export default function Clientes() {
                                   <Car className='h-5 w-5 text-primary' />
                                 </div>
                                 <div>
-                                  <p className='text-[13px] font-semibold text-foreground'>
+                                  <p className='text-sm font-semibold text-foreground'>
                                     {veiculo.placa}
                                   </p>
                                   <p className='text-xs text-muted-foreground'>

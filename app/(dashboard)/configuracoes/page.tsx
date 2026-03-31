@@ -153,7 +153,7 @@ export default function Configuracoes() {
       </div>
 
       <Tabs defaultValue='general' className='w-full gap-0'>
-        <TabsList className='bg-transparent border-b border-[#27272a] rounded-none w-full justify-start h-auto p-0'>
+        <TabsList className='bg-transparent border-b border-border rounded-none w-full justify-start h-auto p-0'>
           <TabsTrigger
             value='general'
             className='gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none text-muted-foreground px-4 py-2.5'>
@@ -172,7 +172,7 @@ export default function Configuracoes() {
         <TabsContent value='general'>
           <div className='grid gap-6 mt-4'>
             {/* Categories - single card with list rows */}
-            <Card className='bg-[#18181b] border-[#27272a] flex flex-col'>
+            <Card className='bg-card border-border flex flex-col'>
               <CardHeader>
                 <div className='flex items-center justify-between'>
                   <div>
@@ -192,7 +192,7 @@ export default function Configuracoes() {
                         Nova Categoria
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className='bg-[#18181b] border-[#27272a] max-w-[540px]'>
+                    <DialogContent className='bg-card border-border max-w-[540px]'>
                       <DialogHeader>
                         <DialogTitle className='text-foreground'>
                           Adicionar Categoria
@@ -202,13 +202,13 @@ export default function Configuracoes() {
                         </DialogDescription>
                       </DialogHeader>
                       <div className='space-y-2'>
-                        <Label htmlFor='cat-name' className='text-[#a1a1aa]'>Nome da Categoria</Label>
+                        <Label htmlFor='cat-name' className='text-muted-foreground'>Nome da Categoria</Label>
                         <Input
                           id='cat-name'
                           value={newCategoryName}
                           onChange={(e) => setNewCategoryName(e.target.value)}
                           placeholder='Ex: Pneus'
-                          className='bg-[#131316] border-[#27272a]'
+                          className='bg-input border-border'
                           onKeyDown={(e) => {
                             if (e.key === 'Enter' && !isSavingCategory) {
                               handleAddCategory();
@@ -260,11 +260,11 @@ export default function Configuracoes() {
                 ) : (
                   <div className='flex flex-col flex-1 justify-between'>
                     {/* List rows instead of table */}
-                    <div className='rounded-lg border border-[#27272a] overflow-hidden divide-y divide-[#27272a]'>
+                    <div className='rounded-lg border border-border overflow-hidden divide-y divide-border'>
                       {paginatedCategories.map((category) => (
                         <div
                           key={category.id}
-                          className='flex items-center justify-between px-4 py-3 hover:bg-[#131316] transition-colors'>
+                          className='flex items-center justify-between px-4 py-3 hover:bg-input transition-colors'>
                           <div className='flex items-center gap-3'>
                             <span className='text-xs text-muted-foreground w-8'>
                               #{category.id}
@@ -290,7 +290,7 @@ export default function Configuracoes() {
                                   <Pencil className='h-4 w-4 text-muted-foreground' />
                                 </Button>
                               </DialogTrigger>
-                              <DialogContent className='bg-[#18181b] border-[#27272a] max-w-[540px]'>
+                              <DialogContent className='bg-card border-border max-w-[540px]'>
                                 <DialogHeader>
                                   <DialogTitle className='text-foreground'>
                                    Editar Categoria
@@ -301,7 +301,7 @@ export default function Configuracoes() {
                                 </DialogHeader>
                                 <div className='space-y-4 py-4'>
                                   <div className='space-y-2'>
-                                    <Label htmlFor='edit-cat-name' className='text-[#a1a1aa]'>
+                                    <Label htmlFor='edit-cat-name' className='text-muted-foreground'>
                                       Nome da Categoria
                                     </Label>
                                     <Input
@@ -317,7 +317,7 @@ export default function Configuracoes() {
                                             : null
                                         )
                                       }
-                                      className='bg-[#131316] border-[#27272a]'
+                                      className='bg-input border-border'
                                       onKeyDown={(e) => {
                                         if (
                                           e.key === 'Enter' &&
@@ -397,7 +397,7 @@ export default function Configuracoes() {
             </Card>
 
             {/* Company section - disabled with opacity */}
-            <Card className='bg-[#18181b] border-[#27272a] opacity-40'>
+            <Card className='bg-card border-border opacity-40'>
               <CardHeader>
                 <div className='flex items-center justify-between'>
                   <div>
@@ -409,7 +409,7 @@ export default function Configuracoes() {
                       Configure os dados da sua oficina
                     </CardDescription>
                   </div>
-                  <Badge variant='outline' className='text-muted-foreground border-[#27272a]'>
+                  <Badge variant='outline' className='text-muted-foreground border-border'>
                     Em breve
                   </Badge>
                 </div>
@@ -417,30 +417,30 @@ export default function Configuracoes() {
               <CardContent className='space-y-4'>
                 <div className='grid gap-4 sm:grid-cols-2'>
                   <div className='space-y-2'>
-                    <Label htmlFor='company' className='text-[#a1a1aa]'>Nome da Empresa</Label>
+                    <Label htmlFor='company' className='text-muted-foreground'>Nome da Empresa</Label>
                     <Input
                       id='company'
                       defaultValue='Oficina de Caminhões Silva'
-                      className='bg-[#131316] border-[#27272a]'
+                      className='bg-input border-border'
                       disabled
                     />
                   </div>
                   <div className='space-y-2'>
-                    <Label htmlFor='cnpj' className='text-[#a1a1aa]'>CNPJ</Label>
+                    <Label htmlFor='cnpj' className='text-muted-foreground'>CNPJ</Label>
                     <Input
                       id='cnpj'
                       defaultValue='12.345.678/0001-90'
-                      className='bg-[#131316] border-[#27272a]'
+                      className='bg-input border-border'
                       disabled
                     />
                   </div>
                 </div>
                 <div className='space-y-2'>
-                  <Label htmlFor='address' className='text-[#a1a1aa]'>Endereço</Label>
+                  <Label htmlFor='address' className='text-muted-foreground'>Endereço</Label>
                   <Input
                     id='address'
                     defaultValue='Av. das Indústrias, 1234 - Distrito Industrial'
-                    className='bg-[#131316] border-[#27272a]'
+                    className='bg-input border-border'
                     disabled
                   />
                 </div>
@@ -451,7 +451,7 @@ export default function Configuracoes() {
 
         {/* Tab: Usuários */}
         <TabsContent value='users'>
-          <Card className='bg-[#18181b] border-[#27272a] mt-4'>
+          <Card className='bg-card border-border mt-4'>
             <CardHeader>
               <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
                 <div>
@@ -473,7 +473,7 @@ export default function Configuracoes() {
                   placeholder='Buscar por nome ou email...'
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className='pl-10 bg-[#131316] border-[#27272a]'
+                  className='pl-10 bg-input border-border'
                 />
               </div>
 
@@ -489,14 +489,14 @@ export default function Configuracoes() {
                 </div>
               ) : (
                 <div className='flex flex-col gap-4'>
-                  <div className='rounded-lg border border-[#27272a] overflow-hidden divide-y divide-[#27272a]'>
+                  <div className='rounded-lg border border-border overflow-hidden divide-y divide-border'>
                     {paginatedUsers.map((user) => (
                       <div
                         key={user.id}
-                        className='flex items-center justify-between px-4 py-3 hover:bg-[#131316] transition-colors'>
+                        className='flex items-center justify-between px-4 py-3 hover:bg-input transition-colors'>
                         <div className='flex items-center gap-4 flex-1 min-w-0'>
                           {/* Avatar */}
-                          <div className='flex h-8 w-8 items-center justify-center rounded-full bg-[#27272a] text-xs font-bold text-[#71717a] shrink-0'>
+                          <div className='flex h-8 w-8 items-center justify-center rounded-full bg-border text-xs font-bold text-muted-foreground shrink-0'>
                             {user.name?.charAt(0)?.toUpperCase() || '?'}
                           </div>
                           <div className='flex-1 min-w-0'>

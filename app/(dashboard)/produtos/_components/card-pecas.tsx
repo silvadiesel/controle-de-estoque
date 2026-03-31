@@ -34,9 +34,9 @@ export const CardPecas = memo(function CardPecas({
       : `${peca.quantidade} un.`;
 
   return (
-    <div className='flex flex-col bg-[#18181b] border border-[#27272a] rounded-[10px] overflow-hidden'>
+    <div className='flex flex-col bg-secondary border border-border rounded-lg overflow-hidden'>
       {/* Image area */}
-      <div className='relative h-[140px] bg-[#131316] border-b border-[#27272a] flex items-center justify-center'>
+      <div className='relative h-36 bg-background border-b border-border flex items-center justify-center'>
         {peca.imagem ? (
           <Image
             src={peca.imagem}
@@ -48,34 +48,34 @@ export const CardPecas = memo(function CardPecas({
             unoptimized
           />
         ) : (
-          <Package className='h-12 w-12 text-muted-foreground' />
+          <Package className='h-12 w-12 text-muted-foreground' aria-hidden='true' />
         )}
       </div>
 
       {/* Body */}
-      <div className='p-[14px] flex flex-col'>
-        <h3 className='text-[14px] font-medium text-foreground line-clamp-1'>
+      <div className='p-3.5 flex flex-col'>
+        <h3 className='text-sm font-medium text-foreground line-clamp-1'>
           {peca.name_peca}
         </h3>
-        <p className='text-[11px] text-muted-foreground mt-0.5'>
+        <p className='text-xs text-muted-foreground mt-0.5'>
           {peca.codigo ? `Cod: ${peca.codigo}` : '\u00A0'}
         </p>
-        <p className='text-[12px] text-muted-foreground mt-1 line-clamp-1'>
+        <p className='text-xs text-muted-foreground mt-1 line-clamp-1'>
           {categoryName}{supplierName ? ` \u00B7 ${supplierName}` : ''}
         </p>
 
         {/* Separator + Price/Qty */}
-        <div className='border-t border-[#27272a] mt-3 pt-3 flex items-center justify-between'>
-          <span className='text-[17px] font-bold text-primary'>
+        <div className='border-t border-border mt-3 pt-3 flex items-center justify-between'>
+          <span className='text-lg font-bold text-primary'>
             {formattedPrice}
           </span>
           <span
-            className={`text-[12px] ${
+            className={`text-xs ${
               isOutOfStock
                 ? 'text-destructive font-medium'
                 : isLowStock
-                  ? 'text-[#eab308]'
-                  : 'text-[#a1a1aa]'
+                  ? 'text-warning'
+                  : 'text-muted-foreground'
             }`}>
             {quantityDisplay}
           </span>
@@ -86,18 +86,18 @@ export const CardPecas = memo(function CardPecas({
           <Button
             variant='ghost'
             size='sm'
-            className='flex-1 h-8 bg-[#27272a] text-[#a1a1aa] hover:bg-[#3f3f46] text-[12px] rounded-[6px]'
+            className='flex-1 h-8 bg-border text-muted-foreground hover:bg-border-hover text-xs rounded-md'
             onClick={() => onEdit(peca)}>
-            <Edit className='mr-1.5 h-3 w-3' />
+            <Edit className='mr-1.5 h-3 w-3' aria-hidden='true' />
             Editar
           </Button>
           <Button
             variant='ghost'
             size='sm'
-            className='h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-[6px]'
+            className='h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md'
             onClick={() => onDelete(peca)}
             aria-label={`Excluir produto ${peca.name_peca}`}>
-            <Trash2 className='h-3.5 w-3.5' />
+            <Trash2 className='h-3.5 w-3.5' aria-hidden='true' />
           </Button>
         </div>
       </div>
