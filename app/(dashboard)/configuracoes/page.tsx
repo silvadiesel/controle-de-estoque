@@ -146,8 +146,8 @@ export default function Configuracoes() {
   return (
     <div className='flex flex-1 flex-col gap-4 p-4'>
       <div className='flex flex-col gap-1'>
-        <h1 className='text-2xl font-bold text-[#e4e4e7]'>Configurações</h1>
-        <p className='text-sm text-[#52525b]'>
+        <h1 className='text-2xl font-bold text-foreground'>Configurações</h1>
+        <p className='text-sm text-muted-foreground'>
           Personalize o sistema conforme sua necessidade
         </p>
       </div>
@@ -156,13 +156,13 @@ export default function Configuracoes() {
         <TabsList className='bg-transparent border-b border-[#27272a] rounded-none w-full justify-start h-auto p-0'>
           <TabsTrigger
             value='general'
-            className='gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[#5b7fa5] data-[state=active]:text-[#e4e4e7] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#52525b] px-4 py-2.5'>
+            className='gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none text-muted-foreground px-4 py-2.5'>
             <Settings className='h-4 w-4' />
             Configurações Gerais
           </TabsTrigger>
           <TabsTrigger
             value='users'
-            className='gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[#5b7fa5] data-[state=active]:text-[#e4e4e7] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#52525b] px-4 py-2.5'>
+            className='gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none text-muted-foreground px-4 py-2.5'>
             <Users className='h-4 w-4' />
             Usuários
           </TabsTrigger>
@@ -176,28 +176,28 @@ export default function Configuracoes() {
               <CardHeader>
                 <div className='flex items-center justify-between'>
                   <div>
-                    <CardTitle className='text-[#e4e4e7] flex items-center gap-2'>
-                      <Tags className='h-5 w-5 text-[#5b7fa5]' />
+                    <CardTitle className='text-foreground flex items-center gap-2'>
+                      <Tags className='h-5 w-5 text-primary' />
                       Categorias dos Produtos
                     </CardTitle>
-                    <CardDescription className='text-[#52525b]'>
+                    <CardDescription className='text-muted-foreground'>
                       Gerencie as categorias dos produtos disponíveis
                     </CardDescription>
                   </div>
 
                   <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
                     <DialogTrigger asChild>
-                      <Button className='bg-[#5b7fa5] text-[#09090B] hover:bg-[#5b7fa5]/90'>
+                      <Button className='bg-primary text-primary-foreground hover:bg-primary/90'>
                         <Plus className='h-4 w-4 mr-2' />
                         Nova Categoria
                       </Button>
                     </DialogTrigger>
                     <DialogContent className='bg-[#18181b] border-[#27272a] max-w-[540px]'>
                       <DialogHeader>
-                        <DialogTitle className='text-[#e4e4e7]'>
+                        <DialogTitle className='text-foreground'>
                           Adicionar Categoria
                         </DialogTitle>
-                        <DialogDescription className='text-[#52525b]'>
+                        <DialogDescription className='text-muted-foreground'>
                           Crie uma nova categoria para organizar seus produtos
                         </DialogDescription>
                       </DialogHeader>
@@ -225,7 +225,7 @@ export default function Configuracoes() {
                         </Button>
                         <Button
                           onClick={handleAddCategory}
-                          className='bg-[#5b7fa5] text-[#09090B] hover:bg-[#5b7fa5]/90'
+                          className='bg-primary text-primary-foreground hover:bg-primary/90'
                           disabled={isSavingCategory}>
                           {isSavingCategory ? (
                             <>
@@ -245,10 +245,10 @@ export default function Configuracoes() {
               <CardContent className='flex flex-col flex-1'>
                 {isLoadingCategories ? (
                   <div className='flex items-center justify-center py-8'>
-                    <Loader2 className='h-8 w-8 animate-spin text-[#52525b]' />
+                    <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
                   </div>
                 ) : categories.length === 0 ? (
-                  <div className='text-center py-8 text-[#52525b]'>
+                  <div className='text-center py-8 text-muted-foreground'>
                     <Tags className='h-12 w-12 mx-auto mb-4 opacity-50' />
                     <p>Nenhuma categoria cadastrada</p>
                     <p className='text-sm'>
@@ -266,10 +266,10 @@ export default function Configuracoes() {
                           key={category.id}
                           className='flex items-center justify-between px-4 py-3 hover:bg-[#131316] transition-colors'>
                           <div className='flex items-center gap-3'>
-                            <span className='text-xs text-[#52525b] w-8'>
+                            <span className='text-xs text-muted-foreground w-8'>
                               #{category.id}
                             </span>
-                            <span className='font-medium text-[#e4e4e7]'>
+                            <span className='font-medium text-foreground'>
                               {category.name}
                             </span>
                           </div>
@@ -287,15 +287,15 @@ export default function Configuracoes() {
                                   onClick={() =>
                                     setEditingCategory(category)
                                   }>
-                                  <Pencil className='h-4 w-4 text-[#52525b]' />
+                                  <Pencil className='h-4 w-4 text-muted-foreground' />
                                 </Button>
                               </DialogTrigger>
                               <DialogContent className='bg-[#18181b] border-[#27272a] max-w-[540px]'>
                                 <DialogHeader>
-                                  <DialogTitle className='text-[#e4e4e7]'>
-                                    Editar Categoria
+                                  <DialogTitle className='text-foreground'>
+                                   Editar Categoria
                                   </DialogTitle>
-                                  <DialogDescription className='text-[#52525b]'>
+                                  <DialogDescription className='text-muted-foreground'>
                                     Altere os dados da categoria
                                   </DialogDescription>
                                 </DialogHeader>
@@ -340,7 +340,7 @@ export default function Configuracoes() {
                                   </Button>
                                   <Button
                                     onClick={handleUpdateCategory}
-                                    className='bg-[#5b7fa5] text-[#09090B] hover:bg-[#5b7fa5]/90'
+                                    className='bg-primary text-primary-foreground hover:bg-primary/90'
                                     disabled={isSavingCategory}>
                                     {isSavingCategory ? (
                                       <>
@@ -401,15 +401,15 @@ export default function Configuracoes() {
               <CardHeader>
                 <div className='flex items-center justify-between'>
                   <div>
-                    <CardTitle className='text-[#e4e4e7] flex items-center gap-2'>
-                      <Building2 className='h-5 w-5 text-[#5b7fa5]' />
+                    <CardTitle className='text-foreground flex items-center gap-2'>
+                      <Building2 className='h-5 w-5 text-primary' />
                       Informações da Empresa
                     </CardTitle>
-                    <CardDescription className='text-[#52525b]'>
+                    <CardDescription className='text-muted-foreground'>
                       Configure os dados da sua oficina
                     </CardDescription>
                   </div>
-                  <Badge variant='outline' className='text-[#52525b] border-[#27272a]'>
+                  <Badge variant='outline' className='text-muted-foreground border-[#27272a]'>
                     Em breve
                   </Badge>
                 </div>
@@ -455,11 +455,11 @@ export default function Configuracoes() {
             <CardHeader>
               <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
                 <div>
-                  <CardTitle className='text-[#e4e4e7] flex items-center gap-2'>
-                    <Users className='h-5 w-5 text-[#5b7fa5]' />
+                  <CardTitle className='text-foreground flex items-center gap-2'>
+                    <Users className='h-5 w-5 text-primary' />
                     Gerenciamento de Usuários
                   </CardTitle>
-                  <CardDescription className='text-[#52525b]'>
+                  <CardDescription className='text-muted-foreground'>
                     Gerencie os usuários do sistema e suas permissões
                   </CardDescription>
                 </div>
@@ -468,7 +468,7 @@ export default function Configuracoes() {
             <CardContent className='space-y-4'>
               {/* Search */}
               <div className='relative max-w-md'>
-                <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#52525b]' />
+                <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
                 <Input
                   placeholder='Buscar por nome ou email...'
                   value={search}
@@ -480,10 +480,10 @@ export default function Configuracoes() {
               {/* Users list */}
               {isLoadingUsers ? (
                 <div className='flex items-center justify-center py-12'>
-                  <Loader2 className='h-8 w-8 animate-spin text-[#52525b]' />
+                  <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
                 </div>
               ) : users.length === 0 ? (
-                <div className='text-center py-12 text-[#52525b]'>
+                <div className='text-center py-12 text-muted-foreground'>
                   <Users className='h-12 w-12 mx-auto mb-4 opacity-50' />
                   <p>Nenhum usuário cadastrado</p>
                 </div>
@@ -500,10 +500,10 @@ export default function Configuracoes() {
                             {user.name?.charAt(0)?.toUpperCase() || '?'}
                           </div>
                           <div className='flex-1 min-w-0'>
-                            <p className='font-medium text-[#e4e4e7] text-sm'>
+                            <p className='font-medium text-foreground text-sm'>
                               {user.name}
                             </p>
-                            <p className='text-xs text-[#52525b]'>
+                            <p className='text-xs text-muted-foreground'>
                               {user.email}
                             </p>
                           </div>
@@ -547,7 +547,7 @@ export default function Configuracoes() {
                                 size='icon'
                                 aria-label={`Editar usuário ${user.name}`}
                                 onClick={() => setEditingUser(user)}>
-                                <Pencil className='h-4 w-4 text-[#52525b]' />
+                                <Pencil className='h-4 w-4 text-muted-foreground' />
                               </Button>
                             }
                           />

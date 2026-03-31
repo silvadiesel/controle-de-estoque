@@ -62,14 +62,14 @@ export function ModalPecas({
       <DialogContent className='bg-[#18181b] border-[#27272a] rounded-[12px] sm:max-w-[720px] max-h-[90vh] overflow-y-auto p-0 gap-0'>
         <DialogHeader className='p-5 pb-4 border-b border-[#27272a]'>
           <div className='flex items-center gap-3'>
-            <div className='h-8 w-8 rounded-[8px] bg-[rgba(91,127,165,0.1)] flex items-center justify-center'>
-              <Package className='h-4 w-4 text-[#5b7fa5]' />
+            <div className='h-8 w-8 rounded-[8px] bg-primary/10 flex items-center justify-center'>
+              <Package className='h-4 w-4 text-primary' />
             </div>
             <div>
-              <DialogTitle className='text-[16px] font-bold text-[#e4e4e7]'>
+              <DialogTitle className='text-[16px] font-bold text-foreground'>
                 {editingPeca ? 'Editar Produto' : 'Adicionar Novo Produto'}
               </DialogTitle>
-              <p className='text-[12px] text-[#52525b] mt-0.5'>
+              <p className='text-[12px] text-muted-foreground mt-0.5'>
                 {editingPeca ? 'Atualize as informações do produto' : 'Preencha os dados do novo produto'}
               </p>
             </div>
@@ -79,7 +79,7 @@ export function ModalPecas({
         <div className='p-5'>
           <div className='grid grid-cols-1 md:grid-cols-12 gap-6'>
             <div className='md:col-span-4 flex flex-col gap-2'>
-              <span className='text-[10px] uppercase tracking-[0.8px] text-[#52525b] font-semibold'>
+              <span className='text-[10px] uppercase tracking-[0.8px] text-muted-foreground font-semibold'>
                 Imagem do Produto
               </span>
 
@@ -105,15 +105,15 @@ export function ModalPecas({
               ) : (
                 <label
                   htmlFor='dropzone-file'
-                  className='flex flex-col items-center justify-center w-full h-52 md:h-full min-h-[200px] border border-dashed rounded-[8px] cursor-pointer bg-[#131316] border-[#3f3f46] hover:border-[#5b7fa5] transition-colors group'>
+                  className='flex flex-col items-center justify-center w-full h-52 md:h-full min-h-[200px] border border-dashed rounded-[8px] cursor-pointer bg-[#131316] border-[#3f3f46] hover:border-primary transition-colors group'>
                   <div className='flex flex-col items-center justify-center pt-5 pb-6 text-center px-4'>
-                    <CloudDownload className='w-10 h-10 text-[#3f3f46] mb-3 group-hover:text-[#5b7fa5] transition-colors' />
+                    <CloudDownload className='w-10 h-10 text-muted-foreground mb-3 group-hover:text-primary transition-colors' />
                     <p className='mb-1 text-[13px] text-[#a1a1aa] font-medium'>
-                      <span className='font-semibold text-[#e4e4e7]'>
+                      <span className='font-semibold text-foreground'>
                         Clique para adicionar
                       </span>
                     </p>
-                    <p className='text-[11px] text-[#52525b]'>(Opcional)</p>
+                    <p className='text-[11px] text-muted-foreground'>(Opcional)</p>
                   </div>
                   <input
                     id='dropzone-file'
@@ -132,7 +132,7 @@ export function ModalPecas({
                 onSubmit={onSubmit}
                 className='flex flex-col gap-5'>
                 <div>
-                  <span className='text-[10px] uppercase tracking-[0.8px] text-[#52525b] font-semibold'>
+                  <span className='text-[10px] uppercase tracking-[0.8px] text-muted-foreground font-semibold'>
                     Identificacao
                   </span>
                   <div className='grid grid-cols-1 md:grid-cols-3 gap-3 mt-2'>
@@ -168,7 +168,7 @@ export function ModalPecas({
                 </div>
 
                 <div>
-                  <span className='text-[10px] uppercase tracking-[0.8px] text-[#52525b] font-semibold'>
+                  <span className='text-[10px] uppercase tracking-[0.8px] text-muted-foreground font-semibold'>
                     Localizacao no Estoque
                   </span>
                   <div className='grid grid-cols-2 gap-3 mt-2'>
@@ -228,7 +228,7 @@ export function ModalPecas({
                 </div>
 
                 <div>
-                  <span className='text-[10px] uppercase tracking-[0.8px] text-[#52525b] font-semibold'>
+                  <span className='text-[10px] uppercase tracking-[0.8px] text-muted-foreground font-semibold'>
                     Classificacao
                   </span>
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-3 mt-2'>
@@ -273,7 +273,7 @@ export function ModalPecas({
                 </div>
 
                 <div>
-                  <span className='text-[10px] uppercase tracking-[0.8px] text-[#52525b] font-semibold'>
+                  <span className='text-[10px] uppercase tracking-[0.8px] text-muted-foreground font-semibold'>
                     Estoque e Preco
                   </span>
                   <div className='grid grid-cols-2 gap-3 mt-2'>
@@ -312,7 +312,7 @@ export function ModalPecas({
                 </div>
 
                 <div>
-                  <span className='text-[10px] uppercase tracking-[0.8px] text-[#52525b] font-semibold'>
+                  <span className='text-[10px] uppercase tracking-[0.8px] text-muted-foreground font-semibold'>
                     Alertas
                   </span>
                   <div className='mt-2'>
@@ -336,7 +336,7 @@ export function ModalPecas({
                         min='0'
                         className='bg-[#131316] border-[#27272a] rounded-[8px] h-10 font-mono'
                       />
-                      <p className='text-[11px] text-[#52525b]'>
+                      <p className='text-[11px] text-muted-foreground'>
                         Alerta sera exibido quando a quantidade estiver abaixo deste
                         valor
                       </p>
@@ -355,14 +355,14 @@ export function ModalPecas({
             size='default'
             onClick={() => handleOpenChange(false)}
             disabled={isLoading}
-            className='text-[13px] text-[#a1a1aa] hover:text-[#e4e4e7]'>
+            className='text-[13px] text-[#a1a1aa] hover:text-foreground'>
             Cancelar
           </Button>
           <Button
             type='submit'
             form='peca-form'
             size='default'
-            className='bg-[#5b7fa5] text-[#09090B] hover:bg-[#5b7fa5]/90 text-[13px] px-6'
+            className='bg-primary text-primary-foreground hover:bg-primary/90 text-[13px] px-6'
             disabled={isLoading}>
             {isLoading
               ? 'Salvando...'

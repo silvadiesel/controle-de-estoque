@@ -124,12 +124,12 @@ export function AppSidebar() {
       {/* Header com Logo */}
       <SidebarHeader className='border-b border-border px-4 py-4 bg-background'>
         <div className='flex items-center gap-3'>
-          <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#5b7fa5] to-[#4a6b8a]'>
+          <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/80'>
             <Truck className='h-5 w-5 text-white' />
           </div>
           <div>
-            <h1 className='text-[15px] font-semibold text-[#e4e4e7]'>Igne System</h1>
-            <p className='text-[11px] text-[#52525b]'>Tudo em um so lugar</p>
+            <h1 className='text-[15px] font-semibold text-foreground'>Igne System</h1>
+            <p className='text-[11px] text-muted-foreground'>Tudo em um so lugar</p>
           </div>
         </div>
       </SidebarHeader>
@@ -138,7 +138,7 @@ export function AppSidebar() {
       <SidebarContent>
         {menuItems.map((group) => (
           <SidebarGroup key={group.title}>
-            <SidebarGroupLabel className='text-[10px] uppercase tracking-[1.2px] text-[#52525b] font-semibold'>
+            <SidebarGroupLabel className='text-[10px] uppercase tracking-[1.2px] text-muted-foreground font-semibold'>
               {group.title}
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -154,15 +154,15 @@ export function AppSidebar() {
                         isActive={isActive}
                         className={`h-9 ${
                           isActive
-                            ? 'bg-[#18181b] text-[#e4e4e7] [&>svg]:text-[#94a8c2]'
-                            : 'text-[#52525b] [&>svg]:text-[#52525b] hover:bg-[#18181b]/50'
+                            ? 'bg-accent text-foreground [&>svg]:text-primary'
+                            : 'text-muted-foreground [&>svg]:text-muted-foreground hover:bg-accent/50'
                         }`}
                         tooltip={item.label}>
                         <a href={item.href}>
                           <Icon className='h-4 w-4' />
                           <span>{item.label}</span>
                           {item.id === 'alertas' && totalAlertas > 0 && (
-                            <span className='ml-auto flex h-5 min-w-5 items-center justify-center rounded-[10px] bg-[#5b7fa5] px-1 text-[10px] font-bold text-[#09090B]'>
+                            <span className='ml-auto flex h-5 min-w-5 items-center justify-center rounded-[10px] bg-primary px-1 text-[10px] font-bold text-primary-foreground'>
                               {totalAlertas > 99 ? '99+' : totalAlertas}
                             </span>
                           )}
@@ -183,21 +183,21 @@ export function AppSidebar() {
       <SidebarFooter className='p-4'>
         <div className='flex items-center gap-3 px-3 py-2'>
           <Avatar className='h-[30px] w-[30px]'>
-            <AvatarFallback className='bg-[#27272a] text-[#a1a1aa] text-xs font-bold'>
+            <AvatarFallback className='bg-secondary text-text-tertiary text-xs font-bold'>
               {session?.user?.name ? getInitials(session.user.name) : '??'}
             </AvatarFallback>
           </Avatar>
           <div className='flex-1 min-w-0'>
-            <p className='text-[13px] font-medium text-[#e4e4e7] truncate'>
+            <p className='text-[13px] font-medium text-foreground truncate'>
               {session?.user?.name || 'Usuario'}
             </p>
-            <p className='text-[11px] text-[#52525b] truncate'>
+            <p className='text-[11px] text-muted-foreground truncate'>
               {session?.user?.email || ''}
             </p>
           </div>
           <button
             onClick={handleLogout}
-            className='text-[#52525b] hover:text-[#a1a1aa] transition-colors'
+            className='text-muted-foreground hover:text-text-tertiary transition-colors'
             title='Sair do sistema'>
             <LogOut className='h-4 w-4' />
           </button>

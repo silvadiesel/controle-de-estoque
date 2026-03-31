@@ -68,8 +68,8 @@ function ChartBarShape(props: Record<string, unknown>) {
       ry={4}
       fill={
         payload?.isToday
-          ? 'rgba(91,127,165,0.7)'
-          : 'rgba(91,127,165,0.3)'
+          ? 'rgba(70,86,179,0.7)'
+          : 'rgba(70,86,179,0.3)'
       }
     />
   );
@@ -85,12 +85,12 @@ export function MovementsChart({ data, isLoading }: MovementsChartProps) {
     <div className="flex-[1.5] bg-card border border-border rounded-[10px] p-5">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-heading" style={{ color: 'var(--text-bright)' }}>
+          <h2 className="text-heading text-foreground">
             Movimentações
           </h2>
           <p className="text-muted-sm mt-0.5">Últimos 7 dias</p>
         </div>
-        <div className="h-8 w-8 rounded-[6px] flex items-center justify-center bg-[rgba(91,127,165,0.12)]">
+        <div className="h-8 w-8 rounded-[6px] flex items-center justify-center bg-primary/12">
           <Activity size={14} className="text-primary" />
         </div>
       </div>
@@ -110,7 +110,7 @@ export function MovementsChart({ data, isLoading }: MovementsChartProps) {
             >
               <CartesianGrid
                 strokeDasharray="3 3"
-                stroke="#27272a"
+                stroke="var(--border)"
                 vertical={false}
               />
               <XAxis
@@ -131,7 +131,7 @@ export function MovementsChart({ data, isLoading }: MovementsChartProps) {
                     y={y + 12}
                     textAnchor="middle"
                     fontSize={11}
-                    fill={data[index]?.isToday ? '#5b7fa5' : '#52525b'}
+                    fill={data[index]?.isToday ? 'var(--primary)' : 'var(--muted-foreground)'}
                     fontWeight={data[index]?.isToday ? 700 : 400}
                   >
                     {payload.value}
@@ -142,20 +142,21 @@ export function MovementsChart({ data, isLoading }: MovementsChartProps) {
               />
               <YAxis
                 allowDecimals={false}
-                tick={{ fontSize: 11, fill: '#52525b' }}
+                tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
                 axisLine={false}
                 tickLine={false}
               />
               <Tooltip
-                cursor={{ fill: 'rgba(91,127,165,0.06)' }}
+                cursor={{ fill: 'rgba(70,86,179,0.06)' }}
                 contentStyle={{
-                  backgroundColor: '#18181b',
-                  border: '1px solid #27272a',
+                  backgroundColor: 'var(--popover)',
+                  border: '1px solid var(--border)',
                   borderRadius: 8,
                   fontSize: 12,
-                  color: '#e4e4e7'
+                  color: 'var(--foreground)'
                 }}
-                labelStyle={{ color: '#52525b' }}
+                labelStyle={{ color: 'var(--muted-foreground)' }}
+                itemStyle={{ color: 'var(--foreground)' }}
                 formatter={(value: number) => [value, 'Movimentações']}
               />
               <Bar

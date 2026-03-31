@@ -54,21 +54,21 @@ export function ModalUsuarios({
         <DialogContent className='bg-[#18181b] border-[#27272a] rounded-[12px] max-w-[540px] p-0'>
           <DialogHeader className='p-6 pb-4 border-b border-[#27272a]'>
             <div className='flex items-center gap-3'>
-              <div className='flex h-8 w-8 items-center justify-center rounded-[8px] bg-[rgba(91,127,165,0.12)]'>
-                <UserCog className='h-4 w-4 text-[#5b7fa5]' />
+              <div className='flex h-8 w-8 items-center justify-center rounded-[8px] bg-primary/12'>
+                <UserCog className='h-4 w-4 text-primary' />
               </div>
               <div>
-                <DialogTitle className='text-[16px] font-semibold text-[#e4e4e7]'>
+                <DialogTitle className='text-[16px] font-semibold text-foreground'>
                   Editar Usuário
                 </DialogTitle>
-                <DialogDescription className='text-[12px] text-[#52525b]'>
+                <DialogDescription className='text-[12px] text-muted-foreground'>
                   Altere os dados do usuário no sistema
                 </DialogDescription>
               </div>
             </div>
           </DialogHeader>
           <div className='p-6'>
-            <p className='text-[10px] uppercase tracking-[0.8px] text-[#52525b] font-semibold mb-3'>DADOS DO USUÁRIO</p>
+            <p className='text-[10px] uppercase tracking-[0.8px] text-muted-foreground font-semibold mb-3'>DADOS DO USUÁRIO</p>
             <div className='grid gap-4'>
             <div className='space-y-2'>
               <Label htmlFor='user-name' className='text-[12px] text-[#a1a1aa]'>Nome</Label>
@@ -111,7 +111,7 @@ export function ModalUsuarios({
             <div className='flex items-center justify-between'>
               <div className='space-y-0.5'>
                 <Label htmlFor='user-status' className='text-[12px] text-[#a1a1aa]'>Status</Label>
-                <p className='text-sm text-[#52525b]'>
+                <p className='text-sm text-muted-foreground'>
                   {data.status ? 'Usuário ativo' : 'Usuário inativo'}
                 </p>
               </div>
@@ -134,7 +134,7 @@ export function ModalUsuarios({
             </Button>
             <Button
               onClick={handleSubmit}
-              className='bg-[#5b7fa5] text-[#09090B] hover:bg-[#5b7fa5]/90'
+              className='bg-primary text-primary-foreground hover:bg-primary/90'
               disabled={isLoading}>
               {isLoading ? (
                 <>

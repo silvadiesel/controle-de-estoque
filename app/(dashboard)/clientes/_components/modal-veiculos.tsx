@@ -51,14 +51,14 @@ export function ModalVeiculos({
       <DialogContent className='bg-[#18181b] border-[#27272a] rounded-[12px] max-w-[540px] p-0'>
         <DialogHeader className='p-6 pb-4 border-b border-[#27272a]'>
           <div className='flex items-center gap-3'>
-            <div className='flex h-8 w-8 items-center justify-center rounded-[8px] bg-[rgba(91,127,165,0.12)]'>
-              <Car className='h-4 w-4 text-[#5b7fa5]' />
+            <div className='flex h-8 w-8 items-center justify-center rounded-[8px] bg-primary/12'>
+              <Car className='h-4 w-4 text-primary' />
             </div>
             <div>
-              <DialogTitle className='text-[16px] font-bold text-[#e4e4e7]'>
+              <DialogTitle className='text-[16px] font-bold text-foreground'>
                 {isEdit ? 'Editar Veículo' : 'Adicionar Veículo'}
               </DialogTitle>
-              <DialogDescription className='text-[12px] text-[#52525b]'>
+              <DialogDescription className='text-[12px] text-muted-foreground'>
                 {isEdit
                   ? 'Altere os dados do veículo'
                   : 'Cadastre um novo veículo para este cliente'}
@@ -68,7 +68,7 @@ export function ModalVeiculos({
         </DialogHeader>
         <ScrollArea className='max-h-[60vh]'>
           <div className='grid gap-4 p-6 pt-4'>
-            <p className='text-[10px] uppercase tracking-[0.8px] text-[#52525b] font-semibold mb-3'>DADOS DO VEÍCULO</p>
+            <p className='text-[10px] uppercase tracking-[0.8px] text-muted-foreground font-semibold mb-3'>DADOS DO VEÍCULO</p>
             <div className='grid gap-4 sm:grid-cols-2'>
               <div className='space-y-2'>
                 <Label className='text-[12px] text-[#a1a1aa]'>Placa *</Label>
@@ -100,7 +100,7 @@ export function ModalVeiculos({
           </Button>
           <Button
             onClick={onSubmit}
-            className='bg-[#5b7fa5] hover:bg-[#5b7fa5]/90 text-[#09090B] w-32'
+            className='bg-primary hover:bg-primary/90 text-primary-foreground w-32'
             disabled={isLoading}>
             {isLoading ? 'Salvando...' : isEdit ? 'Salvar' : 'Adicionar'}
           </Button>

@@ -263,8 +263,8 @@ export default function Ordens() {
       <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
         <div className='flex flex-col gap-1'>
           <div className='flex items-center gap-2.5'>
-            <div className='h-7 w-1 rounded-full bg-[#5b7fa5]' />
-            <h1 className='text-2xl font-bold text-[#e4e4e7]'>
+            <div className='h-7 w-1 rounded-full bg-primary' />
+            <h1 className='text-2xl font-bold text-foreground'>
               Ordens de Serviço e Venda
             </h1>
           </div>
@@ -274,13 +274,11 @@ export default function Ordens() {
         </div>
 
         <div className='flex flex-col md:flex-row gap-2'>
-          <Button
-            onClick={() => setIsAddServicoOpen(true)}
-            className='bg-[#5b7fa5] hover:bg-[#5b7fa5]/90 text-[#09090B]'>
+          <Button onClick={() => setIsAddServicoOpen(true)}>
             <Wrench className='h-4 w-4' />
             Nova Ordem de Serviço
           </Button>
-          <Button variant='outline' onClick={() => setIsAddVendaOpen(true)}>
+          <Button onClick={() => setIsAddVendaOpen(true)}>
             <ShoppingCart className='h-4 w-4' />
             Nova Ordem de Venda
           </Button>
@@ -291,19 +289,23 @@ export default function Ordens() {
       <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
         <div className='bg-[#18181b] border border-[#27272a] rounded-[10px] px-4 py-3'>
           <p className='text-sm text-[#71717a]'>Ativas</p>
-          <p className='text-2xl font-bold text-[#e4e4e7]'>{stats.ativas}</p>
+          <p className='text-2xl font-bold text-foreground'>{stats.ativas}</p>
         </div>
         <div className='bg-[#18181b] border border-[#27272a] rounded-[10px] px-4 py-3'>
           <p className='text-sm text-[#71717a]'>Fechadas</p>
-          <p className='text-2xl font-bold text-[#e4e4e7]'>{stats.fechadas}</p>
+          <p className='text-2xl font-bold text-foreground'>{stats.fechadas}</p>
         </div>
         <div className='bg-[#18181b] border border-[#27272a] rounded-[10px] px-4 py-3'>
           <p className='text-sm text-[#71717a]'>Serviço</p>
-          <p className='text-2xl font-bold text-[#e4e4e7]'>{stats.totalServico}</p>
+          <p className='text-2xl font-bold text-foreground'>
+            {stats.totalServico}
+          </p>
         </div>
         <div className='bg-[#18181b] border border-[#27272a] rounded-[10px] px-4 py-3'>
           <p className='text-sm text-[#71717a]'>Venda</p>
-          <p className='text-2xl font-bold text-[#e4e4e7]'>{stats.totalVenda}</p>
+          <p className='text-2xl font-bold text-foreground'>
+            {stats.totalVenda}
+          </p>
         </div>
       </div>
 
@@ -403,11 +405,13 @@ export default function Ordens() {
                   className='flex items-center gap-4 px-5 py-4 cursor-pointer hover:bg-[#1c1c22]/50 transition-colors'
                   onClick={() => toggleExpand(key)}>
                   {/* Left side bar + Type badge */}
-                  <div className={`self-stretch w-[3px] rounded-full shrink-0 ${isServico ? 'bg-[#5b7fa5]' : 'bg-[#71717a]'}`} />
+                  <div
+                    className={`self-stretch w-[3px] rounded-full shrink-0 ${isServico ? 'bg-primary' : 'bg-[#71717a]'}`}
+                  />
 
                   {/* Type badge */}
                   {isServico ? (
-                    <span className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-[rgba(91,127,165,0.10)] text-[#5b7fa5] shrink-0'>
+                    <span className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-primary/10 text-primary shrink-0'>
                       <Clock className='h-3 w-3' />
                       Serviço
                     </span>
@@ -419,13 +423,15 @@ export default function Ordens() {
                   )}
 
                   {/* Number */}
-                  <span className={`text-[15px] font-bold text-[#e4e4e7] shrink-0 ${isCancelada ? 'line-through' : ''}`}>
+                  <span
+                    className={`text-[15px] font-bold text-foreground shrink-0 ${isCancelada ? 'line-through' : ''}`}>
                     #{ordem.id}
                   </span>
 
                   {/* Cliente */}
                   <div className='flex-1 min-w-0'>
-                    <p className={`text-sm text-[#e4e4e7] truncate ${isCancelada ? 'line-through' : ''}`}>
+                    <p
+                      className={`text-sm text-foreground truncate ${isCancelada ? 'line-through' : ''}`}>
                       {ordem.cliente?.name_cliente || '-'}
                     </p>
                   </div>
@@ -453,7 +459,7 @@ export default function Ordens() {
                       className={`text-[18px] font-bold ${
                         isCancelada
                           ? 'text-[#71717a] line-through'
-                          : 'text-[#5b7fa5]'
+                          : 'text-primary'
                       }`}>
                       {formatCurrency(ordem.valor_total)}
                     </span>
@@ -474,43 +480,80 @@ export default function Ordens() {
                       {isServico && ordemServico ? (
                         <>
                           <div>
-                            <p className='text-[10px] uppercase tracking-wider text-[#3f3f46] font-medium'>Cliente</p>
-                            <p className='text-xs text-[#a1a1aa] truncate'>{ordem.cliente?.name_cliente || '-'}</p>
-                          </div>
-                          <div>
-                            <p className='text-[10px] uppercase tracking-wider text-[#3f3f46] font-medium'>Veículo</p>
-                            <p className='text-xs text-[#a1a1aa] truncate'>{ordemServico.veiculo?.placa || '-'} {ordemServico.veiculo?.modelo ? `- ${ordemServico.veiculo.modelo}` : ''}</p>
-                          </div>
-                          <div>
-                            <p className='text-[10px] uppercase tracking-wider text-[#3f3f46] font-medium'>Responsável</p>
+                            <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
+                              Cliente
+                            </p>
                             <p className='text-xs text-[#a1a1aa] truncate'>
-                              {funcionarios.find((f) => f.id === ordemServico?.funcionario_responsavel_id)?.name || '-'}
+                              {ordem.cliente?.name_cliente || '-'}
                             </p>
                           </div>
                           <div>
-                            <p className='text-[10px] uppercase tracking-wider text-[#3f3f46] font-medium'>Data</p>
-                            <p className='text-xs text-[#a1a1aa]'>{formatDateShort(ordem.data_criacao)}</p>
+                            <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
+                              Veículo
+                            </p>
+                            <p className='text-xs text-[#a1a1aa] truncate'>
+                              {ordemServico.veiculo?.placa || '-'}{' '}
+                              {ordemServico.veiculo?.modelo
+                                ? `- ${ordemServico.veiculo.modelo}`
+                                : ''}
+                            </p>
+                          </div>
+                          <div>
+                            <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
+                              Responsável
+                            </p>
+                            <p className='text-xs text-[#a1a1aa] truncate'>
+                              {funcionarios.find(
+                                (f) =>
+                                  f.id ===
+                                  ordemServico?.funcionario_responsavel_id
+                              )?.name || '-'}
+                            </p>
+                          </div>
+                          <div>
+                            <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
+                              Data
+                            </p>
+                            <p className='text-xs text-[#a1a1aa]'>
+                              {formatDateShort(ordem.data_criacao)}
+                            </p>
                           </div>
                         </>
                       ) : (
                         <>
                           <div>
-                            <p className='text-[10px] uppercase tracking-wider text-[#3f3f46] font-medium'>Cliente</p>
-                            <p className='text-xs text-[#a1a1aa] truncate'>{ordem.cliente?.name_cliente || '-'}</p>
-                          </div>
-                          <div>
-                            <p className='text-[10px] uppercase tracking-wider text-[#3f3f46] font-medium'>Pagamento</p>
+                            <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
+                              Cliente
+                            </p>
                             <p className='text-xs text-[#a1a1aa] truncate'>
-                              {(ordem as OrdemVendaCompleta).metodo_pagamento?.toUpperCase() || '-'}
+                              {ordem.cliente?.name_cliente || '-'}
                             </p>
                           </div>
                           <div>
-                            <p className='text-[10px] uppercase tracking-wider text-[#3f3f46] font-medium'>Responsável</p>
-                            <p className='text-xs text-[#a1a1aa] truncate'>{ordem.cliente?.name_cliente || '-'}</p>
+                            <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
+                              Pagamento
+                            </p>
+                            <p className='text-xs text-[#a1a1aa] truncate'>
+                              {(
+                                ordem as OrdemVendaCompleta
+                              ).metodo_pagamento?.toUpperCase() || '-'}
+                            </p>
                           </div>
                           <div>
-                            <p className='text-[10px] uppercase tracking-wider text-[#3f3f46] font-medium'>Data</p>
-                            <p className='text-xs text-[#a1a1aa]'>{formatDateShort(ordem.data_criacao)}</p>
+                            <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
+                              Responsável
+                            </p>
+                            <p className='text-xs text-[#a1a1aa] truncate'>
+                              {ordem.cliente?.name_cliente || '-'}
+                            </p>
+                          </div>
+                          <div>
+                            <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
+                              Data
+                            </p>
+                            <p className='text-xs text-[#a1a1aa]'>
+                              {formatDateShort(ordem.data_criacao)}
+                            </p>
                           </div>
                         </>
                       )}
@@ -526,46 +569,80 @@ export default function Ordens() {
                       {isServico && ordemServico ? (
                         <>
                           <div>
-                            <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-1'>Cliente</p>
-                            <p className='text-sm text-[#e4e4e7]'>{ordem.cliente?.name_cliente || '-'}</p>
+                            <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
+                              Cliente
+                            </p>
+                            <p className='text-sm text-foreground'>
+                              {ordem.cliente?.name_cliente || '-'}
+                            </p>
                           </div>
                           <div>
-                            <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-1'>Veículo</p>
-                            <p className='text-sm text-[#e4e4e7]'>
+                            <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
+                              Veículo
+                            </p>
+                            <p className='text-sm text-foreground'>
                               {ordemServico.veiculo?.placa || '-'}{' '}
-                              {ordemServico.veiculo?.modelo ? `- ${ordemServico.veiculo.modelo}` : ''}
+                              {ordemServico.veiculo?.modelo
+                                ? `- ${ordemServico.veiculo.modelo}`
+                                : ''}
                             </p>
                           </div>
                           <div>
-                            <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-1'>Responsável</p>
-                            <p className='text-sm text-[#e4e4e7]'>
-                              {funcionarios.find((f) => f.id === ordemServico?.funcionario_responsavel_id)?.name || '-'}
+                            <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
+                              Responsável
+                            </p>
+                            <p className='text-sm text-foreground'>
+                              {funcionarios.find(
+                                (f) =>
+                                  f.id ===
+                                  ordemServico?.funcionario_responsavel_id
+                              )?.name || '-'}
                             </p>
                           </div>
                           <div>
-                            <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-1'>Data Chegada</p>
-                            <p className='text-sm text-[#e4e4e7]'>{formatDateFull(ordemServico.data_chegada)}</p>
+                            <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
+                              Data Chegada
+                            </p>
+                            <p className='text-sm text-foreground'>
+                              {formatDateFull(ordemServico.data_chegada)}
+                            </p>
                           </div>
                         </>
                       ) : (
                         <>
                           <div>
-                            <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-1'>Cliente</p>
-                            <p className='text-sm text-[#e4e4e7]'>{ordem.cliente?.name_cliente || '-'}</p>
-                          </div>
-                          <div>
-                            <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-1'>Pagamento</p>
-                            <p className='text-sm text-[#e4e4e7]'>
-                              {(ordem as OrdemVendaCompleta).metodo_pagamento?.toUpperCase() || '-'}
+                            <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
+                              Cliente
+                            </p>
+                            <p className='text-sm text-foreground'>
+                              {ordem.cliente?.name_cliente || '-'}
                             </p>
                           </div>
                           <div>
-                            <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-1'>Responsável</p>
-                            <p className='text-sm text-[#e4e4e7]'>{ordem.cliente?.name_cliente || '-'}</p>
+                            <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
+                              Pagamento
+                            </p>
+                            <p className='text-sm text-foreground'>
+                              {(
+                                ordem as OrdemVendaCompleta
+                              ).metodo_pagamento?.toUpperCase() || '-'}
+                            </p>
                           </div>
                           <div>
-                            <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-1'>Data</p>
-                            <p className='text-sm text-[#e4e4e7]'>{formatDateFull(ordem.data_criacao)}</p>
+                            <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
+                              Responsável
+                            </p>
+                            <p className='text-sm text-foreground'>
+                              {ordem.cliente?.name_cliente || '-'}
+                            </p>
+                          </div>
+                          <div>
+                            <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
+                              Data
+                            </p>
+                            <p className='text-sm text-foreground'>
+                              {formatDateFull(ordem.data_criacao)}
+                            </p>
                           </div>
                         </>
                       )}
@@ -575,20 +652,20 @@ export default function Ordens() {
                     <div className='flex gap-6 mb-4 flex-wrap'>
                       {isServico && ordemServico && (
                         <div>
-                          <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-1'>
+                          <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
                             Criado por
                           </p>
-                          <p className='text-sm text-[#e4e4e7]'>
+                          <p className='text-sm text-foreground'>
                             {ordemServico.funcionario?.name || '-'}
                           </p>
                         </div>
                       )}
                       {ordem.observacao && (
                         <div className='flex-1 min-w-[200px]'>
-                          <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-1'>
+                          <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
                             Observação
                           </p>
-                          <p className='text-sm text-[#e4e4e7]'>
+                          <p className='text-sm text-foreground'>
                             {ordem.observacao}
                           </p>
                         </div>
@@ -598,7 +675,7 @@ export default function Ordens() {
                     {/* Pecas */}
                     {ordem.pecas.length > 0 && (
                       <div>
-                        <p className='text-[10px] text-[#3f3f46] uppercase tracking-wider font-medium mb-2 flex items-center gap-1.5'>
+                        <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-2 flex items-center gap-1.5'>
                           <Package className='h-3.5 w-3.5' />
                           Peças ({ordem.pecas.length})
                         </p>
@@ -607,14 +684,14 @@ export default function Ordens() {
                             <div
                               key={item.id}
                               className='flex justify-between items-center bg-[#09090B]/60 px-4 py-2.5 rounded-md'>
-                              <span className='text-sm text-[#e4e4e7]'>
+                              <span className='text-sm text-foreground'>
                                 {item.peca?.name_peca || 'Peça não encontrada'}
                               </span>
                               <div className='flex gap-5'>
                                 <span className='text-xs text-[#71717a]'>
                                   x{item.quantidade}
                                 </span>
-                                <span className='text-sm text-[#e4e4e7] font-medium min-w-[80px] text-right'>
+                                <span className='text-sm text-foreground font-medium min-w-[80px] text-right'>
                                   {formatCurrency(
                                     (item.peca?.preco || 0) * item.quantidade
                                   )}
@@ -628,7 +705,7 @@ export default function Ordens() {
                                 e.stopPropagation();
                                 handleView(ordem);
                               }}
-                              className='text-xs text-[#5b7fa5] py-2 border border-dashed border-[#27272a] rounded-md hover:bg-[#1c1c22]/30 transition-colors'>
+                              className='text-xs text-primary py-2 border border-dashed border-[#27272a] rounded-md hover:bg-[#1c1c22]/30 transition-colors'>
                               +{ordem.pecas.length - 2}{' '}
                               {ordem.pecas.length - 2 === 1 ? 'peça' : 'peças'}{' '}
                               — Ver detalhes completos

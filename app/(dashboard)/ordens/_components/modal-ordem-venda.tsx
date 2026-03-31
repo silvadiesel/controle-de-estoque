@@ -244,11 +244,11 @@ export function ModalOrdemVenda({
         className='bg-[#18181b] border-[#27272a] rounded-[12px] max-w-[680px] p-0'>
         <DialogHeader className='p-6 pb-4 border-b border-[#27272a]'>
           <div className='flex items-center gap-3 mb-1'>
-            <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(91,127,165,0.12)]'>
-              <ShoppingCart className='h-4.5 w-4.5 text-[#5b7fa5]' />
+            <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-primary/12'>
+              <ShoppingCart className='h-4.5 w-4.5 text-primary' />
             </div>
             <div>
-              <DialogTitle className='text-[#e4e4e7]'>
+              <DialogTitle className='text-foreground'>
                 {isEdit ? 'Editar Ordem de Venda' : 'Nova Ordem de Venda'}
               </DialogTitle>
               <DialogDescription className='text-[#71717a]'>
@@ -445,16 +445,16 @@ export function ModalOrdemVenda({
                     <TableBody>
                       {formData.pecas.map((item) => (
                         <TableRow key={item.peca_id} className='border-[#27272a] hover:bg-[#1c1c22]/30'>
-                          <TableCell className='text-[#e4e4e7]'>
+                          <TableCell className='text-foreground'>
                             {item.peca?.name_peca || 'Peça não encontrada'}
                           </TableCell>
-                          <TableCell className='text-center text-[#e4e4e7]'>
+                          <TableCell className='text-center text-foreground'>
                             {item.quantidade}
                           </TableCell>
                           <TableCell className='text-right text-[#71717a]'>
                             {formatCurrency(item.peca?.preco || 0)}
                           </TableCell>
-                          <TableCell className='text-right text-[#e4e4e7] font-medium'>
+                          <TableCell className='text-right text-foreground font-medium'>
                             {formatCurrency((item.peca?.preco || 0) * item.quantidade)}
                           </TableCell>
                           <TableCell>
@@ -474,7 +474,7 @@ export function ModalOrdemVenda({
             <div className='rounded-lg bg-[#131316] border border-[#27272a] p-4'>
               <div className='flex items-center justify-between'>
                 <span className='text-sm font-medium text-[#71717a] uppercase tracking-wider'>Total da Venda</span>
-                <span className='text-[22px] font-bold text-[#5b7fa5]'>
+                <span className='text-[22px] font-bold text-primary'>
                   {formatCurrency(calcularTotal())}
                 </span>
               </div>
@@ -489,7 +489,7 @@ export function ModalOrdemVenda({
           <Button
             onClick={handleSubmit}
             disabled={isLoading}
-            className='bg-[#5b7fa5] hover:bg-[#5b7fa5]/90 text-[#09090B] w-32'>
+            className='bg-primary hover:bg-primary/90 text-primary-foreground w-32'>
             {isLoading ? 'Salvando...' : isEdit ? 'Atualizar' : 'Criar Venda'}
           </Button>
         </DialogFooter>

@@ -45,7 +45,7 @@ export function PaginationControls({
 
   return (
     <div className='flex flex-col-reverse sm:flex-row items-center justify-between gap-4 mt-4'>
-      <p className='text-[12px] text-[#52525b] text-center sm:text-left'>
+      <p className='text-[12px] text-muted-foreground text-center sm:text-left'>
         Mostrando {startItem} a {endItem} de {totalItems} {itemLabel}
       </p>
 
@@ -70,7 +70,7 @@ export function PaginationControls({
                   isActive={item === currentPage}
                   className={`cursor-pointer ${
                     item === currentPage
-                      ? 'bg-[#5b7fa5] text-[#09090B] font-semibold border-none h-8 w-8 rounded-[6px]'
+                      ? 'bg-primary text-primary-foreground font-semibold border-none h-8 w-8 rounded-[6px]'
                       : 'bg-[#18181b] border border-[#27272a] text-[#71717a] h-8 w-8 rounded-[6px]'
                   }`}>
                   {item}

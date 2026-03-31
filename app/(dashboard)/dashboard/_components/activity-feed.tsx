@@ -87,7 +87,7 @@ export function ActivityFeed({ movimentacoes, isLoading }: ActivityFeedProps) {
   return (
     <div className="flex-1 bg-card border border-border rounded-[10px] p-5">
       <div className="mb-4">
-        <h2 className="text-heading" style={{ color: 'var(--text-bright)' }}>
+        <h2 className="text-heading text-foreground">
           Atividade Recente
         </h2>
         <p className="text-muted-sm mt-0.5">Últimas ações no sistema</p>
@@ -125,16 +125,16 @@ export function ActivityFeed({ movimentacoes, isLoading }: ActivityFeedProps) {
 
                 {/* Texto */}
                 <div className="min-w-0 flex-1">
-                  <p className="text-body leading-snug" style={{ color: 'var(--text-primary)' }}>
-                    <span style={{ color: 'var(--text-bright)' }}>{item.autor}</span>{' '}
-                    <span style={{ color: 'var(--text-muted)' }}>
+                  <p className="text-body leading-snug text-foreground">
+                    <span className="text-foreground">{item.autor}</span>{' '}
+                    <span className="text-muted-foreground">
                       {ACAO_LABELS[item.tipo_acao] ?? item.tipo_acao}
                     </span>{' '}
                     <span className="font-medium text-primary">
                       {ENTIDADE_LABELS[item.entidade] ?? item.entidade}
                     </span>
                   </p>
-                  <p className="mt-0.5" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                  <p className="mt-0.5 text-[10px] text-muted-foreground">
                     {timeAgo(item.created_at)}
                   </p>
                 </div>
