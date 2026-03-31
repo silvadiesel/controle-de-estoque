@@ -5,6 +5,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { AlertTriangle, Package, ShoppingCart, Users } from 'lucide-react';
 
+import { type Cliente } from '@/db/schema/cliente';
+import { type Peca } from '@/db/schema/pecas';
+
 import { ActivityFeed, type MovimentacaoAPI } from './_components/activity-feed';
 import { buildLast7Days, MovementsChart } from './_components/movements-chart';
 import { LastOrders, type OrdemServicoItem, type OrdemVendaItem } from './_components/last-orders';
@@ -26,17 +29,17 @@ export default function DashboardPage() {
     setIsLoading(true);
 
     const results = await Promise.allSettled([
-      fetch('/api/produtos').then((r) => r.json()),
-      fetch('/api/clientes').then((r) => r.json()),
-      fetch('/api/ordens/servico').then((r) => r.json()),
-      fetch('/api/ordens/venda').then((r) => r.json()),
-      fetch('/api/movimentacoes').then((r) => r.json())
+      fetch('/api/produtos').then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+      fetch('/api/clientes').then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+      fetch('/api/ordens/servico').then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+      fetch('/api/ordens/venda').then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+      fetch('/api/movimentacoes').then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
     ]);
 
-    const produtos = results[0].status === 'fulfilled' && Array.isArray(results[0].value)
+    const produtos: Peca[] = results[0].status === 'fulfilled' && Array.isArray(results[0].value)
       ? results[0].value
       : [];
-    const clientes = results[1].status === 'fulfilled' && Array.isArray(results[1].value)
+    const clientes: Cliente[] = results[1].status === 'fulfilled' && Array.isArray(results[1].value)
       ? results[1].value
       : [];
     const servico: OrdemServicoItem[] =
@@ -59,10 +62,7 @@ export default function DashboardPage() {
         venda.filter((o) => o.status === 'ativa').length
     );
     setAlertasEstoque(
-      produtos.filter(
-        (p: { quantidade: number; alerta: number | null }) =>
-          p.quantidade <= (p.alerta ?? 0)
-      ).length
+      produtos.filter((p) => p.quantidade <= p.alerta).length
     );
     setOrdensServico(servico);
     setOrdensVenda(venda);
