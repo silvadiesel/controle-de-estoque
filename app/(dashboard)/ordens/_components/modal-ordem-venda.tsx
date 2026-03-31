@@ -263,7 +263,9 @@ export function ModalOrdemVenda({
                 onValueChange={(v) =>
                   setFormData({ ...formData, cliente_id: parseInt(v) })
                 }>
-                <SelectTrigger className={`bg-input w-full ${hasError('cliente_id') ? 'border-destructive' : 'border-border'}`}>
+                <SelectTrigger
+                  aria-describedby={hasError('cliente_id') ? 'error-cliente-venda' : undefined}
+                  className={`bg-input w-full ${hasError('cliente_id') ? 'border-destructive' : 'border-border'}`}>
                   <SelectValue placeholder='Selecione um cliente' />
                 </SelectTrigger>
                 <SelectContent className='bg-card border-border w-fit'>
@@ -278,7 +280,7 @@ export function ModalOrdemVenda({
                 </SelectContent>
               </Select>
               {hasError('cliente_id') && (
-                <p className='text-xs text-destructive'>{errors.cliente_id}</p>
+                <p id='error-cliente-venda' className='text-xs text-destructive'>{errors.cliente_id}</p>
               )}
             </div>
 
@@ -385,7 +387,9 @@ export function ModalOrdemVenda({
                 <Select
                   value={selectedPecaId}
                   onValueChange={setSelectedPecaId}>
-                  <SelectTrigger className={`bg-input flex-1 ${hasError('pecas') ? 'border-destructive' : 'border-border'}`}>
+                  <SelectTrigger
+                    aria-describedby={hasError('pecas') ? 'error-pecas-venda' : undefined}
+                    className={`bg-input flex-1 ${hasError('pecas') ? 'border-destructive' : 'border-border'}`}>
                     <SelectValue placeholder='Selecione uma peça' />
                   </SelectTrigger>
                   <SelectContent className='bg-card border-border max-h-60'>
@@ -415,7 +419,7 @@ export function ModalOrdemVenda({
                 </Button>
               </div>
               {hasError('pecas') && (
-                <p className='text-xs text-destructive'>{errors.pecas}</p>
+                <p id='error-pecas-venda' className='text-xs text-destructive'>{errors.pecas}</p>
               )}
 
               {/* Lista de Peças */}
@@ -447,7 +451,7 @@ export function ModalOrdemVenda({
                             {formatCurrency((item.peca?.preco || 0) * item.quantidade)}
                           </TableCell>
                           <TableCell>
-                            <Button type='button' variant='ghost' size='icon' onClick={() => handleRemovePeca(item.peca_id)}>
+                            <Button type='button' variant='ghost' size='icon' aria-label={`Remover peça ${item.peca?.name_peca || ''}`} onClick={() => handleRemovePeca(item.peca_id)}>
                               <X className='h-4 w-4 text-destructive' />
                             </Button>
                           </TableCell>

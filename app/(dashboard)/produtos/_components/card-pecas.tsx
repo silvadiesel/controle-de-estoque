@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 import Image from 'next/image';
 
 import { Badge } from '@/components/ui/badge';
@@ -21,7 +23,7 @@ interface CardPecasProps {
   onDelete: (peca: Peca) => void;
 }
 
-export function CardPecas({
+export const CardPecas = memo(function CardPecas({
   peca,
   categoryName,
   supplierName,
@@ -41,7 +43,9 @@ export function CardPecas({
             src={peca.imagem}
             alt={peca.name_peca}
             fill
+            sizes='(max-width: 640px) 100vw, 192px'
             className='object-contain p-3'
+            loading='lazy'
             unoptimized
           />
         ) : (
@@ -128,11 +132,11 @@ export function CardPecas({
             size='sm'
             className='h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10'
             onClick={() => onDelete(peca)}
-            title='Excluir'>
+            aria-label={`Excluir produto ${peca.name_peca}`}>
             <Trash2 className='h-4 w-4' />
           </Button>
         </div>
       </div>
     </Card>
   );
-}
+});

@@ -63,25 +63,25 @@ const tipoAcaoConfig: Record<
     label: 'Criação',
     icon: PackagePlus,
     className:
-      'bg-transparent text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/5',
-    bar: 'bg-emerald-500',
-    pct: 'text-emerald-600 bg-emerald-500/10'
+      'bg-transparent text-success border-success/40 hover:bg-success/5',
+    bar: 'bg-success',
+    pct: 'text-success bg-success/10'
   },
   edicao: {
     label: 'Edição',
     icon: FilePenLine,
     className:
-      'bg-transparent text-blue-300 border-blue-500/40 hover:bg-blue-500/5',
-    bar: 'bg-blue-500',
-    pct: 'text-blue-600 bg-blue-500/10'
+      'bg-transparent text-primary border-primary/40 hover:bg-primary/5',
+    bar: 'bg-primary',
+    pct: 'text-primary bg-primary/10'
   },
   exclusao: {
     label: 'Exclusão',
     icon: Trash2,
     className:
-      'bg-transparent text-red-300 border-red-500/40 hover:bg-red-500/5',
-    bar: 'bg-red-500',
-    pct: 'text-red-600 bg-red-500/10'
+      'bg-transparent text-destructive border-destructive/40 hover:bg-destructive/5',
+    bar: 'bg-destructive',
+    pct: 'text-destructive bg-destructive/10'
   }
 };
 
@@ -171,7 +171,7 @@ export default function Movimentacoes() {
       <div className='flex flex-col gap-1'>
         <div className='flex items-center gap-2.5'>
           <div className='h-7 w-1 rounded-full bg-primary' />
-          <h2 className='text-2xl font-bold text-foreground'>Movimentações</h2>
+          <h1 className='text-2xl font-bold text-foreground'>Movimentações</h1>
         </div>
         <p className='pl-3.5 text-sm text-muted-foreground'>
           Histórico de ações realizadas no sistema
@@ -202,11 +202,11 @@ export default function Movimentacoes() {
 
         {/* Criações */}
         <Card className='bg-card w-full border-border relative overflow-hidden'>
-          <div className='absolute inset-x-0 top-0 h-0.5 bg-emerald-500/60' />
+          <div className='absolute inset-x-0 top-0 h-0.5 bg-success/60' />
           <CardContent className='px-4 py-4'>
             <div className='flex items-center gap-3'>
-              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 shrink-0'>
-                <PackagePlus className='h-5 w-5 text-emerald-600' />
+              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-success/10 shrink-0'>
+                <PackagePlus className='h-5 w-5 text-success' />
               </div>
               <div className='min-w-0 flex-1'>
                 <p className='text-2xl font-bold text-foreground'>
@@ -220,11 +220,11 @@ export default function Movimentacoes() {
 
         {/* Edições */}
         <Card className='bg-card w-full border-border relative overflow-hidden'>
-          <div className='absolute inset-x-0 top-0 h-0.5 bg-blue-500/60' />
+          <div className='absolute inset-x-0 top-0 h-0.5 bg-primary/60' />
           <CardContent className='px-4 py-4'>
             <div className='flex items-center gap-3'>
-              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 shrink-0'>
-                <TrendingUp className='h-5 w-5 text-blue-600' />
+              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 shrink-0'>
+                <TrendingUp className='h-5 w-5 text-primary' />
               </div>
               <div className='min-w-0 flex-1'>
                 <p className='text-2xl font-bold text-foreground'>
@@ -238,11 +238,11 @@ export default function Movimentacoes() {
 
         {/* Exclusões */}
         <Card className='bg-card w-full border-border relative overflow-hidden'>
-          <div className='absolute inset-x-0 top-0 h-0.5 bg-red-500/60' />
+          <div className='absolute inset-x-0 top-0 h-0.5 bg-destructive/60' />
           <CardContent className='px-4 py-4'>
             <div className='flex items-center gap-3'>
-              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/10 shrink-0'>
-                <Trash2 className='h-5 w-5 text-red-600' />
+              <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-destructive/10 shrink-0'>
+                <Trash2 className='h-5 w-5 text-destructive' />
               </div>
               <div className='min-w-0 flex-1'>
                 <p className='text-2xl font-bold text-foreground'>
@@ -348,7 +348,7 @@ export default function Movimentacoes() {
           </div>
         </CardHeader>
         <CardContent className='p-0'>
-          <div className='overflow-hidden'>
+          <div className='overflow-x-auto'>
             <Table>
               <TableHeader>
                 <TableRow className='border-border hover:bg-transparent bg-muted/40'>

@@ -165,6 +165,7 @@ export function AccordionVeiculos({
                             variant='ghost'
                             size='icon'
                             className='h-7 w-7'
+                            aria-label={`Editar veículo ${veiculo.placa}`}
                             onClick={() => setEditingVeiculo(veiculo)}>
                             <Pencil className='h-3 w-3 text-muted-foreground' />
                           </Button>
@@ -186,6 +187,7 @@ export function AccordionVeiculos({
                             variant='ghost'
                             size='icon'
                             className='h-7 w-7'
+                            aria-label={`Excluir veículo ${veiculo.placa}`}
                             onClick={() => {
                               setCurrentClienteId(clienteId);
                               setDeleteVeiculoId(veiculo.id);

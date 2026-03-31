@@ -130,13 +130,13 @@ export default function Clientes() {
   });
 
   return (
-    <div className='flex flex-1 flex-col gap-4 p-4 lg:p-4'>
+    <div className='flex flex-1 flex-col gap-4 p-4'>
       {/* Header */}
       <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
         <div className='flex flex-col gap-1'>
           <div className='flex items-center gap-2.5'>
             <div className='h-7 w-1 rounded-full bg-primary' />
-            <h2 className='text-2xl font-bold text-foreground'>Clientes</h2>
+            <h1 className='text-2xl font-bold text-foreground'>Clientes</h1>
           </div>
           <p className='pl-3.5 text-sm text-muted-foreground'>
             Gerencie os clientes e seus veículos
@@ -192,8 +192,8 @@ export default function Clientes() {
         <Card className='bg-card border-border'>
           <CardContent className='px-4'>
             <div className='flex items-center gap-3'>
-              <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10'>
-                <Car className='h-5 w-5 text-emerald-500' />
+              <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-success/10'>
+                <Car className='h-5 w-5 text-success' />
               </div>
               <div>
                 {isInitialLoading ? (
@@ -311,6 +311,7 @@ export default function Clientes() {
                             <Button
                               variant='ghost'
                               size='icon'
+                              aria-label={`Editar cliente ${cliente.name_cliente}`}
                               onClick={() => setEditingCliente(cliente)}>
                               <Pencil className='h-4 w-4 text-muted-foreground' />
                             </Button>
@@ -332,6 +333,7 @@ export default function Clientes() {
                             <Button
                               variant='ghost'
                               size='icon'
+                              aria-label={`Excluir cliente ${cliente.name_cliente}`}
                               onClick={() => {
                                 setDeleteId(cliente.id);
                                 setIsDeleteOpen(true);
@@ -447,6 +449,7 @@ export default function Clientes() {
                                         variant='ghost'
                                         size='icon'
                                         className='h-8 w-8'
+                                        aria-label={`Editar veículo ${veiculo.placa}`}
                                         onClick={() => {
                                           setCurrentClienteId(cliente.id);
                                           setEditingVeiculo(veiculo);
@@ -476,6 +479,7 @@ export default function Clientes() {
                                         variant='ghost'
                                         size='icon'
                                         className='h-8 w-8'
+                                        aria-label={`Excluir veículo ${veiculo.placa}`}
                                         onClick={() => {
                                           setCurrentClienteId(cliente.id);
                                           setDeleteVeiculoId(veiculo.id);

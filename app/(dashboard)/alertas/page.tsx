@@ -28,7 +28,7 @@ export default function Alertas() {
       <div className='flex flex-col gap-1'>
         <div className='flex items-center gap-2.5'>
           <div className='h-7 w-1 rounded-full bg-primary' />
-          <h2 className='text-2xl font-bold text-foreground'>Alertas</h2>
+          <h1 className='text-2xl font-bold text-foreground'>Alertas</h1>
         </div>
         <p className='pl-3.5 text-sm text-muted-foreground'>
           Monitore os níveis críticos de estoque
@@ -99,8 +99,8 @@ export default function Alertas() {
       {pecasEmAlerta.length === 0 ? (
         <Card>
           <CardContent className='flex flex-col items-center justify-center py-16'>
-            <div className='mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-green-500/20 bg-green-500/8'>
-              <CheckCircle className='h-8 w-8 text-green-500' />
+            <div className='mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-success/20 bg-success/8'>
+              <CheckCircle className='h-8 w-8 text-success' />
             </div>
             <h3 className='mb-2 text-lg font-bold text-foreground'>
               Tudo em dia!

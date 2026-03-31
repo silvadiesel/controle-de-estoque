@@ -152,11 +152,11 @@ export default function Configuracoes() {
   };
 
   return (
-    <div className='flex flex-1 flex-col gap-4 p-4 lg:p-4'>
+    <div className='flex flex-1 flex-col gap-4 p-4'>
       <div className='flex flex-col gap-1'>
         <div className='flex items-center gap-2.5'>
           <div className='h-7 w-1 rounded-full bg-primary' />
-          <h2 className='text-2xl font-bold text-foreground'>Configurações</h2>
+          <h1 className='text-2xl font-bold text-foreground'>Configurações</h1>
         </div>
         <p className='pl-3.5 text-sm text-muted-foreground'>
           Personalize o sistema conforme sua necessidade
@@ -269,7 +269,7 @@ export default function Configuracoes() {
                   </div>
                 ) : (
                   <div className='flex flex-col flex-1 justify-between'>
-                    <div className='rounded-lg border border-border overflow-hidden'>
+                    <div className='rounded-lg border border-border overflow-x-auto'>
                       <Table>
                         <TableHeader>
                           <TableRow className='border-border hover:bg-transparent'>
@@ -306,6 +306,7 @@ export default function Configuracoes() {
                                       <Button
                                         variant='ghost'
                                         size='icon'
+                                        aria-label={`Editar categoria ${category.name}`}
                                         onClick={() =>
                                           setEditingCategory(category)
                                         }>
@@ -389,7 +390,7 @@ export default function Configuracoes() {
                                     title='Excluir Categoria'
                                     description={`Tem certeza que deseja excluir a categoria "${category.name}"? Esta ação não pode ser desfeita.`}
                                     trigger={
-                                      <Button variant='ghost' size='icon'>
+                                      <Button variant='ghost' size='icon' aria-label={`Excluir categoria ${category.name}`}>
                                         <Trash2 className='h-4 w-4 text-destructive' />
                                       </Button>
                                     }
@@ -421,15 +422,22 @@ export default function Configuracoes() {
               </CardContent>
             </Card>
 
-            <Card className='bg-card border-border'>
+            <Card className='bg-card border-border opacity-60'>
               <CardHeader>
-                <CardTitle className='text-foreground flex items-center gap-2'>
-                  <Building2 className='h-5 w-5 text-primary' />
-                  Informações da Empresa
-                </CardTitle>
-                <CardDescription>
-                  Configure os dados da sua oficina
-                </CardDescription>
+                <div className='flex items-center justify-between'>
+                  <div>
+                    <CardTitle className='text-foreground flex items-center gap-2'>
+                      <Building2 className='h-5 w-5 text-primary' />
+                      Informações da Empresa
+                    </CardTitle>
+                    <CardDescription>
+                      Configure os dados da sua oficina
+                    </CardDescription>
+                  </div>
+                  <Badge variant='outline' className='text-muted-foreground'>
+                    Em breve
+                  </Badge>
+                </div>
               </CardHeader>
               <CardContent className='space-y-4'>
                 <div className='grid gap-4 sm:grid-cols-2'>
@@ -439,6 +447,7 @@ export default function Configuracoes() {
                       id='company'
                       defaultValue='Oficina de Caminhões Silva'
                       className='bg-input border-border'
+                      disabled
                     />
                   </div>
                   <div className='space-y-2'>
@@ -447,6 +456,7 @@ export default function Configuracoes() {
                       id='cnpj'
                       defaultValue='12.345.678/0001-90'
                       className='bg-input border-border'
+                      disabled
                     />
                   </div>
                 </div>
@@ -456,6 +466,7 @@ export default function Configuracoes() {
                     id='address'
                     defaultValue='Av. das Indústrias, 1234 - Distrito Industrial'
                     className='bg-input border-border'
+                    disabled
                   />
                 </div>
               </CardContent>
@@ -503,7 +514,7 @@ export default function Configuracoes() {
                 </div>
               ) : (
                 <div className='flex flex-col gap-4'>
-                  <div className='rounded-lg border border-border overflow-hidden'>
+                  <div className='rounded-lg border border-border overflow-x-auto'>
                     <Table>
                       <TableHeader>
                         <TableRow className='border-border hover:bg-transparent'>
@@ -552,7 +563,7 @@ export default function Configuracoes() {
                                 }
                                 className={
                                   user.status
-                                    ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                                    ? 'bg-success/10 text-success border-success/20'
                                     : ''
                                 }>
                                 {user.status ? 'Ativo' : 'Inativo'}
@@ -573,6 +584,7 @@ export default function Configuracoes() {
                                     <Button
                                       variant='ghost'
                                       size='icon'
+                                      aria-label={`Editar usuário ${user.name}`}
                                       onClick={() => setEditingUser(user)}>
                                       <Pencil className='h-4 w-4 text-muted-foreground' />
                                     </Button>
@@ -589,7 +601,7 @@ export default function Configuracoes() {
                                   title='Excluir Usuário'
                                   description={`Tem certeza que deseja excluir o usuário "${user.name}"? Esta ação não pode ser desfeita e removerá todas as sessões e contas associadas.`}
                                   trigger={
-                                    <Button variant='ghost' size='icon'>
+                                    <Button variant='ghost' size='icon' aria-label={`Excluir usuário ${user.name}`}>
                                       <Trash2 className='h-4 w-4 text-destructive' />
                                     </Button>
                                   }

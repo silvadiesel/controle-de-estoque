@@ -44,8 +44,8 @@ export function PaginationControls({
   }
 
   return (
-    <div className='flex flex-col relative sm:flex-row items-center justify-between gap-4 mt-4'>
-      <p className='absolute left-0 text-sm text-muted-foreground'>
+    <div className='flex flex-col-reverse sm:flex-row items-center justify-between gap-4 mt-4'>
+      <p className='text-sm text-muted-foreground text-center sm:text-left'>
         Mostrando {startItem} a {endItem} de {totalItems} {itemLabel}
       </p>
 
