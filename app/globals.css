@@ -20,7 +20,7 @@
   --border: oklch(0.28 0.01 260);
   --border-hover: oklch(0.36 0.015 260);
   --input: oklch(0.17 0.01 260);
-  --ring: transparent;
+  --ring: oklch(0.36 0.015 260);
   --chart-1: oklch(0.57 0.11 262);
   --chart-2: oklch(0.63 0.1 230);
   --chart-3: oklch(0.7 0.12 165);
@@ -30,7 +30,7 @@
   --warning: oklch(0.79 0.14 90);
   --sidebar: oklch(0.16 0.012 258);
   --sidebar-border: oklch(0.24 0.012 258);
-  --sidebar-ring: transparent;
+  --sidebar-ring: var(--ring);
   --card-foreground: var(--foreground);
   --popover-foreground: var(--foreground);
   --secondary-foreground: var(--foreground);
