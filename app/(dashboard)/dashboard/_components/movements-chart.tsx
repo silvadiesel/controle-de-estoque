@@ -29,7 +29,7 @@ export interface ChartDay {
 const DAY_NAMES = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
 // Recharts renders SVG directly and does not accept Tailwind/CSS classes.
-// These constants align chart typography with the design system (text-xs-label ≈ 10px).
+// These constants align chart typography with the design system (text-[10px] ≈ 10px).
 const CHART_TICK_SIZE = 11;
 const CHART_TOOLTIP_SIZE = 12;
 const CHART_HEIGHT = 'h-[200px]';

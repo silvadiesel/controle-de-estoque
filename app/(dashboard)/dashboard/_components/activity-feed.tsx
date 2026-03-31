@@ -160,7 +160,7 @@ export function ActivityFeed({
                       {ENTIDADE_LABELS[item.entidade] ?? item.entidade}
                     </span>
                   </p>
-                  <p className='mt-0.5 text-xs-label text-muted-foreground'>
+                  <p className='mt-0.5 text-[10px] text-muted-foreground'>
                     {timeAgo(item.created_at)}
                   </p>
                 </div>

@@ -92,7 +92,7 @@ export default function DashboardPage() {
     <div className="flex flex-1 flex-col gap-4 p-4 lg:p-6" data-dashboard-state={dashboardState}>
       {/* Header */}
       <div className="flex flex-col gap-0.5">
-        <h1 className="text-page-title text-foreground">
+        <h1 className="text-xl font-bold text-foreground">
           Dashboard
         </h1>
         <p className="text-muted-sm">Visão geral do sistema</p>
