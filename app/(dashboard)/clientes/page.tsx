@@ -14,6 +14,8 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { usePagination } from '@/hooks/usePagination';
 
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
+
 import { ModalClientes } from './_components/modal-clientes';
 import { ModalVeiculos } from './_components/modal-veiculos';
 import { useClientes, useVeiculos } from './_hooks';
@@ -166,13 +168,13 @@ export default function Clientes() {
           placeholder='Buscar por nome, documento ou placa...'
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className='pl-10 bg-[#131316] border-[#27272a]'
+          className='pl-10'
         />
       </div>
 
       {/* Stats */}
       <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-        <div className='bg-[#18181b] border border-[#27272a] rounded-[10px] p-4'>
+        <div className='bg-card border border-border rounded-xl p-4'>
           <div className='flex items-center gap-3'>
             <div className='flex h-10 w-10 items-center justify-center rounded-[10px] bg-primary/12'>
               <Users className='h-5 w-5 text-primary' />
@@ -185,9 +187,9 @@ export default function Clientes() {
             </div>
           </div>
         </div>
-        <div className='bg-[#18181b] border border-[#27272a] rounded-[10px] p-4'>
+        <div className='bg-card border border-border rounded-xl p-4'>
           <div className='flex items-center gap-3'>
-            <div className='flex h-10 w-10 items-center justify-center rounded-[10px] bg-[rgba(34,197,94,0.12)]'>
+            <div className='flex h-10 w-10 items-center justify-center rounded-[10px] bg-success/12'>
               <Car className='h-5 w-5 text-success' />
             </div>
             <div>
@@ -222,9 +224,12 @@ export default function Clientes() {
             </span>
           </div>
         ) : searchFilteredClientes.length === 0 ? (
-          <div className='text-center py-12 text-muted-foreground'>
-            Nenhum cliente encontrado
-          </div>
+          <Empty className='border-border bg-card'>
+            <EmptyHeader>
+              <EmptyTitle>Nenhum cliente encontrado</EmptyTitle>
+              <EmptyDescription>Tente outra busca ou revise os filtros aplicados.</EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         ) : (
           paginatedClientes.map((cliente) => {
             const isExpanded = expandedClientes.has(cliente.id);
@@ -236,33 +241,25 @@ export default function Clientes() {
                 key={cliente.id}
                 open={isExpanded}
                 onOpenChange={() => toggleExpandCliente(cliente.id)}>
-                <div className='bg-[#18181b] border border-[#27272a] rounded-[10px] overflow-hidden transition-all hover:border-[#3f3f46]'>
+                <div className='bg-card border border-border rounded-xl overflow-hidden transition-all hover:border-border-hover'>
                   {/* Client Row */}
                   <div className='flex items-center justify-between p-4'>
-                    <div className='flex items-center gap-4'>
-                      {/* Avatar with Initials */}
-                      <div className='flex h-10 w-10 items-center justify-center rounded-[10px] bg-primary/12'>
-                        <span className='text-[14px] font-semibold text-primary'>
+                    <div className='flex min-w-0 items-center gap-4'>
+                      {/* Avatar — shrink-0 para não ser comprimido */}
+                      <div className='flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/12'>
+                        <span className='text-sm font-semibold text-primary'>
                           {getInitials(cliente.name_cliente)}
                         </span>
                       </div>
 
-                      {/* Client Info */}
-                      <div className='space-y-0.5'>
-                        <p className='text-[14px] font-medium text-foreground'>
+                      {/* Client Info — min-w-0 permite truncate */}
+                      <div className='min-w-0 flex-1'>
+                        <p className='truncate text-sm font-medium text-foreground'>
                           {cliente.name_cliente}
                         </p>
-                        <div className='flex flex-wrap items-center gap-3 text-[12px]'>
-                          {cliente.cpf && (
-                            <span className='text-[#71717a]'>
-                              CPF: {cliente.cpf}
-                            </span>
-                          )}
-                          {cliente.cnpj && (
-                            <span className='text-[#71717a]'>
-                              CNPJ: {cliente.cnpj}
-                            </span>
-                          )}
+                        <div className='flex min-w-0 flex-wrap items-center gap-3 text-xs text-muted-foreground'>
+                          {cliente.cpf && <span className='truncate'>CPF: {cliente.cpf}</span>}
+                          {cliente.cnpj && <span className='truncate'>CNPJ: {cliente.cnpj}</span>}
                           {cliente.telefone && (
                             <span className='flex items-center gap-1 text-primary font-medium'>
                               <Phone className='h-3 w-3' />
@@ -280,10 +277,10 @@ export default function Clientes() {
                         <Button
                           variant='ghost'
                           size='sm'
-                          className='gap-1.5 text-[12px] text-[#a1a1aa] font-medium hover:text-foreground'>
+                          className='gap-1.5 text-[12px] text-muted-foreground font-medium hover:text-foreground'>
                           <Car className='h-4 w-4' />
                           <span className='hidden sm:inline'>Veículos</span>
-                          <span className='text-[12px] text-[#a1a1aa] font-medium'>
+                          <span className='text-[12px] text-muted-foreground font-medium'>
                             {veiculos.length}
                           </span>
                           <ChevronDown
@@ -345,9 +342,9 @@ export default function Clientes() {
 
                   {/* Vehicles Section (Expandable) */}
                   <CollapsibleContent className='data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 overflow-hidden transition-all duration-300 ease-in-out'>
-                    <div className='border-t border-[#27272a] bg-[#131316] p-4'>
+                    <div className='border-t border-border bg-background p-4'>
                       <div className='flex items-center justify-between mb-4'>
-                        <h4 className='text-[13px] font-medium text-[#a1a1aa] flex items-center gap-2'>
+                        <h4 className='text-[13px] font-medium text-muted-foreground flex items-center gap-2'>
                           <Car className='h-4 w-4' />
                           Veículos do Cliente
                         </h4>
@@ -369,7 +366,7 @@ export default function Clientes() {
                             <Button
                               variant='outline'
                               size='sm'
-                              className='border-[#27272a] text-[#a1a1aa] hover:text-foreground'
+                              className='border-border text-muted-foreground hover:text-foreground'
                               onClick={() => setCurrentClienteId(cliente.id)}>
                               <Plus className='h-3 w-3 mr-1' />
                               Adicionar Veículo
@@ -384,7 +381,7 @@ export default function Clientes() {
                           {[1, 2, 3].map((i) => (
                             <div
                               key={i}
-                              className='flex items-center justify-between p-3 rounded-[8px] bg-[#18181b] border border-[#27272a]'>
+                              className='flex items-center justify-between p-3 rounded-lg bg-card border border-border'>
                               <div className='flex items-center gap-3'>
                                 <Skeleton className='h-10 w-10 rounded-[8px]' />
                                 <div className='space-y-2'>
@@ -403,10 +400,12 @@ export default function Clientes() {
 
                       {/* Empty State */}
                       {!isLoadingVeiculos && veiculos.length === 0 && (
-                        <div className='text-center py-8 text-[13px] text-muted-foreground border border-dashed border-[#27272a] rounded-[8px]'>
-                          <Car className='h-8 w-8 mx-auto mb-2 opacity-50' />
-                          Nenhum veículo cadastrado para este cliente
-                        </div>
+                        <Empty className='border-border bg-card'>
+                          <EmptyHeader>
+                            <EmptyTitle>Nenhum veículo</EmptyTitle>
+                            <EmptyDescription>Nenhum veículo cadastrado para este cliente.</EmptyDescription>
+                          </EmptyHeader>
+                        </Empty>
                       )}
 
                       {/* Vehicles Grid */}
@@ -415,16 +414,16 @@ export default function Clientes() {
                           {veiculos.map((veiculo) => (
                             <div
                               key={veiculo.id}
-                              className='flex items-center justify-between p-3 rounded-[8px] bg-[#18181b] border border-[#27272a] hover:border-[#3f3f46] transition-colors'>
+                              className='flex items-center justify-between p-3 rounded-lg bg-card border border-border hover:border-border-hover transition-colors'>
                               <div className='flex items-center gap-3'>
-                                <div className='flex h-10 w-10 items-center justify-center rounded-[8px] bg-primary/12'>
+                                <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/12'>
                                   <Car className='h-5 w-5 text-primary' />
                                 </div>
                                 <div>
                                   <p className='text-[13px] font-semibold text-foreground'>
                                     {veiculo.placa}
                                   </p>
-                                  <p className='text-[12px] text-[#71717a]'>
+                                  <p className='text-xs text-muted-foreground'>
                                     {veiculo.modelo}
                                   </p>
                                 </div>
@@ -447,7 +446,6 @@ export default function Clientes() {
                                     <Button
                                       variant='ghost'
                                       size='icon'
-                                      className='h-8 w-8'
                                       aria-label={`Editar veículo ${veiculo.placa}`}
                                       onClick={() => {
                                         setCurrentClienteId(cliente.id);
@@ -477,7 +475,6 @@ export default function Clientes() {
                                     <Button
                                       variant='ghost'
                                       size='icon'
-                                      className='h-8 w-8'
                                       aria-label={`Excluir veículo ${veiculo.placa}`}
                                       onClick={() => {
                                         setCurrentClienteId(cliente.id);

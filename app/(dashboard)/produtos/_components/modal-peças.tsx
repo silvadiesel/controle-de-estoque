@@ -11,8 +11,8 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog';
+import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import type { Peca } from '@/db/schema';
 
 import { CloudDownload, Package, Trash2 } from 'lucide-react';
@@ -59,10 +59,10 @@ export function ModalPecas({
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
 
-      <DialogContent className='bg-[#18181b] border-[#27272a] rounded-[12px] sm:max-w-[720px] max-h-[90vh] overflow-y-auto p-0 gap-0'>
-        <DialogHeader className='p-5 pb-4 border-b border-[#27272a]'>
+      <DialogContent className='bg-card border-border rounded-xl sm:max-w-[720px] max-h-[90vh] overflow-y-auto p-0 gap-0'>
+        <DialogHeader className='p-5 pb-4 border-b border-border'>
           <div className='flex items-center gap-3'>
-            <div className='h-8 w-8 rounded-[8px] bg-primary/10 flex items-center justify-center'>
+            <div className='h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center'>
               <Package className='h-4 w-4 text-primary' />
             </div>
             <div>
@@ -84,7 +84,7 @@ export function ModalPecas({
               </span>
 
               {newPeca.imagem ? (
-                <div className='relative flex flex-col items-center justify-center w-full h-52 md:h-full min-h-[200px] border border-[#27272a] rounded-[8px] overflow-hidden bg-[#131316]'>
+                <div className='relative flex flex-col items-center justify-center w-full h-52 md:h-full min-h-[200px] border border-border rounded-lg overflow-hidden bg-background'>
                   <Image
                     src={newPeca.imagem}
                     alt='Previa do produto'
@@ -105,10 +105,10 @@ export function ModalPecas({
               ) : (
                 <label
                   htmlFor='dropzone-file'
-                  className='flex flex-col items-center justify-center w-full h-52 md:h-full min-h-[200px] border border-dashed rounded-[8px] cursor-pointer bg-[#131316] border-[#3f3f46] hover:border-primary transition-colors group'>
+                  className='flex flex-col items-center justify-center w-full h-52 md:h-full min-h-[200px] border border-dashed rounded-lg cursor-pointer bg-background border-border hover:border-primary transition-colors group'>
                   <div className='flex flex-col items-center justify-center pt-5 pb-6 text-center px-4'>
                     <CloudDownload className='w-10 h-10 text-muted-foreground mb-3 group-hover:text-primary transition-colors' />
-                    <p className='mb-1 text-[13px] text-[#a1a1aa] font-medium'>
+                    <p className='mb-1 text-[13px] text-muted-foreground font-medium'>
                       <span className='font-semibold text-foreground'>
                         Clique para adicionar
                       </span>
@@ -136,33 +136,35 @@ export function ModalPecas({
                     Identificacao
                   </span>
                   <div className='grid grid-cols-1 md:grid-cols-3 gap-3 mt-2'>
-                    <div className='md:col-span-2 flex flex-col gap-1.5'>
-                      <Label htmlFor='name' className='text-[12px] text-[#a1a1aa]'>
-                        Nome do produto
-                      </Label>
-                      <Input
-                        id='name'
-                        value={newPeca.name_peca || ''}
-                        onChange={(e) =>
-                          setNewPeca({ ...newPeca, name_peca: e.target.value })
-                        }
-                        className='bg-[#131316] border-[#27272a] rounded-[8px] h-10'
-                        required
-                      />
+                    <div className='md:col-span-2'>
+                      <FieldGroup>
+                        <Field>
+                          <FieldLabel htmlFor='name'>Nome do produto</FieldLabel>
+                          <Input
+                            id='name'
+                            value={newPeca.name_peca || ''}
+                            onChange={(e) =>
+                              setNewPeca({ ...newPeca, name_peca: e.target.value })
+                            }
+                            required
+                          />
+                        </Field>
+                      </FieldGroup>
                     </div>
-                    <div className='flex flex-col gap-1.5'>
-                      <Label htmlFor='code' className='text-[12px] text-[#a1a1aa]'>
-                        Codigo
-                      </Label>
-                      <Input
-                        id='code'
-                        value={newPeca.codigo || ''}
-                        onChange={(e) =>
-                          setNewPeca({ ...newPeca, codigo: e.target.value })
-                        }
-                        className='bg-[#131316] border-[#27272a] rounded-[8px] h-10'
-                        required
-                      />
+                    <div>
+                      <FieldGroup>
+                        <Field>
+                          <FieldLabel htmlFor='code'>Codigo</FieldLabel>
+                          <Input
+                            id='code'
+                            value={newPeca.codigo || ''}
+                            onChange={(e) =>
+                              setNewPeca({ ...newPeca, codigo: e.target.value })
+                            }
+                            required
+                          />
+                        </Field>
+                      </FieldGroup>
                     </div>
                   </div>
                 </div>
@@ -171,59 +173,57 @@ export function ModalPecas({
                   <span className='text-[10px] uppercase tracking-[0.8px] text-muted-foreground font-semibold'>
                     Localizacao no Estoque
                   </span>
-                  <div className='grid grid-cols-2 gap-3 mt-2'>
-                    <div className='flex flex-col gap-1.5'>
-                      <Label htmlFor='estante' className='text-[12px] text-[#a1a1aa]'>
-                        Estante
-                      </Label>
-                      <Input
-                        id='estante'
-                        value={
-                          Array.isArray(newPeca.localizacao)
-                            ? String(newPeca.localizacao[0] || '')
-                            : ''
-                        }
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          const prat = Array.isArray(newPeca.localizacao)
-                            ? newPeca.localizacao[1]
-                            : '';
-                          setNewPeca({
-                            ...newPeca,
-                            localizacao:
-                              val || prat ? [val, String(prat || '')] : null
-                          });
-                        }}
-                        className='bg-[#131316] border-[#27272a] rounded-[8px] h-10'
-                        placeholder='Ex: A1'
-                      />
-                    </div>
-                    <div className='flex flex-col gap-1.5'>
-                      <Label htmlFor='prateleira' className='text-[12px] text-[#a1a1aa]'>
-                        Prateleira
-                      </Label>
-                      <Input
-                        id='prateleira'
-                        value={
-                          Array.isArray(newPeca.localizacao)
-                            ? String(newPeca.localizacao[1] || '')
-                            : ''
-                        }
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          const est = Array.isArray(newPeca.localizacao)
-                            ? newPeca.localizacao[0]
-                            : '';
-                          setNewPeca({
-                            ...newPeca,
-                            localizacao:
-                              est || val ? [String(est || ''), val] : null
-                          });
-                        }}
-                        className='bg-[#131316] border-[#27272a] rounded-[8px] h-10'
-                        placeholder='Ex: 3'
-                      />
-                    </div>
+                  <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2'>
+                    <FieldGroup>
+                      <Field>
+                        <FieldLabel htmlFor='estante'>Estante</FieldLabel>
+                        <Input
+                          id='estante'
+                          value={
+                            Array.isArray(newPeca.localizacao)
+                              ? String(newPeca.localizacao[0] || '')
+                              : ''
+                          }
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            const prat = Array.isArray(newPeca.localizacao)
+                              ? newPeca.localizacao[1]
+                              : '';
+                            setNewPeca({
+                              ...newPeca,
+                              localizacao:
+                                val || prat ? [val, String(prat || '')] : null
+                            });
+                          }}
+                          placeholder='Ex: A1'
+                        />
+                      </Field>
+                    </FieldGroup>
+                    <FieldGroup>
+                      <Field>
+                        <FieldLabel htmlFor='prateleira'>Prateleira</FieldLabel>
+                        <Input
+                          id='prateleira'
+                          value={
+                            Array.isArray(newPeca.localizacao)
+                              ? String(newPeca.localizacao[1] || '')
+                              : ''
+                          }
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            const est = Array.isArray(newPeca.localizacao)
+                              ? newPeca.localizacao[0]
+                              : '';
+                            setNewPeca({
+                              ...newPeca,
+                              localizacao:
+                                est || val ? [String(est || ''), val] : null
+                            });
+                          }}
+                          placeholder='Ex: 3'
+                        />
+                      </Field>
+                    </FieldGroup>
                   </div>
                 </div>
 
@@ -231,44 +231,44 @@ export function ModalPecas({
                   <span className='text-[10px] uppercase tracking-[0.8px] text-muted-foreground font-semibold'>
                     Classificacao
                   </span>
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-3 mt-2'>
-                    <div className='flex flex-col gap-1.5'>
-                      <Label htmlFor='category' className='text-[12px] text-[#a1a1aa]'>
-                        Categoria
-                      </Label>
-                      <ComboboxSearch
-                        items={categoryItems}
-                        value={newPeca.categoria_id}
-                        onSelect={(value) =>
-                          setNewPeca({
-                            ...newPeca,
-                            categoria_id: value ?? undefined
-                          })
-                        }
-                        placeholder='Selecione a categoria'
-                        searchPlaceholder='Buscar...'
-                        emptyMessage='Nada encontrado.'
-                        className='h-10'
-                      />
-                    </div>
-                    <div className='flex flex-col gap-1.5'>
-                      <Label htmlFor='supplier' className='text-[12px] text-[#a1a1aa]'>
-                        Fornecedor
-                      </Label>
-                      <ComboboxSearch
-                        items={fornecedorItems}
-                        value={newPeca.fornecedor_id}
-                        onSelect={(value) =>
-                          setNewPeca({ ...newPeca, fornecedor_id: value })
-                        }
-                        placeholder='Selecione o fornecedor'
-                        searchPlaceholder='Buscar...'
-                        emptyMessage='Nada encontrado.'
-                        allowNone
-                        noneLabel='Nenhum'
-                        className='h-10'
-                      />
-                    </div>
+                  <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2'>
+                    <FieldGroup>
+                      <Field>
+                        <FieldLabel htmlFor='category'>Categoria</FieldLabel>
+                        <ComboboxSearch
+                          items={categoryItems}
+                          value={newPeca.categoria_id}
+                          onSelect={(value) =>
+                            setNewPeca({
+                              ...newPeca,
+                              categoria_id: value ?? undefined
+                            })
+                          }
+                          placeholder='Selecione a categoria'
+                          searchPlaceholder='Buscar...'
+                          emptyMessage='Nada encontrado.'
+                          className='h-10'
+                        />
+                      </Field>
+                    </FieldGroup>
+                    <FieldGroup>
+                      <Field>
+                        <FieldLabel htmlFor='supplier'>Fornecedor</FieldLabel>
+                        <ComboboxSearch
+                          items={fornecedorItems}
+                          value={newPeca.fornecedor_id}
+                          onSelect={(value) =>
+                            setNewPeca({ ...newPeca, fornecedor_id: value })
+                          }
+                          placeholder='Selecione o fornecedor'
+                          searchPlaceholder='Buscar...'
+                          emptyMessage='Nada encontrado.'
+                          allowNone
+                          noneLabel='Nenhum'
+                          className='h-10'
+                        />
+                      </Field>
+                    </FieldGroup>
                   </div>
                 </div>
 
@@ -276,38 +276,38 @@ export function ModalPecas({
                   <span className='text-[10px] uppercase tracking-[0.8px] text-muted-foreground font-semibold'>
                     Estoque e Preco
                   </span>
-                  <div className='grid grid-cols-2 gap-3 mt-2'>
-                    <div className='flex flex-col gap-1.5'>
-                      <Label htmlFor='quantity' className='text-[12px] text-[#a1a1aa]'>
-                        Quantidade
-                      </Label>
-                      <Input
-                        id='quantity'
-                        type='number'
-                        value={newPeca.quantidade || ''}
-                        onChange={(e) =>
-                          setNewPeca({
-                            ...newPeca,
-                            quantidade: Number(e.target.value) || undefined
-                          })
-                        }
-                        placeholder='0'
-                        className='bg-[#131316] border-[#27272a] rounded-[8px] h-10 font-mono'
-                      />
-                    </div>
-                    <div className='flex flex-col gap-1.5'>
-                      <Label htmlFor='price' className='text-[12px] text-[#a1a1aa]'>
-                        Preco (R$)
-                      </Label>
-                      <Input
-                        id='price'
-                        inputMode='decimal'
-                        value={precoInput}
-                        onChange={handlePrecoChange}
-                        placeholder='0,00'
-                        className='bg-[#131316] border-[#27272a] rounded-[8px] h-10 font-mono'
-                      />
-                    </div>
+                  <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2'>
+                    <FieldGroup>
+                      <Field>
+                        <FieldLabel htmlFor='quantity'>Quantidade</FieldLabel>
+                        <Input
+                          id='quantity'
+                          type='number'
+                          value={newPeca.quantidade || ''}
+                          onChange={(e) =>
+                            setNewPeca({
+                              ...newPeca,
+                              quantidade: Number(e.target.value) || undefined
+                            })
+                          }
+                          placeholder='0'
+                          className='font-mono'
+                        />
+                      </Field>
+                    </FieldGroup>
+                    <FieldGroup>
+                      <Field>
+                        <FieldLabel htmlFor='price'>Preco (R$)</FieldLabel>
+                        <Input
+                          id='price'
+                          inputMode='decimal'
+                          value={precoInput}
+                          onChange={handlePrecoChange}
+                          placeholder='0,00'
+                          className='font-mono'
+                        />
+                      </Field>
+                    </FieldGroup>
                   </div>
                 </div>
 
@@ -316,31 +316,30 @@ export function ModalPecas({
                     Alertas
                   </span>
                   <div className='mt-2'>
-                    <div className='flex flex-col gap-1.5'>
-                      <Label htmlFor='alerta' className='text-[12px] text-[#a1a1aa]'>
-                        Quantidade para Alerta
-                      </Label>
-                      <Input
-                        id='alerta'
-                        type='number'
-                        value={newPeca.alerta ?? ''}
-                        onChange={(e) =>
-                          setNewPeca({
-                            ...newPeca,
-                            alerta: e.target.value
-                              ? Number(e.target.value)
-                              : undefined
-                          })
-                        }
-                        placeholder='1'
-                        min='0'
-                        className='bg-[#131316] border-[#27272a] rounded-[8px] h-10 font-mono'
-                      />
-                      <p className='text-[11px] text-muted-foreground'>
-                        Alerta sera exibido quando a quantidade estiver abaixo deste
-                        valor
-                      </p>
-                    </div>
+                    <FieldGroup>
+                      <Field>
+                        <FieldLabel htmlFor='alerta'>Quantidade para Alerta</FieldLabel>
+                        <Input
+                          id='alerta'
+                          type='number'
+                          value={newPeca.alerta ?? ''}
+                          onChange={(e) =>
+                            setNewPeca({
+                              ...newPeca,
+                              alerta: e.target.value
+                                ? Number(e.target.value)
+                                : undefined
+                            })
+                          }
+                          placeholder='1'
+                          min='0'
+                          className='font-mono'
+                        />
+                        <FieldDescription>
+                          Alerta sera exibido quando a quantidade estiver abaixo deste valor
+                        </FieldDescription>
+                      </Field>
+                    </FieldGroup>
                   </div>
                 </div>
               </form>
@@ -348,14 +347,14 @@ export function ModalPecas({
           </div>
         </div>
 
-        <div className='flex justify-end gap-3 p-5 border-t border-[#27272a]'>
+        <div className='flex justify-end gap-3 p-5 border-t border-border'>
           <Button
             type='button'
             variant='ghost'
             size='default'
             onClick={() => handleOpenChange(false)}
             disabled={isLoading}
-            className='text-[13px] text-[#a1a1aa] hover:text-foreground'>
+            className='text-[13px] text-muted-foreground hover:text-foreground'>
             Cancelar
           </Button>
           <Button
