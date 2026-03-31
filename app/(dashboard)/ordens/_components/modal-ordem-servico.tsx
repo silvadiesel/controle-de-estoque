@@ -151,8 +151,7 @@ export function ModalOrdemServico({
     if (user?.id && !formData.funcionario_id) {
       setFormData((prev) => ({ ...prev, funcionario_id: user.id }));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  }, [formData.funcionario_id, user?.id]);
 
   const validate = (data: OrdemServicoFormData): FieldErrors => {
     const errs: FieldErrors = {};
@@ -168,7 +167,6 @@ export function ModalOrdemServico({
     if (submitted) {
       setErrors(validate(formData));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData, submitted]);
 
   const veiculosDisponiveis = formData.cliente_id
