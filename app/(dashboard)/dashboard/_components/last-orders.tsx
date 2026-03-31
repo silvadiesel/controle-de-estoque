@@ -110,8 +110,11 @@ export function LastOrders({
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-border mb-4">
+      <div role="tablist" className="flex gap-1 border-b border-border mb-4">
         <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'servico'}
           onClick={() => setTab('servico')}
           className={`px-4 py-2 text-body font-medium transition-colors -mb-px border-b-2 ${
             tab === 'servico'
@@ -126,6 +129,9 @@ export function LastOrders({
           Serviço
         </button>
         <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'venda'}
           onClick={() => setTab('venda')}
           className={`px-4 py-2 text-body font-medium transition-colors -mb-px border-b-2 ${
             tab === 'venda'
