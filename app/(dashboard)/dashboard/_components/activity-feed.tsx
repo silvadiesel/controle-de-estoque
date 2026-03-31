@@ -1,6 +1,8 @@
 // app/(dashboard)/dashboard/_components/activity-feed.tsx
 'use client';
 
+import { useMemo } from 'react';
+
 import { Skeleton } from '@/components/ui/skeleton';
 
 export interface MovimentacaoAPI {
@@ -64,19 +66,23 @@ interface ActivityFeedProps {
 }
 
 export function ActivityFeed({ movimentacoes, isLoading }: ActivityFeedProps) {
-  const items: FeedItem[] = [...movimentacoes]
-    .sort(
-      (a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    )
-    .slice(0, 8)
-    .map((m) => ({
-      id: m.id,
-      tipo_acao: m.tipo_acao,
-      entidade: m.entidade,
-      created_at: m.created_at,
-      autor: m.usuario?.name ?? 'Usuário removido'
-    }));
+  const items: FeedItem[] = useMemo(
+    () =>
+      [...movimentacoes]
+        .sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        )
+        .slice(0, 8)
+        .map((m) => ({
+          id: m.id,
+          tipo_acao: m.tipo_acao,
+          entidade: m.entidade,
+          created_at: m.created_at,
+          autor: m.usuario?.name ?? 'Usuário removido'
+        })),
+    [movimentacoes]
+  );
 
   return (
     <div className="flex-1 bg-card border border-border rounded-[10px] p-5">
