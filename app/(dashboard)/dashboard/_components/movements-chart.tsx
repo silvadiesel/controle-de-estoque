@@ -1,6 +1,14 @@
 'use client';
 
-import { Activity } from 'lucide-react';
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle
+} from '@/components/ui/empty';
+import { Skeleton } from '@/components/ui/skeleton';
+
+import { ChartColumnIncreasing } from 'lucide-react';
 import {
   Bar,
   BarChart,
@@ -10,8 +18,6 @@ import {
   XAxis,
   YAxis
 } from 'recharts';
-
-import { Skeleton } from '@/components/ui/skeleton';
 
 export interface ChartDay {
   label: string;
@@ -50,14 +56,21 @@ export function buildLast7Days(
   return days;
 }
 
-function ChartBarShape(props: Record<string, unknown>) {
-  const { x, y, width, height, payload } = props as {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    payload: ChartDay;
-  };
+interface ChartBarShapeProps {
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  payload?: ChartDay;
+}
+
+function ChartBarShape({
+  x = 0,
+  y = 0,
+  width = 0,
+  height = 0,
+  payload
+}: ChartBarShapeProps) {
   return (
     <rect
       x={x}
@@ -68,8 +81,8 @@ function ChartBarShape(props: Record<string, unknown>) {
       ry={4}
       fill={
         payload?.isToday
-          ? 'rgba(91,127,165,0.7)'
-          : 'rgba(91,127,165,0.3)'
+          ? 'color-mix(in srgb, var(--primary) 70%, transparent)'
+          : 'color-mix(in srgb, var(--primary) 30%, transparent)'
       }
     />
   );
@@ -78,43 +91,56 @@ function ChartBarShape(props: Record<string, unknown>) {
 interface MovementsChartProps {
   data: ChartDay[];
   isLoading: boolean;
+  state?: 'ready' | 'unavailable';
 }
 
-export function MovementsChart({ data, isLoading }: MovementsChartProps) {
+export function MovementsChart({
+  data,
+  isLoading,
+  state = 'ready'
+}: MovementsChartProps) {
   return (
-    <div className="flex-[1.5] bg-card border border-border rounded-[10px] p-5">
-      <div className="flex items-center justify-between mb-4">
+    <div className='flex-[1.5] bg-card border border-border rounded-xl p-5'>
+      <div className='flex items-center justify-between mb-4'>
         <div>
-          <h2 className="text-heading" style={{ color: 'var(--text-bright)' }}>
-            Movimentações
-          </h2>
-          <p className="text-muted-sm mt-0.5">Últimos 7 dias</p>
+          <h2 className='text-heading text-foreground'>Movimentações</h2>
+          <p className='text-muted-sm mt-0.5'>Últimos 7 dias</p>
         </div>
-        <div className="h-8 w-8 rounded-[6px] flex items-center justify-center bg-[rgba(91,127,165,0.12)]">
-          <Activity size={14} className="text-primary" />
+        <div className='size-8 rounded-md flex items-center justify-center border border-border bg-elevated text-primary'>
+          <ChartColumnIncreasing size={16} />
         </div>
       </div>
 
-      {isLoading ? (
-        <Skeleton className="h-[200px] w-full rounded-[8px]" />
+      {state === 'unavailable' ? (
+        <Empty className='border-border bg-card h-[200px]'>
+          <EmptyHeader>
+            <EmptyTitle>Dados indisponíveis</EmptyTitle>
+            <EmptyDescription>
+              Esse bloco não pode ser carregado agora.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : isLoading ? (
+        <Skeleton className='h-[200px] w-full rounded-[8px]' />
       ) : data.every((d) => d.count === 0) ? (
-        <div className="flex items-center justify-center h-[200px]">
-          <p className="text-muted-sm">Nenhuma movimentação nos últimos 7 dias</p>
+        <div className='flex items-center justify-center h-[200px]'>
+          <p className='text-muted-sm'>
+            Nenhuma movimentação nos últimos 7 dias
+          </p>
         </div>
       ) : (
-        <div className="h-[200px]">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className='h-[200px]'>
+          <ResponsiveContainer width='100%' height='100%'>
             <BarChart
               data={data}
-              margin={{ top: 4, right: 4, bottom: 0, left: -20 }}
-            >
+              margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
               <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="#27272a"
+                strokeDasharray='3 3'
+                stroke='var(--border)'
                 vertical={false}
               />
               <XAxis
-                dataKey="label"
+                dataKey='label'
                 tick={({
                   x,
                   y,
@@ -129,11 +155,14 @@ export function MovementsChart({ data, isLoading }: MovementsChartProps) {
                   <text
                     x={x}
                     y={y + 12}
-                    textAnchor="middle"
+                    textAnchor='middle'
                     fontSize={11}
-                    fill={data[index]?.isToday ? '#5b7fa5' : '#52525b'}
-                    fontWeight={data[index]?.isToday ? 700 : 400}
-                  >
+                    fill={
+                      data[index]?.isToday
+                        ? 'var(--primary)'
+                        : 'var(--muted-foreground)'
+                    }
+                    fontWeight={data[index]?.isToday ? 700 : 400}>
                     {payload.value}
                   </text>
                 )}
@@ -142,27 +171,26 @@ export function MovementsChart({ data, isLoading }: MovementsChartProps) {
               />
               <YAxis
                 allowDecimals={false}
-                tick={{ fontSize: 11, fill: '#52525b' }}
+                tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
                 axisLine={false}
                 tickLine={false}
               />
               <Tooltip
-                cursor={{ fill: 'rgba(91,127,165,0.06)' }}
+                cursor={{
+                  fill: 'color-mix(in srgb, var(--primary) 6%, transparent)'
+                }}
                 contentStyle={{
-                  backgroundColor: '#18181b',
-                  border: '1px solid #27272a',
+                  backgroundColor: 'var(--popover)',
+                  border: '1px solid var(--border)',
                   borderRadius: 8,
                   fontSize: 12,
-                  color: '#e4e4e7'
+                  color: 'var(--foreground)'
                 }}
-                labelStyle={{ color: '#52525b' }}
+                labelStyle={{ color: 'var(--muted-foreground)' }}
+                itemStyle={{ color: 'var(--foreground)' }}
                 formatter={(value: number) => [value, 'Movimentações']}
               />
-              <Bar
-                dataKey="count"
-                shape={<ChartBarShape />}
-                maxBarSize={40}
-              />
+              <Bar dataKey='count' shape={<ChartBarShape />} maxBarSize={40} />
             </BarChart>
           </ResponsiveContainer>
         </div>

@@ -1,6 +1,6 @@
-import { type LucideIcon } from 'lucide-react';
-
 import { Skeleton } from '@/components/ui/skeleton';
+
+import { type LucideIcon } from 'lucide-react';
 
 interface StatCardProps {
   label: string;
@@ -8,6 +8,7 @@ interface StatCardProps {
   subtitle: string;
   icon: LucideIcon;
   isLoading: boolean;
+  state?: 'ready' | 'unavailable';
 }
 
 export function StatCard({
@@ -15,38 +16,27 @@ export function StatCard({
   value,
   subtitle,
   icon: Icon,
-  isLoading
+  isLoading,
+  state = 'ready'
 }: StatCardProps) {
   return (
-    <div className="bg-card border border-border rounded-[10px] p-4">
-      <div className="flex items-start justify-between mb-3">
-        <span
-          className="text-label"
-          style={{ color: 'var(--text-tertiary)' }}
-        >
-          {label}
-        </span>
-        <div className="h-8 w-8 rounded-[6px] flex items-center justify-center bg-[rgba(91,127,165,0.12)]">
-          <Icon size={14} className="text-primary" />
+    <div className='rounded-xl border border-border bg-card p-5'>
+      <div className='mb-4 flex items-start justify-between gap-3'>
+        <div className='min-w-0'>
+          <p className='text-label text-muted-foreground'>{label}</p>
+          {isLoading ? (
+            <Skeleton className='mt-3 h-8 w-20' />
+          ) : (
+            <p className='mt-3 text-data text-foreground'>{value}</p>
+          )}
+        </div>
+        <div className='flex size-9 rounded-md items-center justify-center border border-border bg-elevated text-primary'>
+          <Icon size={20} />
         </div>
       </div>
-
-      {isLoading ? (
-        <div className="flex flex-col gap-1.5">
-          <Skeleton className="h-8 w-16" />
-          <Skeleton className="h-3.5 w-24" />
-        </div>
-      ) : (
-        <>
-          <p
-            className="text-data"
-            style={{ color: 'var(--text-bright)' }}
-          >
-            {value}
-          </p>
-          <p className="text-muted-sm mt-1">{subtitle}</p>
-        </>
-      )}
+      <p className='text-sm text-muted-foreground'>
+        {state === 'unavailable' ? 'Dado indisponível no momento' : subtitle}
+      </p>
     </div>
   );
 }

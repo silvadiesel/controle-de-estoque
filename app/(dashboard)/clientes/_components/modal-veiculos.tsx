@@ -11,8 +11,8 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog';
+import { Field, FieldContent, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { Veiculo } from '@/db/schema';
 import { Car } from 'lucide-react';
@@ -48,17 +48,17 @@ export function ModalVeiculos({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className='bg-[#18181b] border-[#27272a] rounded-[12px] max-w-[540px] p-0'>
-        <DialogHeader className='p-6 pb-4 border-b border-[#27272a]'>
+      <DialogContent className='bg-card border-border rounded-xl max-w-[540px] p-0'>
+        <DialogHeader className='p-6 pb-4 border-b border-border'>
           <div className='flex items-center gap-3'>
-            <div className='flex h-8 w-8 items-center justify-center rounded-[8px] bg-[rgba(91,127,165,0.12)]'>
-              <Car className='h-4 w-4 text-[#5b7fa5]' />
+            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-primary/12'>
+              <Car className='h-4 w-4 text-primary' />
             </div>
             <div>
-              <DialogTitle className='text-[16px] font-bold text-[#e4e4e7]'>
+              <DialogTitle className='text-[16px] font-bold text-foreground'>
                 {isEdit ? 'Editar Veículo' : 'Adicionar Veículo'}
               </DialogTitle>
-              <DialogDescription className='text-[12px] text-[#52525b]'>
+              <DialogDescription className='text-[12px] text-muted-foreground'>
                 {isEdit
                   ? 'Altere os dados do veículo'
                   : 'Cadastre um novo veículo para este cliente'}
@@ -67,40 +67,42 @@ export function ModalVeiculos({
           </div>
         </DialogHeader>
         <ScrollArea className='max-h-[60vh]'>
-          <div className='grid gap-4 p-6 pt-4'>
-            <p className='text-[10px] uppercase tracking-[0.8px] text-[#52525b] font-semibold mb-3'>DADOS DO VEÍCULO</p>
-            <div className='grid gap-4 sm:grid-cols-2'>
-              <div className='space-y-2'>
-                <Label className='text-[12px] text-[#a1a1aa]'>Placa *</Label>
-                <Input
-                  value={data.placa || ''}
-                  onChange={(e) => handlePlacaChange(e.target.value)}
-                  placeholder='ABC-1234'
-                  className='bg-[#131316] border-[#27272a] rounded-[8px] uppercase'
-                />
-              </div>
-              <div className='space-y-2'>
-                <Label className='text-[12px] text-[#a1a1aa]'>Modelo *</Label>
-                <Input
-                  value={data.modelo || ''}
-                  onChange={(e) => setData({ ...data, modelo: e.target.value })}
-                  placeholder='Scania R450'
-                  className='bg-[#131316] border-[#27272a] rounded-[8px]'
-                />
-              </div>
-            </div>
+          <div className='p-6 pt-4'>
+            <FieldGroup>
+              <Field orientation='responsive'>
+                <FieldContent>
+                  <FieldLabel htmlFor='placa'>Placa *</FieldLabel>
+                  <Input
+                    id='placa'
+                    value={data.placa || ''}
+                    onChange={(e) => handlePlacaChange(e.target.value)}
+                    placeholder='ABC-1234'
+                    className='uppercase'
+                  />
+                </FieldContent>
+                <FieldContent>
+                  <FieldLabel htmlFor='modelo'>Modelo *</FieldLabel>
+                  <Input
+                    id='modelo'
+                    value={data.modelo || ''}
+                    onChange={(e) => setData({ ...data, modelo: e.target.value })}
+                    placeholder='Scania R450'
+                  />
+                </FieldContent>
+              </Field>
+            </FieldGroup>
           </div>
         </ScrollArea>
-        <DialogFooter className='px-6 py-4 border-t border-[#27272a]'>
+        <DialogFooter className='px-6 py-4 border-t border-border'>
           <Button
             variant='outline'
             onClick={() => setIsOpen(false)}
-            className='w-32 border-[#27272a] text-[#a1a1aa]'>
+            className='w-32 border-border text-muted-foreground'>
             Cancelar
           </Button>
           <Button
             onClick={onSubmit}
-            className='bg-[#5b7fa5] hover:bg-[#5b7fa5]/90 text-[#09090B] w-32'
+            className='bg-primary hover:bg-primary/90 text-primary-foreground w-32'
             disabled={isLoading}>
             {isLoading ? 'Salvando...' : isEdit ? 'Salvar' : 'Adicionar'}
           </Button>
