@@ -49,15 +49,15 @@ const menuItems = [
         href: '/produtos'
       },
       {
-        id: 'movimentacoes',
-        label: 'Movimentações',
-        icon: ArrowUpDown,
-        href: '/movimentacoes'
+        id: 'clientes',
+        label: 'Clientes',
+        icon: Users,
+        href: '/clientes'
       }
     ]
   },
   {
-    title: 'Gestão',
+    title: 'Gestao',
     items: [
       {
         id: 'ordens',
@@ -66,10 +66,10 @@ const menuItems = [
         href: '/ordens'
       },
       {
-        id: 'clientes',
-        label: 'Clientes',
-        icon: Users,
-        href: '/clientes'
+        id: 'movimentacoes',
+        label: 'Movimentacoes',
+        icon: ArrowUpDown,
+        href: '/movimentacoes'
       },
       {
         id: 'fornecedores',
@@ -90,7 +90,7 @@ const menuItems = [
       },
       {
         id: 'configuracoes',
-        label: 'Configurações',
+        label: 'Configuracoes',
         icon: Settings,
         href: '/configuracoes'
       }
@@ -124,21 +124,23 @@ export function AppSidebar() {
       {/* Header com Logo */}
       <SidebarHeader className='border-b border-border px-4 py-4 bg-background'>
         <div className='flex items-center gap-3'>
-          <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary'>
-            <Truck className='h-6 w-6 text-primary-foreground' />
+          <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#5b7fa5] to-[#4a6b8a]'>
+            <Truck className='h-5 w-5 text-white' />
           </div>
           <div>
-            <h1 className='text-lg font-bold text-foreground'>Igne System</h1>
-            <p className='text-xs text-muted-foreground'>Tudo em um só lugar</p>
+            <h1 className='text-[15px] font-semibold text-[#e4e4e7]'>Igne System</h1>
+            <p className='text-[11px] text-[#52525b]'>Tudo em um so lugar</p>
           </div>
         </div>
       </SidebarHeader>
 
-      {/* Menu de Navegação */}
+      {/* Menu de Navegacao */}
       <SidebarContent>
         {menuItems.map((group) => (
           <SidebarGroup key={group.title}>
-            <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
+            <SidebarGroupLabel className='text-[10px] uppercase tracking-[1.2px] text-[#52525b] font-semibold'>
+              {group.title}
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {group.items.map((item) => {
@@ -150,13 +152,17 @@ export function AppSidebar() {
                       <SidebarMenuButton
                         asChild
                         isActive={isActive}
-                        className={`h-9 ${isActive ? 'bg-primary! text-white!' : ''}`}
+                        className={`h-9 ${
+                          isActive
+                            ? 'bg-[#18181b] text-[#e4e4e7] [&>svg]:text-[#94a8c2]'
+                            : 'text-[#52525b] [&>svg]:text-[#52525b] hover:bg-[#18181b]/50'
+                        }`}
                         tooltip={item.label}>
                         <a href={item.href}>
                           <Icon className='h-4 w-4' />
                           <span>{item.label}</span>
                           {item.id === 'alertas' && totalAlertas > 0 && (
-                            <span className='ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground'>
+                            <span className='ml-auto flex h-5 min-w-5 items-center justify-center rounded-[10px] bg-[#5b7fa5] px-1 text-[10px] font-bold text-[#09090B]'>
                               {totalAlertas > 99 ? '99+' : totalAlertas}
                             </span>
                           )}
@@ -173,33 +179,29 @@ export function AppSidebar() {
 
       <SidebarSeparator />
 
-      {/* Footer com usuário */}
+      {/* Footer com usuario */}
       <SidebarFooter className='p-4'>
-        <div className='flex items-center gap-3 rounded-lg bg-secondary/50 px-3 py-2'>
-          <Avatar className='h-8 w-8'>
-            <AvatarFallback className='bg-primary/20 text-primary text-xs font-bold'>
+        <div className='flex items-center gap-3 px-3 py-2'>
+          <Avatar className='h-[30px] w-[30px]'>
+            <AvatarFallback className='bg-[#27272a] text-[#a1a1aa] text-xs font-bold'>
               {session?.user?.name ? getInitials(session.user.name) : '??'}
             </AvatarFallback>
           </Avatar>
           <div className='flex-1 min-w-0'>
-            <p className='text-sm font-medium text-foreground truncate'>
-              {session?.user?.name || 'Usuário'}
+            <p className='text-[13px] font-medium text-[#e4e4e7] truncate'>
+              {session?.user?.name || 'Usuario'}
             </p>
-            <p className='text-xs text-muted-foreground truncate'>
+            <p className='text-[11px] text-[#52525b] truncate'>
               {session?.user?.email || ''}
             </p>
           </div>
+          <button
+            onClick={handleLogout}
+            className='text-[#52525b] hover:text-[#a1a1aa] transition-colors'
+            title='Sair do sistema'>
+            <LogOut className='h-4 w-4' />
+          </button>
         </div>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={handleLogout}
-              className='text-muted-foreground hover:bg-destructive/10 hover:text-destructive'>
-              <LogOut className='h-4 w-4' />
-              <span>Sair do sistema</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );

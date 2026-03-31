@@ -1,3 +1,4 @@
+import { AlertTriangle } from 'lucide-react';
 import { Button } from './ui/button';
 import {
   Dialog,
@@ -31,15 +32,26 @@ export function ModalDelete({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className='bg-card border-border max-w-md'>
-        <DialogHeader>
-          <DialogTitle className='text-foreground'>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+      <DialogContent className='bg-[#18181b] border-[#27272a] rounded-[12px] max-w-[540px]'>
+        <DialogHeader className='border-b border-[#27272a] pb-4'>
+          <div className='flex items-center gap-3'>
+            <div className='h-8 w-8 rounded-[8px] bg-destructive/10 flex items-center justify-center'>
+              <AlertTriangle className='h-4 w-4 text-destructive' />
+            </div>
+            <div>
+              <DialogTitle className='text-[16px] font-bold text-[#e4e4e7]'>
+                {title}
+              </DialogTitle>
+              <DialogDescription className='text-[12px] text-[#52525b]'>
+                {description}
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
 
-        <DialogFooter>
+        <DialogFooter className='border-t border-[#27272a] pt-4'>
           <Button
-            variant='outline'
+            variant='ghost'
             onClick={() => setIsOpen(false)}
             disabled={isLoading}>
             Cancelar
