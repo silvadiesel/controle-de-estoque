@@ -105,7 +105,7 @@ export function ActivityFeed({
           <p className='text-muted-sm mt-0.5'>Últimas ações no sistema</p>
         </div>
         <div className='size-8 rounded-md flex items-center justify-center border border-border bg-elevated text-primary'>
-          <Activity size={16} />
+          <Activity size={16} aria-hidden='true' />
         </div>
       </div>
 
@@ -121,7 +121,7 @@ export function ActivityFeed({
       ) : isLoading ? (
         <div className='flex flex-col gap-4'>
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className='h-9 w-full rounded-[6px]' />
+            <Skeleton key={i} className='h-9 w-full rounded-md' />
           ))}
         </div>
       ) : items.length === 0 ? (
@@ -135,13 +135,13 @@ export function ActivityFeed({
               <div key={item.id} className='relative flex gap-3 pb-4 last:pb-0'>
                 {/* Linha vertical — conecta ao próximo item */}
                 {idx < items.length - 1 && (
-                  <div className='absolute left-[4px] top-[13px] bottom-0 w-px bg-border' />
+                  <div className='absolute left-1 top-3 bottom-0 w-px bg-border' />
                 )}
 
                 {/* Dot colorido */}
-                <div className='relative mt-[4px] shrink-0'>
+                <div className='relative mt-1 shrink-0'>
                   <div
-                    className='h-[9px] w-[9px] rounded-full'
+                    className='size-2 rounded-full'
                     style={{
                       backgroundColor:
                         DOT_COLORS[item.tipo_acao] ?? 'var(--muted-foreground)'
@@ -160,7 +160,7 @@ export function ActivityFeed({
                       {ENTIDADE_LABELS[item.entidade] ?? item.entidade}
                     </span>
                   </p>
-                  <p className='mt-0.5 text-[10px] text-muted-foreground'>
+                  <p className='mt-0.5 text-xs-label text-muted-foreground'>
                     {timeAgo(item.created_at)}
                   </p>
                 </div>
