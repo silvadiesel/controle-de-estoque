@@ -1,7 +1,7 @@
 export type RequestBucket<T> = { ok: boolean; data: T[] };
 
 export type DashboardBuckets = {
-  produtos: RequestBucket<{ quantidade?: number; alerta?: number }>;
+  produtos: RequestBucket<{ quantidade: number; alerta: number }>;
   clientes: RequestBucket<unknown>;
   servico: RequestBucket<{ status: string }>;
   venda: RequestBucket<{ status: string }>;
