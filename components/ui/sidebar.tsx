@@ -181,6 +181,16 @@ function Sidebar({
   }
 
   if (isMobile) {
+    const sidebarInnerClassName = cn(
+      "data-[slot=sidebar-inner]:bg-sidebar text-sidebar-foreground",
+      "[&_[data-sidebar=menu-button]]:transition-colors",
+      "[&_[data-sidebar=menu-button][data-active=true]]:bg-elevated",
+      "[&_[data-sidebar=menu-button][data-active=true]]:text-foreground",
+      "[&_[data-sidebar=menu-button]:focus-visible]:bg-elevated",
+      "[&_[data-sidebar=menu-button]:focus-visible]:shadow-[inset_0_0_0_1px_var(--border-hover)]",
+      "flex h-full w-full flex-col"
+    )
+
     return (
       <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
         <SheetContent
@@ -199,7 +209,13 @@ function Sidebar({
             <SheetTitle>Sidebar</SheetTitle>
             <SheetDescription>Displays the mobile sidebar.</SheetDescription>
           </SheetHeader>
-          <div className="flex h-full w-full flex-col">{children}</div>
+          <div
+            data-sidebar="sidebar"
+            data-slot="sidebar-inner"
+            className={sidebarInnerClassName}
+          >
+            {children}
+          </div>
         </SheetContent>
       </Sheet>
     )
@@ -241,21 +257,21 @@ function Sidebar({
         )}
         {...props}
       >
-        <div
-          data-sidebar="sidebar"
-          data-slot="sidebar-inner"
-          className={cn(
-            "data-[slot=sidebar-inner]:bg-sidebar text-sidebar-foreground",
-            "[&_[data-sidebar=menu-button]]:transition-colors",
-            "[&_[data-sidebar=menu-button][data-active=true]]:bg-elevated",
-            "[&_[data-sidebar=menu-button][data-active=true]]:text-foreground",
-            "[&_[data-sidebar=menu-button]:focus-visible]:bg-elevated",
-            "[&_[data-sidebar=menu-button]:focus-visible]:shadow-[inset_0_0_0_1px_var(--border-hover)]",
-            "group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
-          )}
-        >
-          {children}
-        </div>
+      <div
+        data-sidebar="sidebar"
+        data-slot="sidebar-inner"
+        className={cn(
+          "data-[slot=sidebar-inner]:bg-sidebar text-sidebar-foreground",
+          "[&_[data-sidebar=menu-button]]:transition-colors",
+          "[&_[data-sidebar=menu-button][data-active=true]]:bg-elevated",
+          "[&_[data-sidebar=menu-button][data-active=true]]:text-foreground",
+          "[&_[data-sidebar=menu-button]:focus-visible]:bg-elevated",
+          "[&_[data-sidebar=menu-button]:focus-visible]:shadow-[inset_0_0_0_1px_var(--border-hover)]",
+          "group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
+        )}
+      >
+        {children}
+      </div>
       </div>
     </div>
   )
@@ -482,7 +498,7 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+  "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:p-2! [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
   {
     variants: {
       variant: {
