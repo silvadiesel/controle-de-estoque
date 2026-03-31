@@ -6,9 +6,16 @@ import { usePathname } from 'next/navigation';
 
 import { useAlertaCount } from '@/hooks/useAlertaCount';
 
+import { createAlertaToastOptions } from './alerta-toast-provider-options';
 import { toast } from 'sonner';
 
-export function AlertaToastProvider() {
+type AlertaToastProviderProps = {
+  toastClassName?: string;
+};
+
+export function AlertaToastProvider({
+  toastClassName
+}: AlertaToastProviderProps) {
   const { totalAlertas, isLoading } = useAlertaCount();
   const pathname = usePathname();
   const hasShown = useRef(false);
@@ -25,18 +32,9 @@ export function AlertaToastProvider() {
       totalAlertas === 1
         ? '1 produto com estoque abaixo do mínimo'
         : `${totalAlertas} produtos com estoque abaixo do mínimo`,
-      {
-        description: 'Acesse a página de Alertas para ver os detalhes.',
-        duration: 6000,
-        action: {
-          label: 'Ver alertas',
-          onClick: () => {
-            window.location.href = '/alertas';
-          }
-        }
-      }
+      createAlertaToastOptions(toastClassName)
     );
-  }, [isLoading, totalAlertas, pathname]);
+  }, [isLoading, totalAlertas, pathname, toastClassName]);
 
   return null;
 }
