@@ -13,7 +13,6 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -23,20 +22,14 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Textarea } from '@/components/ui/textarea';
 import type { Cliente, Peca } from '@/db/schema';
 
 import {
   Banknote,
   CreditCard,
+  Minus,
   Plus,
   QrCode,
   Receipt,
@@ -130,7 +123,6 @@ export function ModalOrdemVenda({
   }));
 
   const [selectedPecaId, setSelectedPecaId] = useState<string>('');
-  const [pecaQuantidade, setPecaQuantidade] = useState(1);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitted, setSubmitted] = useState(false);
 
@@ -142,7 +134,6 @@ export function ModalOrdemVenda({
         ...(initialData || {})
       });
       setSelectedPecaId('');
-      setPecaQuantidade(1);
       setErrors({});
       setSubmitted(false);
     }
@@ -163,38 +154,53 @@ export function ModalOrdemVenda({
     }
   }, [formData, submitted]);
 
-  const handleAddPeca = () => {
-    if (!selectedPecaId || pecaQuantidade <= 0) return;
-
-    const pecaId = parseInt(selectedPecaId);
-    const peca = pecas.find((p) => p.id === pecaId);
+  const handleSelectPeca = (pecaId: string) => {
+    if (!pecaId) return;
+    const id = parseInt(pecaId);
+    const peca = pecas.find((p) => p.id === id);
     if (!peca) return;
-
-    const existingIndex = formData.pecas.findIndex((p) => p.peca_id === pecaId);
-    const quantidadeJaAdicionada = existingIndex >= 0 ? formData.pecas[existingIndex].quantidade : 0;
-    const totalSolicitado = quantidadeJaAdicionada + pecaQuantidade;
-
-    if (totalSolicitado > peca.quantidade) {
-      toast.error(`Estoque insuficiente para "${peca.name_peca}". Disponível: ${peca.quantidade}, Solicitado: ${totalSolicitado}`);
+    if (peca.quantidade === 0) {
+      toast.error(`"${peca.name_peca}" está sem estoque.`);
       return;
     }
 
+    const existingIndex = formData.pecas.findIndex((p) => p.peca_id === id);
     if (existingIndex >= 0) {
+      const item = formData.pecas[existingIndex];
+      const novaQtd = item.quantidade + 1;
+      if (novaQtd > peca.quantidade) {
+        toast.error(`Estoque insuficiente para "${peca.name_peca}". Disponível: ${peca.quantidade}`);
+        return;
+      }
       const updated = [...formData.pecas];
-      updated[existingIndex].quantidade += pecaQuantidade;
+      updated[existingIndex] = { ...updated[existingIndex], quantidade: novaQtd };
       setFormData({ ...formData, pecas: updated });
     } else {
       setFormData({
         ...formData,
-        pecas: [
-          ...formData.pecas,
-          { peca_id: pecaId, quantidade: pecaQuantidade, peca }
-        ]
+        pecas: [...formData.pecas, { peca_id: id, quantidade: 1, peca }]
       });
     }
-
     setSelectedPecaId('');
-    setPecaQuantidade(1);
+  };
+
+  const handleIncrementPeca = (pecaId: number) => {
+    const item = formData.pecas.find((p) => p.peca_id === pecaId);
+    if (!item || !item.peca) return;
+    if (item.quantidade >= item.peca.quantidade) return;
+    const updated = formData.pecas.map((p) =>
+      p.peca_id === pecaId ? { ...p, quantidade: p.quantidade + 1 } : p
+    );
+    setFormData({ ...formData, pecas: updated });
+  };
+
+  const handleDecrementPeca = (pecaId: number) => {
+    const item = formData.pecas.find((p) => p.peca_id === pecaId);
+    if (!item || !item.peca || item.quantidade <= 1) return;
+    const updated = formData.pecas.map((p) =>
+      p.peca_id === pecaId ? { ...p, quantidade: p.quantidade - 1 } : p
+    );
+    setFormData({ ...formData, pecas: updated });
   };
 
   const handleRemovePeca = (pecaId: number) => {
@@ -236,6 +242,17 @@ export function ModalOrdemVenda({
 
   const hasError = (field: keyof FieldErrors) => submitted && !!errors[field];
 
+  const clienteOptions = clientes.map((c) => ({
+    value: c.id.toString(),
+    label: `${c.name_cliente}${c.nome_empresa ? ` - ${c.nome_empresa}` : ''}`
+  }));
+
+  const pecaOptions = pecas.map((p) => ({
+    value: p.id.toString(),
+    label: p.name_peca,
+    sublabel: `${formatCurrency(p.preco)} · Estoque: ${p.quantidade}`
+  }));
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
@@ -260,32 +277,23 @@ export function ModalOrdemVenda({
           </div>
         </DialogHeader>
 
-        <ScrollArea className='max-h-[60vh] overflow-y-auto'>
+        <ScrollArea className='max-h-[60vh]'>
           <div className='grid gap-4 p-6 pt-4'>
             {/* Cliente */}
             <div className='space-y-2'>
               <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Cliente *</Label>
-              <Select
+              <SearchableSelect
+                options={clienteOptions}
                 value={formData.cliente_id ? formData.cliente_id.toString() : ''}
                 onValueChange={(v) =>
                   setFormData({ ...formData, cliente_id: parseInt(v) })
-                }>
-                <SelectTrigger
-                  aria-describedby={hasError('cliente_id') ? 'error-cliente-venda' : undefined}
-                  className={`bg-[#131316] w-full ${hasError('cliente_id') ? 'border-destructive' : 'border-[#27272a]'}`}>
-                  <SelectValue placeholder='Selecione um cliente' />
-                </SelectTrigger>
-                <SelectContent className='bg-[#18181b] border-[#27272a] w-fit'>
-                  {clientes.map((cliente) => (
-                    <SelectItem key={cliente.id} value={cliente.id.toString()}>
-                      <span className='truncate max-w-[200px] block'>
-                        {cliente.name_cliente}
-                        {cliente.nome_empresa && ` - ${cliente.nome_empresa}`}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                }
+                placeholder="Selecione um cliente"
+                searchPlaceholder="Buscar cliente..."
+                emptyText="Nenhum cliente encontrado"
+                hasError={hasError('cliente_id')}
+                aria-describedby={hasError('cliente_id') ? 'error-cliente-venda' : undefined}
+              />
               {hasError('cliente_id') && (
                 <p id='error-cliente-venda' className='text-xs text-destructive'>{errors.cliente_id}</p>
               )}
@@ -390,82 +398,77 @@ export function ModalOrdemVenda({
             {/* Adicionar Peças */}
             <div className='space-y-3'>
               <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Peças *</Label>
-              <div className='flex gap-2'>
-                <Select
-                  value={selectedPecaId}
-                  onValueChange={setSelectedPecaId}>
-                  <SelectTrigger
-                    aria-describedby={hasError('pecas') ? 'error-pecas-venda' : undefined}
-                    className={`bg-[#131316] flex-1 ${hasError('pecas') ? 'border-destructive' : 'border-[#27272a]'}`}>
-                    <SelectValue placeholder='Selecione uma peça' />
-                  </SelectTrigger>
-                  <SelectContent className='bg-[#18181b] border-[#27272a] max-h-60'>
-                    {pecas.map((peca) => (
-                      <SelectItem key={peca.id} value={peca.id.toString()}>
-                        {peca.name_peca} - {formatCurrency(peca.preco)}{' '}
-                        (Estoque: {peca.quantidade})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Input
-                  type='number'
-                  min={1}
-                  value={pecaQuantidade || ''}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setPecaQuantidade(val === '' ? 0 : parseInt(val));
-                  }}
-                  onBlur={() => {
-                    if (!pecaQuantidade || pecaQuantidade < 1) setPecaQuantidade(1);
-                  }}
-                  className='bg-[#131316] border-[#27272a] w-20'
-                />
-                <Button type='button' onClick={handleAddPeca} variant='outline'>
-                  <Plus className='h-4 w-4' />
-                </Button>
-              </div>
+              <SearchableSelect
+                options={pecaOptions}
+                value={selectedPecaId}
+                onValueChange={handleSelectPeca}
+                placeholder="Buscar e selecionar peça..."
+                searchPlaceholder="Buscar peça..."
+                emptyText="Nenhuma peça encontrada"
+                hasError={hasError('pecas')}
+                aria-describedby={hasError('pecas') ? 'error-pecas-venda' : undefined}
+              />
               {hasError('pecas') && (
                 <p id='error-pecas-venda' className='text-xs text-destructive'>{errors.pecas}</p>
               )}
 
-              {/* Lista de Peças */}
-              {formData.pecas.length > 0 && (
-                <div className='rounded-lg border border-[#27272a] overflow-hidden'>
-                  <Table>
-                    <TableHeader>
-                      <TableRow className='border-[#27272a] hover:bg-transparent'>
-                        <TableHead className='text-[#71717a]'>Peça</TableHead>
-                        <TableHead className='text-[#71717a] text-center'>Qtd</TableHead>
-                        <TableHead className='text-[#71717a] text-right'>Preço Unit.</TableHead>
-                        <TableHead className='text-[#71717a] text-right'>Subtotal</TableHead>
-                        <TableHead className='text-[#71717a] w-10'></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {formData.pecas.map((item) => (
-                        <TableRow key={item.peca_id} className='border-[#27272a] hover:bg-[#1c1c22]/30'>
-                          <TableCell className='text-foreground'>
-                            {item.peca?.name_peca || 'Peça não encontrada'}
-                          </TableCell>
-                          <TableCell className='text-center text-foreground'>
-                            {item.quantidade}
-                          </TableCell>
-                          <TableCell className='text-right text-[#71717a]'>
-                            {formatCurrency(item.peca?.preco || 0)}
-                          </TableCell>
-                          <TableCell className='text-right text-foreground font-medium'>
-                            {formatCurrency((item.peca?.preco || 0) * item.quantidade)}
-                          </TableCell>
-                          <TableCell>
-                            <Button type='button' variant='ghost' size='icon' aria-label={`Remover peça ${item.peca?.name_peca || ''}`} onClick={() => handleRemovePeca(item.peca_id)}>
-                              <X className='h-4 w-4 text-destructive' />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+              {formData.pecas.length === 0 ? (
+                <div className='border border-dashed border-[#27272a] rounded-lg p-5 text-center'>
+                  <p className='text-sm text-[#52525b]'>Nenhuma peça adicionada.</p>
+                  <p className='text-xs text-[#3f3f46] mt-1'>Selecione no campo acima para adicionar.</p>
+                </div>
+              ) : (
+                <div className='space-y-2'>
+                  {formData.pecas.map((item) => (
+                    <div key={item.peca_id} className='flex items-center gap-3 p-3 bg-[#131316] border border-[#27272a] rounded-lg'>
+                      <div className='flex-1 min-w-0'>
+                        <p className='text-sm truncate text-foreground'>
+                          {item.peca?.name_peca ?? 'Peça não encontrada'}
+                        </p>
+                        <p className='text-xs text-[#71717a]'>
+                          {formatCurrency(item.peca?.preco ?? 0)} · Estoque: {item.peca?.quantidade ?? 0}
+                        </p>
+                      </div>
+                      <div className='flex items-center gap-2 shrink-0'>
+                        <Button
+                          type='button'
+                          variant='outline'
+                          size='icon'
+                          className='h-7 w-7'
+                          disabled={item.quantidade <= 1}
+                          onClick={() => handleDecrementPeca(item.peca_id)}
+                          aria-label='Diminuir quantidade'
+                        >
+                          <Minus className='h-3 w-3' />
+                        </Button>
+                        <span className='w-8 text-center text-sm font-medium'>{item.quantidade}</span>
+                        <Button
+                          type='button'
+                          variant='outline'
+                          size='icon'
+                          className='h-7 w-7'
+                          disabled={item.quantidade >= (item.peca?.quantidade ?? 0)}
+                          onClick={() => handleIncrementPeca(item.peca_id)}
+                          aria-label='Aumentar quantidade'
+                        >
+                          <Plus className='h-3 w-3' />
+                        </Button>
+                      </div>
+                      <span className='shrink-0 w-[80px] text-right text-sm font-semibold'>
+                        {formatCurrency((item.peca?.preco ?? 0) * item.quantidade)}
+                      </span>
+                      <Button
+                        type='button'
+                        variant='ghost'
+                        size='icon'
+                        className='h-7 w-7 shrink-0'
+                        aria-label={`Remover peça ${item.peca?.name_peca ?? ''}`}
+                        onClick={() => handleRemovePeca(item.peca_id)}
+                      >
+                        <X className='h-4 w-4 text-destructive' />
+                      </Button>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
