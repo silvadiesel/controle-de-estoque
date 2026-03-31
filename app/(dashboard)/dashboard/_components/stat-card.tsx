@@ -26,7 +26,7 @@ export function StatCard({
         >
           {label}
         </span>
-        <div className="h-8 w-8 rounded-[6px] flex items-center justify-center bg-[rgba(91,127,165,0.1)]">
+        <div className="h-8 w-8 rounded-[6px] flex items-center justify-center bg-[rgba(91,127,165,0.12)]">
           <Icon size={14} className="text-primary" />
         </div>
       </div>
