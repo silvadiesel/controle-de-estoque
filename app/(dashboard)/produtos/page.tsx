@@ -63,10 +63,10 @@ export default function Products() {
       <div className='flex flex-col gap-6'>
         <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
           <div className='flex flex-col gap-1'>
-            <h1 className='text-[20px] font-semibold text-foreground'>
+            <h1 className='text-xl font-semibold text-foreground'>
               Produtos
             </h1>
-            <p className='text-[13px] text-muted-foreground'>
+            <p className='text-sm text-muted-foreground'>
               Gerencie o estoque
             </p>
           </div>

@@ -55,7 +55,7 @@ const tipoAcaoConfig: Record<
   criacao: {
     label: 'Criação',
     icon: PackagePlus,
-    dotColor: 'bg-[#22c55e]',
+    dotColor: 'bg-success',
     className:
       'bg-transparent text-success border-success/40 hover:bg-success/5',
     bar: 'bg-success',
@@ -73,7 +73,7 @@ const tipoAcaoConfig: Record<
   exclusao: {
     label: 'Exclusão',
     icon: Trash2,
-    dotColor: 'bg-[#ef4444]',
+    dotColor: 'bg-destructive',
     className:
       'bg-transparent text-destructive border-destructive/40 hover:bg-destructive/5',
     bar: 'bg-destructive',
@@ -340,7 +340,7 @@ export default function Movimentacoes() {
             Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
-                className='bg-card border border-border rounded-[10px] p-4 animate-pulse'>
+                className='bg-card border border-border rounded-lg p-4 animate-pulse'>
                 <div className='flex items-center gap-4'>
                   <div className='h-2.5 w-2.5 rounded-full bg-secondary' />
                   <div className='flex-1 space-y-2'>
@@ -352,7 +352,7 @@ export default function Movimentacoes() {
               </div>
             ))
           ) : movimentacoesFiltradas.length === 0 ? (
-            <div className='bg-card border border-border rounded-[10px] p-8'>
+            <div className='bg-card border border-border rounded-lg p-8'>
               <div className='flex flex-col items-center gap-2 text-muted-foreground'>
                 <Activity className='h-8 w-8 opacity-25' />
                 <p className='text-sm'>
@@ -373,7 +373,7 @@ export default function Movimentacoes() {
               return (
                 <div
                   key={movimentacao.id}
-                  className='bg-card border border-border rounded-[10px] p-4 transition-colors hover:border-border-hover'>
+                  className='bg-card border border-border rounded-lg p-4 transition-colors hover:border-border-hover'>
                   <div className='flex items-start gap-3'>
                     {/* Colored dot */}
                     <div className='flex items-center pt-1.5'>

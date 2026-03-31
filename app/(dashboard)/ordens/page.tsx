@@ -267,7 +267,7 @@ export default function Ordens() {
               Ordens de Serviço e Venda
             </h1>
           </div>
-          <p className='pl-3.5 text-sm text-[#71717a]'>
+          <p className='pl-3.5 text-sm text-muted-foreground'>
             Gerencie serviços e vendas de peças
           </p>
         </div>
@@ -286,22 +286,22 @@ export default function Ordens() {
 
       {/* Stats - 4 cols, simple label+number */}
       <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-        <div className='bg-[#18181b] border border-[#27272a] rounded-[10px] px-4 py-3'>
-          <p className='text-sm text-[#71717a]'>Ativas</p>
+        <div className='bg-secondary border border-border rounded-lg px-4 py-3'>
+          <p className='text-sm text-muted-foreground'>Ativas</p>
           <p className='text-2xl font-bold text-foreground'>{stats.ativas}</p>
         </div>
-        <div className='bg-[#18181b] border border-[#27272a] rounded-[10px] px-4 py-3'>
-          <p className='text-sm text-[#71717a]'>Fechadas</p>
+        <div className='bg-secondary border border-border rounded-lg px-4 py-3'>
+          <p className='text-sm text-muted-foreground'>Fechadas</p>
           <p className='text-2xl font-bold text-foreground'>{stats.fechadas}</p>
         </div>
-        <div className='bg-[#18181b] border border-[#27272a] rounded-[10px] px-4 py-3'>
-          <p className='text-sm text-[#71717a]'>Serviço</p>
+        <div className='bg-secondary border border-border rounded-lg px-4 py-3'>
+          <p className='text-sm text-muted-foreground'>Serviço</p>
           <p className='text-2xl font-bold text-foreground'>
             {stats.totalServico}
           </p>
         </div>
-        <div className='bg-[#18181b] border border-[#27272a] rounded-[10px] px-4 py-3'>
-          <p className='text-sm text-[#71717a]'>Venda</p>
+        <div className='bg-secondary border border-border rounded-lg px-4 py-3'>
+          <p className='text-sm text-muted-foreground'>Venda</p>
           <p className='text-2xl font-bold text-foreground'>
             {stats.totalVenda}
           </p>
@@ -311,31 +311,31 @@ export default function Ordens() {
       {/* Filters */}
       <div className='flex flex-col gap-3 sm:flex-row sm:flex-wrap'>
         <div className='relative flex-1 max-w-md'>
-          <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#71717a]' />
+          <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
           <Input
             placeholder='Buscar por cliente, funcionário, placa ou ID...'
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className='pl-10 bg-[#131316] border-[#27272a]'
+            className='pl-10 bg-input border-border'
           />
         </div>
         <Select
           value={filterType}
           onValueChange={(v: 'all' | 'servico' | 'venda') => setFilterType(v)}>
-          <SelectTrigger className='bg-[#131316] md:flex hidden border-[#27272a] w-full sm:w-40'>
+          <SelectTrigger className='bg-input md:flex hidden border-border w-full sm:w-40'>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className='bg-[#18181b] border-[#27272a]'>
+          <SelectContent className='bg-secondary border-border'>
             <SelectItem value='all'>Todos os Tipos</SelectItem>
             <SelectItem value='servico'>Serviços</SelectItem>
             <SelectItem value='venda'>Vendas</SelectItem>
           </SelectContent>
         </Select>
         <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className='bg-[#131316] border-[#27272a] w-full sm:w-40'>
+          <SelectTrigger className='bg-input border-border w-full sm:w-40'>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className='bg-[#18181b] border-[#27272a]'>
+          <SelectContent className='bg-secondary border-border'>
             <SelectItem value='all'>Todos os Status</SelectItem>
             <SelectItem value='ativa'>Ativa</SelectItem>
             <SelectItem value='fechada'>Fechada</SelectItem>
@@ -343,10 +343,10 @@ export default function Ordens() {
           </SelectContent>
         </Select>
         <Select value={filterMonth} onValueChange={setFilterMonth}>
-          <SelectTrigger className='bg-[#131316] border-[#27272a] w-full sm:w-48'>
+          <SelectTrigger className='bg-input border-border w-full sm:w-48'>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className='bg-[#18181b] border-[#27272a]'>
+          <SelectContent className='bg-secondary border-border'>
             <SelectItem value='all'>Todos os Meses</SelectItem>
             {mesesDisponiveis.map((mes) => {
               const [year, month] = mes.split('-');
@@ -368,7 +368,7 @@ export default function Ordens() {
           Array.from({ length: 5 }).map((_, i) => (
             <div
               key={i}
-              className='bg-[#18181b] border border-[#27272a] rounded-[10px] p-4'>
+              className='bg-secondary border border-border rounded-lg p-4'>
               <div className='flex items-center gap-4'>
                 <Skeleton className='h-4 w-4' />
                 <Skeleton className='h-5 w-12' />
@@ -381,7 +381,7 @@ export default function Ordens() {
             </div>
           ))
         ) : paginatedItems.length === 0 ? (
-          <div className='flex flex-col items-center justify-center py-16 text-[#71717a]'>
+          <div className='flex flex-col items-center justify-center py-16 text-muted-foreground'>
             <Package className='h-8 w-8 mb-2 opacity-25' />
             <p className='text-sm'>Nenhuma ordem encontrada</p>
           </div>
@@ -398,14 +398,14 @@ export default function Ordens() {
             return (
               <div
                 key={key}
-                className={`bg-[#18181b] border border-[#27272a] rounded-[10px] overflow-hidden ${isCancelada ? 'opacity-50' : ''}`}>
+                className={`bg-secondary border border-border rounded-lg overflow-hidden ${isCancelada ? 'opacity-50' : ''}`}>
                 {/* Card header */}
                 <div
-                  className='flex items-center gap-4 px-5 py-4 cursor-pointer hover:bg-[#1c1c22]/50 transition-colors'
+                  className='flex items-center gap-4 px-5 py-4 cursor-pointer hover:bg-accent/50 transition-colors'
                   onClick={() => toggleExpand(key)}>
                   {/* Left side bar + Type badge */}
                   <div
-                    className={`self-stretch w-[3px] rounded-full shrink-0 ${isServico ? 'bg-primary' : 'bg-[#71717a]'}`}
+                    className={`self-stretch w-[3px] rounded-full shrink-0 ${isServico ? 'bg-primary' : 'bg-muted-foreground'}`}
                   />
 
                   {/* Type badge */}
@@ -415,7 +415,7 @@ export default function Ordens() {
                       Serviço
                     </span>
                   ) : (
-                    <span className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-[rgba(113,113,122,0.15)] text-[#a1a1aa] shrink-0'>
+                    <span className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-muted-foreground/15 text-muted-foreground shrink-0'>
                       <ShoppingCart className='h-3 w-3' />
                       Venda
                     </span>
@@ -423,7 +423,7 @@ export default function Ordens() {
 
                   {/* Number */}
                   <span
-                    className={`text-[15px] font-bold text-foreground shrink-0 ${isCancelada ? 'line-through' : ''}`}>
+                    className={`text-sm font-bold text-foreground shrink-0 ${isCancelada ? 'line-through' : ''}`}>
                     #{ordem.id}
                   </span>
 
@@ -437,17 +437,17 @@ export default function Ordens() {
 
                   {/* Status */}
                   {ordem.status === 'ativa' && (
-                    <span className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-[#27272a] text-[#a1a1aa] shrink-0'>
+                    <span className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-border text-muted-foreground shrink-0'>
                       Ativa
                     </span>
                   )}
                   {ordem.status === 'fechada' && (
-                    <span className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-[#1c1c22] text-[#71717a] shrink-0'>
+                    <span className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-accent text-muted-foreground shrink-0'>
                       Fechada
                     </span>
                   )}
                   {ordem.status === 'cancelada' && (
-                    <span className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-[#1c1c22] text-[#71717a] shrink-0 line-through'>
+                    <span className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-accent text-muted-foreground shrink-0 line-through'>
                       Cancelada
                     </span>
                   )}
@@ -455,9 +455,9 @@ export default function Ordens() {
                   {/* Valor */}
                   <div className='min-w-[100px] text-right'>
                     <span
-                      className={`text-[18px] font-bold ${
+                      className={`text-lg font-bold ${
                         isCancelada
-                          ? 'text-[#71717a] line-through'
+                          ? 'text-muted-foreground line-through'
                           : 'text-primary'
                       }`}>
                       {formatCurrency(ordem.valor_total)}
@@ -466,9 +466,9 @@ export default function Ordens() {
 
                   {/* Chevron */}
                   {isExpanded ? (
-                    <ChevronUp className='h-5 w-5 text-[#71717a] shrink-0' />
+                    <ChevronUp className='h-5 w-5 text-muted-foreground shrink-0' />
                   ) : (
-                    <ChevronDown className='h-5 w-5 text-[#71717a] shrink-0' />
+                    <ChevronDown className='h-5 w-5 text-muted-foreground shrink-0' />
                   )}
                 </div>
 
@@ -482,7 +482,7 @@ export default function Ordens() {
                             <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
                               Cliente
                             </p>
-                            <p className='text-xs text-[#a1a1aa] truncate'>
+                            <p className='text-xs text-muted-foreground truncate'>
                               {ordem.cliente?.name_cliente || '-'}
                             </p>
                           </div>
@@ -490,7 +490,7 @@ export default function Ordens() {
                             <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
                               Veículo
                             </p>
-                            <p className='text-xs text-[#a1a1aa] truncate'>
+                            <p className='text-xs text-muted-foreground truncate'>
                               {ordemServico.veiculo?.placa || '-'}{' '}
                               {ordemServico.veiculo?.modelo
                                 ? `- ${ordemServico.veiculo.modelo}`
@@ -501,7 +501,7 @@ export default function Ordens() {
                             <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
                               Responsável
                             </p>
-                            <p className='text-xs text-[#a1a1aa] truncate'>
+                            <p className='text-xs text-muted-foreground truncate'>
                               {funcionarios.find(
                                 (f) =>
                                   f.id ===
@@ -513,7 +513,7 @@ export default function Ordens() {
                             <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
                               Data
                             </p>
-                            <p className='text-xs text-[#a1a1aa]'>
+                            <p className='text-xs text-muted-foreground'>
                               {formatDateShort(ordem.data_criacao)}
                             </p>
                           </div>
@@ -524,7 +524,7 @@ export default function Ordens() {
                             <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
                               Cliente
                             </p>
-                            <p className='text-xs text-[#a1a1aa] truncate'>
+                            <p className='text-xs text-muted-foreground truncate'>
                               {ordem.cliente?.name_cliente || '-'}
                             </p>
                           </div>
@@ -532,7 +532,7 @@ export default function Ordens() {
                             <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
                               Pagamento
                             </p>
-                            <p className='text-xs text-[#a1a1aa] truncate'>
+                            <p className='text-xs text-muted-foreground truncate'>
                               {(
                                 ordem as OrdemVendaCompleta
                               ).metodo_pagamento?.toUpperCase() || '-'}
@@ -542,7 +542,7 @@ export default function Ordens() {
                             <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
                               Responsável
                             </p>
-                            <p className='text-xs text-[#a1a1aa] truncate'>
+                            <p className='text-xs text-muted-foreground truncate'>
                               {ordem.cliente?.name_cliente || '-'}
                             </p>
                           </div>
@@ -550,7 +550,7 @@ export default function Ordens() {
                             <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
                               Data
                             </p>
-                            <p className='text-xs text-[#a1a1aa]'>
+                            <p className='text-xs text-muted-foreground'>
                               {formatDateShort(ordem.data_criacao)}
                             </p>
                           </div>
@@ -562,7 +562,7 @@ export default function Ordens() {
 
                 {/* Expanded content */}
                 {isExpanded && (
-                  <div className='border-t border-[#27272a] px-5 py-4 bg-[#131316]/50'>
+                  <div className='border-t border-border px-5 py-4 bg-input/50'>
                     {/* Info row */}
                     <div className='grid grid-cols-2 md:grid-cols-4 gap-4 mb-4'>
                       {isServico && ordemServico ? (
@@ -682,12 +682,12 @@ export default function Ordens() {
                           {ordem.pecas.slice(0, 2).map((item) => (
                             <div
                               key={item.id}
-                              className='flex justify-between items-center bg-[#09090B]/60 px-4 py-2.5 rounded-md'>
+                              className='flex justify-between items-center bg-background/60 px-4 py-2.5 rounded-md'>
                               <span className='text-sm text-foreground'>
                                 {item.peca?.name_peca || 'Peça não encontrada'}
                               </span>
                               <div className='flex gap-5'>
-                                <span className='text-xs text-[#71717a]'>
+                                <span className='text-xs text-muted-foreground'>
                                   x{item.quantidade}
                                 </span>
                                 <span className='text-sm text-foreground font-medium min-w-[80px] text-right'>
@@ -704,7 +704,7 @@ export default function Ordens() {
                                 e.stopPropagation();
                                 handleView(ordem);
                               }}
-                              className='text-xs text-primary py-2 border border-dashed border-[#27272a] rounded-md hover:bg-[#1c1c22]/30 transition-colors'>
+                              className='text-xs text-primary py-2 border border-dashed border-border rounded-md hover:bg-accent/30 transition-colors'>
                               +{ordem.pecas.length - 2}{' '}
                               {ordem.pecas.length - 2 === 1 ? 'peça' : 'peças'}{' '}
                               — Ver detalhes completos

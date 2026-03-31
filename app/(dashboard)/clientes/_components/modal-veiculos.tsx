@@ -55,10 +55,10 @@ export function ModalVeiculos({
               <Car className='h-4 w-4 text-primary' />
             </div>
             <div>
-              <DialogTitle className='text-[16px] font-bold text-foreground'>
+              <DialogTitle className='text-base font-bold text-foreground'>
                 {isEdit ? 'Editar Veículo' : 'Adicionar Veículo'}
               </DialogTitle>
-              <DialogDescription className='text-[12px] text-muted-foreground'>
+              <DialogDescription className='text-xs text-muted-foreground'>
                 {isEdit
                   ? 'Altere os dados do veículo'
                   : 'Cadastre um novo veículo para este cliente'}

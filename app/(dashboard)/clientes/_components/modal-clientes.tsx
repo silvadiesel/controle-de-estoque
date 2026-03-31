@@ -65,10 +65,10 @@ export function ModalClientes({
               <Users className='h-4 w-4 text-primary' />
             </div>
             <div>
-              <DialogTitle className='text-[16px] font-bold text-foreground'>
+              <DialogTitle className='text-base font-bold text-foreground'>
                 {isEdit ? 'Editar Cliente' : 'Adicionar Cliente'}
               </DialogTitle>
-              <DialogDescription className='text-[12px] text-muted-foreground'>
+              <DialogDescription className='text-xs text-muted-foreground'>
                 {isEdit
                   ? 'Altere os dados do cliente'
                   : 'Cadastre um novo cliente no sistema'}

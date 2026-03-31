@@ -65,7 +65,7 @@ export default function Fornecedores() {
             <div className='h-7 w-1 rounded-full bg-primary' />
             <h1 className='text-2xl font-bold text-foreground'>Fornecedores</h1>
           </div>
-          <p className='pl-3.5 text-sm text-[#71717a]'>
+          <p className='pl-3.5 text-sm text-muted-foreground'>
             Gerencie os fornecedores de peças
           </p>
         </div>
@@ -88,18 +88,18 @@ export default function Fornecedores() {
 
       {/* Search */}
       <div className='relative max-w-md'>
-        <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#71717a]' />
+        <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
         <Input
           placeholder='Buscar por nome, CNPJ ou contato...'
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className='pl-10 bg-[#131316] border-[#27272a]'
+          className='pl-10 bg-input border-border'
         />
       </div>
 
       {/* Stats */}
       <div className='grid gap-4 sm:grid-cols-3'>
-        <div className='bg-[#18181b] border border-[#27272a] rounded-[10px] px-4 py-3'>
+        <div className='bg-secondary border border-border rounded-lg px-4 py-3'>
           <div className='flex items-center gap-3'>
             <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/12'>
               <Factory className='h-5 w-5 text-primary' />
@@ -108,7 +108,7 @@ export default function Fornecedores() {
               <p className='text-2xl font-bold text-foreground'>
                 {fornecedores.length}
               </p>
-              <p className='text-sm text-[#71717a]'>Total de Fornecedores</p>
+              <p className='text-sm text-muted-foreground'>Total de Fornecedores</p>
             </div>
           </div>
         </div>
@@ -117,14 +117,14 @@ export default function Fornecedores() {
       {/* Suppliers Card List */}
       <div className='flex flex-col gap-2'>
         {isLoading ? (
-          <div className='flex items-center justify-center py-16 text-[#71717a]'>
+          <div className='flex items-center justify-center py-16 text-muted-foreground'>
             <div className='flex items-center gap-2'>
               <Loader2 className='h-5 w-5 animate-spin' />
               Carregando fornecedores...
             </div>
           </div>
         ) : filteredFornecedores.length === 0 ? (
-          <div className='flex flex-col items-center justify-center py-16 text-[#71717a]'>
+          <div className='flex flex-col items-center justify-center py-16 text-muted-foreground'>
             <Factory className='h-8 w-8 mb-2 opacity-25' />
             <p className='text-sm'>Nenhum fornecedor encontrado</p>
           </div>
@@ -132,7 +132,7 @@ export default function Fornecedores() {
           paginatedFornecedores.map((fornecedor) => (
             <div
               key={fornecedor.id}
-              className='bg-[#18181b] border border-[#27272a] rounded-[10px] p-4'>
+              className='bg-secondary border border-border rounded-lg p-4'>
               <div className='flex items-center gap-4'>
                 {/* Avatar */}
                 <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/12'>
@@ -144,7 +144,7 @@ export default function Fornecedores() {
                   <p className='font-medium text-foreground truncate'>
                     {fornecedor.name_empresa}
                   </p>
-                  <p className='text-sm text-[#71717a]'>{fornecedor.cnpj}</p>
+                  <p className='text-sm text-muted-foreground'>{fornecedor.cnpj}</p>
                 </div>
 
                 {/* Contact */}
@@ -177,7 +177,7 @@ export default function Fornecedores() {
                         size='icon'
                         aria-label={`Editar fornecedor ${fornecedor.name_empresa}`}
                         onClick={() => setEditingFornecedor(fornecedor)}>
-                        <Pencil className='h-4 w-4 text-[#71717a]' />
+                        <Pencil className='h-4 w-4 text-muted-foreground' />
                       </Button>
                     }
                   />
@@ -208,7 +208,7 @@ export default function Fornecedores() {
               </div>
 
               {/* Mobile contact info */}
-              <div className='flex md:hidden items-center gap-4 mt-3 pt-3 border-t border-[#27272a]'>
+              <div className='flex md:hidden items-center gap-4 mt-3 pt-3 border-t border-border'>
                 <div className='flex items-center gap-1.5 text-sm text-primary font-medium'>
                   <Phone className='h-3.5 w-3.5' />
                   {fornecedor.telefone || '-'}
