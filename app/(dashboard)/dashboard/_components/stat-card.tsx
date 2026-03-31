@@ -31,7 +31,7 @@ export function StatCard({
           )}
         </div>
         <div className='flex size-9 rounded-md items-center justify-center border border-border bg-elevated text-primary'>
-          <Icon size={20} />
+          <Icon size={20} aria-hidden='true' />
         </div>
       </div>
       <p className='text-sm text-muted-foreground'>

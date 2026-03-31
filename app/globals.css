@@ -167,3 +167,14 @@
   font-size: 0.75rem;
   color: var(--text-muted);
 }
+
+.text-page-title {
+  font-size: 1.375rem;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.text-xs-label {
+  font-size: 0.625rem;
+  line-height: 1.4;
+}
