@@ -35,7 +35,7 @@ import { Textarea } from '@/components/ui/textarea';
 import type { Cliente, Peca, Veiculo } from '@/db/schema';
 import { useUser } from '@/hooks/useUser';
 
-import { Plus, X } from 'lucide-react';
+import { Plus, Wrench, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface PecaItem {
@@ -268,32 +268,39 @@ export function ModalOrdemServico({
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
       <DialogContent
         key={isOpen ? 'open' : 'closed'}
-        className='bg-card border-border max-w-3xl p-0 overflow-y-auto'>
-        <DialogHeader className='p-6 pb-0'>
-          <DialogTitle className='text-foreground'>
-            {isEdit ? 'Editar Ordem de Serviço' : 'Nova Ordem de Serviço'}
-          </DialogTitle>
-          <DialogDescription>
-            {isEdit
-              ? 'Atualize os dados da ordem de serviço'
-              : 'Crie uma nova ordem de serviço para um veículo'}
-          </DialogDescription>
+        className='bg-[#18181b] border-[#27272a] rounded-[12px] max-w-[680px] p-0 overflow-y-auto'>
+        <DialogHeader className='p-6 pb-4 border-b border-[#27272a]'>
+          <div className='flex items-center gap-3 mb-1'>
+            <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-[rgba(91,127,165,0.12)]'>
+              <Wrench className='h-4.5 w-4.5 text-[#5b7fa5]' />
+            </div>
+            <div>
+              <DialogTitle className='text-[#e4e4e7]'>
+                {isEdit ? 'Editar Ordem de Serviço' : 'Nova Ordem de Serviço'}
+              </DialogTitle>
+              <DialogDescription className='text-[#71717a]'>
+                {isEdit
+                  ? 'Atualize os dados da ordem de serviço'
+                  : 'Crie uma nova ordem de serviço para um veículo'}
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
 
         <ScrollArea className='max-h-[60vh]'>
           <div className='grid gap-4 p-6 pt-4'>
             {/* Cliente */}
             <div className='space-y-2'>
-              <Label>Cliente *</Label>
+              <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Cliente *</Label>
               <Select
                 value={formData.cliente_id ? formData.cliente_id.toString() : ''}
                 onValueChange={handleClienteChange}>
                 <SelectTrigger
                   aria-describedby={hasError('cliente_id') ? 'error-cliente-servico' : undefined}
-                  className={`bg-input w-full ${hasError('cliente_id') ? 'border-destructive' : 'border-border'}`}>
+                  className={`bg-[#131316] w-full ${hasError('cliente_id') ? 'border-destructive' : 'border-[#27272a]'}`}>
                   <SelectValue placeholder='Selecione um cliente' />
                 </SelectTrigger>
-                <SelectContent className='bg-card border-border max-h-60 w-fit'>
+                <SelectContent className='bg-[#18181b] border-[#27272a] max-h-60 w-fit'>
                   {clientes.map((cliente) => (
                     <SelectItem key={cliente.id} value={cliente.id.toString()}>
                       <span className='truncate w-full block'>
@@ -312,7 +319,7 @@ export function ModalOrdemServico({
             <div className='grid gap-4 sm:grid-cols-2'>
               {/* Data de Chegada */}
               <div className='space-y-2 w-full'>
-                <Label>Data de Chegada *</Label>
+                <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Data de Chegada *</Label>
                 <div className={hasError('data_chegada') ? '[&>button]:border-destructive' : ''}>
                   <DatePicker
                     value={
@@ -337,16 +344,16 @@ export function ModalOrdemServico({
               {/* Status */}
               {isEdit && (
                 <div className='space-y-2'>
-                  <Label>Status</Label>
+                  <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Status</Label>
                   <Select
                     value={formData.status}
                     onValueChange={(v: 'ativa' | 'fechada' | 'cancelada') =>
                       setFormData({ ...formData, status: v })
                     }>
-                    <SelectTrigger className='bg-input border-border w-full'>
+                    <SelectTrigger className='bg-[#131316] border-[#27272a] w-full'>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className='bg-card border-border'>
+                    <SelectContent className='bg-[#18181b] border-[#27272a]'>
                       <SelectItem value='ativa'>Ativa</SelectItem>
                       <SelectItem value='fechada'>Fechada</SelectItem>
                       <SelectItem value='cancelada'>Cancelada</SelectItem>
@@ -358,7 +365,7 @@ export function ModalOrdemServico({
 
             {/* Veículo */}
             <div className='space-y-2 w-full'>
-              <Label>Veículo *</Label>
+              <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Veículo *</Label>
               <Select
                 value={formData.veiculo_id ? formData.veiculo_id.toString() : ''}
                 onValueChange={(v) =>
@@ -367,7 +374,7 @@ export function ModalOrdemServico({
                 disabled={!formData.cliente_id}>
                 <SelectTrigger
                   aria-describedby={hasError('veiculo_id') ? 'error-veiculo-servico' : undefined}
-                  className={`bg-input w-full ${hasError('veiculo_id') ? 'border-destructive' : 'border-border'}`}>
+                  className={`bg-[#131316] w-full ${hasError('veiculo_id') ? 'border-destructive' : 'border-[#27272a]'}`}>
                   <SelectValue
                     placeholder={
                       formData.cliente_id
@@ -376,7 +383,7 @@ export function ModalOrdemServico({
                     }
                   />
                 </SelectTrigger>
-                <SelectContent className='bg-card border-border'>
+                <SelectContent className='bg-[#18181b] border-[#27272a]'>
                   {veiculosDisponiveis.map((veiculo) => (
                     <SelectItem key={veiculo.id} value={veiculo.id.toString()}>
                       <span className='truncate block'>
@@ -393,7 +400,7 @@ export function ModalOrdemServico({
 
             {/* Funcionário Responsável */}
             <div className='space-y-2 w-full'>
-              <Label>Funcionário Responsável *</Label>
+              <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Funcionário Responsável *</Label>
               <Select
                 value={formData.funcionario_responsavel_id || ''}
                 onValueChange={(v) =>
@@ -401,10 +408,10 @@ export function ModalOrdemServico({
                 }>
                 <SelectTrigger
                   aria-describedby={hasError('funcionario_responsavel_id') ? 'error-funcionario-servico' : undefined}
-                  className={`bg-input w-full ${hasError('funcionario_responsavel_id') ? 'border-destructive' : 'border-border'}`}>
+                  className={`bg-[#131316] w-full ${hasError('funcionario_responsavel_id') ? 'border-destructive' : 'border-[#27272a]'}`}>
                   <SelectValue placeholder='Selecione o funcionário responsável' />
                 </SelectTrigger>
-                <SelectContent className='bg-card border-border'>
+                <SelectContent className='bg-[#18181b] border-[#27272a]'>
                   {funcionarios.map((func) => (
                     <SelectItem key={func.id} value={func.id}>
                       {func.name}
@@ -419,28 +426,28 @@ export function ModalOrdemServico({
 
             {/* Observação */}
             <div className='space-y-2'>
-              <Label>Observação / Descrição do Serviço</Label>
+              <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Observação / Descrição do Serviço</Label>
               <Textarea
                 value={formData.observacao}
                 onChange={(e) =>
                   setFormData({ ...formData, observacao: e.target.value })
                 }
                 placeholder='Descreva o serviço a ser realizado...'
-                className='bg-input border-border min-h-[80px] resize-none'
+                className='bg-[#131316] border-[#27272a] min-h-[80px] resize-none'
               />
             </div>
 
             {/* Adicionar Peças */}
             <div className='space-y-3'>
-              <Label>Peças Utilizadas</Label>
+              <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Peças Utilizadas</Label>
               <div className='flex gap-2'>
                 <Select
                   value={selectedPecaId}
                   onValueChange={setSelectedPecaId}>
-                  <SelectTrigger className='bg-input border-border flex-1'>
+                  <SelectTrigger className='bg-[#131316] border-[#27272a] flex-1'>
                     <SelectValue placeholder='Selecione uma peça' />
                   </SelectTrigger>
-                  <SelectContent className='bg-card border-border max-h-60'>
+                  <SelectContent className='bg-[#18181b] border-[#27272a] max-h-60'>
                     {pecas.map((peca) => (
                       <SelectItem key={peca.id} value={peca.id.toString()}>
                         {peca.name_peca} - {formatCurrency(peca.preco)}{' '}
@@ -460,7 +467,7 @@ export function ModalOrdemServico({
                   onBlur={() => {
                     if (!pecaQuantidade || pecaQuantidade < 1) setPecaQuantidade(1);
                   }}
-                  className='bg-input border-border w-20'
+                  className='bg-[#131316] border-[#27272a] w-20'
                 />
                 <Button type='button' onClick={handleAddPeca} variant='outline'>
                   <Plus className='h-4 w-4' />
@@ -469,30 +476,30 @@ export function ModalOrdemServico({
 
               {/* Lista de Peças */}
               {formData.pecas.length > 0 && (
-                <div className='rounded-lg border border-border overflow-hidden'>
+                <div className='rounded-lg border border-[#27272a] overflow-hidden'>
                   <Table>
                     <TableHeader>
-                      <TableRow className='border-border hover:bg-transparent'>
-                        <TableHead className='text-muted-foreground'>Peça</TableHead>
-                        <TableHead className='text-muted-foreground text-center'>Qtd</TableHead>
-                        <TableHead className='text-muted-foreground text-right'>Preço Unit.</TableHead>
-                        <TableHead className='text-muted-foreground text-right'>Subtotal</TableHead>
-                        <TableHead className='text-muted-foreground w-10'></TableHead>
+                      <TableRow className='border-[#27272a] hover:bg-transparent'>
+                        <TableHead className='text-[#71717a]'>Peça</TableHead>
+                        <TableHead className='text-[#71717a] text-center'>Qtd</TableHead>
+                        <TableHead className='text-[#71717a] text-right'>Preço Unit.</TableHead>
+                        <TableHead className='text-[#71717a] text-right'>Subtotal</TableHead>
+                        <TableHead className='text-[#71717a] w-10'></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {formData.pecas.map((item) => (
-                        <TableRow key={item.peca_id} className='border-border hover:bg-muted/30'>
-                          <TableCell className='text-foreground'>
+                        <TableRow key={item.peca_id} className='border-[#27272a] hover:bg-[#1c1c22]/30'>
+                          <TableCell className='text-[#e4e4e7]'>
                             {item.peca?.name_peca || 'Peça não encontrada'}
                           </TableCell>
-                          <TableCell className='text-center text-foreground'>
+                          <TableCell className='text-center text-[#e4e4e7]'>
                             {item.quantidade}
                           </TableCell>
-                          <TableCell className='text-right text-muted-foreground'>
+                          <TableCell className='text-right text-[#71717a]'>
                             {formatCurrency(item.peca?.preco || 0)}
                           </TableCell>
-                          <TableCell className='text-right text-foreground font-medium'>
+                          <TableCell className='text-right text-[#e4e4e7] font-medium'>
                             {formatCurrency((item.peca?.preco || 0) * item.quantidade)}
                           </TableCell>
                           <TableCell>
@@ -509,10 +516,10 @@ export function ModalOrdemServico({
             </div>
 
             {/* Total */}
-            <div className='rounded-lg bg-secondary/50 p-4'>
+            <div className='rounded-lg bg-[#131316] border border-[#27272a] p-4'>
               <div className='flex items-center justify-between'>
-                <span className='text-lg font-medium text-foreground'>Total da Ordem</span>
-                <span className='text-2xl font-bold text-primary'>
+                <span className='text-sm font-medium text-[#71717a] uppercase tracking-wider'>Total da Ordem</span>
+                <span className='text-[22px] font-bold text-[#5b7fa5]'>
                   {formatCurrency(calcularTotal())}
                 </span>
               </div>
@@ -520,14 +527,14 @@ export function ModalOrdemServico({
           </div>
         </ScrollArea>
 
-        <DialogFooter className='px-6 py-4 border-t border-border'>
+        <DialogFooter className='px-6 py-4 border-t border-[#27272a]'>
           <Button variant='outline' onClick={() => setIsOpen(false)} className='w-32'>
             Cancelar
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={isLoading}
-            className='bg-primary hover:bg-primary/90 w-32'>
+            className='bg-[#5b7fa5] hover:bg-[#5b7fa5]/90 text-[#09090B] w-32'>
             {isLoading ? 'Salvando...' : isEdit ? 'Atualizar' : 'Criar Ordem'}
           </Button>
         </DialogFooter>

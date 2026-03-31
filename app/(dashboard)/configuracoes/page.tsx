@@ -24,14 +24,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usePagination } from '@/hooks/usePagination';
 
@@ -154,26 +146,23 @@ export default function Configuracoes() {
   return (
     <div className='flex flex-1 flex-col gap-4 p-4'>
       <div className='flex flex-col gap-1'>
-        <div className='flex items-center gap-2.5'>
-          <div className='h-7 w-1 rounded-full bg-primary' />
-          <h1 className='text-2xl font-bold text-foreground'>Configurações</h1>
-        </div>
-        <p className='pl-3.5 text-sm text-muted-foreground'>
+        <h1 className='text-2xl font-bold text-[#e4e4e7]'>Configurações</h1>
+        <p className='text-sm text-[#52525b]'>
           Personalize o sistema conforme sua necessidade
         </p>
       </div>
 
       <Tabs defaultValue='general' className='w-full gap-0'>
-        <TabsList className='rounded-b-none'>
+        <TabsList className='bg-transparent border-b border-[#27272a] rounded-none w-full justify-start h-auto p-0'>
           <TabsTrigger
             value='general'
-            className='gap-2 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground rounded-b-none'>
+            className='gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[#5b7fa5] data-[state=active]:text-[#e4e4e7] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#52525b] px-4 py-2.5'>
             <Settings className='h-4 w-4' />
             Configurações Gerais
           </TabsTrigger>
           <TabsTrigger
             value='users'
-            className='gap-2 data-[state=active]:bg-primary! data-[state=active]:text-primary-foreground w-32 rounded-b-none'>
+            className='gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-[#5b7fa5] data-[state=active]:text-[#e4e4e7] data-[state=active]:bg-transparent data-[state=active]:shadow-none text-[#52525b] px-4 py-2.5'>
             <Users className='h-4 w-4' />
             Usuários
           </TabsTrigger>
@@ -181,44 +170,45 @@ export default function Configuracoes() {
 
         {/* Tab: Configurações Gerais */}
         <TabsContent value='general'>
-          <div className='grid gap-6'>
-            <Card className='bg-card border-border h-150 flex flex-col rounded-tl-none'>
+          <div className='grid gap-6 mt-4'>
+            {/* Categories - single card with list rows */}
+            <Card className='bg-[#18181b] border-[#27272a] flex flex-col'>
               <CardHeader>
                 <div className='flex items-center justify-between'>
                   <div>
-                    <CardTitle className='text-foreground flex items-center gap-2'>
-                      <Tags className='h-5 w-5 text-primary' />
+                    <CardTitle className='text-[#e4e4e7] flex items-center gap-2'>
+                      <Tags className='h-5 w-5 text-[#5b7fa5]' />
                       Categorias dos Produtos
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className='text-[#52525b]'>
                       Gerencie as categorias dos produtos disponíveis
                     </CardDescription>
                   </div>
 
                   <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
                     <DialogTrigger asChild>
-                      <Button className='bg-primary hover:bg-primary/90'>
+                      <Button className='bg-[#5b7fa5] text-[#09090B] hover:bg-[#5b7fa5]/90'>
                         <Plus className='h-4 w-4 mr-2' />
                         Nova Categoria
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className='bg-card border-border'>
+                    <DialogContent className='bg-[#18181b] border-[#27272a] max-w-[540px]'>
                       <DialogHeader>
-                        <DialogTitle className='text-foreground'>
+                        <DialogTitle className='text-[#e4e4e7]'>
                           Adicionar Categoria
                         </DialogTitle>
-                        <DialogDescription>
+                        <DialogDescription className='text-[#52525b]'>
                           Crie uma nova categoria para organizar seus produtos
                         </DialogDescription>
                       </DialogHeader>
                       <div className='space-y-2'>
-                        <Label htmlFor='cat-name'>Nome da Categoria</Label>
+                        <Label htmlFor='cat-name' className='text-[#a1a1aa]'>Nome da Categoria</Label>
                         <Input
                           id='cat-name'
                           value={newCategoryName}
                           onChange={(e) => setNewCategoryName(e.target.value)}
                           placeholder='Ex: Pneus'
-                          className='bg-input border-border'
+                          className='bg-[#131316] border-[#27272a]'
                           onKeyDown={(e) => {
                             if (e.key === 'Enter' && !isSavingCategory) {
                               handleAddCategory();
@@ -235,7 +225,7 @@ export default function Configuracoes() {
                         </Button>
                         <Button
                           onClick={handleAddCategory}
-                          className='bg-primary hover:bg-primary/90'
+                          className='bg-[#5b7fa5] text-[#09090B] hover:bg-[#5b7fa5]/90'
                           disabled={isSavingCategory}>
                           {isSavingCategory ? (
                             <>
@@ -255,10 +245,10 @@ export default function Configuracoes() {
               <CardContent className='flex flex-col flex-1'>
                 {isLoadingCategories ? (
                   <div className='flex items-center justify-center py-8'>
-                    <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
+                    <Loader2 className='h-8 w-8 animate-spin text-[#52525b]' />
                   </div>
                 ) : categories.length === 0 ? (
-                  <div className='text-center py-8 text-muted-foreground'>
+                  <div className='text-center py-8 text-[#52525b]'>
                     <Tags className='h-12 w-12 mx-auto mb-4 opacity-50' />
                     <p>Nenhuma categoria cadastrada</p>
                     <p className='text-sm'>
@@ -269,138 +259,122 @@ export default function Configuracoes() {
                   </div>
                 ) : (
                   <div className='flex flex-col flex-1 justify-between'>
-                    <div className='rounded-lg border border-border overflow-x-auto'>
-                      <Table>
-                        <TableHeader>
-                          <TableRow className='border-border hover:bg-transparent'>
-                            <TableHead className='text-muted-foreground'>
-                              ID
-                            </TableHead>
-                            <TableHead className='text-muted-foreground'>
-                              Nome
-                            </TableHead>
-                            <TableHead className='text-muted-foreground text-right'>
-                              Ações
-                            </TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {paginatedCategories.map((category) => (
-                            <TableRow
-                              key={category.id}
-                              className='border-border'>
-                              <TableCell className='text-muted-foreground'>
-                                {category.id}
-                              </TableCell>
-                              <TableCell className='font-medium text-foreground'>
-                                {category.name}
-                              </TableCell>
-                              <TableCell className='text-right'>
-                                <div className='flex justify-end gap-2'>
-                                  <Dialog
-                                    open={editingCategory?.id === category.id}
-                                    onOpenChange={(open) =>
-                                      !open && setEditingCategory(null)
-                                    }>
-                                    <DialogTrigger asChild>
-                                      <Button
-                                        variant='ghost'
-                                        size='icon'
-                                        aria-label={`Editar categoria ${category.name}`}
-                                        onClick={() =>
-                                          setEditingCategory(category)
-                                        }>
-                                        <Pencil className='h-4 w-4 text-muted-foreground' />
-                                      </Button>
-                                    </DialogTrigger>
-                                    <DialogContent className='bg-card border-border'>
-                                      <DialogHeader>
-                                        <DialogTitle className='text-foreground'>
-                                          Editar Categoria
-                                        </DialogTitle>
-                                        <DialogDescription>
-                                          Altere os dados da categoria
-                                        </DialogDescription>
-                                      </DialogHeader>
-                                      <div className='space-y-4 py-4'>
-                                        <div className='space-y-2'>
-                                          <Label htmlFor='edit-cat-name'>
-                                            Nome da Categoria
-                                          </Label>
-                                          <Input
-                                            id='edit-cat-name'
-                                            value={editingCategory?.name || ''}
-                                            onChange={(e) =>
-                                              setEditingCategory((prev) =>
-                                                prev
-                                                  ? {
-                                                      ...prev,
-                                                      name: e.target.value
-                                                    }
-                                                  : null
-                                              )
-                                            }
-                                            className='bg-input border-border'
-                                            onKeyDown={(e) => {
-                                              if (
-                                                e.key === 'Enter' &&
-                                                !isSavingCategory
-                                              ) {
-                                                handleUpdateCategory();
+                    {/* List rows instead of table */}
+                    <div className='rounded-lg border border-[#27272a] overflow-hidden divide-y divide-[#27272a]'>
+                      {paginatedCategories.map((category) => (
+                        <div
+                          key={category.id}
+                          className='flex items-center justify-between px-4 py-3 hover:bg-[#131316] transition-colors'>
+                          <div className='flex items-center gap-3'>
+                            <span className='text-xs text-[#52525b] w-8'>
+                              #{category.id}
+                            </span>
+                            <span className='font-medium text-[#e4e4e7]'>
+                              {category.name}
+                            </span>
+                          </div>
+                          <div className='flex items-center gap-1'>
+                            <Dialog
+                              open={editingCategory?.id === category.id}
+                              onOpenChange={(open) =>
+                                !open && setEditingCategory(null)
+                              }>
+                              <DialogTrigger asChild>
+                                <Button
+                                  variant='ghost'
+                                  size='icon'
+                                  aria-label={`Editar categoria ${category.name}`}
+                                  onClick={() =>
+                                    setEditingCategory(category)
+                                  }>
+                                  <Pencil className='h-4 w-4 text-[#52525b]' />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className='bg-[#18181b] border-[#27272a] max-w-[540px]'>
+                                <DialogHeader>
+                                  <DialogTitle className='text-[#e4e4e7]'>
+                                    Editar Categoria
+                                  </DialogTitle>
+                                  <DialogDescription className='text-[#52525b]'>
+                                    Altere os dados da categoria
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div className='space-y-4 py-4'>
+                                  <div className='space-y-2'>
+                                    <Label htmlFor='edit-cat-name' className='text-[#a1a1aa]'>
+                                      Nome da Categoria
+                                    </Label>
+                                    <Input
+                                      id='edit-cat-name'
+                                      value={editingCategory?.name || ''}
+                                      onChange={(e) =>
+                                        setEditingCategory((prev) =>
+                                          prev
+                                            ? {
+                                                ...prev,
+                                                name: e.target.value
                                               }
-                                            }}
-                                          />
-                                        </div>
-                                      </div>
-                                      <DialogFooter>
-                                        <Button
-                                          variant='outline'
-                                          onClick={() =>
-                                            setEditingCategory(null)
-                                          }
-                                          disabled={isSavingCategory}>
-                                          Cancelar
-                                        </Button>
-                                        <Button
-                                          onClick={handleUpdateCategory}
-                                          className='bg-primary hover:bg-primary/90'
-                                          disabled={isSavingCategory}>
-                                          {isSavingCategory ? (
-                                            <>
-                                              <Loader2 className='h-4 w-4 mr-2 animate-spin' />
-                                              Salvando...
-                                            </>
-                                          ) : (
-                                            'Salvar'
-                                          )}
-                                        </Button>
-                                      </DialogFooter>
-                                    </DialogContent>
-                                  </Dialog>
-
-                                  <ModalDelete
-                                    isOpen={deletingCategoryId === category.id}
-                                    setIsOpen={(open) =>
-                                      setDeletingCategoryId(
-                                        open ? category.id : null
-                                      )
-                                    }
-                                    onConfirm={confirmDeleteCategory}
-                                    isLoading={isDeletingCategory}
-                                    title='Excluir Categoria'
-                                    description={`Tem certeza que deseja excluir a categoria "${category.name}"? Esta ação não pode ser desfeita.`}
-                                    trigger={
-                                      <Button variant='ghost' size='icon' aria-label={`Excluir categoria ${category.name}`}>
-                                        <Trash2 className='h-4 w-4 text-destructive' />
-                                      </Button>
-                                    }
-                                  />
+                                            : null
+                                        )
+                                      }
+                                      className='bg-[#131316] border-[#27272a]'
+                                      onKeyDown={(e) => {
+                                        if (
+                                          e.key === 'Enter' &&
+                                          !isSavingCategory
+                                        ) {
+                                          handleUpdateCategory();
+                                        }
+                                      }}
+                                    />
+                                  </div>
                                 </div>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
+                                <DialogFooter>
+                                  <Button
+                                    variant='outline'
+                                    onClick={() =>
+                                      setEditingCategory(null)
+                                    }
+                                    disabled={isSavingCategory}>
+                                    Cancelar
+                                  </Button>
+                                  <Button
+                                    onClick={handleUpdateCategory}
+                                    className='bg-[#5b7fa5] text-[#09090B] hover:bg-[#5b7fa5]/90'
+                                    disabled={isSavingCategory}>
+                                    {isSavingCategory ? (
+                                      <>
+                                        <Loader2 className='h-4 w-4 mr-2 animate-spin' />
+                                        Salvando...
+                                      </>
+                                    ) : (
+                                      'Salvar'
+                                    )}
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+
+                            <ModalDelete
+                              isOpen={deletingCategoryId === category.id}
+                              setIsOpen={(open) =>
+                                setDeletingCategoryId(
+                                  open ? category.id : null
+                                )
+                              }
+                              onConfirm={confirmDeleteCategory}
+                              isLoading={isDeletingCategory}
+                              title='Excluir Categoria'
+                              description={`Tem certeza que deseja excluir a categoria "${category.name}"? Esta ação não pode ser desfeita.`}
+                              trigger={
+                                <Button variant='ghost' size='icon' aria-label={`Excluir categoria ${category.name}`}>
+                                  <Trash2 className='h-4 w-4 text-destructive' />
+                                </Button>
+                              }
+                            />
+                          </div>
+                        </div>
+                      ))}
                     </div>
 
                     <PaginationControls
@@ -422,19 +396,20 @@ export default function Configuracoes() {
               </CardContent>
             </Card>
 
-            <Card className='bg-card border-border opacity-60'>
+            {/* Company section - disabled with opacity */}
+            <Card className='bg-[#18181b] border-[#27272a] opacity-40'>
               <CardHeader>
                 <div className='flex items-center justify-between'>
                   <div>
-                    <CardTitle className='text-foreground flex items-center gap-2'>
-                      <Building2 className='h-5 w-5 text-primary' />
+                    <CardTitle className='text-[#e4e4e7] flex items-center gap-2'>
+                      <Building2 className='h-5 w-5 text-[#5b7fa5]' />
                       Informações da Empresa
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className='text-[#52525b]'>
                       Configure os dados da sua oficina
                     </CardDescription>
                   </div>
-                  <Badge variant='outline' className='text-muted-foreground'>
+                  <Badge variant='outline' className='text-[#52525b] border-[#27272a]'>
                     Em breve
                   </Badge>
                 </div>
@@ -442,30 +417,30 @@ export default function Configuracoes() {
               <CardContent className='space-y-4'>
                 <div className='grid gap-4 sm:grid-cols-2'>
                   <div className='space-y-2'>
-                    <Label htmlFor='company'>Nome da Empresa</Label>
+                    <Label htmlFor='company' className='text-[#a1a1aa]'>Nome da Empresa</Label>
                     <Input
                       id='company'
                       defaultValue='Oficina de Caminhões Silva'
-                      className='bg-input border-border'
+                      className='bg-[#131316] border-[#27272a]'
                       disabled
                     />
                   </div>
                   <div className='space-y-2'>
-                    <Label htmlFor='cnpj'>CNPJ</Label>
+                    <Label htmlFor='cnpj' className='text-[#a1a1aa]'>CNPJ</Label>
                     <Input
                       id='cnpj'
                       defaultValue='12.345.678/0001-90'
-                      className='bg-input border-border'
+                      className='bg-[#131316] border-[#27272a]'
                       disabled
                     />
                   </div>
                 </div>
                 <div className='space-y-2'>
-                  <Label htmlFor='address'>Endereço</Label>
+                  <Label htmlFor='address' className='text-[#a1a1aa]'>Endereço</Label>
                   <Input
                     id='address'
                     defaultValue='Av. das Indústrias, 1234 - Distrito Industrial'
-                    className='bg-input border-border'
+                    className='bg-[#131316] border-[#27272a]'
                     disabled
                   />
                 </div>
@@ -476,15 +451,15 @@ export default function Configuracoes() {
 
         {/* Tab: Usuários */}
         <TabsContent value='users'>
-          <Card className='bg-card border-border rounded-tl-none'>
+          <Card className='bg-[#18181b] border-[#27272a] mt-4'>
             <CardHeader>
               <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
                 <div>
-                  <CardTitle className='text-foreground flex items-center gap-2'>
-                    <Users className='h-5 w-5 text-primary' />
+                  <CardTitle className='text-[#e4e4e7] flex items-center gap-2'>
+                    <Users className='h-5 w-5 text-[#5b7fa5]' />
                     Gerenciamento de Usuários
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className='text-[#52525b]'>
                     Gerencie os usuários do sistema e suas permissões
                   </CardDescription>
                 </div>
@@ -493,125 +468,108 @@ export default function Configuracoes() {
             <CardContent className='space-y-4'>
               {/* Search */}
               <div className='relative max-w-md'>
-                <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+                <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#52525b]' />
                 <Input
                   placeholder='Buscar por nome ou email...'
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className='pl-10 bg-input border-border'
+                  className='pl-10 bg-[#131316] border-[#27272a]'
                 />
               </div>
 
-              {/* Users Table */}
+              {/* Users list */}
               {isLoadingUsers ? (
                 <div className='flex items-center justify-center py-12'>
-                  <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
+                  <Loader2 className='h-8 w-8 animate-spin text-[#52525b]' />
                 </div>
               ) : users.length === 0 ? (
-                <div className='text-center py-12 text-muted-foreground'>
+                <div className='text-center py-12 text-[#52525b]'>
                   <Users className='h-12 w-12 mx-auto mb-4 opacity-50' />
                   <p>Nenhum usuário cadastrado</p>
                 </div>
               ) : (
                 <div className='flex flex-col gap-4'>
-                  <div className='rounded-lg border border-border overflow-x-auto'>
-                    <Table>
-                      <TableHeader>
-                        <TableRow className='border-border hover:bg-transparent'>
-                          <TableHead className='text-muted-foreground'>
-                            Nome
-                          </TableHead>
-                          <TableHead className='text-muted-foreground'>
-                            Email
-                          </TableHead>
-                          <TableHead className='text-muted-foreground'>
-                            Cargo
-                          </TableHead>
-                          <TableHead className='text-muted-foreground'>
-                            Status
-                          </TableHead>
-                          <TableHead className='text-muted-foreground text-right'>
-                            Ações
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {paginatedUsers.map((user) => (
-                          <TableRow key={user.id} className='border-border'>
-                            <TableCell className='font-medium text-foreground'>
+                  <div className='rounded-lg border border-[#27272a] overflow-hidden divide-y divide-[#27272a]'>
+                    {paginatedUsers.map((user) => (
+                      <div
+                        key={user.id}
+                        className='flex items-center justify-between px-4 py-3 hover:bg-[#131316] transition-colors'>
+                        <div className='flex items-center gap-4 flex-1 min-w-0'>
+                          {/* Avatar */}
+                          <div className='flex h-8 w-8 items-center justify-center rounded-full bg-[#27272a] text-xs font-bold text-[#71717a] shrink-0'>
+                            {user.name?.charAt(0)?.toUpperCase() || '?'}
+                          </div>
+                          <div className='flex-1 min-w-0'>
+                            <p className='font-medium text-[#e4e4e7] text-sm'>
                               {user.name}
-                            </TableCell>
-                            <TableCell className='text-muted-foreground'>
+                            </p>
+                            <p className='text-xs text-[#52525b]'>
                               {user.email}
-                            </TableCell>
-                            <TableCell>
-                              <Badge
-                                variant={
-                                  getCargoVariant(user.cargo) as
-                                    | 'default'
-                                    | 'secondary'
-                                    | 'outline'
-                                    | 'destructive'
-                                }>
-                                {getCargoLabel(user.cargo)}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Badge
-                                variant={
-                                  user.status ? 'default' : 'destructive'
-                                }
-                                className={
-                                  user.status
-                                    ? 'bg-success/10 text-success border-success/20'
-                                    : ''
-                                }>
-                                {user.status ? 'Ativo' : 'Inativo'}
-                              </Badge>
-                            </TableCell>
-                            <TableCell className='text-right'>
-                              <div className='flex justify-end gap-2'>
-                                <ModalUsuarios
-                                  data={editingUser}
-                                  setData={setEditingUser}
-                                  isOpen={editingUser?.id === user.id}
-                                  setIsOpen={(open) =>
-                                    !open && setEditingUser(null)
-                                  }
-                                  onSubmit={handleUpdateUser}
-                                  isLoading={isSavingUser}
-                                  trigger={
-                                    <Button
-                                      variant='ghost'
-                                      size='icon'
-                                      aria-label={`Editar usuário ${user.name}`}
-                                      onClick={() => setEditingUser(user)}>
-                                      <Pencil className='h-4 w-4 text-muted-foreground' />
-                                    </Button>
-                                  }
-                                />
+                            </p>
+                          </div>
+                          <div className='flex items-center gap-2 shrink-0'>
+                            <Badge
+                              variant={
+                                getCargoVariant(user.cargo) as
+                                  | 'default'
+                                  | 'secondary'
+                                  | 'outline'
+                                  | 'destructive'
+                              }>
+                              {getCargoLabel(user.cargo)}
+                            </Badge>
+                            <Badge
+                              variant={
+                                user.status ? 'default' : 'destructive'
+                              }
+                              className={
+                                user.status
+                                  ? 'bg-success/10 text-success border-success/20'
+                                  : ''
+                              }>
+                              {user.status ? 'Ativo' : 'Inativo'}
+                            </Badge>
+                          </div>
+                        </div>
+                        <div className='flex items-center gap-1 ml-4'>
+                          <ModalUsuarios
+                            data={editingUser}
+                            setData={setEditingUser}
+                            isOpen={editingUser?.id === user.id}
+                            setIsOpen={(open) =>
+                              !open && setEditingUser(null)
+                            }
+                            onSubmit={handleUpdateUser}
+                            isLoading={isSavingUser}
+                            trigger={
+                              <Button
+                                variant='ghost'
+                                size='icon'
+                                aria-label={`Editar usuário ${user.name}`}
+                                onClick={() => setEditingUser(user)}>
+                                <Pencil className='h-4 w-4 text-[#52525b]' />
+                              </Button>
+                            }
+                          />
 
-                                <ModalDelete
-                                  isOpen={deletingUserId === user.id}
-                                  setIsOpen={(open) =>
-                                    setDeletingUserId(open ? user.id : null)
-                                  }
-                                  onConfirm={handleDeleteUser}
-                                  isLoading={isDeletingUser}
-                                  title='Excluir Usuário'
-                                  description={`Tem certeza que deseja excluir o usuário "${user.name}"? Esta ação não pode ser desfeita e removerá todas as sessões e contas associadas.`}
-                                  trigger={
-                                    <Button variant='ghost' size='icon' aria-label={`Excluir usuário ${user.name}`}>
-                                      <Trash2 className='h-4 w-4 text-destructive' />
-                                    </Button>
-                                  }
-                                />
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                          <ModalDelete
+                            isOpen={deletingUserId === user.id}
+                            setIsOpen={(open) =>
+                              setDeletingUserId(open ? user.id : null)
+                            }
+                            onConfirm={handleDeleteUser}
+                            isLoading={isDeletingUser}
+                            title='Excluir Usuário'
+                            description={`Tem certeza que deseja excluir o usuário "${user.name}"? Esta ação não pode ser desfeita e removerá todas as sessões e contas associadas.`}
+                            trigger={
+                              <Button variant='ghost' size='icon' aria-label={`Excluir usuário ${user.name}`}>
+                                <Trash2 className='h-4 w-4 text-destructive' />
+                              </Button>
+                            }
+                          />
+                        </div>
+                      </div>
+                    ))}
                   </div>
 
                   <PaginationControls

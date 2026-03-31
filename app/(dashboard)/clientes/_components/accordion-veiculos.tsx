@@ -9,7 +9,6 @@ import {
   AccordionItem,
   AccordionTrigger
 } from '@/components/ui/accordion';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { Veiculo } from '@/db/schema';
 
@@ -83,11 +82,13 @@ export function AccordionVeiculos({
       <AccordionItem value={`veiculos-${clienteId}`} className='border-none'>
         <AccordionTrigger className='py-2 hover:no-underline'>
           <div className='flex items-center gap-2'>
-            <Car className='h-4 w-4 text-muted-foreground' />
-            <span className='text-sm font-medium'>Veículos</span>
-            <Badge variant='secondary' className='ml-1'>
+            <Car className='h-4 w-4 text-[#5b7fa5]' />
+            <span className='text-[13px] font-medium text-[#a1a1aa]'>
+              Veículos
+            </span>
+            <span className='text-[12px] text-[#52525b] font-medium ml-1'>
               {veiculos.length}
-            </Badge>
+            </span>
           </div>
         </AccordionTrigger>
         <AccordionContent>
@@ -105,7 +106,7 @@ export function AccordionVeiculos({
                 <Button
                   variant='outline'
                   size='sm'
-                  className='w-full'
+                  className='w-full border-[#27272a] text-[#a1a1aa] hover:text-[#e4e4e7]'
                   onClick={() => setCurrentClienteId(clienteId)}>
                   <Plus className='h-3 w-3 mr-1' />
                   Adicionar Veículo
@@ -116,8 +117,8 @@ export function AccordionVeiculos({
             {/* Loading */}
             {isLoading && (
               <div className='flex items-center justify-center py-4'>
-                <Loader2 className='h-4 w-4 animate-spin text-muted-foreground' />
-                <span className='ml-2 text-sm text-muted-foreground'>
+                <Loader2 className='h-4 w-4 animate-spin text-[#52525b]' />
+                <span className='ml-2 text-[13px] text-[#52525b]'>
                   Carregando veículos...
                 </span>
               </div>
@@ -125,7 +126,7 @@ export function AccordionVeiculos({
 
             {/* Empty State */}
             {!isLoading && veiculos.length === 0 && (
-              <div className='text-center py-4 text-sm text-muted-foreground'>
+              <div className='text-center py-4 text-[13px] text-[#52525b]'>
                 Nenhum veículo cadastrado
               </div>
             )}
@@ -136,16 +137,16 @@ export function AccordionVeiculos({
                 {veiculos.map((veiculo) => (
                   <div
                     key={veiculo.id}
-                    className='flex items-center justify-between p-3 rounded-lg bg-muted/50 border border-border'>
+                    className='flex items-center justify-between p-3 rounded-[8px] bg-[#18181b] border border-[#27272a] hover:border-[#3f3f46] transition-colors'>
                     <div className='flex items-center gap-3'>
-                      <div className='flex h-8 w-8 items-center justify-center rounded-md bg-primary/10'>
-                        <Car className='h-4 w-4 text-primary' />
+                      <div className='flex h-8 w-8 items-center justify-center rounded-[8px] bg-[rgba(91,127,165,0.12)]'>
+                        <Car className='h-4 w-4 text-[#5b7fa5]' />
                       </div>
                       <div>
-                        <p className='text-sm font-medium text-foreground'>
+                        <p className='text-[13px] font-semibold text-[#e4e4e7]'>
                           {veiculo.placa}
                         </p>
-                        <p className='text-xs text-muted-foreground'>
+                        <p className='text-[12px] text-[#71717a]'>
                           {veiculo.modelo}
                         </p>
                       </div>
@@ -167,7 +168,7 @@ export function AccordionVeiculos({
                             className='h-7 w-7'
                             aria-label={`Editar veículo ${veiculo.placa}`}
                             onClick={() => setEditingVeiculo(veiculo)}>
-                            <Pencil className='h-3 w-3 text-muted-foreground' />
+                            <Pencil className='h-3 w-3 text-[#52525b]' />
                           </Button>
                         }
                       />

@@ -56,11 +56,8 @@ export default function Products() {
       <div className='flex flex-col gap-6'>
         <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
           <div className='flex flex-col gap-1'>
-            <div className='flex items-center gap-2.5'>
-              <div className='h-7 w-1 rounded-full bg-primary' />
-              <h1 className='text-2xl font-bold text-foreground'>Produtos</h1>
-            </div>
-            <p className='pl-3.5 text-sm text-muted-foreground'>Gerencie o estoque</p>
+            <h1 className='text-[20px] font-semibold text-[#e4e4e7]'>Produtos</h1>
+            <p className='text-[13px] text-[#52525b]'>Gerencie o estoque</p>
           </div>
 
           <ModalPecas
@@ -78,7 +75,7 @@ export default function Products() {
             precoInput={precoInput}
             handlePrecoChange={handlePrecoChange}
             trigger={
-              <Button className='bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm'>
+              <Button className='bg-[#5b7fa5] text-[#09090B] hover:bg-[#5b7fa5]/90 shadow-sm'>
                 <Plus className='mr-2 h-4 w-4' />
                 Novo Produto
               </Button>
@@ -87,18 +84,18 @@ export default function Products() {
         </div>
 
         <div className='flex flex-col sm:flex-row gap-3 items-start sm:items-center'>
-          <div className='relative w-full sm:max-w-md'>
-            <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+          <div className='relative w-full max-w-[280px]'>
+            <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#52525b]' />
             <Input
               placeholder='Buscar produto...'
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className='bg-card border-border pl-9 h-10 w-full shadow-sm'
+              className='bg-[#18181b] border-[#27272a] pl-9 h-10 w-full rounded-[8px]'
             />
           </div>
 
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className='w-full sm:w-[200px] bg-card border-border h-10 shadow-sm'>
+            <SelectTrigger className='w-full sm:w-[200px] bg-[#18181b] border-[#27272a] h-10 rounded-[8px]'>
               <SelectValue placeholder='Categoria' />
             </SelectTrigger>
             <SelectContent className='bg-popover border-border'>
@@ -112,7 +109,7 @@ export default function Products() {
           </Select>
 
           <Select value={fornecedorFilter} onValueChange={setFornecedorFilter}>
-            <SelectTrigger className='w-full sm:w-[200px] bg-card border-border h-10 shadow-sm'>
+            <SelectTrigger className='w-full sm:w-[200px] bg-[#18181b] border-[#27272a] h-10 rounded-[8px]'>
               <SelectValue placeholder='Fornecedor' />
             </SelectTrigger>
             <SelectContent className='bg-popover border-border'>
@@ -129,24 +126,24 @@ export default function Products() {
 
       <div className='flex-1'>
         {isLoading ? (
-          <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4'>
+          <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-3'>
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
-                className='h-40 bg-card/50 rounded-xl border border-border animate-pulse'
+                className='h-[300px] bg-[#18181b]/50 rounded-[10px] border border-[#27272a] animate-pulse'
               />
             ))}
           </div>
         ) : filteredProducts.length === 0 ? (
-          <div className='flex flex-col items-center justify-center py-20 bg-muted/10 rounded-xl border border-dashed border-border/60'>
-            <PackageOpen className='h-16 w-16 text-muted-foreground/30 mb-4' />
-            <h3 className='text-lg font-semibold text-foreground'>
+          <div className='flex flex-col items-center justify-center py-20 rounded-[10px] border border-dashed border-[#27272a]'>
+            <PackageOpen className='h-16 w-16 text-[#27272a] mb-4' />
+            <h3 className='text-lg font-semibold text-[#52525b]'>
               Nada encontrado
             </h3>
-            <p className='text-sm text-muted-foreground'>Tente outra busca.</p>
+            <p className='text-sm text-[#52525b]'>Tente outra busca.</p>
           </div>
         ) : (
-          <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 pb-10'>
+          <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-3 pb-10'>
             {filteredProducts.map((peca) => (
               <CardPecas
                 key={peca.id}
