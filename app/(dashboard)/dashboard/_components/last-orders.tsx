@@ -207,7 +207,7 @@ export function LastOrders({
                 </span>
                 <span className={COL_STATUS}>
                   <span
-                    className={`inline-block px-2 py-0.5 rounded-full text-xs-label font-medium ${STATUS_STYLES[ordem.status] ?? ''}`}>
+                    className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-medium ${STATUS_STYLES[ordem.status] ?? ''}`}>
                     {STATUS_LABELS[ordem.status] ?? ordem.status}
                   </span>
                 </span>
@@ -249,7 +249,7 @@ export function LastOrders({
               </span>
               <span className={COL_STATUS}>
                 <span
-                  className={`inline-block px-2 py-0.5 rounded-full text-xs-label font-medium ${STATUS_STYLES[ordem.status] ?? ''}`}>
+                  className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-medium ${STATUS_STYLES[ordem.status] ?? ''}`}>
                   {STATUS_LABELS[ordem.status] ?? ordem.status}
                 </span>
               </span>
