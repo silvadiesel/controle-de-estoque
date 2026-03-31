@@ -23,6 +23,12 @@ export default function DashboardPage() {
   const [ordensAtivas, setOrdensAtivas] = useState(0);
   const [alertasEstoque, setAlertasEstoque] = useState(0);
 
+  const [produtosState, setProdutosState] = useState<'ready' | 'unavailable'>('ready');
+  const [clientesState, setClientesState] = useState<'ready' | 'unavailable'>('ready');
+  const [movimentacoesState, setMovimentacoesState] = useState<'ready' | 'unavailable'>('ready');
+  const [servicoState, setServicoState] = useState<'ready' | 'unavailable'>('ready');
+  const [vendaState, setVendaState] = useState<'ready' | 'unavailable'>('ready');
+
   const [ordensServico, setOrdensServico] = useState<OrdemServicoItem[]>([]);
   const [ordensVenda, setOrdensVenda] = useState<OrdemVendaItem[]>([]);
   const [movimentacoes, setMovimentacoes] = useState<MovimentacaoAPI[]>([]);
@@ -56,6 +62,11 @@ export default function DashboardPage() {
     setDashboardState(nextState.pageState);
     setTotalProdutos(nextState.cards.produtos.value);
     setTotalClientes(nextState.cards.clientes.value);
+    setProdutosState(nextState.cards.produtos.state);
+    setClientesState(nextState.cards.clientes.state);
+    setMovimentacoesState(buckets.movimentacoes.ok ? 'ready' : 'unavailable');
+    setServicoState(buckets.servico.ok ? 'ready' : 'unavailable');
+    setVendaState(buckets.venda.ok ? 'ready' : 'unavailable');
     setOrdensAtivas(
       buckets.servico.data.filter((o) => o.status === 'ativa').length +
         buckets.venda.data.filter((o) => o.status === 'ativa').length
@@ -95,6 +106,7 @@ export default function DashboardPage() {
           subtitle="itens em estoque"
           icon={Package}
           isLoading={isLoading}
+          state={produtosState}
         />
         <StatCard
           label="Clientes"
@@ -102,6 +114,7 @@ export default function DashboardPage() {
           subtitle="cadastrados"
           icon={Users}
           isLoading={isLoading}
+          state={clientesState}
         />
         <StatCard
           label="Ordens Ativas"
@@ -121,8 +134,8 @@ export default function DashboardPage() {
 
       {/* Chart + Activity */}
       <div className="flex flex-col lg:flex-row gap-4">
-        <MovementsChart data={chartData} isLoading={isLoading} />
-        <ActivityFeed movimentacoes={movimentacoes} isLoading={isLoading} />
+        <MovementsChart data={chartData} isLoading={isLoading} state={movimentacoesState} />
+        <ActivityFeed movimentacoes={movimentacoes} isLoading={isLoading} state={movimentacoesState} />
       </div>
 
       {/* Last Orders */}
@@ -130,6 +143,8 @@ export default function DashboardPage() {
         ordensServico={ordensServico}
         ordensVenda={ordensVenda}
         isLoading={isLoading}
+        servicoState={servicoState}
+        vendaState={vendaState}
       />
     </div>
   );

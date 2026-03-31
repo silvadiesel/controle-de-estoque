@@ -4,6 +4,12 @@
 import { useMemo } from 'react';
 
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyTitle
+} from '@/components/ui/empty';
 
 export interface MovimentacaoAPI {
   id: number;
@@ -41,9 +47,9 @@ const ACAO_LABELS: Record<string, string> = {
 };
 
 const DOT_COLORS: Record<string, string> = {
-  criacao: '#22c55e',
-  edicao: '#eab308',
-  exclusao: '#ef4444'
+  criacao: 'var(--success)',
+  edicao: 'var(--warning)',
+  exclusao: 'var(--destructive)'
 };
 
 function timeAgo(isoDate: string): string {
@@ -63,9 +69,14 @@ function timeAgo(isoDate: string): string {
 interface ActivityFeedProps {
   movimentacoes: MovimentacaoAPI[];
   isLoading: boolean;
+  state?: 'ready' | 'unavailable';
 }
 
-export function ActivityFeed({ movimentacoes, isLoading }: ActivityFeedProps) {
+export function ActivityFeed({
+  movimentacoes,
+  isLoading,
+  state = 'ready'
+}: ActivityFeedProps) {
   const items: FeedItem[] = useMemo(
     () =>
       [...movimentacoes]
@@ -85,7 +96,7 @@ export function ActivityFeed({ movimentacoes, isLoading }: ActivityFeedProps) {
   );
 
   return (
-    <div className="flex-1 bg-card border border-border rounded-[10px] p-5">
+    <div className="flex-1 bg-card border border-border rounded-xl p-5">
       <div className="mb-4">
         <h2 className="text-heading text-foreground">
           Atividade Recente
@@ -93,7 +104,14 @@ export function ActivityFeed({ movimentacoes, isLoading }: ActivityFeedProps) {
         <p className="text-muted-sm mt-0.5">Últimas ações no sistema</p>
       </div>
 
-      {isLoading ? (
+      {state === 'unavailable' ? (
+        <Empty className="border-border bg-card">
+          <EmptyHeader>
+            <EmptyTitle>Dados indisponíveis</EmptyTitle>
+            <EmptyDescription>Esse bloco não pode ser carregado agora.</EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : isLoading ? (
         <div className="flex flex-col gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-9 w-full rounded-[6px]" />
@@ -118,7 +136,7 @@ export function ActivityFeed({ movimentacoes, isLoading }: ActivityFeedProps) {
                   <div
                     className="h-[9px] w-[9px] rounded-full"
                     style={{
-                      backgroundColor: DOT_COLORS[item.tipo_acao] ?? '#52525b'
+                      backgroundColor: DOT_COLORS[item.tipo_acao] ?? 'var(--muted-foreground)'
                     }}
                   />
                 </div>
