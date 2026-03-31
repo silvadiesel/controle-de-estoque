@@ -288,7 +288,9 @@ export function ModalOrdemServico({
               <Select
                 value={formData.cliente_id ? formData.cliente_id.toString() : ''}
                 onValueChange={handleClienteChange}>
-                <SelectTrigger className={`bg-input w-full ${hasError('cliente_id') ? 'border-destructive' : 'border-border'}`}>
+                <SelectTrigger
+                  aria-describedby={hasError('cliente_id') ? 'error-cliente-servico' : undefined}
+                  className={`bg-input w-full ${hasError('cliente_id') ? 'border-destructive' : 'border-border'}`}>
                   <SelectValue placeholder='Selecione um cliente' />
                 </SelectTrigger>
                 <SelectContent className='bg-card border-border max-h-60 w-fit'>
@@ -303,7 +305,7 @@ export function ModalOrdemServico({
                 </SelectContent>
               </Select>
               {hasError('cliente_id') && (
-                <p className='text-xs text-destructive'>{errors.cliente_id}</p>
+                <p id='error-cliente-servico' className='text-xs text-destructive'>{errors.cliente_id}</p>
               )}
             </div>
 
@@ -328,7 +330,7 @@ export function ModalOrdemServico({
                   />
                 </div>
                 {hasError('data_chegada') && (
-                  <p className='text-xs text-destructive'>{errors.data_chegada}</p>
+                  <p id='error-data-chegada' className='text-xs text-destructive'>{errors.data_chegada}</p>
                 )}
               </div>
 
@@ -363,7 +365,9 @@ export function ModalOrdemServico({
                   setFormData({ ...formData, veiculo_id: parseInt(v) })
                 }
                 disabled={!formData.cliente_id}>
-                <SelectTrigger className={`bg-input w-full ${hasError('veiculo_id') ? 'border-destructive' : 'border-border'}`}>
+                <SelectTrigger
+                  aria-describedby={hasError('veiculo_id') ? 'error-veiculo-servico' : undefined}
+                  className={`bg-input w-full ${hasError('veiculo_id') ? 'border-destructive' : 'border-border'}`}>
                   <SelectValue
                     placeholder={
                       formData.cliente_id
@@ -383,7 +387,7 @@ export function ModalOrdemServico({
                 </SelectContent>
               </Select>
               {hasError('veiculo_id') && (
-                <p className='text-xs text-destructive'>{errors.veiculo_id}</p>
+                <p id='error-veiculo-servico' className='text-xs text-destructive'>{errors.veiculo_id}</p>
               )}
             </div>
 
@@ -395,7 +399,9 @@ export function ModalOrdemServico({
                 onValueChange={(v) =>
                   setFormData({ ...formData, funcionario_responsavel_id: v })
                 }>
-                <SelectTrigger className={`bg-input w-full ${hasError('funcionario_responsavel_id') ? 'border-destructive' : 'border-border'}`}>
+                <SelectTrigger
+                  aria-describedby={hasError('funcionario_responsavel_id') ? 'error-funcionario-servico' : undefined}
+                  className={`bg-input w-full ${hasError('funcionario_responsavel_id') ? 'border-destructive' : 'border-border'}`}>
                   <SelectValue placeholder='Selecione o funcionário responsável' />
                 </SelectTrigger>
                 <SelectContent className='bg-card border-border'>
@@ -407,7 +413,7 @@ export function ModalOrdemServico({
                 </SelectContent>
               </Select>
               {hasError('funcionario_responsavel_id') && (
-                <p className='text-xs text-destructive'>{errors.funcionario_responsavel_id}</p>
+                <p id='error-funcionario-servico' className='text-xs text-destructive'>{errors.funcionario_responsavel_id}</p>
               )}
             </div>
 
@@ -490,7 +496,7 @@ export function ModalOrdemServico({
                             {formatCurrency((item.peca?.preco || 0) * item.quantidade)}
                           </TableCell>
                           <TableCell>
-                            <Button type='button' variant='ghost' size='icon' onClick={() => handleRemovePeca(item.peca_id)}>
+                            <Button type='button' variant='ghost' size='icon' aria-label={`Remover peça ${item.peca?.name_peca || ''}`} onClick={() => handleRemovePeca(item.peca_id)}>
                               <X className='h-4 w-4 text-destructive' />
                             </Button>
                           </TableCell>

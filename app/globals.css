@@ -28,6 +28,10 @@
   --chart-3: oklch(0.646 0.222 41.116);
   --chart-4: oklch(0.553 0.195 38.402);
   --chart-5: oklch(0.47 0.157 37.304);
+  --success: oklch(0.648 0.15 160);
+  --success-foreground: oklch(0.985 0 0);
+  --warning: oklch(0.75 0.183 55.934);
+  --warning-foreground: oklch(0.21 0.006 285.885);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.141 0.005 285.823);
   --sidebar-primary: oklch(0.646 0.222 41.116);
@@ -62,6 +66,10 @@
   --chart-3: oklch(0.646 0.222 41.116);
   --chart-4: oklch(0.553 0.195 38.402);
   --chart-5: oklch(0.47 0.157 37.304);
+  --success: oklch(0.696 0.17 162.48);
+  --success-foreground: oklch(0.985 0 0);
+  --warning: oklch(0.75 0.183 55.934);
+  --warning-foreground: oklch(0.21 0.006 285.885);
   --sidebar: oklch(0.21 0.006 285.885);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.705 0.213 47.604);
@@ -131,5 +139,25 @@
   input[type='number']::-webkit-outer-spin-button {
     appearance: none;
     margin: 0;
+  }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Ensure minimum 44px touch targets on touch devices */
+@media (pointer: coarse) {
+  [data-slot='button'] {
+    min-height: 44px;
+    min-width: 44px;
   }
 }

@@ -55,7 +55,7 @@ const statusConfig = {
   fechada: {
     label: 'Fechada',
     icon: CheckCircle,
-    className: 'bg-emerald-500/20 text-emerald-400'
+    className: 'bg-success/20 text-success'
   },
   cancelada: {
     label: 'Cancelada',
@@ -307,7 +307,7 @@ export function ModalDetalhesOrdem({
                     variant='outline'
                     onClick={() => onUpdateStatus('fechada')}
                     disabled={isLoading}
-                    className='bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/30'>
+                    className='bg-success/10 hover:bg-success/20 text-success border-success/30'>
                     <CheckCircle className='h-4 w-4 mr-2' />
                     Finalizar
                   </Button>

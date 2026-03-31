@@ -86,7 +86,7 @@ export function ModalPecas({
                     size='icon'
                     className='absolute top-2 right-2 h-10 w-10 rounded-full shadow-md hover:scale-105 transition-transform'
                     onClick={handleRemoveImage}
-                    title='Remover imagem'>
+                    aria-label='Remover imagem do produto'>
                     <Trash2 className='h-5 w-5' />
                   </Button>
                 </div>

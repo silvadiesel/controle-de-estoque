@@ -19,6 +19,7 @@ import { ModalFornecedores } from './_components/modal-fornecedores';
 import { useFornecedores } from './_hook/useFornecedores';
 import {
   Factory,
+  Loader2,
   Mail,
   Pencil,
   Phone,
@@ -65,13 +66,13 @@ export default function Fornecedores() {
   } = usePagination({ items: filteredFornecedores, itemsPerPage: 7 });
 
   return (
-    <div className='flex flex-1 flex-col gap-4 p-4 lg:p-4'>
+    <div className='flex flex-1 flex-col gap-4 p-4'>
       {/* Header */}
       <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
         <div className='flex flex-col gap-1'>
           <div className='flex items-center gap-2.5'>
             <div className='h-7 w-1 rounded-full bg-primary' />
-            <h2 className='text-2xl font-bold text-foreground'>Fornecedores</h2>
+            <h1 className='text-2xl font-bold text-foreground'>Fornecedores</h1>
           </div>
           <p className='pl-3.5 text-sm text-muted-foreground'>
             Gerencie os fornecedores de peças
@@ -134,7 +135,7 @@ export default function Fornecedores() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className='rounded-lg border border-border overflow-hidden'>
+          <div className='rounded-lg border border-border overflow-x-auto'>
             <Table>
               <TableHeader>
                 <TableRow className='border-border hover:bg-transparent'>
@@ -158,7 +159,10 @@ export default function Fornecedores() {
                     <TableCell
                       colSpan={4}
                       className='h-24 text-center text-muted-foreground'>
-                      Carregando...
+                      <div className='flex items-center justify-center gap-2'>
+                        <Loader2 className='h-5 w-5 animate-spin' />
+                        Carregando fornecedores...
+                      </div>
                     </TableCell>
                   </TableRow>
                 ) : filteredFornecedores.length === 0 ? (
@@ -221,6 +225,7 @@ export default function Fornecedores() {
                               <Button
                                 variant='ghost'
                                 size='icon'
+                                aria-label={`Editar fornecedor ${fornecedor.name_empresa}`}
                                 onClick={() =>
                                   setEditingFornecedor(fornecedor)
                                 }>
@@ -244,6 +249,7 @@ export default function Fornecedores() {
                               <Button
                                 variant='ghost'
                                 size='icon'
+                                aria-label={`Excluir fornecedor ${fornecedor.name_empresa}`}
                                 onClick={() => {
                                   setDeleteId(fornecedor.id);
                                   setIsDeleteOpen(true);

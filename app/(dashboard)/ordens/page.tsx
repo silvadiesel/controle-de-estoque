@@ -57,12 +57,12 @@ const statusConfig = {
   ativa: {
     label: 'Ativa',
     icon: Clock,
-    className: 'bg-yellow-700/20 text-yellow-500'
+    className: 'bg-warning/20 text-warning'
   },
   fechada: {
     label: 'Fechada',
     icon: CheckCircle,
-    className: 'bg-emerald-500/20 text-emerald-400'
+    className: 'bg-success/20 text-success'
   },
   cancelada: {
     label: 'Cancelada',
@@ -280,15 +280,15 @@ export default function Ordens() {
   };
 
   return (
-    <div className='flex flex-1 flex-col gap-4 p-4 lg:p-4'>
+    <div className='flex flex-1 flex-col gap-4 p-4'>
       {/* Header */}
       <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
         <div className='flex flex-col gap-1'>
           <div className='flex items-center gap-2.5'>
             <div className='h-7 w-1 rounded-full bg-primary' />
-            <h2 className='text-2xl font-bold text-foreground'>
+            <h1 className='text-2xl font-bold text-foreground'>
               Ordens de Serviço e Venda
-            </h2>
+            </h1>
           </div>
           <p className='pl-3.5 text-sm text-muted-foreground'>
             Gerencie serviços e vendas de peças
@@ -313,11 +313,11 @@ export default function Ordens() {
       <div className='flex flex-col md:flex-row w-full gap-4'>
         <div className='flex gap-4 w-full'>
           <Card className='bg-card w-full border-border relative overflow-hidden'>
-            <div className='absolute inset-x-0 top-0 h-0.5 bg-yellow-500/50' />
+            <div className='absolute inset-x-0 top-0 h-0.5 bg-warning/50' />
             <CardContent className='px-4 py-4'>
               <div className='flex items-center gap-3'>
-                <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-500/10'>
-                  <Clock className='h-5 w-5 text-yellow-500' />
+                <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-warning/10'>
+                  <Clock className='h-5 w-5 text-warning' />
                 </div>
                 <div>
                   <p className='text-2xl font-bold text-foreground'>
@@ -329,11 +329,11 @@ export default function Ordens() {
             </CardContent>
           </Card>
           <Card className='bg-card w-full border-border relative overflow-hidden'>
-            <div className='absolute inset-x-0 top-0 h-0.5 bg-emerald-500/50' />
+            <div className='absolute inset-x-0 top-0 h-0.5 bg-success/50' />
             <CardContent className='px-4 py-4'>
               <div className='flex items-center gap-3'>
-                <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10'>
-                  <CheckCircle className='h-5 w-5 text-emerald-500' />
+                <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-success/10'>
+                  <CheckCircle className='h-5 w-5 text-success' />
                 </div>
                 <div>
                   <p className='text-2xl font-bold text-foreground'>
@@ -382,7 +382,7 @@ export default function Ordens() {
       </div>
 
       {/* Filters */}
-      <div className='flex flex-col gap-3 sm:flex-row'>
+      <div className='flex flex-col gap-3 sm:flex-row sm:flex-wrap'>
         <div className='relative flex-1 max-w-md'>
           <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
           <Input
@@ -395,7 +395,7 @@ export default function Ordens() {
         <Select
           value={filterType}
           onValueChange={(v: 'all' | 'servico' | 'venda') => setFilterType(v)}>
-          <SelectTrigger className='bg-input md:flex hidden zborder-border w-full sm:w-40'>
+          <SelectTrigger className='bg-input md:flex hidden border-border w-full sm:w-40'>
             <SelectValue />
           </SelectTrigger>
           <SelectContent className='bg-card border-border'>
@@ -690,7 +690,7 @@ export default function Ordens() {
                                 'fechada'
                               );
                             }}>
-                            <CheckCircle className='h-4 w-4 text-emerald-500' />
+                            <CheckCircle className='h-4 w-4 text-success' />
                             Finalizar
                           </Button>
                           <Button
