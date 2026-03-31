@@ -1,25 +1,32 @@
 'use client';
 
 import type React from 'react';
-import { useState } from 'react';
+import { startTransition, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AuthShell } from '@/app/(auth)/auth-shell';
 import { Button } from '@/components/ui/button';
-import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { signUp } from '@/lib/auth-client';
 
-import {
-  AlertCircle,
-  ArrowRight,
-  Eye,
-  EyeOff,
-  Loader2,
-  Truck
-} from 'lucide-react';
+import { AlertCircle, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
+
+function getRegisterErrorMessage(message?: string) {
+  const normalized = message?.toLowerCase() ?? '';
+
+  if (normalized.includes('exist') || normalized.includes('already')) {
+    return 'Esse email ja esta em uso. Tente entrar ou use outro endereco.';
+  }
+
+  if (normalized.includes('password') || normalized.includes('senha')) {
+    return 'Sua senha precisa atender aos requisitos minimos para concluir o cadastro.';
+  }
+
+  return 'Nao foi possivel criar sua conta agora. Tente novamente em instantes.';
+}
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -39,7 +46,7 @@ export default function RegisterPage() {
 
     if (codigoVerificacao !== CODIGO_LOJA) {
       setError(
-        'Código de verificação inválido. Entre em contato com o administrador.'
+        'Codigo de verificacao invalido. Entre em contato com o administrador.'
       );
       return;
     }
@@ -54,9 +61,11 @@ export default function RegisterPage() {
       });
 
       if (result.error) {
-        setError(result.error.message || 'Erro ao criar conta');
+        setError(getRegisterErrorMessage(result.error.message));
       } else {
-        router.push('/login');
+        startTransition(() => {
+          router.push('/login');
+        });
       }
     } catch {
       setError('Erro ao criar conta. Tente novamente.');
@@ -66,174 +75,145 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className='min-h-screen bg-background flex'>
-      {/* Left — Brand panel */}
-      <div className='hidden lg:flex lg:w-1/2 xl:w-3/5 relative bg-zinc-950'>
-        <div className='absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-primary/6 to-transparent' />
+    <AuthShell
+      formTitle='Crie sua conta'
+      mobileMessage='Abra seu acesso para centralizar a operacao e comecar a organizar estoque, ordens e clientes em um so lugar.'
+      footer={
+        <>
+          Ja tem uma conta?{' '}
+          <Link
+            href='/login'
+            className='font-medium text-primary transition-colors hover:text-white'>
+            Entrar
+          </Link>
+        </>
+      }>
+      <form onSubmit={handleSubmit} className='space-y-5'>
+        <div className='space-y-2'>
+          <Label htmlFor='name' className='text-base font-medium text-zinc-100'>
+            Nome completo
+          </Label>
+          <Input
+            id='name'
+            type='text'
+            placeholder='Seu nome'
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            autoComplete='name'
+            aria-invalid={Boolean(error)}
+            required
+            disabled={loading}
+            className='h-14 rounded-2xl border-white/8 bg-white/3 px-4 text-base text-white placeholder:text-zinc-500'
+          />
+        </div>
 
-        <div className='relative z-10 flex flex-col justify-between p-12 xl:p-16 w-full'>
-          <div className='flex items-center gap-3'>
-            <div className='flex items-center justify-center w-10 h-10 rounded-lg bg-primary text-primary-foreground'>
-              <Truck className='w-5 h-5' />
-            </div>
-            <span className='text-lg font-semibold text-white tracking-tight'>
-              Igne System
-            </span>
+        <div className='space-y-2'>
+          <Label
+            htmlFor='email'
+            className='text-base font-medium text-zinc-100'>
+            Email
+          </Label>
+          <Input
+            id='email'
+            type='email'
+            placeholder='seu@email.com'
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoComplete='email'
+            aria-invalid={Boolean(error)}
+            required
+            disabled={loading}
+            className='h-14 rounded-2xl border-white/8 bg-white/3 px-4 text-base text-white placeholder:text-zinc-500'
+          />
+        </div>
+
+        <div className='space-y-2'>
+          <Label
+            htmlFor='password'
+            className='text-base font-medium text-zinc-100'>
+            Senha
+          </Label>
+          <div className='relative'>
+            <Input
+              id='password'
+              type={showPassword ? 'text' : 'password'}
+              placeholder='••••••••'
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete='new-password'
+              aria-invalid={Boolean(error)}
+              required
+              minLength={8}
+              disabled={loading}
+              className='h-14 rounded-2xl border-white/8 bg-white/3 px-4 pr-12 text-base text-white placeholder:text-zinc-500'
+            />
+            <button
+              type='button'
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+              className='absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 transition-colors hover:text-zinc-100'>
+              {showPassword ? (
+                <EyeOff className='h-5 w-5' />
+              ) : (
+                <Eye className='h-5 w-5' />
+              )}
+            </button>
           </div>
-
-          <div className='max-w-lg'>
-            <h1 className='text-5xl xl:text-6xl font-bold text-white leading-[1.1] tracking-tight'>
-              Comece a{' '}
-              <span className='text-primary'>organizar.</span>
-            </h1>
-            <p className='mt-6 text-zinc-400 text-lg leading-relaxed max-w-sm'>
-              Crie sua conta e tenha controle total sobre estoque, clientes e
-              ordens de serviço.
-            </p>
-          </div>
-
-          <p className='text-xs text-zinc-600'>
-            © 2025 Igne System
+          <p className='text-sm leading-6 text-zinc-500'>
+            Minimo de 8 caracteres.
           </p>
         </div>
-      </div>
 
-      {/* Right — Form */}
-      <div className='flex-1 flex items-center justify-center p-6 sm:p-12'>
-        <div className='w-full max-w-sm'>
-          {/* Mobile logo */}
-          <div className='flex lg:hidden items-center gap-3 mb-12'>
-            <div className='flex items-center justify-center w-10 h-10 rounded-lg bg-primary text-primary-foreground'>
-              <Truck className='w-5 h-5' />
-            </div>
-            <span className='text-lg font-semibold text-foreground'>
-              Igne System
-            </span>
-          </div>
-
-          <div className='space-y-2 mb-8'>
-            <h2 className='text-2xl font-bold text-foreground'>
-              Criar sua conta
-            </h2>
-            <p className='text-muted-foreground'>
-              Preencha os dados abaixo para começar
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit}>
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor='name'>Nome completo</FieldLabel>
-                <Input
-                  id='name'
-                  type='text'
-                  placeholder='Seu nome'
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  disabled={loading}
-                />
-              </Field>
-
-              <Field>
-                <FieldLabel htmlFor='email'>Email</FieldLabel>
-                <Input
-                  id='email'
-                  type='email'
-                  placeholder='seu@email.com'
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={loading}
-                />
-              </Field>
-
-              <Field>
-                <FieldLabel htmlFor='password'>Senha</FieldLabel>
-                <div className='relative'>
-                  <Input
-                    id='password'
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder='••••••••'
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    minLength={8}
-                    disabled={loading}
-                    className='pr-12'
-                  />
-                  <button
-                    type='button'
-                    onClick={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
-                    className='absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors'>
-                    {showPassword ? (
-                      <EyeOff className='w-5 h-5' />
-                    ) : (
-                      <Eye className='w-5 h-5' />
-                    )}
-                  </button>
-                </div>
-                <FieldDescription>Mínimo de 8 caracteres</FieldDescription>
-              </Field>
-
-              <Field>
-                <FieldLabel htmlFor='codigoVerificacao'>
-                  Código de verificação
-                </FieldLabel>
-                <Input
-                  id='codigoVerificacao'
-                  type='text'
-                  placeholder='Digite o código da loja'
-                  value={codigoVerificacao}
-                  onChange={(e) => setCodigoVerificacao(e.target.value)}
-                  required
-                  disabled={loading}
-                />
-                <FieldDescription>
-                  Solicite o código ao administrador
-                </FieldDescription>
-              </Field>
-
-              {error ? (
-                <Alert variant='destructive'>
-                  <AlertCircle />
-                  <AlertTitle>Falha ao criar conta</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              ) : null}
-
-              <Button
-                type='submit'
-                className='w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-md group'
-                disabled={loading}>
-                {loading ? (
-                  <>
-                    <Loader2 className='w-5 h-5 mr-2 animate-spin' />
-                    Criando conta...
-                  </>
-                ) : (
-                  <>
-                    Criar minha conta
-                    <ArrowRight className='w-4 h-4 ml-2 group-hover:translate-x-0.5 transition-transform' />
-                  </>
-                )}
-              </Button>
-            </FieldGroup>
-          </form>
-
-          <p className='mt-8 text-center text-sm text-muted-foreground'>
-            Já tem uma conta?{' '}
-            <Link
-              href='/login'
-              aria-disabled={loading}
-              tabIndex={loading ? -1 : undefined}
-              className={`text-primary font-medium ${loading ? 'pointer-events-none opacity-50' : 'hover:underline'}`}>
-              Entrar
-            </Link>
+        <div className='space-y-2'>
+          <Label
+            htmlFor='codigoVerificacao'
+            className='text-base font-medium text-zinc-100'>
+            Codigo de verificacao
+          </Label>
+          <Input
+            id='codigoVerificacao'
+            type='text'
+            placeholder='Digite o codigo da loja'
+            value={codigoVerificacao}
+            onChange={(e) => setCodigoVerificacao(e.target.value)}
+            autoComplete='off'
+            aria-invalid={Boolean(error)}
+            required
+            disabled={loading}
+            className='h-14 rounded-2xl border-white/8 bg-white/3 px-4 text-base text-white placeholder:text-zinc-500'
+          />
+          <p className='text-sm leading-6 text-zinc-500'>
+            Solicite o codigo ao administrador para liberar o cadastro.
           </p>
         </div>
-      </div>
-    </div>
+
+        {error && (
+          <div
+            aria-live='polite'
+            role='alert'
+            className='flex items-center gap-3 rounded-2xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive'>
+            <AlertCircle className='h-5 w-5 shrink-0' />
+            <span>{error}</span>
+          </div>
+        )}
+
+        <Button
+          type='submit'
+          className='group h-14 w-full rounded-2xl bg-[linear-gradient(180deg,#7b9cc0,#5b7fa5)] text-base font-semibold text-[#081019] shadow-[0_20px_40px_rgba(91,127,165,0.24)] hover:opacity-95'
+          disabled={loading}>
+          {loading ? (
+            <>
+              <Loader2 className='mr-2 h-5 w-5 animate-spin' />
+              Criando conta...
+            </>
+          ) : (
+            <>
+              Criar minha conta
+              <ArrowRight className='h-4 w-4 transition-transform group-hover:translate-x-0.5' />
+            </>
+          )}
+        </Button>
+      </form>
+    </AuthShell>
   );
 }
