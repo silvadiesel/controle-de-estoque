@@ -27,7 +27,9 @@ export default async function DashboardLayout({
       <AppSidebar />
       <SidebarInset>
         <AlertaToastProvider />
-        {children}
+        <main id='main-content'>
+          {children}
+        </main>
       </SidebarInset>
     </SidebarProvider>
   );

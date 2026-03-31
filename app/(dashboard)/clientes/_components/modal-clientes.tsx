@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { Cliente } from '@/db/schema';
+import { Users } from 'lucide-react';
 
 interface ModalClientesProps {
   mode: 'create' | 'edit';
@@ -57,81 +58,100 @@ export function ModalClientes({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className='bg-card border-border max-w-2xl p-0'>
-        <DialogHeader className='p-6 pb-0'>
-          <DialogTitle className='text-foreground'>
-            {isEdit ? 'Editar Cliente' : 'Adicionar Cliente'}
-          </DialogTitle>
-          <DialogDescription>
-            {isEdit
-              ? 'Altere os dados do cliente'
-              : 'Cadastre um novo cliente no sistema'}
-          </DialogDescription>
+      <DialogContent className='bg-[#18181b] border-[#27272a] rounded-[12px] max-w-[540px] p-0'>
+        <DialogHeader className='p-6 pb-4 border-b border-[#27272a]'>
+          <div className='flex items-center gap-3'>
+            <div className='flex h-8 w-8 items-center justify-center rounded-[8px] bg-[rgba(91,127,165,0.12)]'>
+              <Users className='h-4 w-4 text-[#5b7fa5]' />
+            </div>
+            <div>
+              <DialogTitle className='text-[16px] font-bold text-[#e4e4e7]'>
+                {isEdit ? 'Editar Cliente' : 'Adicionar Cliente'}
+              </DialogTitle>
+              <DialogDescription className='text-[12px] text-[#52525b]'>
+                {isEdit
+                  ? 'Altere os dados do cliente'
+                  : 'Cadastre um novo cliente no sistema'}
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
         <ScrollArea className='max-h-[60vh]'>
           <div className='grid gap-4 p-6 pt-4'>
+            <p className='text-[10px] uppercase tracking-[0.8px] text-[#52525b] font-semibold mb-3'>DADOS DO CLIENTE</p>
             <div className='grid gap-4 sm:grid-cols-2'>
               <div className='space-y-2'>
-                <Label>Nome do Cliente *</Label>
+                <Label className='text-[12px] text-[#a1a1aa]'>
+                  Nome do Cliente *
+                </Label>
                 <Input
                   value={data.name_cliente || ''}
                   onChange={(e) =>
                     setData({ ...data, name_cliente: e.target.value })
                   }
                   placeholder='João Silva'
-                  className='bg-input border-border'
+                  className='bg-[#131316] border-[#27272a] rounded-[8px]'
                 />
               </div>
               <div className='space-y-2'>
-                <Label>Nome da Empresa *</Label>
+                <Label className='text-[12px] text-[#a1a1aa]'>
+                  Nome da Empresa *
+                </Label>
                 <Input
                   value={data.nome_empresa || ''}
                   onChange={(e) =>
                     setData({ ...data, nome_empresa: e.target.value })
                   }
                   placeholder='Transportadora Silva'
-                  className='bg-input border-border'
+                  className='bg-[#131316] border-[#27272a] rounded-[8px]'
                 />
               </div>
             </div>
             <div className='grid gap-4 sm:grid-cols-2'>
               <div className='space-y-2'>
-                <Label>CPF (ou informe CNPJ)</Label>
+                <Label className='text-[12px] text-[#a1a1aa]'>
+                  CPF (ou informe CNPJ)
+                </Label>
                 <Input
                   value={data.cpf || ''}
                   onChange={(e) => handleCPFChange(e.target.value)}
                   placeholder='000.000.000-00'
-                  className='bg-input border-border'
+                  className='bg-[#131316] border-[#27272a] rounded-[8px]'
                 />
               </div>
               <div className='space-y-2'>
-                <Label>CNPJ (ou informe CPF)</Label>
+                <Label className='text-[12px] text-[#a1a1aa]'>
+                  CNPJ (ou informe CPF)
+                </Label>
                 <Input
                   value={data.cnpj || ''}
                   onChange={(e) => handleCNPJChange(e.target.value)}
                   placeholder='00.000.000/0001-00'
-                  className='bg-input border-border'
+                  className='bg-[#131316] border-[#27272a] rounded-[8px]'
                 />
               </div>
             </div>
             <div className='space-y-2'>
-              <Label>Telefone *</Label>
+              <Label className='text-[12px] text-[#a1a1aa]'>Telefone *</Label>
               <Input
                 value={data.telefone || ''}
                 onChange={(e) => handlePhoneChange(e.target.value)}
                 placeholder='(11) 99999-9999'
-                className='bg-input border-border'
+                className='bg-[#131316] border-[#27272a] rounded-[8px]'
               />
             </div>
           </div>
         </ScrollArea>
-        <DialogFooter className='px-6 py-4 border-t border-border'>
-          <Button variant='outline' onClick={() => setIsOpen(false)} className='w-32'>
+        <DialogFooter className='px-6 py-4 border-t border-[#27272a]'>
+          <Button
+            variant='outline'
+            onClick={() => setIsOpen(false)}
+            className='w-32 border-[#27272a] text-[#a1a1aa]'>
             Cancelar
           </Button>
           <Button
             onClick={onSubmit}
-            className='bg-primary hover:bg-primary/90 w-32'
+            className='bg-[#5b7fa5] hover:bg-[#5b7fa5]/90 text-[#09090B] w-32'
             disabled={isLoading}>
             {isLoading ? 'Salvando...' : isEdit ? 'Salvar' : 'Adicionar'}
           </Button>
