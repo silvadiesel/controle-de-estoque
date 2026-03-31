@@ -244,7 +244,15 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
+          className={cn(
+            "data-[slot=sidebar-inner]:bg-sidebar text-sidebar-foreground",
+            "[&_[data-sidebar=menu-button]]:transition-colors",
+            "[&_[data-sidebar=menu-button][data-active=true]]:bg-elevated",
+            "[&_[data-sidebar=menu-button][data-active=true]]:text-foreground",
+            "[&_[data-sidebar=menu-button]:focus-visible]:bg-elevated",
+            "[&_[data-sidebar=menu-button]:focus-visible]:shadow-[inset_0_0_0_1px_var(--border-hover)]",
+            "group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
+          )}
         >
           {children}
         </div>
@@ -606,10 +614,7 @@ function SidebarMenuSkeleton({
 }: React.ComponentProps<"div"> & {
   showIcon?: boolean
 }) {
-  // Random width between 50 to 90%.
-  const width = React.useMemo(() => {
-    return `${Math.floor(Math.random() * 40) + 50}%`
-  }, [])
+  const width = "72%"
 
   return (
     <div
