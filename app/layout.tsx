@@ -17,7 +17,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'Igne System',
-  description: 'Tudo em um só lugar'
+  description: 'Tudo em um só lugar',
+  icons: {
+    icon: '/img/main_icon.svg'
+  }
 };
 
 export default function RootLayout({
