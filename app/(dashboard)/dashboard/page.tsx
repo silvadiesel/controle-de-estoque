@@ -12,9 +12,11 @@ import { ActivityFeed, type MovimentacaoAPI } from './_components/activity-feed'
 import { buildLast7Days, MovementsChart } from './_components/movements-chart';
 import { LastOrders, type OrdemServicoItem, type OrdemVendaItem } from './_components/last-orders';
 import { StatCard } from './_components/stat-card';
+import { deriveDashboardState, type DashboardBuckets, type RequestBucket } from './_lib/dashboard-state';
 
 export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
+  const [dashboardState, setDashboardState] = useState<'loading' | 'ready' | 'partial-error' | 'total-error'>('loading');
 
   const [totalProdutos, setTotalProdutos] = useState(0);
   const [totalClientes, setTotalClientes] = useState(0);
@@ -27,6 +29,7 @@ export default function DashboardPage() {
 
   const fetchAll = useCallback(async () => {
     setIsLoading(true);
+    setDashboardState('loading');
 
     const results = await Promise.allSettled([
       fetch('/api/produtos').then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
@@ -36,49 +39,46 @@ export default function DashboardPage() {
       fetch('/api/movimentacoes').then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
     ]);
 
-    const produtos: Peca[] = results[0].status === 'fulfilled' && Array.isArray(results[0].value)
-      ? results[0].value
-      : [];
-    const clientes: Cliente[] = results[1].status === 'fulfilled' && Array.isArray(results[1].value)
-      ? results[1].value
-      : [];
-    const servico: OrdemServicoItem[] =
-      results[2].status === 'fulfilled' && Array.isArray(results[2].value)
-        ? results[2].value
-        : [];
-    const venda: OrdemVendaItem[] =
-      results[3].status === 'fulfilled' && Array.isArray(results[3].value)
-        ? results[3].value
-        : [];
-    const movs: MovimentacaoAPI[] =
-      results[4].status === 'fulfilled' && Array.isArray(results[4].value)
-        ? results[4].value
-        : [];
+    const toBucket = <T,>(result: PromiseSettledResult<unknown>): RequestBucket<T> => ({
+      ok: result.status === 'fulfilled' && Array.isArray(result.value),
+      data: result.status === 'fulfilled' && Array.isArray(result.value) ? (result.value as T[]) : []
+    });
 
-    setTotalProdutos(produtos.length);
-    setTotalClientes(clientes.length);
+    const buckets: DashboardBuckets = {
+      produtos: toBucket<Peca>(results[0]),
+      clientes: toBucket<Cliente>(results[1]),
+      servico: toBucket<OrdemServicoItem>(results[2]),
+      venda: toBucket<OrdemVendaItem>(results[3]),
+      movimentacoes: toBucket<MovimentacaoAPI>(results[4])
+    };
+
+    const nextState = deriveDashboardState(buckets);
+    setDashboardState(nextState.pageState);
+    setTotalProdutos(nextState.cards.produtos.value);
+    setTotalClientes(nextState.cards.clientes.value);
     setOrdensAtivas(
-      servico.filter((o) => o.status === 'ativa').length +
-        venda.filter((o) => o.status === 'ativa').length
+      buckets.servico.data.filter((o) => o.status === 'ativa').length +
+        buckets.venda.data.filter((o) => o.status === 'ativa').length
     );
     setAlertasEstoque(
-      produtos.filter((p) => p.quantidade <= p.alerta).length
+      buckets.produtos.data.filter((p) => p.quantidade <= p.alerta).length
     );
-    setOrdensServico(servico);
-    setOrdensVenda(venda);
-    setMovimentacoes(movs);
+    setOrdensServico(buckets.servico.data);
+    setOrdensVenda(buckets.venda.data);
+    setMovimentacoes(buckets.movimentacoes.data);
 
     setIsLoading(false);
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetchAll é assíncrono; os setState ocorrem após o primeiro await, não no corpo síncrono do efeito
     fetchAll();
   }, [fetchAll]);
 
   const chartData = useMemo(() => buildLast7Days(movimentacoes), [movimentacoes]);
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 lg:p-6">
+    <div className="flex flex-1 flex-col gap-4 p-4 lg:p-6" data-dashboard-state={dashboardState}>
       {/* Header */}
       <div className="flex flex-col gap-0.5">
         <h1 className="text-[22px] font-bold" style={{ color: 'var(--text-bright)' }}>
