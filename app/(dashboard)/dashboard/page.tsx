@@ -122,6 +122,7 @@ export default function DashboardPage() {
           subtitle="em andamento"
           icon={ShoppingCart}
           isLoading={isLoading}
+          state={servicoState === 'unavailable' || vendaState === 'unavailable' ? 'unavailable' : 'ready'}
         />
         <StatCard
           label="Alertas de Estoque"
@@ -129,6 +130,7 @@ export default function DashboardPage() {
           subtitle="produtos com estoque baixo"
           icon={AlertTriangle}
           isLoading={isLoading}
+          state={produtosState}
         />
       </div>
 
