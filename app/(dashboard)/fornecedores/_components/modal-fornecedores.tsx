@@ -1,132 +1,151 @@
+'use client';
+
+import { useEffect } from 'react';
 import { formatCNPJ, formatPhone } from '@/app/utils/formatters';
+import { fornecedorSchema } from '@/app/utils/validators';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog';
+import { DialogShell } from '@/components/ui/dialog-shell';
+import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import type { Fornecedor } from '@/db/schema';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Factory } from 'lucide-react';
+import { Controller, useForm } from 'react-hook-form';
+import type { FornecedorFormValues } from '../_hooks';
 
 interface ModalFornecedoresProps {
   mode: 'create' | 'edit';
-  data: Partial<Fornecedor>;
-  setData: (data: Partial<Fornecedor>) => void;
+  initialData?: Partial<Fornecedor>;
   isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
-  onSubmit: () => Promise<void>;
+  setIsOpen: (open: boolean) => void;
+  onSubmit: (data: FornecedorFormValues) => Promise<boolean>;
   isLoading: boolean;
   trigger?: React.ReactNode;
 }
 
+function getDefaultValues(initialData?: Partial<Fornecedor>): FornecedorFormValues {
+  return {
+    name_empresa: initialData?.name_empresa ?? '',
+    cnpj: initialData?.cnpj ?? '',
+    telefone: initialData?.telefone ?? '',
+    email: initialData?.email ?? ''
+  };
+}
+
 export function ModalFornecedores({
-  mode,
-  data,
-  setData,
-  isOpen,
-  setIsOpen,
-  onSubmit,
-  isLoading,
-  trigger
+  mode, initialData, isOpen, setIsOpen, onSubmit, isLoading, trigger
 }: ModalFornecedoresProps) {
   const isEdit = mode === 'edit';
+  const form = useForm<FornecedorFormValues>({
+    resolver: zodResolver(fornecedorSchema),
+    defaultValues: getDefaultValues(initialData),
+    mode: 'onSubmit',
+    reValidateMode: 'onChange'
+  });
 
-  const handleCNPJChange = (value: string) => {
-    const formatted = formatCNPJ(value);
-    setData({ ...data, cnpj: formatted });
+  const { control, formState: { errors }, handleSubmit, register, reset } = form;
+
+  useEffect(() => {
+    if (isOpen) reset(getDefaultValues(initialData));
+  }, [initialData, isOpen, reset]);
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open) reset(getDefaultValues(initialData));
+    setIsOpen(open);
   };
 
-  const handlePhoneChange = (value: string) => {
-    const formatted = formatPhone(value);
-    setData({ ...data, telefone: formatted });
-  };
+  const handleFormSubmit = handleSubmit(async (values) => {
+    const didSave = await onSubmit(values);
+    if (didSave) {
+      reset(getDefaultValues());
+      setIsOpen(false);
+    }
+  });
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className='bg-card border-border rounded-xl max-w-[540px] p-0'>
-        <DialogHeader className='p-6 pb-4 border-b border-border'>
-          <div className='flex items-center gap-3 mb-1'>
-            <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-primary/12'>
-              <Factory className='h-4.5 w-4.5 text-primary' />
-            </div>
-            <div>
-              <DialogTitle className='text-foreground'>
-                {isEdit ? 'Editar Fornecedor' : 'Adicionar Fornecedor'}
-              </DialogTitle>
-              <DialogDescription className='text-muted-foreground'>
-                {isEdit
-                  ? 'Altere os dados do fornecedor'
-                  : 'Cadastre um novo fornecedor no sistema'}
-              </DialogDescription>
-            </div>
-          </div>
-        </DialogHeader>
-        <ScrollArea className='max-h-[60vh]'>
-          <div className='grid gap-4 p-6 pt-4'>
-            <div className='grid gap-4 sm:grid-cols-2'>
-              <div className='space-y-2'>
-                <Label className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>Nome / Razão Social *</Label>
-                <Input
-                  value={data.name_empresa || ''}
-                  onChange={(e) =>
-                    setData({ ...data, name_empresa: e.target.value })
-                  }
-                  placeholder='AutoPeças Brasil'
-                  className='bg-input border-border'
-                />
-              </div>
-              <div className='space-y-2'>
-                <Label className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>CNPJ *</Label>
-                <Input
-                  value={data.cnpj || ''}
-                  onChange={(e) => handleCNPJChange(e.target.value)}
-                  placeholder='00.000.000/0001-00'
-                  className='bg-input border-border'
-                />
-              </div>
-            </div>
-            <div className='grid gap-4 sm:grid-cols-2'>
-              <div className='space-y-2'>
-                <Label className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>Telefone</Label>
-                <Input
-                  value={data.telefone || ''}
-                  onChange={(e) => handlePhoneChange(e.target.value)}
-                  placeholder='(11) 99999-9999'
-                  className='bg-input border-border'
-                />
-              </div>
-              <div className='space-y-2'>
-                <Label className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>Email</Label>
-                <Input
-                  value={data.email || ''}
-                  onChange={(e) => setData({ ...data, email: e.target.value })}
-                  placeholder='vendas@fornecedor.com'
-                  className='bg-input border-border'
-                />
-              </div>
-            </div>
-          </div>
-        </ScrollArea>
-        <DialogFooter className='px-6 py-4 border-t border-border'>
-          <Button variant='outline' onClick={() => setIsOpen(false)} className='w-32'>
-            Cancelar
-          </Button>
-          <Button
-            onClick={onSubmit}
-            className='bg-primary hover:bg-primary/90 text-primary-foreground w-32'
-            disabled={isLoading}>
+    <DialogShell
+      open={isOpen}
+      onOpenChange={handleOpenChange}
+      icon={Factory}
+      title={isEdit ? 'Editar fornecedor' : 'Adicionar fornecedor'}
+      description={isEdit ? 'Atualize os dados do fornecedor.' : 'Cadastre um novo fornecedor no sistema.'}
+      trigger={trigger}
+      footer={
+        <>
+          <Button variant='outline' onClick={() => handleOpenChange(false)}>Cancelar</Button>
+          <Button type='submit' form='fornecedor-form' disabled={isLoading}>
             {isLoading ? 'Salvando...' : isEdit ? 'Salvar' : 'Adicionar'}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </>
+      }
+    >
+      <form id='fornecedor-form' onSubmit={handleFormSubmit}>
+        <FieldGroup className='flex flex-col gap-4'>
+          <Field orientation='responsive'>
+            <FieldContent>
+              <FieldLabel htmlFor='name_empresa'>Nome / Razão Social</FieldLabel>
+              <Input
+                id='name_empresa'
+                placeholder='AutoPeças Brasil'
+                className='bg-input border-border'
+                aria-invalid={!!errors.name_empresa}
+                {...register('name_empresa')}
+              />
+              <FieldError errors={[errors.name_empresa]} />
+            </FieldContent>
+            <FieldContent>
+              <FieldLabel htmlFor='cnpj'>CNPJ</FieldLabel>
+              <Controller
+                name='cnpj'
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id='cnpj'
+                    value={field.value ?? ''}
+                    onChange={(e) => field.onChange(formatCNPJ(e.target.value))}
+                    placeholder='00.000.000/0001-00'
+                    className='bg-input border-border'
+                    aria-invalid={!!errors.cnpj}
+                  />
+                )}
+              />
+              <FieldError errors={[errors.cnpj]} />
+            </FieldContent>
+          </Field>
+
+          <Field orientation='responsive'>
+            <FieldContent>
+              <FieldLabel htmlFor='telefone'>Telefone</FieldLabel>
+              <Controller
+                name='telefone'
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id='telefone'
+                    value={field.value ?? ''}
+                    onChange={(e) => field.onChange(formatPhone(e.target.value))}
+                    placeholder='(11) 99999-9999'
+                    className='bg-input border-border'
+                    aria-invalid={!!errors.telefone}
+                  />
+                )}
+              />
+              <FieldError errors={[errors.telefone]} />
+            </FieldContent>
+            <FieldContent>
+              <FieldLabel htmlFor='email'>Email</FieldLabel>
+              <Input
+                id='email'
+                placeholder='vendas@fornecedor.com'
+                className='bg-input border-border'
+                aria-invalid={!!errors.email}
+                {...register('email')}
+              />
+              <FieldError errors={[errors.email]} />
+            </FieldContent>
+          </Field>
+        </FieldGroup>
+      </form>
+    </DialogShell>
   );
 }
