@@ -44,7 +44,7 @@ export function AlertToast() {
 
     toast.custom(
       () => (
-        <Alert className='max-w-7xl border-border bg-popover shadow-lg flex flex-col gap-1'>
+        <Alert className='min-w-md border-border bg-popover shadow-lg flex flex-col gap-1'>
           <div className='flex mb-2 items-center justify-between w-full gap-3'>
             {hasCriticalItems ? (
               <AlertTriangle size={17} color='#e7000b' />
