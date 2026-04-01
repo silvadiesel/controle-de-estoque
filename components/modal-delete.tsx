@@ -1,4 +1,5 @@
 import { AlertTriangle } from 'lucide-react';
+
 import { Button } from './ui/button';
 import {
   Dialog,
@@ -31,27 +32,27 @@ export function ModalDelete({
 }: ModalDeleteProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className='bg-[#18181b] border-[#27272a] rounded-[12px] max-w-[540px]'>
-        <DialogHeader className='border-b border-[#27272a] pb-4'>
+      {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
+      <DialogContent className='max-w-[540px] gap-0 rounded-xl border-border bg-card p-0'>
+        <DialogHeader className='border-b border-border p-6 pb-4'>
           <div className='flex items-center gap-3'>
-            <div className='h-8 w-8 rounded-[8px] bg-destructive/10 flex items-center justify-center'>
-              <AlertTriangle className='h-4 w-4 text-destructive' />
+            <div className='flex size-8 items-center justify-center rounded-lg bg-destructive/12'>
+              <AlertTriangle className='size-4 text-destructive' />
             </div>
             <div>
-              <DialogTitle className='text-[16px] font-bold text-foreground'>
+              <DialogTitle className='text-base font-bold text-foreground'>
                 {title}
               </DialogTitle>
-              <DialogDescription className='text-[12px] text-muted-foreground'>
+              <DialogDescription className='text-xs text-muted-foreground'>
                 {description}
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
-        <DialogFooter className='border-t border-[#27272a] pt-4'>
+        <DialogFooter className='border-t border-border px-6 py-4'>
           <Button
-            variant='ghost'
+            variant='outline'
             onClick={() => setIsOpen(false)}
             disabled={isLoading}>
             Cancelar
