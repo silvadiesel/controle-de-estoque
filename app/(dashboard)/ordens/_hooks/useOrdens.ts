@@ -311,7 +311,6 @@ export function useOrdens(): UseOrdensReturn {
 
       await refreshData();
       setEditingServico(null);
-      setViewingServico(null);
       toast.success('Ordem de serviço atualizada com sucesso!');
     } catch (error) {
       console.error('Erro:', error);
@@ -385,7 +384,6 @@ export function useOrdens(): UseOrdensReturn {
 
       await refreshData();
       setEditingVenda(null);
-      setViewingVenda(null);
       toast.success('Ordem de venda atualizada com sucesso!');
     } catch (error) {
       console.error('Erro:', error);
