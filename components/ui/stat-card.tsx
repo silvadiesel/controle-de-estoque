@@ -4,7 +4,7 @@ import { type LucideIcon } from 'lucide-react';
 interface StatCardProps {
   label: string;
   value: number;
-  subtitle: string;
+  subtitle?: string;
   icon: LucideIcon;
   isLoading: boolean;
   state?: 'ready' | 'unavailable';
@@ -33,9 +33,11 @@ export function StatCard({
           <Icon size={20} aria-hidden='true' />
         </div>
       </div>
-      <p className='text-sm text-muted-foreground'>
-        {state === 'unavailable' ? 'Dado indisponível no momento' : subtitle}
-      </p>
+      {state === 'unavailable' || subtitle ? (
+        <p className='text-sm text-muted-foreground'>
+          {state === 'unavailable' ? 'Dado indisponível no momento' : subtitle}
+        </p>
+      ) : null}
     </div>
   );
 }

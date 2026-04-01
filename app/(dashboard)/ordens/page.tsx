@@ -1,10 +1,30 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { startTransition, useDeferredValue, useMemo, useState } from 'react';
+
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import {
+  CheckCircle2,
+  Clock3,
+  PackageSearch,
+  Search,
+  ShoppingCart,
+  Wrench,
+  X
+} from 'lucide-react';
 
 import { ModalDelete } from '@/components/modal-delete';
 import { PaginationControls } from '@/components/pagination-controls';
 import { Button } from '@/components/ui/button';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle
+} from '@/components/ui/empty';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -14,14 +34,20 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import { StatCard } from '@/components/ui/stat-card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Peca } from '@/db/schema/pecas';
 import { usePagination } from '@/hooks/usePagination';
 
+import { ModalDetalhesOrdem, ModalOrdemServico, ModalOrdemVenda } from './_components';
+import { OrdemCard } from './_components/ordem-card';
 import {
-  ModalDetalhesOrdem,
-  ModalOrdemServico,
-  ModalOrdemVenda
-} from './_components';
+  buildAvailableMonths,
+  buildOrdensMetrics,
+  buildVendaFormInitialData,
+  filterOrdens,
+  type OrdemFilters
+} from './_lib/ordens-view';
 import {
   type NovaOrdemServico,
   type NovaOrdemVenda,
@@ -29,42 +55,28 @@ import {
   type OrdemVendaCompleta,
   useOrdens
 } from './_hooks';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import {
-  CheckCircle,
-  ChevronDown,
-  ChevronUp,
-  Clock,
-  Package,
-  Pencil,
-  Search,
-  ShoppingCart,
-  Trash2,
-  Wrench,
-  XCircle
-} from 'lucide-react';
 
-type OrdemUnificada =
-  | (OrdemServicoCompleta & { tipo: 'servico' })
-  | (OrdemVendaCompleta & { tipo: 'venda' });
+type SectionType = 'servico' | 'venda';
 
-const formatCurrency = (value: number) => {
-  return (value / 100).toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL'
+const createDefaultFilters = (): OrdemFilters => ({
+  search: '',
+  status: 'all',
+  month: 'all'
+});
+
+const formatMonthLabel = (monthKey: string) => {
+  const [year, month] = monthKey.split('-');
+  const label = format(new Date(Number(year), Number(month) - 1), 'MMMM yyyy', {
+    locale: ptBR
   });
+
+  return `${label.charAt(0).toUpperCase()}${label.slice(1)}`;
 };
 
-const formatDateShort = (date: string) => {
-  return format(new Date(date), 'dd/MM/yy', { locale: ptBR });
-};
+const hasActiveFilters = (filters: OrdemFilters) =>
+  Boolean(filters.search) || filters.status !== 'all' || filters.month !== 'all';
 
-const formatDateFull = (date: string) => {
-  return format(new Date(date), 'dd/MM/yyyy', { locale: ptBR });
-};
-
-export default function Ordens() {
+export default function OrdensPage() {
   const {
     ordensServico,
     ordensVenda,
@@ -73,14 +85,6 @@ export default function Ordens() {
     pecas,
     funcionarios,
     isLoading,
-    search,
-    setSearch,
-    filterType,
-    setFilterType,
-    filterStatus,
-    setFilterStatus,
-    filterMonth,
-    setFilterMonth,
     isAddServicoOpen,
     setIsAddServicoOpen,
     editingServico,
@@ -101,124 +105,94 @@ export default function Ordens() {
     handleAddOrdemVenda,
     handleUpdateOrdemVenda,
     handleDelete,
-    stats,
     getVeiculosByCliente
   } = useOrdens();
 
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [serviceFilters, setServiceFilters] = useState<OrdemFilters>(
+    createDefaultFilters
+  );
+  const [saleFilters, setSaleFilters] = useState<OrdemFilters>(createDefaultFilters);
+  const [activeTab, setActiveTab] = useState<SectionType>('servico');
+  const [expandedBySection, setExpandedBySection] = useState<
+    Record<SectionType, string | null>
+  >({
+    servico: null,
+    venda: null
+  });
 
-  const ordensUnificadas = useMemo(() => {
-    const servicos: OrdemUnificada[] = ordensServico.map((o) => ({
-      ...o,
-      tipo: 'servico' as const
-    }));
-    const vendas: OrdemUnificada[] = ordensVenda.map((o) => ({
-      ...o,
-      tipo: 'venda' as const
-    }));
-    const todas = [...servicos, ...vendas];
-    todas.sort(
-      (a, b) =>
-        new Date(b.data_criacao).getTime() - new Date(a.data_criacao).getTime()
-    );
-    return todas;
-  }, [ordensServico, ordensVenda]);
+  const deferredServiceSearch = useDeferredValue(serviceFilters.search);
+  const deferredSaleSearch = useDeferredValue(saleFilters.search);
 
-  const mesesDisponiveis = useMemo(() => {
-    const meses = new Set<string>();
-    ordensUnificadas.forEach((ordem) => {
-      const date = new Date(ordem.data_criacao);
-      meses.add(
-        `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-      );
-    });
-    return Array.from(meses).sort().reverse();
-  }, [ordensUnificadas]);
+  const normalizedServiceFilters = useMemo(
+    () => ({ ...serviceFilters, search: deferredServiceSearch }),
+    [deferredServiceSearch, serviceFilters]
+  );
+  const normalizedSaleFilters = useMemo(
+    () => ({ ...saleFilters, search: deferredSaleSearch }),
+    [deferredSaleSearch, saleFilters]
+  );
 
-  const ordensFiltradas = useMemo(() => {
-    return ordensUnificadas.filter((ordem) => {
-      const searchLower = search.toLowerCase();
-      const matchesSearch =
-        ordem.cliente?.name_cliente.toLowerCase().includes(searchLower) ||
-        ordem.cliente?.nome_empresa.toLowerCase().includes(searchLower) ||
-        ordem.id.toString().includes(search) ||
-        (ordem.tipo === 'servico' &&
-          (ordem as OrdemServicoCompleta).veiculo?.placa
-            .toLowerCase()
-            .includes(searchLower)) ||
-        (ordem.tipo === 'servico' &&
-          ((ordem as OrdemServicoCompleta).funcionario?.name
-            ?.toLowerCase()
-            .includes(searchLower) ||
-            (ordem as OrdemServicoCompleta).funcionario_responsavel?.name
-              ?.toLowerCase()
-              .includes(searchLower)));
-      const matchesType = filterType === 'all' || ordem.tipo === filterType;
-      const matchesStatus =
-        filterStatus === 'all' || ordem.status === filterStatus;
-      const matchesMonth =
-        filterMonth === 'all' ||
-        (() => {
-          const date = new Date(ordem.data_criacao);
-          const ordemMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-          return ordemMonth === filterMonth;
-        })();
-      return matchesSearch && matchesType && matchesStatus && matchesMonth;
-    });
-  }, [ordensUnificadas, search, filterType, filterStatus, filterMonth]);
+  const serviceMetrics = useMemo(
+    () => buildOrdensMetrics(ordensServico),
+    [ordensServico]
+  );
+  const saleMetrics = useMemo(() => buildOrdensMetrics(ordensVenda), [ordensVenda]);
 
-  const {
-    paginatedItems,
-    currentPage,
-    totalPages,
-    startItem,
-    endItem,
-    goToPage,
-    goToNextPage,
-    goToPreviousPage,
-    isFirstPage,
-    isLastPage,
-    pageItems
-  } = usePagination({ items: ordensFiltradas, itemsPerPage: 10 });
+  const serviceMonths = useMemo(
+    () => buildAvailableMonths(ordensServico),
+    [ordensServico]
+  );
+  const saleMonths = useMemo(() => buildAvailableMonths(ordensVenda), [ordensVenda]);
 
-  const handleStatusChange = async (
-    tipo: 'servico' | 'venda',
-    id: number,
-    newStatus: 'ativa' | 'fechada' | 'cancelada'
-  ) => {
-    if (tipo === 'servico') {
-      await handleUpdateOrdemServico(id, { status: newStatus });
-    } else {
-      await handleUpdateOrdemVenda(id, { status: newStatus });
+  const filteredServiceOrders = useMemo(
+    () => filterOrdens(ordensServico, normalizedServiceFilters),
+    [normalizedServiceFilters, ordensServico]
+  );
+  const filteredSaleOrders = useMemo(
+    () => filterOrdens(ordensVenda, normalizedSaleFilters),
+    [normalizedSaleFilters, ordensVenda]
+  );
+
+  const servicePagination = usePagination({
+    items: filteredServiceOrders,
+    itemsPerPage: 8
+  });
+  const salePagination = usePagination({
+    items: filteredSaleOrders,
+    itemsPerPage: 8
+  });
+
+  const isInitialLoading =
+    isLoading && ordensServico.length === 0 && ordensVenda.length === 0;
+
+  const statsCards = [
+    {
+      label: 'Serviço',
+      value: serviceMetrics.total,
+      icon: Wrench
+    },
+    {
+      label: 'Venda',
+      value: saleMetrics.total,
+      icon: ShoppingCart
+    },
+    {
+      label: 'Ativas',
+      value: serviceMetrics.ativas + saleMetrics.ativas,
+      icon: Clock3
+    },
+    {
+      label: 'Fechadas',
+      value: serviceMetrics.fechadas + saleMetrics.fechadas,
+      icon: CheckCircle2
     }
-  };
-
-  const handleEdit = (ordem: OrdemUnificada) => {
-    if (ordem.tipo === 'servico') {
-      setEditingServico(ordem as OrdemServicoCompleta);
-    } else {
-      setEditingVenda(ordem as OrdemVendaCompleta);
-    }
-  };
-
-  const handleView = (ordem: OrdemUnificada) => {
-    if (ordem.tipo === 'servico') {
-      setViewingServico(ordem as OrdemServicoCompleta);
-    } else {
-      setViewingVenda(ordem as OrdemVendaCompleta);
-    }
-  };
-
-  const handleConfirmDelete = (tipo: 'servico' | 'venda', id: number) => {
-    setDeleteId({ type: tipo, id });
-    setIsDeleteOpen(true);
-  };
+  ];
 
   const getServicoInitialData = (ordem: OrdemServicoCompleta | null) => {
     if (!ordem) return undefined;
+
     return {
       data_chegada: ordem.data_chegada.split('T')[0],
-      data_saida: ordem.data_saida?.split('T')[0] || '',
       status: ordem.status,
       cliente_id: ordem.cliente_id,
       veiculo_id: ordem.veiculo_id,
@@ -226,581 +200,382 @@ export default function Ordens() {
       funcionario_responsavel_id: ordem.funcionario_responsavel_id,
       observacao: ordem.observacao || '',
       valor_total: ordem.valor_total,
-      pecas: ordem.pecas.map((p) => ({
-        peca_id: p.peca_id,
-        quantidade: p.quantidade,
-        peca: p.peca
-          ? ({ ...p.peca, preco: p.peca.preco } as Peca | null)
-          : null
+      pecas: ordem.pecas.map((peca) => ({
+        peca_id: peca.peca_id,
+        quantidade: peca.quantidade,
+        peca: peca.peca ? ({ ...peca.peca, preco: peca.peca.preco } as Peca) : null
       }))
     };
   };
 
-  const getVendaInitialData = (ordem: OrdemVendaCompleta | null) => {
-    if (!ordem) return undefined;
-    return {
-      data_pagamento: ordem.data_pagamento?.split('T')[0] || '',
-      status: ordem.status,
-      cliente_id: ordem.cliente_id,
-      observacao: ordem.observacao || '',
-      valor_total: ordem.valor_total,
-      metodo_pagamento: ordem.metodo_pagamento || undefined,
-      pecas: ordem.pecas.map((p) => ({
-        peca_id: p.peca_id,
-        quantidade: p.quantidade,
-        peca: p.peca ? ({ ...p.peca, preco: p.peca.preco } as Peca) : null
-      }))
-    };
+  const getVendaInitialData = (ordem: OrdemVendaCompleta | null) =>
+    ordem ? buildVendaFormInitialData(ordem, pecas) : undefined;
+
+  const updateFilters = (
+    section: SectionType,
+    nextFilters: Partial<OrdemFilters>
+  ) => {
+    startTransition(() => {
+      if (section === 'servico') {
+        setServiceFilters((current) => ({
+          ...current,
+          ...nextFilters
+        }));
+        return;
+      }
+
+      setSaleFilters((current) => ({
+        ...current,
+        ...nextFilters
+      }));
+    });
   };
 
-  const toggleExpand = (key: string) => {
-    setExpandedId((prev) => (prev === key ? null : key));
+  const resetFilters = (section: SectionType) => {
+    const next = createDefaultFilters();
+
+    if (section === 'servico') {
+      setServiceFilters(next);
+      return;
+    }
+
+    setSaleFilters(next);
+  };
+
+  const toggleExpanded = (section: SectionType, orderId: number) => {
+    const key = `${section}-${orderId}`;
+
+    setExpandedBySection((current) => ({
+      ...current,
+      [section]: current[section] === key ? null : key
+    }));
+  };
+
+  const handleStatusChange = async (
+    tipo: SectionType,
+    id: number,
+    status: 'ativa' | 'fechada' | 'cancelada'
+  ) => {
+    if (tipo === 'servico') {
+      await handleUpdateOrdemServico(id, { status });
+      return;
+    }
+
+    await handleUpdateOrdemVenda(id, { status });
+  };
+
+  const renderFilters = (section: SectionType, months: string[]) => {
+    const filters = section === 'servico' ? serviceFilters : saleFilters;
+
+    return (
+      <div className='flex flex-wrap items-center gap-2'>
+        <div className='relative min-w-[280px] flex-1 md:min-w-[34%]'>
+          <Search className='pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+          <Input
+            value={filters.search}
+            onChange={(event) =>
+              updateFilters(section, {
+                search: event.target.value
+              })
+            }
+            placeholder={
+              section === 'servico'
+                ? 'Buscar por cliente, placa, responsável ou ID...'
+                : 'Buscar por cliente, empresa, pagamento ou ID...'
+            }
+            className='bg-input pl-9'
+          />
+        </div>
+
+        <Select
+          value={filters.status}
+          onValueChange={(value: OrdemFilters['status']) =>
+            updateFilters(section, { status: value })
+          }
+        >
+          <SelectTrigger className='w-full bg-input sm:w-44'>
+            <SelectValue placeholder='Status' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='all'>Todos os status</SelectItem>
+            <SelectItem value='ativa'>Ativas</SelectItem>
+            <SelectItem value='fechada'>Fechadas</SelectItem>
+            <SelectItem value='cancelada'>Canceladas</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select
+          value={filters.month}
+          onValueChange={(value) => updateFilters(section, { month: value })}
+        >
+          <SelectTrigger className='w-full bg-input sm:w-48'>
+            <SelectValue placeholder='Mês' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='all'>Todos os meses</SelectItem>
+            {months.map((month) => (
+              <SelectItem key={month} value={month}>
+                {formatMonthLabel(month)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {hasActiveFilters(filters) ? (
+          <Button
+            variant='ghost'
+            size='sm'
+            onClick={() => resetFilters(section)}
+            className='gap-1.5 text-muted-foreground hover:text-foreground'
+          >
+            <X className='h-3.5 w-3.5' />
+            Limpar
+          </Button>
+        ) : null}
+      </div>
+    );
+  };
+
+  const renderEmpty = (section: SectionType) => {
+    const filters = section === 'servico' ? serviceFilters : saleFilters;
+    const filtered = hasActiveFilters(filters);
+
+    return (
+      <Empty className='border-border bg-card'>
+        <EmptyHeader>
+          <EmptyMedia variant='icon'>
+            <PackageSearch />
+          </EmptyMedia>
+          <EmptyTitle>
+            {filtered
+              ? 'Nenhuma ordem encontrada'
+              : section === 'servico'
+                ? 'Nenhuma ordem de serviço cadastrada'
+                : 'Nenhuma ordem de venda cadastrada'}
+          </EmptyTitle>
+          <EmptyDescription>
+            {filtered
+              ? 'Ajuste os filtros ou limpe a busca para voltar a ver resultados.'
+              : section === 'servico'
+                ? 'Crie a primeira ordem de serviço.'
+                : 'Crie a primeira ordem de venda.'}
+          </EmptyDescription>
+        </EmptyHeader>
+        <EmptyContent>
+          {filtered ? (
+            <Button variant='outline' onClick={() => resetFilters(section)}>
+              Limpar filtros
+            </Button>
+          ) : (
+            <Button
+              onClick={() =>
+                section === 'servico'
+                  ? setIsAddServicoOpen(true)
+                  : setIsAddVendaOpen(true)
+              }
+            >
+              {section === 'servico' ? (
+                <Wrench data-icon='inline-start' />
+              ) : (
+                <ShoppingCart data-icon='inline-start' />
+              )}
+              {section === 'servico'
+                ? 'Nova ordem de serviço'
+                : 'Nova ordem de venda'}
+            </Button>
+          )}
+        </EmptyContent>
+      </Empty>
+    );
+  };
+
+  const renderLoadingCards = () => (
+    <div className='flex flex-col gap-3'>
+      {Array.from({ length: 4 }).map((_, index) => (
+        <div
+          key={index}
+          className='rounded-xl border border-border bg-card px-4 py-4'
+        >
+          <div className='flex items-center gap-3'>
+            <Skeleton className='size-9 rounded-lg' />
+            <Skeleton className='h-10 w-14 rounded-md' />
+            <div className='flex-1'>
+              <Skeleton className='h-4 w-40 rounded-md' />
+              <Skeleton className='mt-2 h-3 w-56 rounded-md' />
+            </div>
+            <Skeleton className='h-6 w-20 rounded-full' />
+            <Skeleton className='h-9 w-20 rounded-md' />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  const renderSectionContent = (section: SectionType) => {
+    const months = section === 'servico' ? serviceMonths : saleMonths;
+    const filteredOrders =
+      section === 'servico' ? filteredServiceOrders : filteredSaleOrders;
+    const pagination =
+      section === 'servico' ? servicePagination : salePagination;
+    const isServiceSection = section === 'servico';
+
+    return (
+      <section className='flex flex-col gap-4 pt-4'>
+        {renderFilters(section, months)}
+
+        {isInitialLoading ? (
+          renderLoadingCards()
+        ) : filteredOrders.length === 0 ? (
+          renderEmpty(section)
+        ) : (
+          <>
+            <div className='flex flex-col gap-3'>
+              {isServiceSection
+                ? pagination.paginatedItems.map((ordem) => {
+                    const serviceOrder = ordem as OrdemServicoCompleta;
+
+                    return (
+                      <OrdemCard
+                        key={serviceOrder.id}
+                        tipo='servico'
+                        ordem={serviceOrder}
+                        expanded={
+                          expandedBySection.servico === `servico-${serviceOrder.id}`
+                        }
+                        onToggle={() => toggleExpanded('servico', serviceOrder.id)}
+                        onEdit={() => setEditingServico(serviceOrder)}
+                        onViewDetails={() => setViewingServico(serviceOrder)}
+                        onDelete={() => {
+                          setDeleteId({ type: 'servico', id: serviceOrder.id });
+                          setIsDeleteOpen(true);
+                        }}
+                        onFinalize={() =>
+                          handleStatusChange('servico', serviceOrder.id, 'fechada')
+                        }
+                        onCancel={() =>
+                          handleStatusChange('servico', serviceOrder.id, 'cancelada')
+                        }
+                        isBusy={isLoading}
+                      />
+                    );
+                  })
+                : pagination.paginatedItems.map((ordem) => {
+                    const saleOrder = ordem as OrdemVendaCompleta;
+
+                    return (
+                      <OrdemCard
+                        key={saleOrder.id}
+                        tipo='venda'
+                        ordem={saleOrder}
+                        expanded={expandedBySection.venda === `venda-${saleOrder.id}`}
+                        onToggle={() => toggleExpanded('venda', saleOrder.id)}
+                        onEdit={() => setEditingVenda(saleOrder)}
+                        onViewDetails={() => setViewingVenda(saleOrder)}
+                        onDelete={() => {
+                          setDeleteId({ type: 'venda', id: saleOrder.id });
+                          setIsDeleteOpen(true);
+                        }}
+                        onFinalize={() =>
+                          handleStatusChange('venda', saleOrder.id, 'fechada')
+                        }
+                        onCancel={() =>
+                          handleStatusChange('venda', saleOrder.id, 'cancelada')
+                        }
+                        isBusy={isLoading}
+                      />
+                    );
+                  })}
+            </div>
+
+            <PaginationControls
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
+              startItem={pagination.startItem}
+              endItem={pagination.endItem}
+              totalItems={filteredOrders.length}
+              onPageChange={pagination.goToPage}
+              onNextPage={pagination.goToNextPage}
+              onPreviousPage={pagination.goToPreviousPage}
+              isFirstPage={pagination.isFirstPage}
+              isLastPage={pagination.isLastPage}
+              pageItems={pagination.pageItems}
+              itemLabel='ordens'
+            />
+          </>
+        )}
+      </section>
+    );
   };
 
   return (
-    <div className='flex flex-1 flex-col gap-4 p-4'>
-      {/* Header */}
-      <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-        <div className='flex flex-col gap-1'>
-          <div className='flex items-center gap-2.5'>
+    <div className='flex flex-1 flex-col gap-6 p-4 lg:p-6'>
+      <div className='animate-in fade-in-0 slide-in-from-bottom-1 flex flex-col gap-6 duration-300'>
+        <header className='flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between'>
+          <div className='flex flex-col gap-1'>
             <h1 className='text-2xl font-bold text-foreground'>
               Ordens de Serviço e Venda
             </h1>
+            <p className='text-sm text-muted-foreground'>
+              Operação organizada em filas independentes.
+            </p>
           </div>
-          <p className='pl-3.5 text-sm text-muted-foreground'>
-            Gerencie serviços e vendas de peças
-          </p>
-        </div>
 
-        <div className='flex flex-col md:flex-row gap-2'>
-          <Button onClick={() => setIsAddServicoOpen(true)}>
-            <Wrench className='h-4 w-4' />
-            Nova Ordem de Serviço
-          </Button>
-          <Button onClick={() => setIsAddVendaOpen(true)}>
-            <ShoppingCart className='h-4 w-4' />
-            Nova Ordem de Venda
-          </Button>
-        </div>
-      </div>
-
-      {/* Stats - 4 cols, simple label+number */}
-      <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-        <div className='bg-secondary border border-border rounded-lg px-4 py-3'>
-          <p className='text-sm text-muted-foreground'>Ativas</p>
-          <p className='text-2xl font-bold text-foreground'>{stats.ativas}</p>
-        </div>
-        <div className='bg-secondary border border-border rounded-lg px-4 py-3'>
-          <p className='text-sm text-muted-foreground'>Fechadas</p>
-          <p className='text-2xl font-bold text-foreground'>{stats.fechadas}</p>
-        </div>
-        <div className='bg-secondary border border-border rounded-lg px-4 py-3'>
-          <p className='text-sm text-muted-foreground'>Serviço</p>
-          <p className='text-2xl font-bold text-foreground'>
-            {stats.totalServico}
-          </p>
-        </div>
-        <div className='bg-secondary border border-border rounded-lg px-4 py-3'>
-          <p className='text-sm text-muted-foreground'>Venda</p>
-          <p className='text-2xl font-bold text-foreground'>
-            {stats.totalVenda}
-          </p>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className='flex flex-col gap-3 sm:flex-row sm:flex-wrap'>
-        <div className='relative flex-1 max-w-md'>
-          <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
-          <Input
-            placeholder='Buscar por cliente, funcionário, placa ou ID...'
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className='pl-10 bg-input border-border'
-          />
-        </div>
-        <Select
-          value={filterType}
-          onValueChange={(v: 'all' | 'servico' | 'venda') => setFilterType(v)}>
-          <SelectTrigger className='bg-input md:flex hidden border-border w-full sm:w-40'>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className='bg-secondary border-border'>
-            <SelectItem value='all'>Todos os Tipos</SelectItem>
-            <SelectItem value='servico'>Serviços</SelectItem>
-            <SelectItem value='venda'>Vendas</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className='bg-input border-border w-full sm:w-40'>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className='bg-secondary border-border'>
-            <SelectItem value='all'>Todos os Status</SelectItem>
-            <SelectItem value='ativa'>Ativa</SelectItem>
-            <SelectItem value='fechada'>Fechada</SelectItem>
-            <SelectItem value='cancelada'>Cancelada</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={filterMonth} onValueChange={setFilterMonth}>
-          <SelectTrigger className='bg-input border-border w-full sm:w-48'>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className='bg-secondary border-border'>
-            <SelectItem value='all'>Todos os Meses</SelectItem>
-            {mesesDisponiveis.map((mes) => {
-              const [year, month] = mes.split('-');
-              const date = new Date(Number(year), Number(month) - 1);
-              const label = format(date, 'MMMM yyyy', { locale: ptBR });
-              return (
-                <SelectItem key={mes} value={mes}>
-                  {label.charAt(0).toUpperCase() + label.slice(1)}
-                </SelectItem>
-              );
-            })}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Orders List */}
-      <div className='flex flex-col gap-2'>
-        {isLoading ? (
-          Array.from({ length: 5 }).map((_, i) => (
-            <div
-              key={i}
-              className='bg-secondary border border-border rounded-lg p-4'>
-              <div className='flex items-center gap-4'>
-                <Skeleton className='h-4 w-4' />
-                <Skeleton className='h-5 w-12' />
-                <Skeleton className='h-4 w-32' />
-                <Skeleton className='h-4 w-24 hidden lg:block' />
-                <Skeleton className='h-5 w-16' />
-                <Skeleton className='h-4 w-24 hidden md:block' />
-                <Skeleton className='h-5 w-20 ml-auto' />
-              </div>
-            </div>
-          ))
-        ) : paginatedItems.length === 0 ? (
-          <div className='flex flex-col items-center justify-center py-16 text-muted-foreground'>
-            <Package className='h-8 w-8 mb-2 opacity-25' />
-            <p className='text-sm'>Nenhuma ordem encontrada</p>
+          <div className='flex flex-col gap-2 sm:flex-row'>
+            <Button onClick={() => setIsAddServicoOpen(true)}>
+              <Wrench data-icon='inline-start' />
+              Nova ordem de serviço
+            </Button>
+            <Button onClick={() => setIsAddVendaOpen(true)}>
+              <ShoppingCart data-icon='inline-start' />
+              Nova ordem de venda
+            </Button>
           </div>
-        ) : (
-          paginatedItems.map((ordem) => {
-            const key = `${ordem.tipo}-${ordem.id}`;
-            const isExpanded = expandedId === key;
-            const isServico = ordem.tipo === 'servico';
-            const ordemServico = isServico
-              ? (ordem as OrdemServicoCompleta)
-              : null;
-            const isCancelada = ordem.status === 'cancelada';
+        </header>
 
-            return (
-              <div
-                key={key}
-                className={`bg-secondary border border-border rounded-lg overflow-hidden ${isCancelada ? 'opacity-50' : ''}`}>
-                {/* Card header */}
-                <div
-                  className='flex items-center gap-4 px-5 py-4 cursor-pointer hover:bg-accent/50 transition-colors'
-                  onClick={() => toggleExpand(key)}>
-                  {/* Left side bar + Type badge */}
-                  <div
-                    className={`self-stretch w-[3px] rounded-full shrink-0 ${isServico ? 'bg-primary' : 'bg-muted-foreground'}`}
-                  />
+        <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
+          {statsCards.map((card) => (
+            <StatCard
+              key={card.label}
+              label={card.label}
+              value={card.value}
+              icon={card.icon}
+              isLoading={isInitialLoading}
+            />
+          ))}
+        </div>
 
-                  {/* Type badge */}
-                  {isServico ? (
-                    <span className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-primary/10 text-primary shrink-0'>
-                      <Clock className='h-3 w-3' />
-                      Serviço
-                    </span>
-                  ) : (
-                    <span className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-muted-foreground/15 text-muted-foreground shrink-0'>
-                      <ShoppingCart className='h-3 w-3' />
-                      Venda
-                    </span>
-                  )}
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => setActiveTab(value as SectionType)}
+          className='w-full gap-0'
+        >
+          <TabsList className='h-auto w-full justify-start rounded-none border-b border-border bg-transparent p-0'>
+            <TabsTrigger
+              value='servico'
+              className='gap-2 rounded-none border-b-2 border-transparent px-4 py-2.5 text-muted-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none'
+            >
+              <Wrench className='h-4 w-4' />
+              Serviço
+            </TabsTrigger>
+            <TabsTrigger
+              value='venda'
+              className='gap-2 rounded-none border-b-2 border-transparent px-4 py-2.5 text-muted-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none'
+            >
+              <ShoppingCart className='h-4 w-4' />
+              Venda
+            </TabsTrigger>
+          </TabsList>
 
-                  {/* Number */}
-                  <span
-                    className={`text-sm font-bold text-foreground shrink-0 ${isCancelada ? 'line-through' : ''}`}>
-                    #{ordem.id}
-                  </span>
+          <TabsContent value='servico'>
+            {renderSectionContent('servico')}
+          </TabsContent>
 
-                  {/* Cliente */}
-                  <div className='flex-1 min-w-0'>
-                    <p
-                      className={`text-sm text-foreground truncate ${isCancelada ? 'line-through' : ''}`}>
-                      {ordem.cliente?.name_cliente || '-'}
-                    </p>
-                  </div>
-
-                  {/* Status */}
-                  {ordem.status === 'ativa' && (
-                    <span className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-border text-muted-foreground shrink-0'>
-                      Ativa
-                    </span>
-                  )}
-                  {ordem.status === 'fechada' && (
-                    <span className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-accent text-muted-foreground shrink-0'>
-                      Fechada
-                    </span>
-                  )}
-                  {ordem.status === 'cancelada' && (
-                    <span className='inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md bg-accent text-muted-foreground shrink-0 line-through'>
-                      Cancelada
-                    </span>
-                  )}
-
-                  {/* Valor */}
-                  <div className='min-w-[100px] text-right'>
-                    <span
-                      className={`text-lg font-bold ${
-                        isCancelada
-                          ? 'text-muted-foreground line-through'
-                          : 'text-primary'
-                      }`}>
-                      {formatCurrency(ordem.valor_total)}
-                    </span>
-                  </div>
-
-                  {/* Chevron */}
-                  {isExpanded ? (
-                    <ChevronUp className='h-5 w-5 text-muted-foreground shrink-0' />
-                  ) : (
-                    <ChevronDown className='h-5 w-5 text-muted-foreground shrink-0' />
-                  )}
-                </div>
-
-                {/* Info grid below header */}
-                {!isExpanded && (
-                  <div className='px-5 pb-3 -mt-1'>
-                    <div className='grid grid-cols-2 md:grid-cols-4 gap-3'>
-                      {isServico && ordemServico ? (
-                        <>
-                          <div>
-                            <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
-                              Cliente
-                            </p>
-                            <p className='text-xs text-muted-foreground truncate'>
-                              {ordem.cliente?.name_cliente || '-'}
-                            </p>
-                          </div>
-                          <div>
-                            <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
-                              Veículo
-                            </p>
-                            <p className='text-xs text-muted-foreground truncate'>
-                              {ordemServico.veiculo?.placa || '-'}{' '}
-                              {ordemServico.veiculo?.modelo
-                                ? `- ${ordemServico.veiculo.modelo}`
-                                : ''}
-                            </p>
-                          </div>
-                          <div>
-                            <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
-                              Responsável
-                            </p>
-                            <p className='text-xs text-muted-foreground truncate'>
-                              {funcionarios.find(
-                                (f) =>
-                                  f.id ===
-                                  ordemServico?.funcionario_responsavel_id
-                              )?.name || '-'}
-                            </p>
-                          </div>
-                          <div>
-                            <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
-                              Data
-                            </p>
-                            <p className='text-xs text-muted-foreground'>
-                              {formatDateShort(ordem.data_criacao)}
-                            </p>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div>
-                            <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
-                              Cliente
-                            </p>
-                            <p className='text-xs text-muted-foreground truncate'>
-                              {ordem.cliente?.name_cliente || '-'}
-                            </p>
-                          </div>
-                          <div>
-                            <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
-                              Pagamento
-                            </p>
-                            <p className='text-xs text-muted-foreground truncate'>
-                              {(
-                                ordem as OrdemVendaCompleta
-                              ).metodo_pagamento?.toUpperCase() || '-'}
-                            </p>
-                          </div>
-                          <div>
-                            <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
-                              Responsável
-                            </p>
-                            <p className='text-xs text-muted-foreground truncate'>
-                              {ordem.cliente?.name_cliente || '-'}
-                            </p>
-                          </div>
-                          <div>
-                            <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
-                              Data
-                            </p>
-                            <p className='text-xs text-muted-foreground'>
-                              {formatDateShort(ordem.data_criacao)}
-                            </p>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Expanded content */}
-                {isExpanded && (
-                  <div className='border-t border-border px-5 py-4 bg-input/50'>
-                    {/* Info row */}
-                    <div className='grid grid-cols-2 md:grid-cols-4 gap-4 mb-4'>
-                      {isServico && ordemServico ? (
-                        <>
-                          <div>
-                            <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
-                              Cliente
-                            </p>
-                            <p className='text-sm text-foreground'>
-                              {ordem.cliente?.name_cliente || '-'}
-                            </p>
-                          </div>
-                          <div>
-                            <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
-                              Veículo
-                            </p>
-                            <p className='text-sm text-foreground'>
-                              {ordemServico.veiculo?.placa || '-'}{' '}
-                              {ordemServico.veiculo?.modelo
-                                ? `- ${ordemServico.veiculo.modelo}`
-                                : ''}
-                            </p>
-                          </div>
-                          <div>
-                            <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
-                              Responsável
-                            </p>
-                            <p className='text-sm text-foreground'>
-                              {funcionarios.find(
-                                (f) =>
-                                  f.id ===
-                                  ordemServico?.funcionario_responsavel_id
-                              )?.name || '-'}
-                            </p>
-                          </div>
-                          <div>
-                            <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
-                              Data Chegada
-                            </p>
-                            <p className='text-sm text-foreground'>
-                              {formatDateFull(ordemServico.data_chegada)}
-                            </p>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div>
-                            <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
-                              Cliente
-                            </p>
-                            <p className='text-sm text-foreground'>
-                              {ordem.cliente?.name_cliente || '-'}
-                            </p>
-                          </div>
-                          <div>
-                            <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
-                              Pagamento
-                            </p>
-                            <p className='text-sm text-foreground'>
-                              {(
-                                ordem as OrdemVendaCompleta
-                              ).metodo_pagamento?.toUpperCase() || '-'}
-                            </p>
-                          </div>
-                          <div>
-                            <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
-                              Responsável
-                            </p>
-                            <p className='text-sm text-foreground'>
-                              {ordem.cliente?.name_cliente || '-'}
-                            </p>
-                          </div>
-                          <div>
-                            <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
-                              Data
-                            </p>
-                            <p className='text-sm text-foreground'>
-                              {formatDateFull(ordem.data_criacao)}
-                            </p>
-                          </div>
-                        </>
-                      )}
-                    </div>
-
-                    {/* Criado por + Observação */}
-                    <div className='flex gap-6 mb-4 flex-wrap'>
-                      {isServico && ordemServico && (
-                        <div>
-                          <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
-                            Criado por
-                          </p>
-                          <p className='text-sm text-foreground'>
-                            {ordemServico.funcionario?.name || '-'}
-                          </p>
-                        </div>
-                      )}
-                      {ordem.observacao && (
-                        <div className='flex-1 min-w-[200px]'>
-                          <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-1'>
-                            Observação
-                          </p>
-                          <p className='text-sm text-foreground'>
-                            {ordem.observacao}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Pecas */}
-                    {ordem.pecas.length > 0 && (
-                      <div>
-                        <p className='text-[10px] text-muted-foreground uppercase tracking-wider font-medium mb-2 flex items-center gap-1.5'>
-                          <Package className='h-3.5 w-3.5' />
-                          Peças ({ordem.pecas.length})
-                        </p>
-                        <div className='flex flex-col gap-1.5'>
-                          {ordem.pecas.slice(0, 2).map((item) => (
-                            <div
-                              key={item.id}
-                              className='flex justify-between items-center bg-background/60 px-4 py-2.5 rounded-md'>
-                              <span className='text-sm text-foreground'>
-                                {item.peca?.name_peca || 'Peça não encontrada'}
-                              </span>
-                              <div className='flex gap-5'>
-                                <span className='text-xs text-muted-foreground'>
-                                  x{item.quantidade}
-                                </span>
-                                <span className='text-sm text-foreground font-medium min-w-[80px] text-right'>
-                                  {formatCurrency(
-                                    (item.peca?.preco || 0) * item.quantidade
-                                  )}
-                                </span>
-                              </div>
-                            </div>
-                          ))}
-                          {ordem.pecas.length > 2 && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleView(ordem);
-                              }}
-                              className='text-xs text-primary py-2 border border-dashed border-border rounded-md hover:bg-accent/30 transition-colors'>
-                              +{ordem.pecas.length - 2}{' '}
-                              {ordem.pecas.length - 2 === 1 ? 'peça' : 'peças'}{' '}
-                              — Ver detalhes completos
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Actions */}
-                    <div className='flex gap-2 mt-4 items-center justify-end'>
-                      {ordem.status === 'ativa' && (
-                        <Button
-                          variant='outline'
-                          size='default'
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEdit(ordem);
-                          }}>
-                          <Pencil className='h-3.5 w-3.5' />
-                          Editar
-                        </Button>
-                      )}
-                      {ordem.status === 'ativa' && (
-                        <>
-                          <Button
-                            variant='outline'
-                            size='default'
-                            title='Finalizar'
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleStatusChange(
-                                ordem.tipo,
-                                ordem.id,
-                                'fechada'
-                              );
-                            }}>
-                            <CheckCircle className='h-4 w-4 text-success' />
-                            Finalizar
-                          </Button>
-                          <Button
-                            variant='outline'
-                            size='default'
-                            title='Cancelar'
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleStatusChange(
-                                ordem.tipo,
-                                ordem.id,
-                                'cancelada'
-                              );
-                            }}>
-                            <XCircle className='h-4 w-4 text-destructive' />
-                            Cancelar
-                          </Button>
-                        </>
-                      )}
-                      <Button
-                        variant='outline'
-                        size='default'
-                        title='Excluir'
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleConfirmDelete(ordem.tipo, ordem.id);
-                        }}>
-                        <Trash2 className='h-4 w-4 text-destructive' />
-                        Excluir
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })
-        )}
+          <TabsContent value='venda'>
+            {renderSectionContent('venda')}
+          </TabsContent>
+        </Tabs>
       </div>
 
-      {/* Pagination */}
-      {ordensFiltradas.length > 0 && (
-        <PaginationControls
-          currentPage={currentPage}
-          totalPages={totalPages}
-          startItem={startItem}
-          endItem={endItem}
-          totalItems={ordensFiltradas.length}
-          onPageChange={goToPage}
-          onNextPage={goToNextPage}
-          onPreviousPage={goToPreviousPage}
-          isFirstPage={isFirstPage}
-          isLastPage={isLastPage}
-          pageItems={pageItems}
-          itemLabel='ordens'
-        />
-      )}
-
-      {/* Modais */}
       <ModalOrdemServico
         mode='create'
         clientes={clientes}
@@ -814,7 +589,7 @@ export default function Ordens() {
             await handleAddOrdemServico(data as NovaOrdemServico);
             setIsAddServicoOpen(false);
           } catch {
-            // erro já tratado pelo hook
+            // erro já tratado no hook
           }
         }}
         isLoading={isLoading}
@@ -828,7 +603,7 @@ export default function Ordens() {
         veiculos={veiculos}
         pecas={pecas}
         funcionarios={funcionarios}
-        isOpen={!!editingServico}
+        isOpen={Boolean(editingServico)}
         setIsOpen={(open) => !open && setEditingServico(null)}
         onSubmit={async (data) => {
           if (editingServico) {
@@ -853,7 +628,7 @@ export default function Ordens() {
             await handleAddOrdemVenda(data as NovaOrdemVenda);
             setIsAddVendaOpen(false);
           } catch {
-            // erro já tratado pelo hook
+            // erro já tratado no hook
           }
         }}
         isLoading={isLoading}
@@ -864,14 +639,11 @@ export default function Ordens() {
         initialData={getVendaInitialData(editingVenda)}
         clientes={clientes}
         pecas={pecas}
-        isOpen={!!editingVenda}
+        isOpen={Boolean(editingVenda)}
         setIsOpen={(open) => !open && setEditingVenda(null)}
         onSubmit={async (data) => {
           if (editingVenda) {
-            await handleUpdateOrdemVenda(
-              editingVenda.id,
-              data as NovaOrdemVenda
-            );
+            await handleUpdateOrdemVenda(editingVenda.id, data as NovaOrdemVenda);
           }
         }}
         isLoading={isLoading}
@@ -880,7 +652,7 @@ export default function Ordens() {
       <ModalDetalhesOrdem
         type='servico'
         ordem={viewingServico}
-        isOpen={!!viewingServico}
+        isOpen={Boolean(viewingServico)}
         setIsOpen={(open) => !open && setViewingServico(null)}
         onUpdateStatus={(status) => {
           if (viewingServico) {
@@ -893,7 +665,7 @@ export default function Ordens() {
       <ModalDetalhesOrdem
         type='venda'
         ordem={viewingVenda}
-        isOpen={!!viewingVenda}
+        isOpen={Boolean(viewingVenda)}
         setIsOpen={(open) => !open && setViewingVenda(null)}
         onUpdateStatus={(status) => {
           if (viewingVenda) {
@@ -908,7 +680,7 @@ export default function Ordens() {
         setIsOpen={setIsDeleteOpen}
         onConfirm={handleDelete}
         isLoading={isLoading}
-        title='Excluir Ordem'
+        title='Excluir ordem'
         description='Tem certeza que deseja excluir esta ordem? Esta ação não pode ser desfeita.'
       />
     </div>
