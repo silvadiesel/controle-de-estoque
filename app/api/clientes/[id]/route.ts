@@ -46,14 +46,29 @@ export async function DELETE(request: Request, { params }: Params) {
   const { id: idParam } = await params;
   const id = Number(idParam);
 
-  // First delete all vehicles associated with this client
-  await db.delete(schema.veiculo).where(eq(schema.veiculo.cliente_id, id));
+  try {
+    await db.delete(schema.veiculo).where(eq(schema.veiculo.cliente_id, id));
+    await db.delete(schema.cliente).where(eq(schema.cliente.id, id));
 
-  // Then delete the client
-  await db.delete(schema.cliente).where(eq(schema.cliente.id, id));
-
-  await logAction(request, 'exclusao', 'cliente', String(id), `Cliente #${id} excluído`);
-  return new Response(
-    JSON.stringify({ message: 'Cliente deleted successfully' })
-  );
+    await logAction(request, 'exclusao', 'cliente', String(id), `Cliente #${id} excluído`);
+    return new Response(
+      JSON.stringify({ message: 'Cliente deleted successfully' })
+    );
+  } catch (error: unknown) {
+    if (error instanceof Error && 'cause' in error) {
+      const cause = (error as { cause?: { code?: string } }).cause;
+      if (cause?.code === '23503') {
+        return new Response(
+          JSON.stringify({
+            error: 'Não é possível excluir este cliente pois existem ordens de serviço vinculadas aos seus veículos. Remova as ordens de serviço primeiro.',
+          }),
+          { status: 409 }
+        );
+      }
+    }
+    return new Response(
+      JSON.stringify({ error: 'Erro ao excluir cliente' }),
+      { status: 500 }
+    );
+  }
 }
