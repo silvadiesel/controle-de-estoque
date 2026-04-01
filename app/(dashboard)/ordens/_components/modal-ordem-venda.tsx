@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
+import { DialogShell } from '@/components/ui/dialog-shell';
 import {
   Field,
   FieldContent,
@@ -11,11 +12,22 @@ import {
   FieldGroup,
   FieldLabel
 } from '@/components/ui/field';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { SearchableSelect } from '@/components/ui/searchable-select';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import type { Cliente, Peca } from '@/db/schema';
 
+import {
+  type OrdemItemBuilderValue,
+  OrdemItemsBuilder
+} from './ordem-items-builder';
 import {
   Banknote,
   CreditCard,
@@ -24,12 +36,6 @@ import {
   ShoppingCart
 } from 'lucide-react';
 import { toast } from 'sonner';
-
-import { DialogShell } from '@/components/ui/dialog-shell';
-import {
-  OrdemItemsBuilder,
-  type OrdemItemBuilderValue
-} from './ordem-items-builder';
 
 interface OrdemVendaFormData {
   data_pagamento: string;
@@ -179,11 +185,14 @@ export function ModalOrdemVenda({
             Cancelar
           </Button>
           <Button onClick={handleSubmit} disabled={isLoading}>
-            {isLoading ? 'Salvando...' : isEdit ? 'Atualizar venda' : 'Criar venda'}
+            {isLoading
+              ? 'Salvando...'
+              : isEdit
+                ? 'Atualizar venda'
+                : 'Criar venda'}
           </Button>
         </>
-      }
-    >
+      }>
       <FieldGroup>
         <Field data-invalid={submitted && Boolean(errors.cliente_id)}>
           <FieldLabel>Cliente *</FieldLabel>
@@ -225,8 +234,7 @@ export function ModalOrdemVenda({
                     ...current,
                     metodo_pagamento: value
                   }))
-                }
-              >
+                }>
                 <SelectTrigger className='w-full bg-input'>
                   <SelectValue placeholder='Selecione o método' />
                 </SelectTrigger>
@@ -277,8 +285,7 @@ export function ModalOrdemVenda({
                 value={formData.status}
                 onValueChange={(value: 'ativa' | 'fechada' | 'cancelada') =>
                   setFormData((current) => ({ ...current, status: value }))
-                }
-              >
+                }>
                 <SelectTrigger className='w-full bg-input'>
                   <SelectValue />
                 </SelectTrigger>
@@ -306,7 +313,7 @@ export function ModalOrdemVenda({
                 }))
               }
               placeholder='Inclua contexto de retirada, entrega ou negociação, se necessário.'
-              className='min-h-24 resize-none bg-input'
+              className='min-h-24 resize-none bg-input! border-border!'
             />
           </FieldContent>
         </Field>
@@ -320,7 +327,9 @@ export function ModalOrdemVenda({
         emptyDescription='Adicione pelo menos uma peça para registrar a venda.'
         items={formData.pecas}
         pecas={pecas}
-        onChange={(items) => setFormData((current) => ({ ...current, pecas: items }))}
+        onChange={(items) =>
+          setFormData((current) => ({ ...current, pecas: items }))
+        }
       />
     </DialogShell>
   );
