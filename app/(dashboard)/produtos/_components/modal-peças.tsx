@@ -14,6 +14,7 @@ import {
 import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import type { Peca } from '@/db/schema';
+import { blockNonNumericKeyDown } from '@/app/utils/formatters';
 
 import { CloudDownload, Package, Trash2 } from 'lucide-react';
 
@@ -282,14 +283,14 @@ export function ModalPecas({
                         <FieldLabel htmlFor='quantity'>Quantidade</FieldLabel>
                         <Input
                           id='quantity'
-                          type='number'
-                          value={newPeca.quantidade || ''}
-                          onChange={(e) =>
-                            setNewPeca({
-                              ...newPeca,
-                              quantidade: Number(e.target.value) || undefined
-                            })
-                          }
+                          type='text'
+                          inputMode='numeric'
+                          value={newPeca.quantidade ?? ''}
+                          onKeyDown={blockNonNumericKeyDown}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/\D/g, '');
+                            setNewPeca({ ...newPeca, quantidade: val ? Number(val) : undefined });
+                          }}
                           placeholder='0'
                           className='font-mono'
                         />
@@ -321,18 +322,15 @@ export function ModalPecas({
                         <FieldLabel htmlFor='alerta'>Quantidade para Alerta</FieldLabel>
                         <Input
                           id='alerta'
-                          type='number'
+                          type='text'
+                          inputMode='numeric'
                           value={newPeca.alerta ?? ''}
-                          onChange={(e) =>
-                            setNewPeca({
-                              ...newPeca,
-                              alerta: e.target.value
-                                ? Number(e.target.value)
-                                : undefined
-                            })
-                          }
+                          onKeyDown={blockNonNumericKeyDown}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/\D/g, '');
+                            setNewPeca({ ...newPeca, alerta: val ? Number(val) : undefined });
+                          }}
                           placeholder='1'
-                          min='0'
                           className='font-mono'
                         />
                         <FieldDescription>
