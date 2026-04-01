@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 
 import { usePathname, useRouter } from 'next/navigation';
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { useAlerta } from '@/hooks/useAlerta';
 
@@ -44,20 +44,21 @@ export function AlertToast() {
 
     toast.custom(
       () => (
-        <Alert className='max-w-360 border-border bg-popover shadow-lg'>
-          {hasCriticalItems ? (
-            <AlertTriangle color='#e7000b' />
-          ) : (
-            <BellRing color='#ffd700' />
-          )}
-          <div className='flex items-center justify-between gap-2'>
-            <AlertTitle className='mb-0 text-popover-foreground'>
+        <Alert className='max-w-7xl border-border bg-popover shadow-lg flex flex-col gap-1'>
+          <div className='flex mb-2 items-center justify-between w-full gap-3'>
+            {hasCriticalItems ? (
+              <AlertTriangle size={17} color='#e7000b' />
+            ) : (
+              <BellRing size={17} color='#ffd700' />
+            )}
+            <span className='flex-1 text-sm font-medium text-popover-foreground'>
               {hasCriticalItems
                 ? 'Estoque exigindo reposição'
                 : 'Estoque em alerta'}
-            </AlertTitle>
+            </span>
             <Button
               size='sm'
+              className=' h-6 rounded-sm'
               onClick={() => {
                 router.push('/alertas');
                 toast.dismiss(STOCK_ALERT_TOAST_ID);
@@ -65,9 +66,7 @@ export function AlertToast() {
               Ver alertas
             </Button>
           </div>
-          <AlertDescription className='text-muted-foreground p-0'>
-            {description}
-          </AlertDescription>
+          <div className='text-sm text-muted-foreground'>{description}</div>
         </Alert>
       ),
       {
