@@ -29,6 +29,7 @@ import {
   resolveExpandedClienteIds,
   toggleExpandedCliente
 } from './_lib/clientes-view-model';
+import { formatCNPJ, formatCPF, formatPhone } from '@/app/utils/formatters';
 import {
   Building2,
   Car,
@@ -204,7 +205,7 @@ export default function Clientes() {
       </div>
 
       <Card className='gap-0 overflow-hidden border-border bg-card shadow-none'>
-        <CardHeader className='gap-4 border-b border-border'>
+        <CardHeader className='gap-4 pb-0!'>
           <div className='flex flex-col gap-1'>
             <CardTitle className='text-base font-semibold'>
               Base de clientes
@@ -251,331 +252,321 @@ export default function Clientes() {
           <EmptyHeader>
             <EmptyTitle>Nenhum cliente encontrado</EmptyTitle>
             <EmptyDescription>
-              Ajuste a busca para localizar um cliente ou uma placa
-              específica.
+              Ajuste a busca para localizar um cliente ou uma placa específica.
             </EmptyDescription>
           </EmptyHeader>
         </Empty>
       ) : (
         <div className='flex flex-col gap-3'>
           {paginatedClientes.map((result) => {
-                const { cliente, matchedVehicleIds, veiculos, vehicleCount } =
-                  result;
-                const isExpanded = expandedClienteIds.has(cliente.id);
-                const isLoadingVeiculos = isLoadingCliente(cliente.id);
+            const { cliente, matchedVehicleIds, veiculos, vehicleCount } =
+              result;
+            const isExpanded = expandedClienteIds.has(cliente.id);
+            const isLoadingVeiculos = isLoadingCliente(cliente.id);
 
-                return (
-                  <Collapsible key={cliente.id} open={isExpanded}>
-                    <div className='overflow-hidden rounded-xl border border-border bg-card'>
-                      <div className='flex items-start gap-4 px-5 py-4'>
-                        <button
-                          type='button'
-                          onClick={() => handleToggleCliente(cliente.id)}
-                          className='group flex min-w-0 flex-1 items-start gap-4 text-left outline-none transition-colors hover:text-foreground focus-visible:text-foreground'>
-                          <div className='flex size-11 shrink-0 items-center justify-center rounded-lg border border-border bg-elevated text-sm font-semibold text-primary transition-colors group-hover:border-border-hover'>
-                            {getInitials(cliente.name_cliente)}
-                          </div>
-
-                          <div className='flex min-w-0 flex-1 flex-col gap-2'>
-                            <div className='flex flex-col gap-1 lg:flex-row lg:items-center lg:justify-between'>
-                              <div className='min-w-0'>
-                                <p className='truncate text-sm font-semibold text-foreground'>
-                                  {cliente.name_cliente}
-                                </p>
-                                <div className='mt-1 flex min-w-0 items-center gap-2 text-sm text-muted-foreground'>
-                                  <Building2 className='size-3.5 shrink-0' />
-                                  <span className='truncate'>
-                                    {cliente.nome_empresa}
-                                  </span>
-                                </div>
-                              </div>
-
-                              <div className='flex shrink-0 items-center gap-2'>
-                                <Badge
-                                  variant='outline'
-                                  className='border-border bg-background text-muted-foreground'>
-                                  {vehicleCount}{' '}
-                                  {vehicleCount === 1 ? 'veículo' : 'veículos'}
-                                </Badge>
-                                <ChevronDown
-                                  className={cn(
-                                    'size-4 shrink-0 text-muted-foreground transition-transform duration-200 ease-out',
-                                    isExpanded && 'rotate-180 text-foreground'
-                                  )}
-                                />
-                              </div>
-                            </div>
-
-                            <div className='flex flex-wrap items-center gap-3 text-xs text-muted-foreground'>
-                              {cliente.telefone ? (
-                                <span className='inline-flex items-center gap-1.5'>
-                                  <Phone className='size-3.5' />
-                                  {cliente.telefone}
-                                </span>
-                              ) : null}
-                              {cliente.cpf ? (
-                                <span>CPF {cliente.cpf}</span>
-                              ) : null}
-                              {cliente.cnpj ? (
-                                <span>CNPJ {cliente.cnpj}</span>
-                              ) : null}
-                            </div>
-
-                            {matchedVehicleIds.length > 0 ? (
-                              <p className='text-xs font-medium text-primary'>
-                                Busca encontrou {matchedVehicleIds.length}{' '}
-                                {matchedVehicleIds.length === 1
-                                  ? 'placa vinculada'
-                                  : 'placas vinculadas'}
-                                .
-                              </p>
-                            ) : null}
-                          </div>
-                        </button>
-
-                        <div className='flex shrink-0 items-center gap-1'>
-                          <ModalClientes
-                            mode='edit'
-                            initialData={editingCliente || undefined}
-                            isOpen={editingCliente?.id === cliente.id}
-                            setIsOpen={(open) =>
-                              !open && setEditingCliente(null)
-                            }
-                            onSubmit={(data) =>
-                              handleUpdateCliente(cliente.id, data)
-                            }
-                            isLoading={isSavingCliente}
-                            trigger={
-                              <Button
-                                variant='ghost'
-                                size='icon-sm'
-                                aria-label={`Editar cliente ${cliente.name_cliente}`}
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  setEditingCliente(cliente);
-                                }}>
-                                <Pencil />
-                              </Button>
-                            }
-                          />
-
-                          <ModalDelete
-                            isOpen={isDeleteOpen && deleteId === cliente.id}
-                            setIsOpen={(open) => {
-                              setIsDeleteOpen(open);
-                              if (!open) {
-                                setDeleteId(null);
-                              }
-                            }}
-                            onConfirm={() => handleDeleteCliente(cliente.id)}
-                            isLoading={isSavingCliente}
-                            title='Excluir cliente'
-                            description={`Tem certeza que deseja excluir o cliente "${cliente.name_cliente}"? Todos os veículos associados também serão removidos.`}
-                            trigger={
-                              <Button
-                                variant='ghost'
-                                size='icon-sm'
-                                aria-label={`Excluir cliente ${cliente.name_cliente}`}
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  setDeleteId(cliente.id);
-                                  setIsDeleteOpen(true);
-                                }}>
-                                <Trash2 />
-                              </Button>
-                            }
-                          />
-                        </div>
+            return (
+              <Collapsible key={cliente.id} open={isExpanded}>
+                <div className='overflow-hidden rounded-xl border border-border bg-card'>
+                  <div className='flex items-start gap-4 px-5 py-4'>
+                    <button
+                      type='button'
+                      onClick={() => handleToggleCliente(cliente.id)}
+                      className='group flex min-w-0 flex-1 items-start gap-4 text-left outline-none transition-colors hover:text-foreground focus-visible:text-foreground'>
+                      <div className='flex size-11 shrink-0 items-center justify-center rounded-lg border border-border bg-elevated text-sm font-semibold text-primary transition-colors group-hover:border-border-hover'>
+                        {getInitials(cliente.name_cliente)}
                       </div>
 
-                      <CollapsibleContent className='overflow-hidden border-t border-border bg-background/50 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-1 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-1 data-[state=open]:duration-200'>
-                        <div className='px-5 py-4'>
-                          <div className='mb-3 flex items-center justify-between'>
-                            <div>
-                              <p className='text-xs font-medium uppercase tracking-wider text-muted-foreground'>
-                                Veículos do cliente
-                              </p>
-                              <p className='mt-0.5 text-xs text-muted-foreground'>
-                                {vehicleCount}{' '}
-                                {vehicleCount === 1
-                                  ? 'veículo cadastrado'
-                                  : 'veículos cadastrados'}
-                              </p>
+                      <div className='flex min-w-0 flex-1 flex-col gap-2'>
+                        <div className='flex flex-col gap-1 lg:flex-row lg:items-center lg:justify-between'>
+                          <div className='min-w-0'>
+                            <p className='truncate text-sm font-semibold text-foreground'>
+                              {cliente.name_cliente}
+                            </p>
+                            <div className='mt-1 flex min-w-0 items-center gap-2 text-sm text-muted-foreground'>
+                              <Building2 className='size-3.5 shrink-0' />
+                              <span className='truncate'>
+                                {cliente.nome_empresa}
+                              </span>
                             </div>
-
-                            <ModalVeiculos
-                              mode='create'
-                              initialData={undefined}
-                              isOpen={
-                                isVeiculoAddOpen &&
-                                activeClienteIdForNewVeiculo === cliente.id
-                              }
-                              setIsOpen={(open) => {
-                                setIsVeiculoAddOpen(open);
-                                if (!open) {
-                                  setActiveClienteIdForNewVeiculo(null);
-                                }
-                              }}
-                              onSubmit={(data) =>
-                                handleAddVeiculo(cliente.id, data)
-                              }
-                              isLoading={isSaving}
-                              trigger={
-                                <Button
-                                  variant='outline'
-                                  size='sm'
-                                  onClick={() =>
-                                    setActiveClienteIdForNewVeiculo(cliente.id)
-                                  }>
-                                  <Plus data-icon='inline-start' />
-                                  Adicionar veículo
-                                </Button>
-                              }
-                            />
                           </div>
 
-                          {isLoadingVeiculos ||
-                          (isInitialLoading && veiculos.length === 0) ? (
-                            <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
-                              {Array.from({ length: 2 }).map((_, index) => (
-                                <div
-                                  key={index}
-                                  className='flex items-center justify-between rounded-lg border border-border bg-card p-3'>
-                                  <div className='flex items-center gap-3'>
-                                    <Skeleton className='size-9 rounded-md' />
-                                    <div className='flex flex-col gap-2'>
-                                      <Skeleton className='h-3.5 w-20' />
-                                      <Skeleton className='h-3 w-28' />
-                                    </div>
+                          <div className='flex shrink-0 items-center gap-2'>
+                            <Badge
+                              variant='outline'
+                              className='border-border bg-background text-muted-foreground'>
+                              {vehicleCount}{' '}
+                              {vehicleCount === 1 ? 'veículo' : 'veículos'}
+                            </Badge>
+                            <ChevronDown
+                              className={cn(
+                                'size-4 shrink-0 text-muted-foreground transition-transform duration-200 ease-out',
+                                isExpanded && 'rotate-180 text-foreground'
+                              )}
+                            />
+                          </div>
+                        </div>
+
+                        <div className='flex flex-wrap items-center gap-3 text-xs text-muted-foreground'>
+                          {cliente.telefone ? (
+                            <span className='inline-flex items-center gap-1.5'>
+                              <Phone className='size-3.5' />
+                              {formatPhone(cliente.telefone)}
+                            </span>
+                          ) : null}
+                          {cliente.cpf ? <span>CPF {formatCPF(cliente.cpf)}</span> : null}
+                          {cliente.cnpj ? (
+                            <span>CNPJ {formatCNPJ(cliente.cnpj)}</span>
+                          ) : null}
+                        </div>
+
+                        {matchedVehicleIds.length > 0 ? (
+                          <p className='text-xs font-medium text-primary'>
+                            Busca encontrou {matchedVehicleIds.length}{' '}
+                            {matchedVehicleIds.length === 1
+                              ? 'placa vinculada'
+                              : 'placas vinculadas'}
+                            .
+                          </p>
+                        ) : null}
+                      </div>
+                    </button>
+
+                    <div className='flex shrink-0 items-center gap-1'>
+                      <ModalClientes
+                        mode='edit'
+                        initialData={editingCliente || undefined}
+                        isOpen={editingCliente?.id === cliente.id}
+                        setIsOpen={(open) => !open && setEditingCliente(null)}
+                        onSubmit={(data) =>
+                          handleUpdateCliente(cliente.id, data)
+                        }
+                        isLoading={isSavingCliente}
+                        trigger={
+                          <Button
+                            variant='ghost'
+                            size='icon-sm'
+                            aria-label={`Editar cliente ${cliente.name_cliente}`}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setEditingCliente(cliente);
+                            }}>
+                            <Pencil />
+                          </Button>
+                        }
+                      />
+
+                      <ModalDelete
+                        isOpen={isDeleteOpen && deleteId === cliente.id}
+                        setIsOpen={(open) => {
+                          setIsDeleteOpen(open);
+                          if (!open) {
+                            setDeleteId(null);
+                          }
+                        }}
+                        onConfirm={() => handleDeleteCliente(cliente.id)}
+                        isLoading={isSavingCliente}
+                        title='Excluir cliente'
+                        description={`Tem certeza que deseja excluir o cliente "${cliente.name_cliente}"? Todos os veículos associados também serão removidos.`}
+                        trigger={
+                          <Button
+                            variant='ghost'
+                            size='icon-sm'
+                            aria-label={`Excluir cliente ${cliente.name_cliente}`}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setDeleteId(cliente.id);
+                              setIsDeleteOpen(true);
+                            }}>
+                            <Trash2 />
+                          </Button>
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  <CollapsibleContent className='overflow-hidden border-t border-border bg-background/50 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-1 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-1 data-[state=open]:duration-200'>
+                    <div className='px-5 py-4'>
+                      <div className='mb-3 flex items-center justify-between'>
+                        <div>
+                          <p className='text-xs font-medium uppercase tracking-wider text-muted-foreground'>
+                            Veículos do cliente
+                          </p>
+                          <p className='mt-0.5 text-xs text-muted-foreground'>
+                            {vehicleCount}{' '}
+                            {vehicleCount === 1
+                              ? 'veículo cadastrado'
+                              : 'veículos cadastrados'}
+                          </p>
+                        </div>
+
+                        <ModalVeiculos
+                          mode='create'
+                          initialData={undefined}
+                          isOpen={
+                            isVeiculoAddOpen &&
+                            activeClienteIdForNewVeiculo === cliente.id
+                          }
+                          setIsOpen={(open) => {
+                            setIsVeiculoAddOpen(open);
+                            if (!open) {
+                              setActiveClienteIdForNewVeiculo(null);
+                            }
+                          }}
+                          onSubmit={(data) =>
+                            handleAddVeiculo(cliente.id, data)
+                          }
+                          isLoading={isSaving}
+                          trigger={
+                            <Button
+                              variant='outline'
+                              size='sm'
+                              onClick={() =>
+                                setActiveClienteIdForNewVeiculo(cliente.id)
+                              }>
+                              <Plus data-icon='inline-start' />
+                              Adicionar veículo
+                            </Button>
+                          }
+                        />
+                      </div>
+
+                      {isLoadingVeiculos ||
+                      (isInitialLoading && veiculos.length === 0) ? (
+                        <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
+                          {Array.from({ length: 2 }).map((_, index) => (
+                            <div
+                              key={index}
+                              className='flex items-center justify-between rounded-lg border border-border bg-card p-3'>
+                              <div className='flex items-center gap-3'>
+                                <Skeleton className='size-9 rounded-md' />
+                                <div className='flex flex-col gap-2'>
+                                  <Skeleton className='h-3.5 w-20' />
+                                  <Skeleton className='h-3 w-28' />
+                                </div>
+                              </div>
+                              <div className='flex gap-1'>
+                                <Skeleton className='size-8 rounded-md' />
+                                <Skeleton className='size-8 rounded-md' />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : veiculos.length === 0 ? (
+                        <Empty className='border-border bg-card py-8'>
+                          <EmptyMedia variant='icon'>
+                            <Car />
+                          </EmptyMedia>
+                          <EmptyHeader>
+                            <EmptyTitle>Nenhum veículo cadastrado</EmptyTitle>
+                            <EmptyDescription>
+                              Adicione o primeiro veículo para manter o
+                              histórico deste cliente completo.
+                            </EmptyDescription>
+                          </EmptyHeader>
+                        </Empty>
+                      ) : (
+                        <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
+                          {veiculos.map((veiculo) => {
+                            const isMatchedVehicle = matchedVehicleIds.includes(
+                              veiculo.id
+                            );
+
+                            return (
+                              <div
+                                key={veiculo.id}
+                                className={cn(
+                                  'flex items-center justify-between rounded-lg border border-border bg-card p-3 transition-colors',
+                                  isMatchedVehicle &&
+                                    'border-primary/40 bg-primary/5'
+                                )}>
+                                <div className='flex min-w-0 items-center gap-3'>
+                                  <div className='flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-elevated text-primary'>
+                                    <Car className='size-4' />
                                   </div>
-                                  <div className='flex gap-1'>
-                                    <Skeleton className='size-8 rounded-md' />
-                                    <Skeleton className='size-8 rounded-md' />
+                                  <div className='min-w-0'>
+                                    <p className='text-sm font-semibold text-foreground'>
+                                      {veiculo.placa}
+                                    </p>
+                                    <p className='truncate text-sm text-muted-foreground'>
+                                      {veiculo.modelo}
+                                    </p>
                                   </div>
                                 </div>
-                              ))}
-                            </div>
-                          ) : veiculos.length === 0 ? (
-                            <Empty className='border-border bg-card py-8'>
-                              <EmptyMedia variant='icon'>
-                                <Car />
-                              </EmptyMedia>
-                              <EmptyHeader>
-                                <EmptyTitle>
-                                  Nenhum veículo cadastrado
-                                </EmptyTitle>
-                                <EmptyDescription>
-                                  Adicione o primeiro veículo para manter o
-                                  histórico deste cliente completo.
-                                </EmptyDescription>
-                              </EmptyHeader>
-                            </Empty>
-                          ) : (
-                            <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
-                              {veiculos.map((veiculo) => {
-                                const isMatchedVehicle =
-                                  matchedVehicleIds.includes(veiculo.id);
 
-                                return (
-                                  <div
-                                    key={veiculo.id}
-                                    className={cn(
-                                      'flex items-center justify-between rounded-lg border border-border bg-card p-3 transition-colors',
-                                      isMatchedVehicle &&
-                                        'border-primary/40 bg-primary/5'
-                                    )}>
-                                    <div className='flex min-w-0 items-center gap-3'>
-                                      <div className='flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-elevated text-primary'>
-                                        <Car className='size-4' />
-                                      </div>
-                                      <div className='min-w-0'>
-                                        <p className='text-sm font-semibold text-foreground'>
-                                          {veiculo.placa}
-                                        </p>
-                                        <p className='truncate text-sm text-muted-foreground'>
-                                          {veiculo.modelo}
-                                        </p>
-                                      </div>
-                                    </div>
+                                <div className='flex shrink-0 items-center gap-1'>
+                                  <ModalVeiculos
+                                    mode='edit'
+                                    initialData={editingVeiculo || undefined}
+                                    isOpen={editingVeiculo?.id === veiculo.id}
+                                    setIsOpen={(open) =>
+                                      !open && setEditingVeiculo(null)
+                                    }
+                                    onSubmit={(data) =>
+                                      handleUpdateVeiculo(
+                                        veiculo.id,
+                                        cliente.id,
+                                        data
+                                      )
+                                    }
+                                    isLoading={isSaving}
+                                    trigger={
+                                      <Button
+                                        variant='ghost'
+                                        size='icon-sm'
+                                        aria-label={`Editar veículo ${veiculo.placa}`}
+                                        onClick={() => {
+                                          setEditingVeiculo(veiculo);
+                                        }}>
+                                        <Pencil />
+                                      </Button>
+                                    }
+                                  />
 
-                                    <div className='flex shrink-0 items-center gap-1'>
-                                      <ModalVeiculos
-                                        mode='edit'
-                                        initialData={
-                                          editingVeiculo || undefined
-                                        }
-                                        isOpen={
-                                          editingVeiculo?.id === veiculo.id
-                                        }
-                                        setIsOpen={(open) =>
-                                          !open && setEditingVeiculo(null)
-                                        }
-                                        onSubmit={(data) =>
-                                          handleUpdateVeiculo(
-                                            veiculo.id,
-                                            cliente.id,
-                                            data
-                                          )
-                                        }
-                                        isLoading={isSaving}
-                                        trigger={
-                                          <Button
-                                            variant='ghost'
-                                            size='icon-sm'
-                                            aria-label={`Editar veículo ${veiculo.placa}`}
-                                            onClick={() => {
-                                              setEditingVeiculo(veiculo);
-                                            }}>
-                                            <Pencil />
-                                          </Button>
-                                        }
-                                      />
-
-                                      <ModalDelete
-                                        isOpen={
-                                          isVeiculoDeleteOpen &&
-                                          deleteVeiculoId === veiculo.id
-                                        }
-                                        setIsOpen={(open) => {
-                                          setIsVeiculoDeleteOpen(open);
-                                          if (!open) {
-                                            setDeleteVeiculoId(null);
-                                          }
-                                        }}
-                                        onConfirm={() =>
-                                          handleDeleteVeiculo(
-                                            veiculo.id,
-                                            cliente.id
-                                          )
-                                        }
-                                        isLoading={isSaving}
-                                        title='Excluir veículo'
-                                        description={`Tem certeza que deseja excluir o veículo "${veiculo.placa}"?`}
-                                        trigger={
-                                          <Button
-                                            variant='ghost'
-                                            size='icon-sm'
-                                            aria-label={`Excluir veículo ${veiculo.placa}`}
-                                            onClick={() => {
-                                              setDeleteVeiculoId(veiculo.id);
-                                              setIsVeiculoDeleteOpen(true);
-                                            }}>
-                                            <Trash2 />
-                                          </Button>
-                                        }
-                                      />
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )}
+                                  <ModalDelete
+                                    isOpen={
+                                      isVeiculoDeleteOpen &&
+                                      deleteVeiculoId === veiculo.id
+                                    }
+                                    setIsOpen={(open) => {
+                                      setIsVeiculoDeleteOpen(open);
+                                      if (!open) {
+                                        setDeleteVeiculoId(null);
+                                      }
+                                    }}
+                                    onConfirm={() =>
+                                      handleDeleteVeiculo(
+                                        veiculo.id,
+                                        cliente.id
+                                      )
+                                    }
+                                    isLoading={isSaving}
+                                    title='Excluir veículo'
+                                    description={`Tem certeza que deseja excluir o veículo "${veiculo.placa}"?`}
+                                    trigger={
+                                      <Button
+                                        variant='ghost'
+                                        size='icon-sm'
+                                        aria-label={`Excluir veículo ${veiculo.placa}`}
+                                        onClick={() => {
+                                          setDeleteVeiculoId(veiculo.id);
+                                          setIsVeiculoDeleteOpen(true);
+                                        }}>
+                                        <Trash2 />
+                                      </Button>
+                                    }
+                                  />
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
-                      </CollapsibleContent>
+                      )}
                     </div>
-                  </Collapsible>
-                );
-              })}
+                  </CollapsibleContent>
+                </div>
+              </Collapsible>
+            );
+          })}
         </div>
       )}
 

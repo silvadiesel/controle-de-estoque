@@ -8,6 +8,7 @@ import { usePagination } from '@/hooks/usePagination';
 
 import { ModalFornecedores } from './_components/modal-fornecedores';
 import { useFornecedores } from './_hook/useFornecedores';
+import { formatCNPJ, formatPhone } from '@/app/utils/formatters';
 import {
   Factory,
   Loader2,
@@ -144,14 +145,14 @@ export default function Fornecedores() {
                   <p className='font-medium text-foreground truncate'>
                     {fornecedor.name_empresa}
                   </p>
-                  <p className='text-sm text-muted-foreground'>{fornecedor.cnpj}</p>
+                  <p className='text-sm text-muted-foreground'>{fornecedor.cnpj ? formatCNPJ(fornecedor.cnpj) : '-'}</p>
                 </div>
 
                 {/* Contact */}
                 <div className='hidden md:flex items-center gap-4'>
                   <div className='flex items-center gap-1.5 text-sm text-primary font-medium'>
                     <Phone className='h-3.5 w-3.5' />
-                    {fornecedor.telefone || '-'}
+                    {fornecedor.telefone ? formatPhone(fornecedor.telefone) : '-'}
                   </div>
                   <div className='flex items-center gap-1.5 text-sm text-primary font-medium'>
                     <Mail className='h-3.5 w-3.5' />
@@ -211,7 +212,7 @@ export default function Fornecedores() {
               <div className='flex md:hidden items-center gap-4 mt-3 pt-3 border-t border-border'>
                 <div className='flex items-center gap-1.5 text-sm text-primary font-medium'>
                   <Phone className='h-3.5 w-3.5' />
-                  {fornecedor.telefone || '-'}
+                  {fornecedor.telefone ? formatPhone(fornecedor.telefone) : '-'}
                 </div>
                 <div className='flex items-center gap-1.5 text-sm text-primary font-medium'>
                   <Mail className='h-3.5 w-3.5' />

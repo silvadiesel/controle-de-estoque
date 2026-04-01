@@ -115,7 +115,8 @@ export function useClientes(): UseClientesReturn {
     const response = await fetch(`/api/clientes/${id}`, { method: 'DELETE' });
 
     if (!response.ok) {
-      throw new Error('Erro ao excluir cliente');
+      const data = await response.json();
+      throw new Error(data.error || 'Erro ao excluir cliente');
     }
 
     await fetchClientes();
@@ -216,7 +217,8 @@ export function useClientes(): UseClientesReturn {
       return true;
     } catch (error) {
       console.error('Erro ao excluir cliente:', error);
-      toast.error('Erro ao excluir cliente');
+      const message = error instanceof Error ? error.message : 'Erro ao excluir cliente';
+      toast.error(message);
       return false;
     } finally {
       setIsSaving(false);
