@@ -33,17 +33,17 @@ interface OrdemStatusBadgeProps {
   className?: string;
 }
 
-export function OrdemStatusBadge({
-  status,
-  className
-}: OrdemStatusBadgeProps) {
+export function OrdemStatusBadge({ status, className }: OrdemStatusBadgeProps) {
   const { label, icon: Icon, className: toneClassName } = statusConfig[status];
 
   return (
     <Badge
       variant='outline'
-      className={cn('gap-1.5 px-2.5 py-1 text-[10px] uppercase tracking-[0.08em]', toneClassName, className)}
-    >
+      className={cn(
+        'gap-1.5 px-2.5 py-1 text-[10px] rounded-sm uppercase tracking-[0.08em]',
+        toneClassName,
+        className
+      )}>
       <Icon />
       {label}
     </Badge>
