@@ -1,6 +1,9 @@
 'use client';
 
+import { useEffect } from 'react';
+
 import { formatPlaca } from '@/app/utils/formatters';
+import { veiculoSchema } from '@/app/utils/validators';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,27 +14,43 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog';
-import { Field, FieldContent, FieldGroup, FieldLabel } from '@/components/ui/field';
+import {
+  Field,
+  FieldContent,
+  FieldError,
+  FieldGroup,
+  FieldLabel
+} from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { Veiculo } from '@/db/schema';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, useForm } from 'react-hook-form';
+
+import type { VeiculoFormValues } from '../_hooks/useVeiculos';
 import { Car } from 'lucide-react';
 
 interface ModalVeiculosProps {
   mode: 'create' | 'edit';
-  data: Partial<Veiculo>;
-  setData: (data: Partial<Veiculo>) => void;
+  initialData?: Partial<Veiculo>;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  onSubmit: () => Promise<void>;
+  onSubmit: (data: VeiculoFormValues) => Promise<boolean>;
   isLoading: boolean;
   trigger?: React.ReactNode;
 }
 
+function getDefaultValues(initialData?: Partial<Veiculo>): VeiculoFormValues {
+  return {
+    placa: initialData?.placa ?? '',
+    modelo: initialData?.modelo ?? ''
+  };
+}
+
 export function ModalVeiculos({
   mode,
-  data,
-  setData,
+  initialData,
   isOpen,
   setIsOpen,
   onSubmit,
@@ -39,71 +58,114 @@ export function ModalVeiculos({
   trigger
 }: ModalVeiculosProps) {
   const isEdit = mode === 'edit';
+  const form = useForm<VeiculoFormValues>({
+    resolver: zodResolver(veiculoSchema),
+    defaultValues: getDefaultValues(initialData),
+    mode: 'onSubmit',
+    reValidateMode: 'onChange'
+  });
 
-  const handlePlacaChange = (value: string) => {
-    const formatted = formatPlaca(value);
-    setData({ ...data, placa: formatted });
+  const {
+    control,
+    formState: { errors },
+    handleSubmit,
+    register,
+    reset
+  } = form;
+
+  useEffect(() => {
+    if (isOpen) {
+      reset(getDefaultValues(initialData));
+    }
+  }, [initialData, isOpen, reset]);
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      reset(getDefaultValues(initialData));
+    }
+
+    setIsOpen(open);
   };
 
+  const handleFormSubmit = handleSubmit(async (values) => {
+    const didSave = await onSubmit(values);
+
+    if (didSave) {
+      reset(getDefaultValues());
+      setIsOpen(false);
+    }
+  });
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className='bg-card border-border rounded-xl max-w-[540px] p-0'>
-        <DialogHeader className='p-6 pb-4 border-b border-border'>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
+      <DialogContent className='max-w-[560px] gap-0 rounded-xl border-border bg-card p-0'>
+        <DialogHeader className='border-b border-border p-6 pb-4'>
           <div className='flex items-center gap-3'>
-            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-primary/12'>
-              <Car className='h-4 w-4 text-primary' />
+            <div className='flex size-8 items-center justify-center rounded-lg bg-primary/12'>
+              <Car className='size-4 text-primary' />
             </div>
             <div>
               <DialogTitle className='text-base font-bold text-foreground'>
-                {isEdit ? 'Editar Veículo' : 'Adicionar Veículo'}
+                {isEdit ? 'Editar veículo' : 'Adicionar veículo'}
               </DialogTitle>
               <DialogDescription className='text-xs text-muted-foreground'>
                 {isEdit
-                  ? 'Altere os dados do veículo'
-                  : 'Cadastre um novo veículo para este cliente'}
+                  ? 'Atualize os dados do veículo vinculado a este cliente.'
+                  : 'Cadastre um novo veículo para manter o histórico completo.'}
               </DialogDescription>
             </div>
           </div>
         </DialogHeader>
+
         <ScrollArea className='max-h-[60vh]'>
-          <div className='p-6 pt-4'>
+          <form
+            id='veiculo-form'
+            onSubmit={handleFormSubmit}
+            className='p-6 pt-4'>
             <FieldGroup>
               <Field orientation='responsive'>
                 <FieldContent>
-                  <FieldLabel htmlFor='placa'>Placa *</FieldLabel>
-                  <Input
-                    id='placa'
-                    value={data.placa || ''}
-                    onChange={(e) => handlePlacaChange(e.target.value)}
-                    placeholder='ABC-1234'
-                    className='uppercase'
+                  <FieldLabel htmlFor='placa'>Placa</FieldLabel>
+                  <Controller
+                    name='placa'
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        id='placa'
+                        value={field.value ?? ''}
+                        onChange={(event) =>
+                          field.onChange(formatPlaca(event.target.value))
+                        }
+                        placeholder='ABC-1234'
+                        aria-invalid={!!errors.placa}
+                        className='uppercase'
+                      />
+                    )}
                   />
+                  <FieldError errors={[errors.placa]} />
                 </FieldContent>
+
                 <FieldContent>
-                  <FieldLabel htmlFor='modelo'>Modelo *</FieldLabel>
+                  <FieldLabel htmlFor='modelo'>Modelo</FieldLabel>
                   <Input
                     id='modelo'
-                    value={data.modelo || ''}
-                    onChange={(e) => setData({ ...data, modelo: e.target.value })}
                     placeholder='Scania R450'
+                    aria-invalid={!!errors.modelo}
+                    {...register('modelo')}
                   />
+                  <FieldError errors={[errors.modelo]} />
                 </FieldContent>
               </Field>
             </FieldGroup>
-          </div>
+          </form>
         </ScrollArea>
-        <DialogFooter className='px-6 py-4 border-t border-border'>
-          <Button
-            variant='outline'
-            onClick={() => setIsOpen(false)}
-            className='w-32 border-border text-muted-foreground'>
+
+        <DialogFooter className='border-t border-border px-6 py-4'>
+          <Button variant='outline' onClick={() => handleOpenChange(false)}>
             Cancelar
           </Button>
-          <Button
-            onClick={onSubmit}
-            className='bg-primary hover:bg-primary/90 text-primary-foreground w-32'
-            disabled={isLoading}>
+          <Button type='submit' form='veiculo-form' disabled={isLoading}>
             {isLoading ? 'Salvando...' : isEdit ? 'Salvar' : 'Adicionar'}
           </Button>
         </DialogFooter>
