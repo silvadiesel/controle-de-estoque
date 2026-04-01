@@ -11,7 +11,7 @@ import { type Peca } from '@/db/schema/pecas';
 import { ActivityFeed, type MovimentacaoAPI } from './_components/activity-feed';
 import { buildLast7Days, MovementsChart } from './_components/movements-chart';
 import { LastOrders, type OrdemServicoItem, type OrdemVendaItem } from './_components/last-orders';
-import { StatCard } from './_components/stat-card';
+import { StatCard } from '@/components/ui/stat-card';
 import { deriveDashboardState, type RequestBucket } from './_lib/dashboard-state';
 
 export default function DashboardPage() {

@@ -1,5 +1,4 @@
 import { Skeleton } from '@/components/ui/skeleton';
-
 import { type LucideIcon } from 'lucide-react';
 
 interface StatCardProps {
