@@ -147,12 +147,9 @@ export default function Ordens() {
             .toLowerCase()
             .includes(searchLower)) ||
         (ordem.tipo === 'servico' &&
-          ((ordem as OrdemServicoCompleta).funcionario?.name
+          (ordem as OrdemServicoCompleta).funcionario_responsavel?.name
             ?.toLowerCase()
-            .includes(searchLower) ||
-            (ordem as OrdemServicoCompleta).funcionario_responsavel?.name
-              ?.toLowerCase()
-              .includes(searchLower)));
+            .includes(searchLower));
       const matchesType = filterType === 'all' || ordem.tipo === filterType;
       const matchesStatus =
         filterStatus === 'all' || ordem.status === filterStatus;
