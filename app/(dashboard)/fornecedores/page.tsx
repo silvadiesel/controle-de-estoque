@@ -12,6 +12,7 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { StatCard } from '@/components/ui/stat-card';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { usePagination } from '@/hooks/usePagination';
 import { cn } from '@/lib/utils';
 import { formatCNPJ, formatPhone } from '@/app/utils/formatters';
@@ -261,14 +262,8 @@ export default function Fornecedores() {
 
                     {/* Ações */}
                     <div className='flex shrink-0 items-center gap-1'>
-                      <ModalFornecedores
-                        mode='edit'
-                        initialData={editingFornecedor || undefined}
-                        isOpen={editingFornecedor?.id === fornecedor.id}
-                        setIsOpen={(open) => !open && setEditingFornecedor(null)}
-                        onSubmit={(data) => handleUpdateFornecedor(fornecedor.id, data)}
-                        isLoading={isSavingFornecedor}
-                        trigger={
+                      <Tooltip>
+                        <TooltipTrigger asChild>
                           <Button
                             variant='ghost'
                             size='icon-sm'
@@ -276,17 +271,20 @@ export default function Fornecedores() {
                             onClick={(e) => { e.stopPropagation(); setEditingFornecedor(fornecedor); }}>
                             <Pencil />
                           </Button>
-                        }
+                        </TooltipTrigger>
+                        <TooltipContent>Editar</TooltipContent>
+                      </Tooltip>
+                      <ModalFornecedores
+                        mode='edit'
+                        initialData={editingFornecedor || undefined}
+                        isOpen={editingFornecedor?.id === fornecedor.id}
+                        setIsOpen={(open) => !open && setEditingFornecedor(null)}
+                        onSubmit={(data) => handleUpdateFornecedor(fornecedor.id, data)}
+                        isLoading={isSavingFornecedor}
                       />
 
-                      <ModalDelete
-                        isOpen={isDeleteOpen && deleteId === fornecedor.id}
-                        setIsOpen={(open) => { setIsDeleteOpen(open); if (!open) setDeleteId(null); }}
-                        onConfirm={() => handleDeleteFornecedor(fornecedor.id)}
-                        isLoading={isSavingFornecedor}
-                        title='Excluir fornecedor'
-                        description={`Tem certeza que deseja excluir "${fornecedor.name_empresa}"? Esta ação não pode ser desfeita.`}
-                        trigger={
+                      <Tooltip>
+                        <TooltipTrigger asChild>
                           <Button
                             variant='ghost'
                             size='icon-sm'
@@ -294,7 +292,16 @@ export default function Fornecedores() {
                             onClick={(e) => { e.stopPropagation(); setDeleteId(fornecedor.id); setIsDeleteOpen(true); }}>
                             <Trash2 />
                           </Button>
-                        }
+                        </TooltipTrigger>
+                        <TooltipContent>Excluir</TooltipContent>
+                      </Tooltip>
+                      <ModalDelete
+                        isOpen={isDeleteOpen && deleteId === fornecedor.id}
+                        setIsOpen={(open) => { setIsDeleteOpen(open); if (!open) setDeleteId(null); }}
+                        onConfirm={() => handleDeleteFornecedor(fornecedor.id)}
+                        isLoading={isSavingFornecedor}
+                        title='Excluir fornecedor'
+                        description={`Tem certeza que deseja excluir "${fornecedor.name_empresa}"? Esta ação não pode ser desfeita.`}
                       />
                     </div>
                   </div>
@@ -369,13 +376,18 @@ export default function Fornecedores() {
                                 </div>
                               </div>
 
-                              <Button
-                                variant='ghost'
-                                size='icon-sm'
-                                aria-label={`Desvincular ${peca.name_peca}`}
-                                onClick={() => handleDesvincular(fornecedor.id, peca.id)}>
-                                <Unlink />
-                              </Button>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant='ghost'
+                                    size='icon-sm'
+                                    aria-label={`Desvincular ${peca.name_peca}`}
+                                    onClick={() => handleDesvincular(fornecedor.id, peca.id)}>
+                                    <Unlink />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Desvincular</TooltipContent>
+                              </Tooltip>
                             </div>
                           ))}
                         </div>

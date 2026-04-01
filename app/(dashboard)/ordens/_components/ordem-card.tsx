@@ -14,6 +14,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent
+} from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
 import type {
@@ -197,39 +202,59 @@ export function OrdemCard(props: OrdemCardProps) {
           <div className='hidden shrink-0 items-center gap-1 lg:flex'>
             {isActive && (
               <>
-                <Button
-                  variant='ghost'
-                  size='icon-sm'
-                  onClick={onEdit}
-                  aria-label='Editar ordem'>
-                  <Pencil />
-                </Button>
-                <Button
-                  variant='ghost'
-                  size='icon-sm'
-                  onClick={onFinalize}
-                  disabled={isBusy}
-                  aria-label='Finalizar ordem'>
-                  <CheckCircle2 />
-                </Button>
-                <Button
-                  variant='ghost'
-                  size='icon-sm'
-                  onClick={onCancel}
-                  disabled={isBusy}
-                  aria-label='Cancelar ordem'>
-                  <XCircle />
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant='ghost'
+                      size='icon-sm'
+                      onClick={onEdit}
+                      aria-label='Editar ordem'>
+                      <Pencil />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Editar</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant='ghost'
+                      size='icon-sm'
+                      onClick={onFinalize}
+                      disabled={isBusy}
+                      aria-label='Finalizar ordem'>
+                      <CheckCircle2 />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Finalizar</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant='ghost'
+                      size='icon-sm'
+                      onClick={onCancel}
+                      disabled={isBusy}
+                      aria-label='Cancelar ordem'>
+                      <XCircle />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Cancelar</TooltipContent>
+                </Tooltip>
               </>
             )}
-            <Button
-              variant='ghost'
-              size='icon-sm'
-              onClick={onDelete}
-              disabled={isBusy}
-              aria-label='Excluir ordem'>
-              <Trash2 />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant='ghost'
+                  size='icon-sm'
+                  onClick={onDelete}
+                  disabled={isBusy}
+                  aria-label='Excluir ordem'>
+                  <Trash2 />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Excluir</TooltipContent>
+            </Tooltip>
           </div>
 
           {/* Mobile actions */}

@@ -18,6 +18,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { StatCard } from '@/components/ui/stat-card';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { usePagination } from '@/hooks/usePagination';
 import { cn } from '@/lib/utils';
 
@@ -332,16 +333,8 @@ export default function Clientes() {
                     </button>
 
                     <div className='flex shrink-0 items-center gap-1'>
-                      <ModalClientes
-                        mode='edit'
-                        initialData={editingCliente || undefined}
-                        isOpen={editingCliente?.id === cliente.id}
-                        setIsOpen={(open) => !open && setEditingCliente(null)}
-                        onSubmit={(data) =>
-                          handleUpdateCliente(cliente.id, data)
-                        }
-                        isLoading={isSavingCliente}
-                        trigger={
+                      <Tooltip>
+                        <TooltipTrigger asChild>
                           <Button
                             variant='ghost'
                             size='icon-sm'
@@ -352,9 +345,36 @@ export default function Clientes() {
                             }}>
                             <Pencil />
                           </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Editar</TooltipContent>
+                      </Tooltip>
+                      <ModalClientes
+                        mode='edit'
+                        initialData={editingCliente || undefined}
+                        isOpen={editingCliente?.id === cliente.id}
+                        setIsOpen={(open) => !open && setEditingCliente(null)}
+                        onSubmit={(data) =>
+                          handleUpdateCliente(cliente.id, data)
                         }
+                        isLoading={isSavingCliente}
                       />
 
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant='ghost'
+                            size='icon-sm'
+                            aria-label={`Excluir cliente ${cliente.name_cliente}`}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setDeleteId(cliente.id);
+                              setIsDeleteOpen(true);
+                            }}>
+                            <Trash2 />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Excluir</TooltipContent>
+                      </Tooltip>
                       <ModalDelete
                         isOpen={isDeleteOpen && deleteId === cliente.id}
                         setIsOpen={(open) => {
@@ -367,19 +387,6 @@ export default function Clientes() {
                         isLoading={isSavingCliente}
                         title='Excluir cliente'
                         description={`Tem certeza que deseja excluir o cliente "${cliente.name_cliente}"? Todos os veículos associados também serão removidos.`}
-                        trigger={
-                          <Button
-                            variant='ghost'
-                            size='icon-sm'
-                            aria-label={`Excluir cliente ${cliente.name_cliente}`}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              setDeleteId(cliente.id);
-                              setIsDeleteOpen(true);
-                            }}>
-                            <Trash2 />
-                          </Button>
-                        }
                       />
                     </div>
                   </div>
@@ -494,6 +501,20 @@ export default function Clientes() {
                                 </div>
 
                                 <div className='flex shrink-0 items-center gap-1'>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant='ghost'
+                                        size='icon-sm'
+                                        aria-label={`Editar veículo ${veiculo.placa}`}
+                                        onClick={() => {
+                                          setEditingVeiculo(veiculo);
+                                        }}>
+                                        <Pencil />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>Editar</TooltipContent>
+                                  </Tooltip>
                                   <ModalVeiculos
                                     mode='edit'
                                     initialData={editingVeiculo || undefined}
@@ -509,19 +530,23 @@ export default function Clientes() {
                                       )
                                     }
                                     isLoading={isSaving}
-                                    trigger={
+                                  />
+
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
                                       <Button
                                         variant='ghost'
                                         size='icon-sm'
-                                        aria-label={`Editar veículo ${veiculo.placa}`}
+                                        aria-label={`Excluir veículo ${veiculo.placa}`}
                                         onClick={() => {
-                                          setEditingVeiculo(veiculo);
+                                          setDeleteVeiculoId(veiculo.id);
+                                          setIsVeiculoDeleteOpen(true);
                                         }}>
-                                        <Pencil />
+                                        <Trash2 />
                                       </Button>
-                                    }
-                                  />
-
+                                    </TooltipTrigger>
+                                    <TooltipContent>Excluir</TooltipContent>
+                                  </Tooltip>
                                   <ModalDelete
                                     isOpen={
                                       isVeiculoDeleteOpen &&
@@ -542,18 +567,6 @@ export default function Clientes() {
                                     isLoading={isSaving}
                                     title='Excluir veículo'
                                     description={`Tem certeza que deseja excluir o veículo "${veiculo.placa}"?`}
-                                    trigger={
-                                      <Button
-                                        variant='ghost'
-                                        size='icon-sm'
-                                        aria-label={`Excluir veículo ${veiculo.placa}`}
-                                        onClick={() => {
-                                          setDeleteVeiculoId(veiculo.id);
-                                          setIsVeiculoDeleteOpen(true);
-                                        }}>
-                                        <Trash2 />
-                                      </Button>
-                                    }
                                   />
                                 </div>
                               </div>
