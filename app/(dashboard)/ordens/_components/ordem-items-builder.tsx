@@ -57,11 +57,13 @@ export function OrdemItemsBuilder({
 
   const pecaOptions = useMemo(
     () =>
-      pecas.map((peca) => ({
-        value: peca.id.toString(),
-        label: peca.name_peca,
-        sublabel: `${formatCurrency(peca.preco)} · Estoque: ${peca.quantidade}`
-      })),
+      pecas
+        .filter((peca) => peca.quantidade > 0)
+        .map((peca) => ({
+          value: peca.id.toString(),
+          label: peca.name_peca,
+          sublabel: `${formatCurrency(peca.preco)} · Estoque: ${peca.quantidade}`
+        })),
     [pecas]
   );
 
