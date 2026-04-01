@@ -145,7 +145,6 @@ export function filterOrdens<T extends OrdemServiceSearchable | OrdemSaleSearcha
         ? [
             ordem.veiculo?.placa,
             ordem.veiculo?.modelo,
-            ordem.funcionario?.name,
             ordem.funcionario_responsavel?.name
           ]
         : [];

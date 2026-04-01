@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { AlertaToastProvider } from '@/components/alerta-toast-provider';
+import { AlertToast } from '@/components/alert-toast';
 import { AppSidebar } from '@/components/app-sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 
@@ -26,7 +26,7 @@ export default async function DashboardLayout({
     <SidebarProvider defaultOpen={defaultOpen}>
       <AppSidebar />
       <SidebarInset>
-        <AlertaToastProvider toastClassName='w-full text-base' />
+        <AlertToast />
         <main id='main-content'>{children}</main>
       </SidebarInset>
     </SidebarProvider>
