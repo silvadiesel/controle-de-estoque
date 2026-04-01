@@ -5,10 +5,15 @@ import { useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger
+  CollapsibleContent
 } from '@/components/ui/collapsible';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 
 import type {
@@ -21,6 +26,8 @@ import { ptBR } from 'date-fns/locale';
 import {
   CheckCircle2,
   ChevronDown,
+  MoreHorizontal,
+  Package,
   Pencil,
   ShoppingCart,
   Trash2,
@@ -74,7 +81,7 @@ const paymentMethodLabel: Record<string, string> = {
 
 function OrdemInfoBlock({ label, value }: { label: string; value: string }) {
   return (
-    <div className='rounded-lg border border-border bg-background/60 px-3 py-2.5'>
+    <div className='rounded-lg border border-border bg-card px-3 py-2.5'>
       <p className='text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground'>
         {label}
       </p>
@@ -118,181 +125,280 @@ export function OrdemCard(props: OrdemCardProps) {
 
   const Icon = tipo === 'servico' ? Wrench : ShoppingCart;
   const cardLabel = tipo === 'servico' ? 'OS' : 'OV';
+  const isActive = ordem.status === 'ativa';
 
   return (
-    <Collapsible
-      open={expanded}
-      onOpenChange={onToggle}
-      className={cn(
-        'overflow-hidden rounded-xl border border-border bg-card transition-[border-color,transform] duration-200 ease-out',
-        'hover:border-border-hover',
-        expanded && 'border-border-hover'
-      )}>
-      <CollapsibleTrigger asChild>
-        <button
-          type='button'
-          className={cn(
-            'flex w-full items-start gap-3 px-4 py-4 text-left transition-colors duration-200 ease-out sm:items-center justify-between',
-            'hover:bg-elevated/40'
-          )}>
-          <div className='flex items-center gap-3'>
-            <div className='flex size-9 items-center justify-center rounded-lg border border-border bg-elevated text-primary'>
-              <Icon />
-              <span className='sr-only'>{tipo}</span>
+    <Collapsible open={expanded}>
+      <div
+        className={cn(
+          'overflow-hidden rounded-xl border border-border bg-card transition-colors',
+          'hover:border-border-hover',
+          expanded && 'border-border-hover'
+        )}>
+        {/* Header */}
+        <div className='flex items-start gap-4 px-5 py-4'>
+          {/* Toggle area */}
+          <button
+            type='button'
+            onClick={onToggle}
+            className='group flex min-w-0 flex-1 items-start gap-4 text-left outline-none transition-colors hover:text-foreground focus-visible:text-foreground'>
+            <div className='flex size-11 shrink-0 items-center justify-center rounded-lg border border-border bg-elevated text-sm font-semibold text-primary transition-colors group-hover:border-border-hover'>
+              <Icon className='size-4' />
             </div>
 
-            <div className='min-w-20 shrink-0'>
-              <div className='flex flex-col items-start justify-center'>
-                <p className='text-[10px] uppercase tracking-[0.08em] text-muted-foreground'>
-                  {cardLabel}
-                </p>
-                <p className='text-sm font-semibold text-foreground'>
-                  #{ordem.id}
-                </p>
+            <div className='flex min-w-0 flex-1 flex-col gap-2'>
+              {/* Primary row */}
+              <div className='flex flex-col gap-1 lg:flex-row lg:items-center lg:justify-between'>
+                <div className='min-w-0'>
+                  <p className='truncate text-sm font-semibold text-foreground'>
+                    {cardLabel} #{ordem.id} ·{' '}
+                    {ordem.cliente?.name_cliente || 'Cliente não encontrado'}
+                  </p>
+                  <p className='mt-1 truncate text-sm text-muted-foreground'>
+                    {headerMeta}
+                  </p>
+                </div>
+
+                <div className='flex shrink-0 items-center gap-3'>
+                  <OrdemStatusBadge status={ordem.status} />
+                  <div className='text-right'>
+                    <p className='text-[10px] uppercase tracking-[0.08em] text-muted-foreground'>
+                      Total
+                    </p>
+                    <p className='text-sm font-semibold text-foreground'>
+                      {formatCurrency(ordem.valor_total)}
+                    </p>
+                  </div>
+                  <ChevronDown
+                    className={cn(
+                      'size-4 shrink-0 text-muted-foreground transition-transform duration-200 ease-out',
+                      expanded && 'rotate-180 text-foreground'
+                    )}
+                  />
+                </div>
+              </div>
+
+              {/* Secondary row */}
+              <div className='flex flex-wrap items-center gap-3 text-xs text-muted-foreground'>
+                <span>
+                  {tipo === 'servico'
+                    ? `Chegada ${formatDate((props.ordem as OrdemServicoCompleta).data_chegada)}`
+                    : `Criada ${formatDate(ordem.data_criacao)}`}
+                </span>
+                <span>
+                  {ordem.pecas.length}{' '}
+                  {ordem.pecas.length === 1 ? 'item' : 'itens'}
+                </span>
               </div>
             </div>
-          </div>
+          </button>
 
-          <div className='min-w-0 w-1/4 sm:basis-1/4 sm:shrink-0'>
-            <p className='truncate text-sm font-semibold text-foreground'>
-              {ordem.cliente?.name_cliente || 'Cliente não encontrado'}
-            </p>
-            <p className='truncate text-xs text-muted-foreground'>
-              {headerMeta}
-            </p>
-          </div>
-
-          <div className='min-w-0 flex w-1/4 flex-col items-start justify-center'>
-            <p className='text-[10px] uppercase tracking-[0.08em] text-muted-foreground sm:hidden'>
-              Contexto operacional
-            </p>
-            <p className='truncate text-sm font-medium text-foreground'>
-              {tipo === 'servico'
-                ? [ordem.veiculo?.placa, ordem.veiculo?.modelo]
-                    .filter(Boolean)
-                    .join(' · ') || 'Veículo não informado'
-                : (paymentMethodLabel[ordem.metodo_pagamento ?? ''] ??
-                  'Método não informado')}
-            </p>
-            <p className='truncate text-xs text-muted-foreground'>
-              {tipo === 'servico'
-                ? `Resp. ${ordem.funcionario_responsavel?.name ?? 'Sem responsável'}`
-                : ordem.cliente?.nome_empresa || 'Cliente sem empresa'}
-            </p>
-          </div>
-
-          <div className='hidden w-1/12 shrink-0 md:block '>
-            <OrdemStatusBadge status={ordem.status} />
-          </div>
-
-          <div className='shrink-0 text-right w-1/12'>
-            <p className='text-[10px] uppercase tracking-[0.08em] text-muted-foreground'>
-              Total
-            </p>
-            <p className='text-sm font-semibold text-foreground'>
-              {formatCurrency(ordem.valor_total)}
-            </p>
-          </div>
-
-          <ChevronDown
-            className={cn(
-              'shrink-0 text-muted-foreground transition-transform duration-200 ease-out',
-              expanded && 'rotate-180'
-            )}
-          />
-        </button>
-      </CollapsibleTrigger>
-
-      <CollapsibleContent className='overflow-hidden border-t border-border data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down'>
-        <div className='flex flex-col gap-4 bg-input/30 px-4 py-4'>
-          <div className='grid gap-3 md:grid-cols-2 xl:grid-cols-4'>
-            <OrdemInfoBlock
-              label='Cliente'
-              value={
-                ordem.cliente?.nome_empresa
-                  ? `${ordem.cliente.name_cliente} · ${ordem.cliente.nome_empresa}`
-                  : ordem.cliente?.name_cliente || 'Não informado'
-              }
-            />
-
-            {tipo === 'servico' ? (
+          {/* Desktop actions */}
+          <div className='hidden shrink-0 items-center gap-1 lg:flex'>
+            {isActive && (
               <>
-                <OrdemInfoBlock
-                  label='Veículo'
-                  value={
-                    [props.ordem.veiculo?.placa, props.ordem.veiculo?.modelo]
-                      .filter(Boolean)
-                      .join(' · ') || 'Não informado'
-                  }
-                />
-                <OrdemInfoBlock
-                  label='Responsável'
-                  value={
-                    props.ordem.funcionario_responsavel?.name || 'Não informado'
-                  }
-                />
-                <OrdemInfoBlock
-                  label='Chegada'
-                  value={formatDate(props.ordem.data_chegada)}
-                />
-              </>
-            ) : (
-              <>
-                <OrdemInfoBlock
-                  label='Pagamento'
-                  value={
-                    paymentMethodLabel[props.ordem.metodo_pagamento ?? ''] ??
-                    'Não informado'
-                  }
-                />
-                <OrdemInfoBlock
-                  label='Previsão'
-                  value={formatDate(
-                    props.ordem.data_pagamento ??
-                      props.ordem.data_previsao_pagamento
-                  )}
-                />
-                <OrdemInfoBlock
-                  label='Criada em'
-                  value={formatDate(props.ordem.data_criacao)}
-                />
+                <Button
+                  variant='ghost'
+                  size='icon-sm'
+                  onClick={onEdit}
+                  aria-label='Editar ordem'>
+                  <Pencil />
+                </Button>
+                <Button
+                  variant='ghost'
+                  size='icon-sm'
+                  onClick={onFinalize}
+                  disabled={isBusy}
+                  aria-label='Finalizar ordem'>
+                  <CheckCircle2 />
+                </Button>
+                <Button
+                  variant='ghost'
+                  size='icon-sm'
+                  onClick={onCancel}
+                  disabled={isBusy}
+                  aria-label='Cancelar ordem'>
+                  <XCircle />
+                </Button>
               </>
             )}
+            <Button
+              variant='ghost'
+              size='icon-sm'
+              onClick={onDelete}
+              disabled={isBusy}
+              aria-label='Excluir ordem'>
+              <Trash2 />
+            </Button>
           </div>
 
-          {ordem.observacao ? (
-            <div className='rounded-lg border border-border bg-background/60 px-3 py-3'>
-              <p className='text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground'>
-                Observação
-              </p>
-              <p className='mt-1 text-sm text-foreground'>{ordem.observacao}</p>
-            </div>
-          ) : null}
+          {/* Mobile actions */}
+          <div className='flex shrink-0 items-center lg:hidden'>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant='ghost'
+                  size='icon-sm'
+                  aria-label='Ações da ordem'>
+                  <MoreHorizontal />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align='end'
+                className='bg-card border-border rounded-xl p-1.5'>
+                {isActive && (
+                  <>
+                    <DropdownMenuItem
+                      onClick={onEdit}
+                      className='rounded-lg px-3 py-2'>
+                      <Pencil />
+                      Editar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={onFinalize}
+                      disabled={isBusy}
+                      className='rounded-lg px-3 py-2'>
+                      <CheckCircle2 />
+                      Finalizar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={onCancel}
+                      disabled={isBusy}
+                      className='rounded-lg px-3 py-2'>
+                      <XCircle />
+                      Cancelar
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className='bg-border' />
+                  </>
+                )}
+                <DropdownMenuItem
+                  variant='destructive'
+                  onClick={onDelete}
+                  disabled={isBusy}
+                  className='rounded-lg px-3 py-2'>
+                  <Trash2 />
+                  Excluir
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
 
-          <div className='flex flex-col gap-4'>
-            <div className='pl-2'>
-              <p className='text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground'>
-                Itens (
-                <span className='text-primary'>{ordem.pecas.length}</span>)
-              </p>
+        {/* Expanded content */}
+        <CollapsibleContent className='overflow-hidden border-t border-border bg-background/50 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-1 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-1 data-[state=open]:duration-200'>
+          <div className='flex flex-col gap-4 px-5 py-4'>
+            {/* Info blocks */}
+            <div className='grid gap-3 md:grid-cols-2 xl:grid-cols-4'>
+              <OrdemInfoBlock
+                label='Cliente'
+                value={
+                  ordem.cliente?.nome_empresa
+                    ? `${ordem.cliente.name_cliente} · ${ordem.cliente.nome_empresa}`
+                    : ordem.cliente?.name_cliente || 'Não informado'
+                }
+              />
+
+              {tipo === 'servico' ? (
+                <>
+                  <OrdemInfoBlock
+                    label='Veículo'
+                    value={
+                      [
+                        (props.ordem as OrdemServicoCompleta).veiculo?.placa,
+                        (props.ordem as OrdemServicoCompleta).veiculo?.modelo
+                      ]
+                        .filter(Boolean)
+                        .join(' · ') || 'Não informado'
+                    }
+                  />
+                  <OrdemInfoBlock
+                    label='Responsável'
+                    value={
+                      (props.ordem as OrdemServicoCompleta)
+                        .funcionario_responsavel?.name || 'Não informado'
+                    }
+                  />
+                  <OrdemInfoBlock
+                    label='Chegada'
+                    value={formatDate(
+                      (props.ordem as OrdemServicoCompleta).data_chegada
+                    )}
+                  />
+                </>
+              ) : (
+                <>
+                  <OrdemInfoBlock
+                    label='Pagamento'
+                    value={
+                      paymentMethodLabel[
+                        (props.ordem as OrdemVendaCompleta).metodo_pagamento ??
+                          ''
+                      ] ?? 'Não informado'
+                    }
+                  />
+                  <OrdemInfoBlock
+                    label='Previsão'
+                    value={formatDate(
+                      (props.ordem as OrdemVendaCompleta).data_pagamento ??
+                        (props.ordem as OrdemVendaCompleta)
+                          .data_previsao_pagamento
+                    )}
+                  />
+                  <OrdemInfoBlock
+                    label='Criada em'
+                    value={formatDate(props.ordem.data_criacao)}
+                  />
+                </>
+              )}
             </div>
 
-            {ordem.pecas.length > 0 ? (
-              <ScrollArea className='max-h-[220px]'>
-                <div className='flex flex-col gap-2'>
+            {/* Observação */}
+            {ordem.observacao ? (
+              <div className='rounded-lg border border-border bg-card px-3 py-3'>
+                <p className='text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground'>
+                  Observação
+                </p>
+                <p className='mt-1 text-sm text-foreground'>
+                  {ordem.observacao}
+                </p>
+              </div>
+            ) : null}
+
+            {/* Items — padrão visual de veículos (Clientes) */}
+            <div className='flex flex-col gap-3'>
+              <div>
+                <p className='text-xs font-medium uppercase tracking-wider text-muted-foreground'>
+                  Itens da ordem
+                </p>
+                <p className='mt-0.5 text-xs text-muted-foreground'>
+                  {ordem.pecas.length}{' '}
+                  {ordem.pecas.length === 1
+                    ? 'item vinculado'
+                    : 'itens vinculados'}
+                </p>
+              </div>
+
+              {ordem.pecas.length > 0 ? (
+                <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
                   {ordem.pecas.map((item) => (
                     <div
                       key={item.id}
-                      className='flex items-center justify-between gap-3 rounded-lg border border-border bg-background/60 px-3 py-2.5'>
-                      <div className='min-w-0'>
-                        <p className='truncate text-sm text-foreground'>
-                          {item.peca?.name_peca || 'Peça não encontrada'}
-                        </p>
-                        <p className='text-xs text-muted-foreground'>
-                          Qtd: {item.quantidade}
-                        </p>
+                      className='flex items-center justify-between rounded-lg border border-border bg-card p-3 transition-colors'>
+                      <div className='flex min-w-0 items-center gap-3'>
+                        <div className='flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-elevated text-primary'>
+                          <Package className='size-4' />
+                        </div>
+                        <div className='min-w-0'>
+                          <p className='truncate text-sm font-semibold text-foreground'>
+                            {item.peca?.name_peca || 'Peça não encontrada'}
+                          </p>
+                          <p className='truncate text-sm text-muted-foreground'>
+                            Qtd: {item.quantidade} ·{' '}
+                            {formatCurrency(item.peca?.preco || 0)} un.
+                          </p>
+                        </div>
                       </div>
-                      <span className='text-sm font-medium text-foreground'>
+                      <span className='shrink-0 pl-2 text-sm font-semibold text-foreground'>
                         {formatCurrency(
                           (item.peca?.preco || 0) * item.quantidade
                         )}
@@ -300,48 +406,15 @@ export function OrdemCard(props: OrdemCardProps) {
                     </div>
                   ))}
                 </div>
-              </ScrollArea>
-            ) : (
-              <div className='rounded-lg border border-dashed border-border bg-background/40 px-3 py-4 text-sm text-muted-foreground'>
-                Nenhum item vinculado a esta ordem.
-              </div>
-            )}
+              ) : (
+                <div className='rounded-lg border border-dashed border-border bg-background/40 px-3 py-4 text-sm text-muted-foreground'>
+                  Nenhum item vinculado a esta ordem.
+                </div>
+              )}
+            </div>
           </div>
-
-          <div className='flex flex-wrap items-center justify-end gap-2'>
-            {ordem.status === 'ativa' ? (
-              <>
-                <Button
-                  variant='outline'
-                  onClick={onEdit}
-                  className='border-border'>
-                  <Pencil data-icon='inline-start' />
-                  Editar
-                </Button>
-                <Button
-                  variant='default'
-                  onClick={onFinalize}
-                  disabled={isBusy}
-                  className='bg-success text-success-foreground hover:bg-success/90'>
-                  <CheckCircle2 data-icon='inline-start' />
-                  Finalizar
-                </Button>
-                <Button
-                  variant='destructive'
-                  onClick={onCancel}
-                  disabled={isBusy}>
-                  <XCircle data-icon='inline-start' />
-                  Cancelar
-                </Button>
-              </>
-            ) : null}
-            <Button variant='destructive' onClick={onDelete} disabled={isBusy}>
-              <Trash2 data-icon='inline-start' />
-              Excluir
-            </Button>
-          </div>
-        </div>
-      </CollapsibleContent>
+        </CollapsibleContent>
+      </div>
     </Collapsible>
   );
 }
