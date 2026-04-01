@@ -6,7 +6,9 @@ import { veiculoSchema } from '@/app/utils/validators';
 import type { Veiculo } from '@/db/schema';
 
 import { toast } from 'sonner';
-import { ZodError } from 'zod';
+import { type z, ZodError } from 'zod';
+
+export type VeiculoFormValues = z.infer<typeof veiculoSchema>;
 
 export interface UseVeiculosReturn {
   veiculosByCliente: Map<number, Veiculo[]>;
@@ -16,28 +18,18 @@ export interface UseVeiculosReturn {
   setIsAddOpen: (isOpen: boolean) => void;
   editingVeiculo: Veiculo | null;
   setEditingVeiculo: (veiculo: Veiculo | null) => void;
-  newVeiculo: Partial<Veiculo>;
-  setNewVeiculo: (data: Partial<Veiculo>) => void;
-  currentClienteId: number | null;
-  setCurrentClienteId: (id: number | null) => void;
   deleteVeiculoId: number | null;
   setDeleteVeiculoId: (id: number | null) => void;
   isDeleteOpen: boolean;
   setIsDeleteOpen: (isOpen: boolean) => void;
   isSaving: boolean;
   fetchVeiculosByCliente: (clienteId: number) => Promise<void>;
-  handleAddVeiculo: () => Promise<void>;
-  handleUpdateVeiculo: () => Promise<void>;
-  handleDeleteVeiculo: (id: number) => Promise<void>;
-  getVeiculosForCliente: (clienteId: number) => Veiculo[];
-  isLoadingCliente: (clienteId: number) => boolean;
+  handleAddVeiculo: (clienteId: number, data: VeiculoFormValues) => Promise<boolean>;
+  handleUpdateVeiculo: (veiculoId: number, clienteId: number, data: VeiculoFormValues) => Promise<boolean>;
+  handleDeleteVeiculo: (veiculoId: number, clienteId: number) => Promise<boolean>;
   getTotalVeiculos: () => number;
+  isLoadingCliente: (clienteId: number) => boolean;
 }
-
-const veiculoVazio: Partial<Veiculo> = {
-  placa: '',
-  modelo: ''
-};
 
 export function useVeiculos(): UseVeiculosReturn {
   const [veiculosByCliente, setVeiculosByCliente] = useState<
@@ -49,26 +41,25 @@ export function useVeiculos(): UseVeiculosReturn {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingVeiculo, setEditingVeiculo] = useState<Veiculo | null>(null);
-  const [newVeiculo, setNewVeiculo] = useState<Partial<Veiculo>>(veiculoVazio);
-  const [currentClienteId, setCurrentClienteId] = useState<number | null>(null);
   const [deleteVeiculoId, setDeleteVeiculoId] = useState<number | null>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Buscar TODOS os veículos ao inicializar e agrupar por cliente_id
   const fetchAllVeiculos = useCallback(async () => {
     setIsInitialLoading(true);
     try {
-      const res = await fetch('/api/veiculos');
-      const data: Veiculo[] = await res.json();
+      const response = await fetch('/api/veiculos');
+      const data: Veiculo[] = await response.json();
 
-      // Agrupar por cliente_id
       const grouped = new Map<number, Veiculo[]>();
+
       data.forEach((veiculo) => {
-        if (veiculo.cliente_id) {
-          const existing = grouped.get(veiculo.cliente_id) || [];
-          grouped.set(veiculo.cliente_id, [...existing, veiculo]);
+        if (!veiculo.cliente_id) {
+          return;
         }
+
+        const currentVeiculos = grouped.get(veiculo.cliente_id) ?? [];
+        grouped.set(veiculo.cliente_id, [...currentVeiculos, veiculo]);
       });
 
       setVeiculosByCliente(grouped);
@@ -79,38 +70,35 @@ export function useVeiculos(): UseVeiculosReturn {
     }
   }, []);
 
-  // Carregar todos os veículos ao montar o componente
   useEffect(() => {
-    fetchAllVeiculos();
+    void fetchAllVeiculos();
   }, [fetchAllVeiculos]);
 
-  // GET: Buscar veículos de um cliente
   const fetchVeiculosByCliente = useCallback(async (clienteId: number) => {
-    setLoadingClientes((prev) => new Set(prev).add(clienteId));
+    setLoadingClientes((previous) => new Set(previous).add(clienteId));
     try {
-      const res = await fetch(`/api/veiculos?cliente_id=${clienteId}`);
-      const data: Veiculo[] = await res.json();
+      const response = await fetch(`/api/veiculos?cliente_id=${clienteId}`);
+      const data: Veiculo[] = await response.json();
 
-      setVeiculosByCliente((prev) => {
-        const newMap = new Map(prev);
-        newMap.set(clienteId, data);
-        return newMap;
+      setVeiculosByCliente((previous) => {
+        const updated = new Map(previous);
+        updated.set(clienteId, data);
+        return updated;
       });
     } catch (error) {
       console.error('Erro ao buscar veículos:', error);
       toast.error('Erro ao carregar veículos');
     } finally {
-      setLoadingClientes((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(clienteId);
-        return newSet;
+      setLoadingClientes((previous) => {
+        const updated = new Set(previous);
+        updated.delete(clienteId);
+        return updated;
       });
     }
   }, []);
 
-  // POST: Criar veículo
-  const createVeiculo = async (data: Partial<Veiculo>, clienteId: number) => {
-    const res = await fetch('/api/veiculos', {
+  const createVeiculo = async (clienteId: number, data: VeiculoFormValues) => {
+    const response = await fetch('/api/veiculos', {
       method: 'POST',
       body: JSON.stringify({
         placa: data.placa,
@@ -119,153 +107,162 @@ export function useVeiculos(): UseVeiculosReturn {
         cliente_id: clienteId
       })
     });
-    if (res.status === 409) {
-      const body = await res.json();
+
+    if (response.status === 409) {
+      const body = await response.json();
       throw new Error(body.error);
     }
-    if (!res.ok) throw new Error('Erro ao adicionar veículo');
+
+    if (!response.ok) {
+      throw new Error('Erro ao adicionar veículo');
+    }
+
     await fetchVeiculosByCliente(clienteId);
   };
 
-  // PUT: Editar veículo
   const updateVeiculo = async (
-    id: number,
-    data: Partial<Veiculo>,
-    clienteId: number
+    veiculoId: number,
+    clienteId: number,
+    data: VeiculoFormValues
   ) => {
-    const res = await fetch(`/api/veiculos/${id}`, {
+    const response = await fetch(`/api/veiculos/${veiculoId}`, {
       method: 'PUT',
       body: JSON.stringify({
         placa: data.placa,
         modelo: data.modelo,
-        status: data.status ?? true
+        status: true
       })
     });
-    if (res.ok) await fetchVeiculosByCliente(clienteId);
-  };
 
-  // DELETE: Remover veículo
-  const deleteVeiculo = async (id: number, clienteId: number) => {
-    const res = await fetch(`/api/veiculos/${id}`, { method: 'DELETE' });
-    if (res.ok) await fetchVeiculosByCliente(clienteId);
-  };
-
-  // Helpers para verificar duplicata de placa globalmente
-  const getAllVeiculos = (): Veiculo[] => {
-    const all: Veiculo[] = [];
-    veiculosByCliente.forEach((veiculos) => all.push(...veiculos));
-    return all;
-  };
-
-  // Handlers
-  const handleAddVeiculo = async () => {
-    if (!currentClienteId) {
-      toast.error('Selecione um cliente primeiro');
-      return;
+    if (!response.ok) {
+      throw new Error('Erro ao atualizar veículo');
     }
 
+    await fetchVeiculosByCliente(clienteId);
+  };
+
+  const deleteVeiculo = async (veiculoId: number, clienteId: number) => {
+    const response = await fetch(`/api/veiculos/${veiculoId}`, {
+      method: 'DELETE'
+    });
+
+    if (!response.ok) {
+      throw new Error('Erro ao excluir veículo');
+    }
+
+    await fetchVeiculosByCliente(clienteId);
+  };
+
+  const getAllVeiculos = () => {
+    const veiculos: Veiculo[] = [];
+    veiculosByCliente.forEach((currentVeiculos) => {
+      veiculos.push(...currentVeiculos);
+    });
+    return veiculos;
+  };
+
+  const validateUniquePlate = (placa: string, veiculoId?: number) => {
+    const normalizedPlate = placa
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .toUpperCase();
+
+    const hasDuplicatePlate = getAllVeiculos().some((veiculo) => {
+      const currentPlate = veiculo.placa
+        .replace(/[^a-zA-Z0-9]/g, '')
+        .toUpperCase();
+
+      return veiculo.id !== veiculoId && currentPlate === normalizedPlate;
+    });
+
+    if (hasDuplicatePlate) {
+      throw new Error(
+        veiculoId
+          ? `Já existe outro veículo cadastrado com a placa '${placa}'`
+          : `Já existe um veículo cadastrado com a placa '${placa}'`
+      );
+    }
+  };
+
+  const handleAddVeiculo = async (
+    clienteId: number,
+    data: VeiculoFormValues
+  ) => {
     setIsSaving(true);
     try {
-      veiculoSchema.parse(newVeiculo);
-
-      const placaNova = newVeiculo.placa?.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-      const duplicada = getAllVeiculos().some(
-        (v) => v.placa.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() === placaNova
-      );
-      if (duplicada) {
-        toast.error(`Já existe um veículo cadastrado com a placa '${newVeiculo.placa}'`);
-        return;
-      }
-
-      await createVeiculo(newVeiculo, currentClienteId);
-      setNewVeiculo(veiculoVazio);
+      veiculoSchema.parse(data);
+      validateUniquePlate(data.placa);
+      await createVeiculo(clienteId, data);
       setIsAddOpen(false);
       toast.success('Veículo adicionado com sucesso!');
+      return true;
     } catch (error) {
       if (error instanceof ZodError) {
-        toast.error(error.issues[0].message);
+        toast.error(error.issues[0]?.message ?? 'Dados inválidos');
       } else if (error instanceof Error) {
         toast.error(error.message);
       } else {
         toast.error('Erro ao adicionar veículo');
       }
+      return false;
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleUpdateVeiculo = async () => {
-    if (!editingVeiculo || !editingVeiculo.cliente_id) return;
-
+  const handleUpdateVeiculo = async (
+    veiculoId: number,
+    clienteId: number,
+    data: VeiculoFormValues
+  ) => {
     setIsSaving(true);
     try {
-      veiculoSchema.parse(editingVeiculo);
-
-      const placaEditada = editingVeiculo.placa?.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-      const duplicada = getAllVeiculos().some(
-        (v) =>
-          v.id !== editingVeiculo.id &&
-          v.placa.replace(/[^a-zA-Z0-9]/g, '').toUpperCase() === placaEditada
-      );
-      if (duplicada) {
-        toast.error(`Já existe outro veículo cadastrado com a placa '${editingVeiculo.placa}'`);
-        return;
-      }
-
-      await updateVeiculo(
-        editingVeiculo.id,
-        editingVeiculo,
-        editingVeiculo.cliente_id
-      );
+      veiculoSchema.parse(data);
+      validateUniquePlate(data.placa, veiculoId);
+      await updateVeiculo(veiculoId, clienteId, data);
       setEditingVeiculo(null);
       toast.success('Veículo atualizado com sucesso!');
+      return true;
     } catch (error) {
-      console.error('Erro ao atualizar:', error);
+      console.error('Erro ao atualizar veículo:', error);
       if (error instanceof ZodError) {
-        toast.error(error.issues[0].message);
+        toast.error(error.issues[0]?.message ?? 'Dados inválidos');
       } else if (error instanceof Error) {
         toast.error(error.message);
       } else {
         toast.error('Erro ao atualizar veículo');
       }
+      return false;
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleDeleteVeiculo = async (id: number) => {
-    if (!currentClienteId) return;
-
+  const handleDeleteVeiculo = async (veiculoId: number, clienteId: number) => {
     setIsSaving(true);
     try {
-      await deleteVeiculo(id, currentClienteId);
+      await deleteVeiculo(veiculoId, clienteId);
       setIsDeleteOpen(false);
       setDeleteVeiculoId(null);
       toast.success('Veículo excluído com sucesso!');
+      return true;
     } catch (error) {
-      console.error('Erro ao excluir:', error);
+      console.error('Erro ao excluir veículo:', error);
       toast.error('Erro ao excluir veículo');
+      return false;
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Helpers
-  const getVeiculosForCliente = (clienteId: number): Veiculo[] => {
-    return veiculosByCliente.get(clienteId) || [];
-  };
-
-  const isLoadingCliente = (clienteId: number): boolean => {
-    return loadingClientes.has(clienteId);
-  };
-
-  const getTotalVeiculos = (): number => {
+  const getTotalVeiculos = () => {
     let total = 0;
     veiculosByCliente.forEach((veiculos) => {
       total += veiculos.length;
     });
     return total;
   };
+
+  const isLoadingCliente = (clienteId: number) => loadingClientes.has(clienteId);
 
   return {
     veiculosByCliente,
@@ -275,10 +272,6 @@ export function useVeiculos(): UseVeiculosReturn {
     setIsAddOpen,
     editingVeiculo,
     setEditingVeiculo,
-    newVeiculo,
-    setNewVeiculo,
-    currentClienteId,
-    setCurrentClienteId,
     deleteVeiculoId,
     setDeleteVeiculoId,
     isDeleteOpen,
@@ -288,8 +281,7 @@ export function useVeiculos(): UseVeiculosReturn {
     handleAddVeiculo,
     handleUpdateVeiculo,
     handleDeleteVeiculo,
-    getVeiculosForCliente,
-    isLoadingCliente,
-    getTotalVeiculos
+    getTotalVeiculos,
+    isLoadingCliente
   };
 }
