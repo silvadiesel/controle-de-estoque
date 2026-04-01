@@ -64,6 +64,7 @@ export interface OrdemVendaCompleta {
   id: number;
   data_criacao: string;
   data_pagamento: string | null;
+  data_previsao_pagamento: string | null;
   status: 'ativa' | 'fechada' | 'cancelada';
   cliente_id: number;
   observacao: string | null;
