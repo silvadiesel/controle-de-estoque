@@ -321,9 +321,9 @@ export function ModalOrdemServico({
               )}
             </div>
 
-            <div className='grid gap-4 sm:grid-cols-2'>
-              {/* Data de Chegada */}
-              <div className='space-y-2 w-full'>
+            {/* Data de Chegada + Funcionário Responsável */}
+            <div className='grid grid-cols-3 gap-4'>
+              <div className='space-y-2 col-span-1'>
                 <Label className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>Data de Chegada *</Label>
                 <div className={hasError('data_chegada') ? '[&>button]:border-destructive' : ''}>
                   <DatePicker
@@ -338,7 +338,7 @@ export function ModalOrdemServico({
                         data_chegada: date ? date.toISOString().split('T')[0] : ''
                       })
                     }
-                    placeholder='Selecione a data de chegada'
+                    placeholder='Selecione a data'
                   />
                 </div>
                 {hasError('data_chegada') && (
@@ -346,26 +346,30 @@ export function ModalOrdemServico({
                 )}
               </div>
 
-              {/* Status */}
-              {isEdit && (
-                <div className='space-y-2'>
-                  <Label className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>Status</Label>
-                  <Select
-                    value={formData.status}
-                    onValueChange={(v: 'ativa' | 'fechada' | 'cancelada') =>
-                      setFormData({ ...formData, status: v })
-                    }>
-                    <SelectTrigger className='bg-input border-border w-full'>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value='ativa'>Ativa</SelectItem>
-                      <SelectItem value='fechada'>Fechada</SelectItem>
-                      <SelectItem value='cancelada'>Cancelada</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+              <div className='space-y-2 col-span-2'>
+                <Label className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>Funcionário Responsável *</Label>
+                <Select
+                  value={formData.funcionario_responsavel_id || ''}
+                  onValueChange={(v) =>
+                    setFormData({ ...formData, funcionario_responsavel_id: v })
+                  }>
+                  <SelectTrigger
+                    aria-describedby={hasError('funcionario_responsavel_id') ? 'error-funcionario-servico' : undefined}
+                    className={`bg-input w-full ${hasError('funcionario_responsavel_id') ? 'border-destructive' : 'border-border'}`}>
+                    <SelectValue placeholder='Selecione o funcionário responsável' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {funcionarios.map((func) => (
+                      <SelectItem key={func.id} value={func.id}>
+                        {func.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {hasError('funcionario_responsavel_id') && (
+                  <p id='error-funcionario-servico' className='text-xs text-destructive'>{errors.funcionario_responsavel_id}</p>
+                )}
+              </div>
             </div>
 
             {/* Veículo */}
@@ -403,31 +407,26 @@ export function ModalOrdemServico({
               )}
             </div>
 
-            {/* Funcionário Responsável */}
-            <div className='space-y-2 w-full'>
-              <Label className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>Funcionário Responsável *</Label>
-              <Select
-                value={formData.funcionario_responsavel_id || ''}
-                onValueChange={(v) =>
-                  setFormData({ ...formData, funcionario_responsavel_id: v })
-                }>
-                <SelectTrigger
-                  aria-describedby={hasError('funcionario_responsavel_id') ? 'error-funcionario-servico' : undefined}
-                  className={`bg-input w-full ${hasError('funcionario_responsavel_id') ? 'border-destructive' : 'border-border'}`}>
-                  <SelectValue placeholder='Selecione o funcionário responsável' />
-                </SelectTrigger>
-                <SelectContent>
-                  {funcionarios.map((func) => (
-                    <SelectItem key={func.id} value={func.id}>
-                      {func.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {hasError('funcionario_responsavel_id') && (
-                <p id='error-funcionario-servico' className='text-xs text-destructive'>{errors.funcionario_responsavel_id}</p>
-              )}
-            </div>
+            {/* Status (apenas edição) */}
+            {isEdit && (
+              <div className='space-y-2'>
+                <Label className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>Status</Label>
+                <Select
+                  value={formData.status}
+                  onValueChange={(v: 'ativa' | 'fechada' | 'cancelada') =>
+                    setFormData({ ...formData, status: v })
+                  }>
+                  <SelectTrigger className='bg-input border-border w-full'>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value='ativa'>Ativa</SelectItem>
+                    <SelectItem value='fechada'>Fechada</SelectItem>
+                    <SelectItem value='cancelada'>Cancelada</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             {/* Observação */}
             <div className='space-y-2'>
