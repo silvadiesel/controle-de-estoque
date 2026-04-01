@@ -78,7 +78,6 @@ export interface OrdemVendaFormInitialData {
     peca_id: number;
     quantidade: number;
     peca?:
-      | Pick<Peca, 'id' | 'name_peca' | 'preco'>
       | Pick<Peca, 'id' | 'name_peca' | 'quantidade' | 'preco'>
       | null;
   }[];
@@ -184,19 +183,19 @@ export function buildVendaFormInitialData(
     observacao: ordem.observacao ?? '',
     valor_total: ordem.valor_total,
     metodo_pagamento: ordem.metodo_pagamento ?? undefined,
-    pecas: ordem.pecas.map((peca) => ({
-      peca_id: peca.peca_id,
-      quantidade: peca.quantidade,
-      peca:
-        availablePecas.find((availablePeca) => availablePeca.id === peca.peca_id) ??
-        (peca.peca
-          ? {
-              id: peca.peca.id,
-              name_peca: peca.peca.name_peca,
-              preco: peca.peca.preco,
-              quantidade: 0
-            }
-          : null)
-    }))
+    pecas: ordem.pecas.map((peca) => {
+      const pecaBanco = availablePecas.find((p) => p.id === peca.peca_id);
+      const estoqueEfetivo = (pecaBanco?.quantidade ?? peca.peca?.quantidade ?? 0) + peca.quantidade;
+
+      return {
+        peca_id: peca.peca_id,
+        quantidade: peca.quantidade,
+        peca: pecaBanco
+          ? { ...pecaBanco, quantidade: estoqueEfetivo }
+          : (peca.peca
+            ? { id: peca.peca.id, name_peca: peca.peca.name_peca, preco: peca.peca.preco, quantidade: estoqueEfetivo }
+            : null)
+      };
+    })
   };
 }

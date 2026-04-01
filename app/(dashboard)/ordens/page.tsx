@@ -194,6 +194,14 @@ export default function OrdensPage() {
     }
   ];
 
+  const getAdjustedPecas = (ordemPecas: { peca_id: number; quantidade: number }[]) => {
+    const ordemMap = new Map(ordemPecas.map((p) => [p.peca_id, p.quantidade]));
+    return pecas.map((peca) => {
+      const qtdNaOrdem = ordemMap.get(peca.id) ?? 0;
+      return qtdNaOrdem > 0 ? { ...peca, quantidade: peca.quantidade + qtdNaOrdem } : peca;
+    });
+  };
+
   const getServicoInitialData = (ordem: OrdemServicoCompleta | null) => {
     if (!ordem) return undefined;
 
@@ -206,13 +214,18 @@ export default function OrdensPage() {
       funcionario_responsavel_id: ordem.funcionario_responsavel_id,
       observacao: ordem.observacao || '',
       valor_total: ordem.valor_total,
-      pecas: ordem.pecas.map((peca) => ({
-        peca_id: peca.peca_id,
-        quantidade: peca.quantidade,
-        peca: peca.peca
-          ? ({ ...peca.peca, preco: peca.peca.preco } as Peca)
-          : null
-      }))
+      pecas: ordem.pecas.map((item) => {
+        const pecaBanco = pecas.find((p) => p.id === item.peca_id);
+        const estoqueEfetivo = (pecaBanco?.quantidade ?? item.peca?.quantidade ?? 0) + item.quantidade;
+
+        return {
+          peca_id: item.peca_id,
+          quantidade: item.quantidade,
+          peca: item.peca
+            ? { ...item.peca, quantidade: estoqueEfetivo, preco: item.peca.preco }
+            : null
+        };
+      })
     };
   };
 
@@ -612,7 +625,7 @@ export default function OrdensPage() {
         initialData={getServicoInitialData(editingServico)}
         clientes={clientes}
         veiculos={veiculos}
-        pecas={pecas}
+        pecas={getAdjustedPecas(editingServico?.pecas ?? [])}
         funcionarios={funcionarios}
         isOpen={Boolean(editingServico)}
         setIsOpen={(open) => !open && setEditingServico(null)}
@@ -649,7 +662,7 @@ export default function OrdensPage() {
         mode='edit'
         initialData={getVendaInitialData(editingVenda)}
         clientes={clientes}
-        pecas={pecas}
+        pecas={getAdjustedPecas(editingVenda?.pecas ?? [])}
         isOpen={Boolean(editingVenda)}
         setIsOpen={(open) => !open && setEditingVenda(null)}
         onSubmit={async (data) => {
