@@ -34,7 +34,7 @@ export const CardPecas = memo(function CardPecas({
       : `${peca.quantidade} un.`;
 
   return (
-    <div className='flex flex-col bg-secondary border border-border rounded-lg overflow-hidden'>
+    <div className='flex flex-col bg-card border border-border rounded-lg overflow-hidden'>
       {/* Image area */}
       <div className='relative h-36 bg-background border-b border-border flex items-center justify-center'>
         {peca.imagem ? (
@@ -84,9 +84,9 @@ export const CardPecas = memo(function CardPecas({
         {/* Actions */}
         <div className='flex gap-2 mt-3'>
           <Button
-            variant='ghost'
+            variant='outline'
             size='sm'
-            className='flex-1 h-8 bg-border text-muted-foreground hover:bg-border-hover text-xs rounded-md'
+            className='flex-1 h-8 text-xs'
             onClick={() => onEdit(peca)}>
             <Edit className='mr-1.5 h-3 w-3' aria-hidden='true' />
             Editar
