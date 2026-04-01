@@ -3,10 +3,7 @@
 import { useMemo } from 'react';
 
 import { Button } from '@/components/ui/button';
-import {
-  Collapsible,
-  CollapsibleContent
-} from '@/components/ui/collapsible';
+import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,8 +13,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
   Tooltip,
-  TooltipTrigger,
-  TooltipContent
+  TooltipContent,
+  TooltipTrigger
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
@@ -164,9 +161,9 @@ export function OrdemCard(props: OrdemCardProps) {
                   </p>
                 </div>
 
-                <div className='flex shrink-0 items-center gap-3'>
+                <div className='flex shrink-0   items-baseline-last gap-5'>
                   <OrdemStatusBadge status={ordem.status} />
-                  <div className='text-right'>
+                  <div className='text-left'>
                     <p className='text-[10px] uppercase tracking-[0.08em] text-muted-foreground'>
                       Total
                     </p>

@@ -95,7 +95,7 @@ export default function DashboardPage() {
         <h1 className="text-xl font-bold text-foreground">
           Dashboard
         </h1>
-        <p className="text-muted-sm">Visão geral do sistema</p>
+        <p className="text-xs text-muted-foreground">Visão geral do sistema</p>
       </div>
 
       {/* Stat Cards */}

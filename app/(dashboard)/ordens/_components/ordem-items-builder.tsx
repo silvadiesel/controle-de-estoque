@@ -12,8 +12,8 @@ import {
   FieldLabel
 } from '@/components/ui/field';
 import { SearchableSelect } from '@/components/ui/searchable-select';
-import { cn } from '@/lib/utils';
 import { type Peca } from '@/db/schema';
+import { cn } from '@/lib/utils';
 
 import { Minus, Package2, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -149,7 +149,8 @@ export function OrdemItemsBuilder({
             hasError={Boolean(error)}
           />
           <FieldDescription>
-            O estoque é validado no momento da seleção e do ajuste de quantidade.
+            O estoque é validado no momento da seleção e do ajuste de
+            quantidade.
           </FieldDescription>
           <FieldError>{error}</FieldError>
         </FieldContent>
@@ -161,15 +162,16 @@ export function OrdemItemsBuilder({
             <Package2 />
           </div>
           <p className='text-sm font-medium text-foreground'>{emptyTitle}</p>
-          <p className='mt-1 text-sm text-muted-foreground'>{emptyDescription}</p>
+          <p className='mt-1 text-sm text-muted-foreground'>
+            {emptyDescription}
+          </p>
         </div>
       ) : (
         <div className='flex flex-col gap-3'>
           {items.map((item) => (
             <div
               key={item.peca_id}
-              className='rounded-xl border border-border bg-input/60 px-4 py-3 transition-colors hover:border-border-hover'
-            >
+              className='rounded-xl border border-border bg-input/60 px-4 py-3 transition-colors hover:border-border-hover'>
               <div className='flex flex-col gap-3 md:flex-row md:items-center'>
                 <div className='min-w-0 flex-1'>
                   <p className='truncate text-sm font-medium text-foreground'>
@@ -188,8 +190,7 @@ export function OrdemItemsBuilder({
                       variant='outline'
                       size='icon-sm'
                       onClick={() => updateItemQuantity(item.peca_id, -1)}
-                      aria-label={`Diminuir quantidade de ${item.peca?.name_peca ?? 'peça'}`}
-                    >
+                      aria-label={`Diminuir quantidade de ${item.peca?.name_peca ?? 'peça'}`}>
                       <Minus />
                     </Button>
                     <span className='min-w-8 text-center text-sm font-semibold tabular-nums'>
@@ -200,8 +201,7 @@ export function OrdemItemsBuilder({
                       variant='outline'
                       size='icon-sm'
                       onClick={() => updateItemQuantity(item.peca_id, 1)}
-                      aria-label={`Aumentar quantidade de ${item.peca?.name_peca ?? 'peça'}`}
-                    >
+                      aria-label={`Aumentar quantidade de ${item.peca?.name_peca ?? 'peça'}`}>
                       <Plus />
                     </Button>
                   </div>
@@ -215,11 +215,12 @@ export function OrdemItemsBuilder({
                     variant='ghost'
                     size='icon-sm'
                     onClick={() =>
-                      onChange(items.filter((entry) => entry.peca_id !== item.peca_id))
+                      onChange(
+                        items.filter((entry) => entry.peca_id !== item.peca_id)
+                      )
                     }
                     aria-label={`Remover ${item.peca?.name_peca ?? 'peça'}`}
-                    className='text-destructive hover:text-destructive'
-                  >
+                    className='text-destructive hover:text-destructive'>
                     <Trash2 />
                   </Button>
                 </div>
@@ -231,8 +232,7 @@ export function OrdemItemsBuilder({
             className={cn(
               'flex items-center justify-between rounded-xl border border-border bg-elevated/70 px-4 py-3',
               'transition-colors'
-            )}
-          >
+            )}>
             <span className='text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground'>
               Total dos itens
             </span>

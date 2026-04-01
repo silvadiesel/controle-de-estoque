@@ -86,12 +86,8 @@ export default function Products() {
       <div className='flex flex-col gap-6'>
         <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
           <div className='flex flex-col gap-1'>
-            <h1 className='text-xl font-semibold text-foreground'>
-              Produtos
-            </h1>
-            <p className='text-sm text-muted-foreground'>
-              Gerencie o estoque
-            </p>
+            <h1 className='text-xl font-semibold text-foreground'>Produtos</h1>
+            <p className='text-sm text-muted-foreground'>Gerencie o estoque</p>
           </div>
 
           <ModalPecas
@@ -113,10 +109,10 @@ export default function Products() {
         </div>
 
         <div className='flex flex-col sm:flex-row gap-3 items-start sm:items-center'>
-          <div className='relative w-full sm:max-w-xs'>
+          <div className='relative w-full '>
             <Search className='absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
             <Input
-              placeholder='Buscar produto...'
+              placeholder='Procurar por nome, código ou categoria...'
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className='pl-10'

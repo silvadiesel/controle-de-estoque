@@ -19,7 +19,7 @@
   --destructive-foreground: #e7ebf2;
   --border: #26292e;
   --border-hover: #393d45;
-  --input: #0d1014;
+  --input: #0f1216;
   --ring: #393d45;
   --chart-1: #5376b8;
   --chart-2: #3d94ba;
@@ -135,35 +135,4 @@
     min-height: 44px;
     min-width: 44px;
   }
-}
-
-/* ── Typography utilities ───────────────────────────────────────────────── */
-.text-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.text-data {
-  font-size: clamp(1.625rem, 1.3rem + 1vw, 2rem);
-  line-height: 1;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.text-heading {
-  font-size: 1.125rem;
-  line-height: 1.2;
-  font-weight: 600;
-}
-
-.text-body {
-  font-size: 0.9375rem;
-  line-height: 1.45;
-}
-
-.text-muted-sm {
-  font-size: 0.75rem;
-  color: var(--text-muted);
 }

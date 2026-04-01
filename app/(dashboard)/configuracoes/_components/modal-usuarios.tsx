@@ -68,7 +68,7 @@ export function ModalUsuarios({
             </div>
           </DialogHeader>
           <div className='p-6'>
-            <p className='text-[10px] uppercase tracking-[0.8px] text-muted-foreground font-semibold mb-3'>DADOS DO USUÁRIO</p>
+            <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-3'>DADOS DO USUÁRIO</p>
             <div className='grid gap-4'>
             <div className='space-y-2'>
               <Label htmlFor='user-name' className='text-xs text-muted-foreground'>Nome</Label>
