@@ -65,7 +65,7 @@ export function SearchableSelect({
           disabled={disabled}
           variant="outline"
           className={cn(
-            'w-full justify-between font-normal bg-input border-border text-left hover:bg-input hover:border-border-hover',
+            'h-10 w-full justify-between font-normal bg-input border-border text-left hover:bg-input hover:border-border-hover',
             !selectedOption && 'text-muted-foreground',
             hasError && 'border-destructive',
             disabled && 'opacity-50 cursor-not-allowed',

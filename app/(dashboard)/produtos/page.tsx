@@ -1,6 +1,9 @@
 'use client';
 
+import { useEffect } from 'react';
+
 import { ModalDelete } from '@/components/modal-delete';
+import { PaginationControls } from '@/components/pagination-controls';
 import { Button } from '@/components/ui/button';
 import {
   Empty,
@@ -10,13 +13,8 @@ import {
   EmptyTitle
 } from '@/components/ui/empty';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
+import { SearchableSelect } from '@/components/ui/searchable-select';
+import { usePagination } from '@/hooks/usePagination';
 
 import { CardPecas } from './_components/card-pecas';
 import { ModalPecas } from './_components/modal-peças';
@@ -31,8 +29,6 @@ export default function Products() {
     filteredProducts,
     isAddOpen,
     editingPeca,
-    newPeca,
-    setNewPeca,
     handleSubmit,
     handleEdit,
     handleDeletePeca,
@@ -40,8 +36,6 @@ export default function Products() {
     setDeleteId,
     isDeleteOpen,
     setIsDeleteOpen,
-    categories,
-    fornecedores,
     categoryFilter,
     setCategoryFilter,
     fornecedorFilter,
@@ -50,13 +44,42 @@ export default function Products() {
     getFornecedorName,
     formatPrice,
     handleOpenChange,
-    handleImageChange,
-    handleRemoveImage,
-    categoryItems,
-    fornecedorItems,
-    precoInput,
-    handlePrecoChange
+    categoryOptions,
+    supplierOptions
   } = usePecas();
+
+  const {
+    paginatedItems,
+    currentPage,
+    totalPages,
+    totalItems,
+    startItem,
+    endItem,
+    pageItems,
+    isFirstPage,
+    isLastPage,
+    goToPage,
+    goToNextPage,
+    goToPreviousPage
+  } = usePagination({
+    items: filteredProducts,
+    itemsPerPage: 20
+  });
+
+  // Reset paginação quando filtros/search mudam
+  useEffect(() => {
+    goToPage(1);
+  }, [search, categoryFilter, fornecedorFilter]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const categoryFilterOptions = [
+    { value: 'all', label: 'Todas as categorias' },
+    ...categoryOptions
+  ];
+
+  const supplierFilterOptions = [
+    { value: 'all', label: 'Todos os fornecedores' },
+    ...supplierOptions
+  ];
 
   return (
     <div className='flex flex-1 flex-col gap-4 p-4'>
@@ -72,22 +95,17 @@ export default function Products() {
           </div>
 
           <ModalPecas
-            editingPeca={editingPeca}
-            newPeca={newPeca}
-            setNewPeca={setNewPeca}
+            mode={editingPeca ? 'edit' : 'create'}
+            initialData={editingPeca ?? undefined}
             isOpen={isAddOpen}
+            setIsOpen={handleOpenChange}
             onSubmit={handleSubmit}
             isLoading={isLoading}
-            handleOpenChange={handleOpenChange}
-            handleImageChange={handleImageChange}
-            handleRemoveImage={handleRemoveImage}
-            categoryItems={categoryItems}
-            fornecedorItems={fornecedorItems}
-            precoInput={precoInput}
-            handlePrecoChange={handlePrecoChange}
+            categoryOptions={categoryOptions}
+            supplierOptions={supplierOptions}
             trigger={
-              <Button className='bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm'>
-                <Plus className='mr-2 h-4 w-4' />
+              <Button className='w-full sm:w-auto'>
+                <Plus data-icon='inline-start' />
                 Novo Produto
               </Button>
             }
@@ -95,57 +113,50 @@ export default function Products() {
         </div>
 
         <div className='flex flex-col sm:flex-row gap-3 items-start sm:items-center'>
-          <div className='relative w-full max-w-[280px]'>
-            <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+          <div className='relative w-full sm:max-w-xs'>
+            <Search className='absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
             <Input
               placeholder='Buscar produto...'
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className='pl-9'
+              className='pl-10'
+              aria-label='Buscar produto'
             />
           </div>
 
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className='w-full sm:w-[200px]'>
-              <SelectValue placeholder='Categoria' />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='all'>Todas as categorias</SelectItem>
-              {categories.map((cat) => (
-                <SelectItem key={cat.id} value={cat.id.toString()}>
-                  {cat.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <SearchableSelect
+            options={categoryFilterOptions}
+            value={categoryFilter}
+            onValueChange={setCategoryFilter}
+            placeholder='Categoria'
+            searchPlaceholder='Buscar categoria...'
+            emptyText='Nenhuma categoria encontrada.'
+            className='w-full sm:w-[200px]'
+          />
 
-          <Select value={fornecedorFilter} onValueChange={setFornecedorFilter}>
-            <SelectTrigger className='w-full sm:w-[200px]'>
-              <SelectValue placeholder='Fornecedor' />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='all'>Todos os fornecedores</SelectItem>
-              {fornecedores.map((f) => (
-                <SelectItem key={f.id} value={f.id.toString()}>
-                  {f.name_empresa}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <SearchableSelect
+            options={supplierFilterOptions}
+            value={fornecedorFilter}
+            onValueChange={setFornecedorFilter}
+            placeholder='Fornecedor'
+            searchPlaceholder='Buscar fornecedor...'
+            emptyText='Nenhum fornecedor encontrado.'
+            className='w-full sm:w-[200px]'
+          />
         </div>
       </div>
 
       <div className='flex-1'>
         {isLoading ? (
           <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-3'>
-            {[1, 2, 3, 4, 5, 6].map((i) => (
+            {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
-                className='h-[300px] bg-card/50 rounded-xl border border-border animate-pulse'
+                className='h-[300px] bg-card rounded-lg border border-border animate-pulse'
               />
             ))}
           </div>
-        ) : filteredProducts.length === 0 ? (
+        ) : paginatedItems.length === 0 ? (
           <Empty className='border-border bg-card'>
             <EmptyMedia variant='icon'>
               <PackageOpen />
@@ -158,8 +169,8 @@ export default function Products() {
             </EmptyHeader>
           </Empty>
         ) : (
-          <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-3 pb-10'>
-            {filteredProducts.map((peca) => (
+          <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-3'>
+            {paginatedItems.map((peca) => (
               <CardPecas
                 key={peca.id}
                 peca={peca}
@@ -176,6 +187,21 @@ export default function Products() {
           </div>
         )}
       </div>
+
+      <PaginationControls
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        startItem={startItem}
+        endItem={endItem}
+        pageItems={pageItems}
+        isFirstPage={isFirstPage}
+        isLastPage={isLastPage}
+        onPageChange={goToPage}
+        onNextPage={goToNextPage}
+        onPreviousPage={goToPreviousPage}
+        itemLabel='produtos'
+      />
 
       <ModalDelete
         isOpen={isDeleteOpen}
