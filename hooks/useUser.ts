@@ -1,6 +1,11 @@
 'use client';
 
 import { useSession } from '@/lib/auth-client';
+import {
+  type AppPermission,
+  hasPermission as roleHasPermission,
+  hasRoutePermission
+} from '@/lib/permissions';
 import type { Cargo } from '@/lib/types/auth';
 import { CARGO_HIERARCHY } from '@/lib/types/auth';
 
@@ -43,6 +48,16 @@ export function useUser() {
     return roles.includes(cargo);
   };
 
+  const hasPermission = (permission: AppPermission): boolean => {
+    if (!user) return false;
+    return roleHasPermission(cargo, permission);
+  };
+
+  const canAccessRoute = (pathname: string): boolean => {
+    if (!user) return false;
+    return hasRoutePermission(cargo, pathname);
+  };
+
   return {
     // Dados do usuário
     user,
@@ -60,6 +75,17 @@ export function useUser() {
     // Funções utilitárias
     canAccess,
     hasRole,
+    hasPermission,
+    canAccessRoute,
+    canViewFornecedoresPage: hasPermission('view_fornecedores_page'),
+    canManageFornecedores: hasPermission('manage_fornecedores'),
+    canViewConfiguracoes: hasPermission('view_configuracoes'),
+    canManageCategorias: hasPermission('manage_categorias'),
+    canManageUsers: hasPermission('manage_users'),
+    canViewProdutos: hasPermission('view_produtos'),
+    canManageProdutos: hasPermission('manage_produtos'),
+    canReadFornecedorContext: hasPermission('read_fornecedor_context'),
+    canReadCategoriaContext: hasPermission('read_categoria_context'),
 
     // Estado do usuário
     isAuthenticated: !!user,

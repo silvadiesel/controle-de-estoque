@@ -1,5 +1,6 @@
 import { db, schema } from '@/db';
 import { logAction } from '@/lib/log-action';
+import { requireRoutePermission } from '@/lib/server/access-control';
 
 import { eq } from 'drizzle-orm';
 
@@ -10,6 +11,15 @@ type Params = {
 };
 
 export async function GET(_request: Request, { params }: Params) {
+  const permissionCheck = await requireRoutePermission(
+    _request,
+    'view_produtos'
+  );
+
+  if (permissionCheck instanceof Response) {
+    return permissionCheck;
+  }
+
   const { id: idParam } = await params;
   const id = Number(idParam);
 
@@ -21,6 +31,15 @@ export async function GET(_request: Request, { params }: Params) {
 }
 
 export async function PUT(request: Request, { params }: Params) {
+  const permissionCheck = await requireRoutePermission(
+    request,
+    'manage_produtos'
+  );
+
+  if (permissionCheck instanceof Response) {
+    return permissionCheck;
+  }
+
   const { id: idParam } = await params;
   const id = Number(idParam);
   const data = await request.json();
@@ -46,6 +65,15 @@ export async function PUT(request: Request, { params }: Params) {
 }
 
 export async function DELETE(request: Request, { params }: Params) {
+  const permissionCheck = await requireRoutePermission(
+    request,
+    'manage_produtos'
+  );
+
+  if (permissionCheck instanceof Response) {
+    return permissionCheck;
+  }
+
   const { id: idParam } = await params;
   const id = Number(idParam);
 

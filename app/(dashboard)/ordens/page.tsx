@@ -24,7 +24,6 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { StatCard } from '@/components/ui/stat-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Peca } from '@/db/schema/pecas';
 import { usePagination } from '@/hooks/usePagination';
 
 import {

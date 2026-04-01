@@ -30,7 +30,6 @@ import { usePagination } from '@/hooks/usePagination';
 import { ModalUsuarios } from './_components/modal-usuarios';
 import { useCategories, useUsers } from './_hooks';
 import {
-  Building2,
   Loader2,
   Pencil,
   Plus,
@@ -170,294 +169,233 @@ export default function Configuracoes() {
 
         {/* Tab: Configurações Gerais */}
         <TabsContent value='general'>
-          <div className='grid gap-6 mt-4'>
-            {/* Categories - single card with list rows */}
-            <Card className='bg-card border-border flex flex-col'>
-              <CardHeader>
-                <div className='flex items-center justify-between'>
-                  <div>
-                    <CardTitle className='text-foreground flex items-center gap-2'>
-                      <Tags className='h-5 w-5 text-primary' />
-                      Categorias dos Produtos
-                    </CardTitle>
-                    <CardDescription className='text-muted-foreground'>
-                      Gerencie as categorias dos produtos disponíveis
-                    </CardDescription>
-                  </div>
-
-                  <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-                    <DialogTrigger asChild>
-                      <Button className='bg-primary text-primary-foreground hover:bg-primary/90'>
-                        <Plus className='h-4 w-4 mr-2' />
-                        Nova Categoria
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className='bg-card border-border max-w-[540px]'>
-                      <DialogHeader>
-                        <DialogTitle className='text-foreground'>
-                          Adicionar Categoria
-                        </DialogTitle>
-                        <DialogDescription className='text-muted-foreground'>
-                          Crie uma nova categoria para organizar seus produtos
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className='space-y-2'>
-                        <Label
-                          htmlFor='cat-name'
-                          className='text-muted-foreground'>
-                          Nome da Categoria
-                        </Label>
-                        <Input
-                          id='cat-name'
-                          value={newCategoryName}
-                          onChange={(e) => setNewCategoryName(e.target.value)}
-                          placeholder='Ex: Pneus'
-                          className='bg-input border-border'
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !isSavingCategory) {
-                              handleAddCategory();
-                            }
-                          }}
-                        />
-                      </div>
-                      <DialogFooter>
-                        <Button
-                          variant='secondary'
-                          onClick={() => setIsAddOpen(false)}
-                          disabled={isSavingCategory}>
-                          Cancelar
-                        </Button>
-                        <Button
-                          onClick={handleAddCategory}
-                          className='bg-primary text-primary-foreground hover:bg-primary/90'
-                          disabled={isSavingCategory}>
-                          {isSavingCategory ? (
-                            <>
-                              <Loader2 className='h-4 w-4 mr-2 animate-spin' />
-                              Salvando...
-                            </>
-                          ) : (
-                            'Adicionar'
-                          )}
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
+          {/* Categories - single card with list rows */}
+          <Card className='bg-card border-border flex flex-col'>
+            <CardHeader>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <CardTitle className='text-foreground flex items-center gap-2'>
+                    <Tags className='h-5 w-5 text-primary' />
+                    Categorias dos Produtos
+                  </CardTitle>
+                  <CardDescription className='text-muted-foreground'>
+                    Gerencie as categorias dos produtos disponíveis
+                  </CardDescription>
                 </div>
-              </CardHeader>
 
-              <CardContent className='flex flex-col flex-1'>
-                {isLoadingCategories ? (
-                  <div className='flex items-center justify-center py-8'>
-                    <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
-                  </div>
-                ) : categories.length === 0 ? (
-                  <div className='text-center py-8 text-muted-foreground'>
-                    <Tags className='h-12 w-12 mx-auto mb-4 opacity-50' />
-                    <p>Nenhuma categoria cadastrada</p>
-                    <p className='text-sm'>
-                      Clique em{' '}
-                      <span className='font-semibold'>Nova Categoria</span> para
-                      começar
-                    </p>
-                  </div>
-                ) : (
-                  <div className='flex flex-col flex-1 justify-between'>
-                    {/* List rows instead of table */}
-                    <div className='rounded-lg border border-border overflow-hidden divide-y divide-border'>
-                      {paginatedCategories.map((category) => (
-                        <div
-                          key={category.id}
-                          className='flex items-center justify-between px-4 py-3 hover:bg-input transition-colors'>
-                          <div className='flex items-center gap-3'>
-                            <span className='text-xs text-muted-foreground w-8'>
-                              #{category.id}
-                            </span>
-                            <span className='font-medium text-foreground'>
-                              {category.name}
-                            </span>
-                          </div>
-                          <div className='flex items-center gap-1'>
-                            <Dialog
-                              open={editingCategory?.id === category.id}
-                              onOpenChange={(open) =>
-                                !open && setEditingCategory(null)
-                              }>
-                              <DialogTrigger asChild>
-                                <Button
-                                  variant='ghost'
-                                  size='icon'
-                                  aria-label={`Editar categoria ${category.name}`}
-                                  onClick={() => setEditingCategory(category)}>
-                                  <Pencil className='h-4 w-4 text-muted-foreground' />
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className='bg-card border-border max-w-[540px]'>
-                                <DialogHeader>
-                                  <DialogTitle className='text-foreground'>
-                                    Editar Categoria
-                                  </DialogTitle>
-                                  <DialogDescription className='text-muted-foreground'>
-                                    Altere os dados da categoria
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <div className='space-y-4 py-4'>
-                                  <div className='space-y-2'>
-                                    <Label
-                                      htmlFor='edit-cat-name'
-                                      className='text-muted-foreground'>
-                                      Nome da Categoria
-                                    </Label>
-                                    <Input
-                                      id='edit-cat-name'
-                                      value={editingCategory?.name || ''}
-                                      onChange={(e) =>
-                                        setEditingCategory((prev) =>
-                                          prev
-                                            ? {
-                                                ...prev,
-                                                name: e.target.value
-                                              }
-                                            : null
-                                        )
-                                      }
-                                      className='bg-input border-border'
-                                      onKeyDown={(e) => {
-                                        if (
-                                          e.key === 'Enter' &&
-                                          !isSavingCategory
-                                        ) {
-                                          handleUpdateCategory();
-                                        }
-                                      }}
-                                    />
-                                  </div>
-                                </div>
-                                <DialogFooter>
-                                  <Button
-                                    variant='outline'
-                                    onClick={() => setEditingCategory(null)}
-                                    disabled={isSavingCategory}>
-                                    Cancelar
-                                  </Button>
-                                  <Button
-                                    onClick={handleUpdateCategory}
-                                    className='bg-primary text-primary-foreground hover:bg-primary/90'
-                                    disabled={isSavingCategory}>
-                                    {isSavingCategory ? (
-                                      <>
-                                        <Loader2 className='h-4 w-4 mr-2 animate-spin' />
-                                        Salvando...
-                                      </>
-                                    ) : (
-                                      'Salvar'
-                                    )}
-                                  </Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
-
-                            <ModalDelete
-                              isOpen={deletingCategoryId === category.id}
-                              setIsOpen={(open) =>
-                                setDeletingCategoryId(open ? category.id : null)
-                              }
-                              onConfirm={confirmDeleteCategory}
-                              isLoading={isDeletingCategory}
-                              title='Excluir Categoria'
-                              description={`Tem certeza que deseja excluir a categoria "${category.name}"? Esta ação não pode ser desfeita.`}
-                              trigger={
-                                <Button
-                                  variant='ghost'
-                                  size='icon'
-                                  aria-label={`Excluir categoria ${category.name}`}>
-                                  <Trash2 className='h-4 w-4 text-destructive' />
-                                </Button>
-                              }
-                            />
-                          </div>
-                        </div>
-                      ))}
+                <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+                  <DialogTrigger asChild>
+                    <Button className='bg-primary text-primary-foreground hover:bg-primary/90'>
+                      <Plus className='h-4 w-4 mr-2' />
+                      Nova Categoria
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className='bg-card border-border max-w-[540px]'>
+                    <DialogHeader>
+                      <DialogTitle className='text-foreground'>
+                        Adicionar Categoria
+                      </DialogTitle>
+                      <DialogDescription className='text-muted-foreground'>
+                        Crie uma nova categoria para organizar seus produtos
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className='space-y-2'>
+                      <Label
+                        htmlFor='cat-name'
+                        className='text-muted-foreground'>
+                        Nome da Categoria
+                      </Label>
+                      <Input
+                        id='cat-name'
+                        value={newCategoryName}
+                        onChange={(e) => setNewCategoryName(e.target.value)}
+                        placeholder='Ex: Pneus'
+                        className='bg-input border-border'
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !isSavingCategory) {
+                            handleAddCategory();
+                          }
+                        }}
+                      />
                     </div>
+                    <DialogFooter>
+                      <Button
+                        variant='secondary'
+                        onClick={() => setIsAddOpen(false)}
+                        disabled={isSavingCategory}>
+                        Cancelar
+                      </Button>
+                      <Button
+                        onClick={handleAddCategory}
+                        className='bg-primary text-primary-foreground hover:bg-primary/90'
+                        disabled={isSavingCategory}>
+                        {isSavingCategory ? (
+                          <>
+                            <Loader2 className='h-4 w-4 mr-2 animate-spin' />
+                            Salvando...
+                          </>
+                        ) : (
+                          'Adicionar'
+                        )}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </CardHeader>
 
-                    <PaginationControls
-                      currentPage={currentPageCategories}
-                      totalPages={totalPagesCategories}
-                      totalItems={totalItemsCategories}
-                      startItem={startItemCategories}
-                      endItem={endItemCategories}
-                      pageItems={pageItemsCategories}
-                      isFirstPage={isFirstPageCategories}
-                      isLastPage={isLastPageCategories}
-                      onPageChange={goToPageCategories}
-                      onNextPage={goToNextPageCategories}
-                      onPreviousPage={goToPreviousPageCategories}
-                      itemLabel='categorias'
-                    />
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <CardContent className='flex flex-col flex-1'>
+              {isLoadingCategories ? (
+                <div className='flex items-center justify-center py-8'>
+                  <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
+                </div>
+              ) : categories.length === 0 ? (
+                <div className='text-center py-8 text-muted-foreground'>
+                  <Tags className='h-12 w-12 mx-auto mb-4 opacity-50' />
+                  <p>Nenhuma categoria cadastrada</p>
+                  <p className='text-sm'>
+                    Clique em{' '}
+                    <span className='font-semibold'>Nova Categoria</span> para
+                    começar
+                  </p>
+                </div>
+              ) : (
+                <div className='flex flex-col flex-1 justify-between'>
+                  {/* List rows instead of table */}
+                  <div className='rounded-lg border border-border overflow-hidden divide-y divide-border'>
+                    {paginatedCategories.map((category) => (
+                      <div
+                        key={category.id}
+                        className='flex items-center justify-between px-4 py-3 hover:bg-input transition-colors'>
+                        <div className='flex items-center gap-3'>
+                          <span className='text-xs text-muted-foreground w-8'>
+                            #{category.id}
+                          </span>
+                          <span className='font-medium text-foreground'>
+                            {category.name}
+                          </span>
+                        </div>
+                        <div className='flex items-center gap-1'>
+                          <Dialog
+                            open={editingCategory?.id === category.id}
+                            onOpenChange={(open) =>
+                              !open && setEditingCategory(null)
+                            }>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant='ghost'
+                                size='icon'
+                                aria-label={`Editar categoria ${category.name}`}
+                                onClick={() => setEditingCategory(category)}>
+                                <Pencil className='h-4 w-4 text-muted-foreground' />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className='bg-card border-border max-w-[540px]'>
+                              <DialogHeader>
+                                <DialogTitle className='text-foreground'>
+                                  Editar Categoria
+                                </DialogTitle>
+                                <DialogDescription className='text-muted-foreground'>
+                                  Altere os dados da categoria
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className='space-y-4 py-4'>
+                                <div className='space-y-2'>
+                                  <Label
+                                    htmlFor='edit-cat-name'
+                                    className='text-muted-foreground'>
+                                    Nome da Categoria
+                                  </Label>
+                                  <Input
+                                    id='edit-cat-name'
+                                    value={editingCategory?.name || ''}
+                                    onChange={(e) =>
+                                      setEditingCategory((prev) =>
+                                        prev
+                                          ? {
+                                              ...prev,
+                                              name: e.target.value
+                                            }
+                                          : null
+                                      )
+                                    }
+                                    className='bg-input border-border'
+                                    onKeyDown={(e) => {
+                                      if (
+                                        e.key === 'Enter' &&
+                                        !isSavingCategory
+                                      ) {
+                                        handleUpdateCategory();
+                                      }
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                              <DialogFooter>
+                                <Button
+                                  variant='outline'
+                                  onClick={() => setEditingCategory(null)}
+                                  disabled={isSavingCategory}>
+                                  Cancelar
+                                </Button>
+                                <Button
+                                  onClick={handleUpdateCategory}
+                                  className='bg-primary text-primary-foreground hover:bg-primary/90'
+                                  disabled={isSavingCategory}>
+                                  {isSavingCategory ? (
+                                    <>
+                                      <Loader2 className='h-4 w-4 mr-2 animate-spin' />
+                                      Salvando...
+                                    </>
+                                  ) : (
+                                    'Salvar'
+                                  )}
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
 
-            {/* Company section - disabled with opacity */}
-            <Card className='bg-card border-border opacity-40'>
-              <CardHeader>
-                <div className='flex items-center justify-between'>
-                  <div>
-                    <CardTitle className='text-foreground flex items-center gap-2'>
-                      <Building2 className='h-5 w-5 text-primary' />
-                      Informações da Empresa
-                    </CardTitle>
-                    <CardDescription className='text-muted-foreground'>
-                      Configure os dados da sua oficina
-                    </CardDescription>
+                          <ModalDelete
+                            isOpen={deletingCategoryId === category.id}
+                            setIsOpen={(open) =>
+                              setDeletingCategoryId(open ? category.id : null)
+                            }
+                            onConfirm={confirmDeleteCategory}
+                            isLoading={isDeletingCategory}
+                            title='Excluir Categoria'
+                            description={`Tem certeza que deseja excluir a categoria "${category.name}"? Esta ação não pode ser desfeita.`}
+                            trigger={
+                              <Button
+                                variant='ghost'
+                                size='icon'
+                                aria-label={`Excluir categoria ${category.name}`}>
+                                <Trash2 className='h-4 w-4 text-destructive' />
+                              </Button>
+                            }
+                          />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <Badge
-                    variant='outline'
-                    className='text-muted-foreground border-border'>
-                    Em breve
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className='space-y-4'>
-                <div className='grid gap-4 sm:grid-cols-2'>
-                  <div className='space-y-2'>
-                    <Label htmlFor='company' className='text-muted-foreground'>
-                      Nome da Empresa
-                    </Label>
-                    <Input
-                      id='company'
-                      defaultValue='Oficina de Caminhões Silva'
-                      className='bg-input border-border'
-                      disabled
-                    />
-                  </div>
-                  <div className='space-y-2'>
-                    <Label htmlFor='cnpj' className='text-muted-foreground'>
-                      CNPJ
-                    </Label>
-                    <Input
-                      id='cnpj'
-                      defaultValue='12.345.678/0001-90'
-                      className='bg-input border-border'
-                      disabled
-                    />
-                  </div>
-                </div>
-                <div className='space-y-2'>
-                  <Label htmlFor='address' className='text-muted-foreground'>
-                    Endereço
-                  </Label>
-                  <Input
-                    id='address'
-                    defaultValue='Av. das Indústrias, 1234 - Distrito Industrial'
-                    className='bg-input border-border'
-                    disabled
+
+                  <PaginationControls
+                    currentPage={currentPageCategories}
+                    totalPages={totalPagesCategories}
+                    totalItems={totalItemsCategories}
+                    startItem={startItemCategories}
+                    endItem={endItemCategories}
+                    pageItems={pageItemsCategories}
+                    isFirstPage={isFirstPageCategories}
+                    isLastPage={isLastPageCategories}
+                    onPageChange={goToPageCategories}
+                    onNextPage={goToNextPageCategories}
+                    onPreviousPage={goToPreviousPageCategories}
+                    itemLabel='categorias'
                   />
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Tab: Usuários */}
