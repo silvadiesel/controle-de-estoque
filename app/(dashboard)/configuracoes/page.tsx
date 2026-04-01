@@ -94,7 +94,7 @@ export default function Configuracoes() {
     goToPage: goToPageCategories,
     goToNextPage: goToNextPageCategories,
     goToPreviousPage: goToPreviousPageCategories
-  } = usePagination({ items: categories, itemsPerPage: 7 });
+  } = usePagination({ items: categories, itemsPerPage: 10 });
 
   // Pagination for users
   const {
