@@ -153,16 +153,16 @@ export default function Configuracoes() {
       </div>
 
       <Tabs defaultValue='general' className='w-full gap-0'>
-        <TabsList className='bg-transparent border-b border-border rounded-none w-full justify-start h-auto p-0'>
+        <TabsList className='h-11 w-full gap-2! bg-transparent! flex p-0'>
           <TabsTrigger
             value='general'
-            className='gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none text-muted-foreground px-4 py-2.5'>
+            className='  flex bg-muted  text-muted-foreground data-[state=active]:border-primary/70! data-[state=active]:bg-muted!'>
             <Settings className='h-4 w-4' />
             Configurações Gerais
           </TabsTrigger>
           <TabsTrigger
             value='users'
-            className='gap-2 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-foreground data-[state=active]:bg-transparent data-[state=active]:shadow-none text-muted-foreground px-4 py-2.5'>
+            className='  flex bg-muted  text-muted-foreground data-[state=active]:border-primary/70! data-[state=active]:bg-muted!'>
             <Users className='h-4 w-4' />
             Usuários
           </TabsTrigger>
@@ -202,7 +202,11 @@ export default function Configuracoes() {
                         </DialogDescription>
                       </DialogHeader>
                       <div className='space-y-2'>
-                        <Label htmlFor='cat-name' className='text-muted-foreground'>Nome da Categoria</Label>
+                        <Label
+                          htmlFor='cat-name'
+                          className='text-muted-foreground'>
+                          Nome da Categoria
+                        </Label>
                         <Input
                           id='cat-name'
                           value={newCategoryName}
@@ -284,16 +288,14 @@ export default function Configuracoes() {
                                   variant='ghost'
                                   size='icon'
                                   aria-label={`Editar categoria ${category.name}`}
-                                  onClick={() =>
-                                    setEditingCategory(category)
-                                  }>
+                                  onClick={() => setEditingCategory(category)}>
                                   <Pencil className='h-4 w-4 text-muted-foreground' />
                                 </Button>
                               </DialogTrigger>
                               <DialogContent className='bg-card border-border max-w-[540px]'>
                                 <DialogHeader>
                                   <DialogTitle className='text-foreground'>
-                                   Editar Categoria
+                                    Editar Categoria
                                   </DialogTitle>
                                   <DialogDescription className='text-muted-foreground'>
                                     Altere os dados da categoria
@@ -301,7 +303,9 @@ export default function Configuracoes() {
                                 </DialogHeader>
                                 <div className='space-y-4 py-4'>
                                   <div className='space-y-2'>
-                                    <Label htmlFor='edit-cat-name' className='text-muted-foreground'>
+                                    <Label
+                                      htmlFor='edit-cat-name'
+                                      className='text-muted-foreground'>
                                       Nome da Categoria
                                     </Label>
                                     <Input
@@ -332,9 +336,7 @@ export default function Configuracoes() {
                                 <DialogFooter>
                                   <Button
                                     variant='outline'
-                                    onClick={() =>
-                                      setEditingCategory(null)
-                                    }
+                                    onClick={() => setEditingCategory(null)}
                                     disabled={isSavingCategory}>
                                     Cancelar
                                   </Button>
@@ -358,16 +360,17 @@ export default function Configuracoes() {
                             <ModalDelete
                               isOpen={deletingCategoryId === category.id}
                               setIsOpen={(open) =>
-                                setDeletingCategoryId(
-                                  open ? category.id : null
-                                )
+                                setDeletingCategoryId(open ? category.id : null)
                               }
                               onConfirm={confirmDeleteCategory}
                               isLoading={isDeletingCategory}
                               title='Excluir Categoria'
                               description={`Tem certeza que deseja excluir a categoria "${category.name}"? Esta ação não pode ser desfeita.`}
                               trigger={
-                                <Button variant='ghost' size='icon' aria-label={`Excluir categoria ${category.name}`}>
+                                <Button
+                                  variant='ghost'
+                                  size='icon'
+                                  aria-label={`Excluir categoria ${category.name}`}>
                                   <Trash2 className='h-4 w-4 text-destructive' />
                                 </Button>
                               }
@@ -409,7 +412,9 @@ export default function Configuracoes() {
                       Configure os dados da sua oficina
                     </CardDescription>
                   </div>
-                  <Badge variant='outline' className='text-muted-foreground border-border'>
+                  <Badge
+                    variant='outline'
+                    className='text-muted-foreground border-border'>
                     Em breve
                   </Badge>
                 </div>
@@ -417,7 +422,9 @@ export default function Configuracoes() {
               <CardContent className='space-y-4'>
                 <div className='grid gap-4 sm:grid-cols-2'>
                   <div className='space-y-2'>
-                    <Label htmlFor='company' className='text-muted-foreground'>Nome da Empresa</Label>
+                    <Label htmlFor='company' className='text-muted-foreground'>
+                      Nome da Empresa
+                    </Label>
                     <Input
                       id='company'
                       defaultValue='Oficina de Caminhões Silva'
@@ -426,7 +433,9 @@ export default function Configuracoes() {
                     />
                   </div>
                   <div className='space-y-2'>
-                    <Label htmlFor='cnpj' className='text-muted-foreground'>CNPJ</Label>
+                    <Label htmlFor='cnpj' className='text-muted-foreground'>
+                      CNPJ
+                    </Label>
                     <Input
                       id='cnpj'
                       defaultValue='12.345.678/0001-90'
@@ -436,7 +445,9 @@ export default function Configuracoes() {
                   </div>
                 </div>
                 <div className='space-y-2'>
-                  <Label htmlFor='address' className='text-muted-foreground'>Endereço</Label>
+                  <Label htmlFor='address' className='text-muted-foreground'>
+                    Endereço
+                  </Label>
                   <Input
                     id='address'
                     defaultValue='Av. das Indústrias, 1234 - Distrito Industrial'
@@ -519,9 +530,7 @@ export default function Configuracoes() {
                               {getCargoLabel(user.cargo)}
                             </Badge>
                             <Badge
-                              variant={
-                                user.status ? 'default' : 'destructive'
-                              }
+                              variant={user.status ? 'default' : 'destructive'}
                               className={
                                 user.status
                                   ? 'bg-success/10 text-success border-success/20'
@@ -536,9 +545,7 @@ export default function Configuracoes() {
                             data={editingUser}
                             setData={setEditingUser}
                             isOpen={editingUser?.id === user.id}
-                            setIsOpen={(open) =>
-                              !open && setEditingUser(null)
-                            }
+                            setIsOpen={(open) => !open && setEditingUser(null)}
                             onSubmit={handleUpdateUser}
                             isLoading={isSavingUser}
                             trigger={
@@ -562,7 +569,10 @@ export default function Configuracoes() {
                             title='Excluir Usuário'
                             description={`Tem certeza que deseja excluir o usuário "${user.name}"? Esta ação não pode ser desfeita e removerá todas as sessões e contas associadas.`}
                             trigger={
-                              <Button variant='ghost' size='icon' aria-label={`Excluir usuário ${user.name}`}>
+                              <Button
+                                variant='ghost'
+                                size='icon'
+                                aria-label={`Excluir usuário ${user.name}`}>
                                 <Trash2 className='h-4 w-4 text-destructive' />
                               </Button>
                             }

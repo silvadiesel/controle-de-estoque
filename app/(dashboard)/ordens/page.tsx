@@ -2,18 +2,6 @@
 
 import { startTransition, useDeferredValue, useMemo, useState } from 'react';
 
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import {
-  CheckCircle2,
-  Clock3,
-  PackageSearch,
-  Search,
-  ShoppingCart,
-  Wrench,
-  X
-} from 'lucide-react';
-
 import { ModalDelete } from '@/components/modal-delete';
 import { PaginationControls } from '@/components/pagination-controls';
 import { Button } from '@/components/ui/button';
@@ -39,15 +27,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Peca } from '@/db/schema/pecas';
 import { usePagination } from '@/hooks/usePagination';
 
-import { ModalDetalhesOrdem, ModalOrdemServico, ModalOrdemVenda } from './_components';
-import { OrdemCard } from './_components/ordem-card';
 import {
-  buildAvailableMonths,
-  buildOrdensMetrics,
-  buildVendaFormInitialData,
-  filterOrdens,
-  type OrdemFilters
-} from './_lib/ordens-view';
+  ModalDetalhesOrdem,
+  ModalOrdemServico,
+  ModalOrdemVenda
+} from './_components';
+import { OrdemCard } from './_components/ordem-card';
 import {
   type NovaOrdemServico,
   type NovaOrdemVenda,
@@ -55,6 +40,24 @@ import {
   type OrdemVendaCompleta,
   useOrdens
 } from './_hooks';
+import {
+  type OrdemFilters,
+  buildAvailableMonths,
+  buildOrdensMetrics,
+  buildVendaFormInitialData,
+  filterOrdens
+} from './_lib/ordens-view';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import {
+  CheckCircle2,
+  Clock3,
+  PackageSearch,
+  Search,
+  ShoppingCart,
+  Wrench,
+  X
+} from 'lucide-react';
 
 type SectionType = 'servico' | 'venda';
 
@@ -74,7 +77,9 @@ const formatMonthLabel = (monthKey: string) => {
 };
 
 const hasActiveFilters = (filters: OrdemFilters) =>
-  Boolean(filters.search) || filters.status !== 'all' || filters.month !== 'all';
+  Boolean(filters.search) ||
+  filters.status !== 'all' ||
+  filters.month !== 'all';
 
 export default function OrdensPage() {
   const {
@@ -108,10 +113,10 @@ export default function OrdensPage() {
     getVeiculosByCliente
   } = useOrdens();
 
-  const [serviceFilters, setServiceFilters] = useState<OrdemFilters>(
-    createDefaultFilters
-  );
-  const [saleFilters, setSaleFilters] = useState<OrdemFilters>(createDefaultFilters);
+  const [serviceFilters, setServiceFilters] =
+    useState<OrdemFilters>(createDefaultFilters);
+  const [saleFilters, setSaleFilters] =
+    useState<OrdemFilters>(createDefaultFilters);
   const [activeTab, setActiveTab] = useState<SectionType>('servico');
   const [expandedBySection, setExpandedBySection] = useState<
     Record<SectionType, string | null>
@@ -136,13 +141,19 @@ export default function OrdensPage() {
     () => buildOrdensMetrics(ordensServico),
     [ordensServico]
   );
-  const saleMetrics = useMemo(() => buildOrdensMetrics(ordensVenda), [ordensVenda]);
+  const saleMetrics = useMemo(
+    () => buildOrdensMetrics(ordensVenda),
+    [ordensVenda]
+  );
 
   const serviceMonths = useMemo(
     () => buildAvailableMonths(ordensServico),
     [ordensServico]
   );
-  const saleMonths = useMemo(() => buildAvailableMonths(ordensVenda), [ordensVenda]);
+  const saleMonths = useMemo(
+    () => buildAvailableMonths(ordensVenda),
+    [ordensVenda]
+  );
 
   const filteredServiceOrders = useMemo(
     () => filterOrdens(ordensServico, normalizedServiceFilters),
@@ -203,7 +214,9 @@ export default function OrdensPage() {
       pecas: ordem.pecas.map((peca) => ({
         peca_id: peca.peca_id,
         quantidade: peca.quantidade,
-        peca: peca.peca ? ({ ...peca.peca, preco: peca.peca.preco } as Peca) : null
+        peca: peca.peca
+          ? ({ ...peca.peca, preco: peca.peca.preco } as Peca)
+          : null
       }))
     };
   };
@@ -269,7 +282,7 @@ export default function OrdensPage() {
 
     return (
       <div className='flex flex-wrap items-center gap-2'>
-        <div className='relative min-w-[280px] flex-1 md:min-w-[34%]'>
+        <div className='relative  flex-1'>
           <Search className='pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
           <Input
             value={filters.search}
@@ -283,7 +296,7 @@ export default function OrdensPage() {
                 ? 'Buscar por cliente, placa, responsável ou ID...'
                 : 'Buscar por cliente, empresa, pagamento ou ID...'
             }
-            className='bg-input pl-9'
+            className=' bg-input border-border pl-9'
           />
         </div>
 
@@ -291,9 +304,8 @@ export default function OrdensPage() {
           value={filters.status}
           onValueChange={(value: OrdemFilters['status']) =>
             updateFilters(section, { status: value })
-          }
-        >
-          <SelectTrigger className='w-full bg-input sm:w-44'>
+          }>
+          <SelectTrigger className='w-full bg-input! border-border h-10! sm:w-44'>
             <SelectValue placeholder='Status' />
           </SelectTrigger>
           <SelectContent>
@@ -306,9 +318,8 @@ export default function OrdensPage() {
 
         <Select
           value={filters.month}
-          onValueChange={(value) => updateFilters(section, { month: value })}
-        >
-          <SelectTrigger className='w-full bg-input sm:w-48'>
+          onValueChange={(value) => updateFilters(section, { month: value })}>
+          <SelectTrigger className='w-full bg-input! border-border h-10! sm:w-48'>
             <SelectValue placeholder='Mês' />
           </SelectTrigger>
           <SelectContent>
@@ -326,8 +337,7 @@ export default function OrdensPage() {
             variant='ghost'
             size='sm'
             onClick={() => resetFilters(section)}
-            className='gap-1.5 text-muted-foreground hover:text-foreground'
-          >
+            className='gap-1.5 text-muted-foreground hover:text-foreground'>
             <X className='h-3.5 w-3.5' />
             Limpar
           </Button>
@@ -372,8 +382,7 @@ export default function OrdensPage() {
                 section === 'servico'
                   ? setIsAddServicoOpen(true)
                   : setIsAddVendaOpen(true)
-              }
-            >
+              }>
               {section === 'servico' ? (
                 <Wrench data-icon='inline-start' />
               ) : (
@@ -394,8 +403,7 @@ export default function OrdensPage() {
       {Array.from({ length: 4 }).map((_, index) => (
         <div
           key={index}
-          className='rounded-xl border border-border bg-card px-4 py-4'
-        >
+          className='rounded-xl border border-border bg-card px-4 py-4'>
           <div className='flex items-center gap-3'>
             <Skeleton className='size-9 rounded-lg' />
             <Skeleton className='h-10 w-14 rounded-md' />
@@ -440,9 +448,12 @@ export default function OrdensPage() {
                         tipo='servico'
                         ordem={serviceOrder}
                         expanded={
-                          expandedBySection.servico === `servico-${serviceOrder.id}`
+                          expandedBySection.servico ===
+                          `servico-${serviceOrder.id}`
                         }
-                        onToggle={() => toggleExpanded('servico', serviceOrder.id)}
+                        onToggle={() =>
+                          toggleExpanded('servico', serviceOrder.id)
+                        }
                         onEdit={() => setEditingServico(serviceOrder)}
                         onViewDetails={() => setViewingServico(serviceOrder)}
                         onDelete={() => {
@@ -450,10 +461,18 @@ export default function OrdensPage() {
                           setIsDeleteOpen(true);
                         }}
                         onFinalize={() =>
-                          handleStatusChange('servico', serviceOrder.id, 'fechada')
+                          handleStatusChange(
+                            'servico',
+                            serviceOrder.id,
+                            'fechada'
+                          )
                         }
                         onCancel={() =>
-                          handleStatusChange('servico', serviceOrder.id, 'cancelada')
+                          handleStatusChange(
+                            'servico',
+                            serviceOrder.id,
+                            'cancelada'
+                          )
                         }
                         isBusy={isLoading}
                       />
@@ -467,7 +486,9 @@ export default function OrdensPage() {
                         key={saleOrder.id}
                         tipo='venda'
                         ordem={saleOrder}
-                        expanded={expandedBySection.venda === `venda-${saleOrder.id}`}
+                        expanded={
+                          expandedBySection.venda === `venda-${saleOrder.id}`
+                        }
                         onToggle={() => toggleExpanded('venda', saleOrder.id)}
                         onEdit={() => setEditingVenda(saleOrder)}
                         onViewDetails={() => setViewingVenda(saleOrder)}
@@ -547,20 +568,17 @@ export default function OrdensPage() {
         <Tabs
           value={activeTab}
           onValueChange={(value) => setActiveTab(value as SectionType)}
-          className='w-full gap-0'
-        >
-          <TabsList className='h-auto w-full justify-start rounded-none border-b border-border bg-transparent p-0'>
+          className='w-full gap-0 p-0'>
+          <TabsList className='h-11 w-full gap-2! bg-transparent! flex p-0'>
             <TabsTrigger
               value='servico'
-              className='gap-2 rounded-none border-b-2 border-transparent px-4 py-2.5 text-muted-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none'
-            >
+              className='  flex  bg-muted  text-muted-foreground data-[state=active]:border-primary/70! data-[state=active]:bg-muted!'>
               <Wrench className='h-4 w-4' />
               Serviço
             </TabsTrigger>
             <TabsTrigger
               value='venda'
-              className='gap-2 rounded-none border-b-2 border-transparent px-4 py-2.5 text-muted-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none'
-            >
+              className='  flex bg-muted  text-muted-foreground data-[state=active]:border-primary/70! data-[state=active]:bg-muted!'>
               <ShoppingCart className='h-4 w-4' />
               Venda
             </TabsTrigger>
@@ -643,7 +661,10 @@ export default function OrdensPage() {
         setIsOpen={(open) => !open && setEditingVenda(null)}
         onSubmit={async (data) => {
           if (editingVenda) {
-            await handleUpdateOrdemVenda(editingVenda.id, data as NovaOrdemVenda);
+            await handleUpdateOrdemVenda(
+              editingVenda.id,
+              data as NovaOrdemVenda
+            );
           }
         }}
         isLoading={isLoading}
