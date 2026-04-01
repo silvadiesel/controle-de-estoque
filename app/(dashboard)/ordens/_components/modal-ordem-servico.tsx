@@ -21,7 +21,7 @@ import { useUser } from '@/hooks/useUser';
 import { Wrench } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { OrdemDialogShell } from './ordem-dialog-shell';
+import { DialogShell } from '@/components/ui/dialog-shell';
 import {
   OrdemItemsBuilder,
   type OrdemItemBuilderValue
@@ -191,9 +191,10 @@ export function ModalOrdemServico({
   };
 
   return (
-    <OrdemDialogShell
+    <DialogShell
       open={isOpen}
       onOpenChange={setIsOpen}
+      contentClassName='max-w-[720px] sm:max-w-[720px]'
       icon={Wrench}
       title={isEdit ? 'Editar ordem de serviço' : 'Nova ordem de serviço'}
       description={
@@ -388,6 +389,6 @@ export function ModalOrdemServico({
         pecas={pecas}
         onChange={(items) => setFormData((current) => ({ ...current, pecas: items }))}
       />
-    </OrdemDialogShell>
+    </DialogShell>
   );
 }

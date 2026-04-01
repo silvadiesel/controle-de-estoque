@@ -6,12 +6,9 @@ import { clienteSchema } from '@/app/utils/validators';
 import type { Cliente } from '@/db/schema';
 
 import { toast } from 'sonner';
-import { ZodError } from 'zod';
+import { type z, ZodError } from 'zod';
 
-export type ClienteFormValues = Pick<
-  Cliente,
-  'name_cliente' | 'nome_empresa' | 'cpf' | 'cnpj' | 'telefone'
->;
+export type ClienteFormValues = z.infer<typeof clienteSchema>;
 
 export interface UseClientesReturn {
   clientes: Cliente[];

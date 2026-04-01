@@ -6,9 +6,9 @@ import { veiculoSchema } from '@/app/utils/validators';
 import type { Veiculo } from '@/db/schema';
 
 import { toast } from 'sonner';
-import { ZodError } from 'zod';
+import { type z, ZodError } from 'zod';
 
-export type VeiculoFormValues = Pick<Veiculo, 'placa' | 'modelo'>;
+export type VeiculoFormValues = z.infer<typeof veiculoSchema>;
 
 export interface UseVeiculosReturn {
   veiculosByCliente: Map<number, Veiculo[]>;

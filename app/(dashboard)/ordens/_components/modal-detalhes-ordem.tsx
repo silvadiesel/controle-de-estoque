@@ -25,7 +25,7 @@ import {
   XCircle
 } from 'lucide-react';
 
-import { OrdemDialogShell } from './ordem-dialog-shell';
+import { DialogShell } from '@/components/ui/dialog-shell';
 import { OrdemStatusBadge } from './ordem-status-badge';
 
 interface ModalDetalhesOrdemProps {
@@ -87,9 +87,10 @@ export function ModalDetalhesOrdem({
 
   if (!ordem) {
     return (
-      <OrdemDialogShell
+      <DialogShell
         open={isOpen}
         onOpenChange={setIsOpen}
+        contentClassName='max-w-[720px] sm:max-w-[720px]'
         icon={ClipboardList}
         title='Carregando ordem'
         description='Buscando os detalhes da ordem selecionada.'
@@ -104,14 +105,15 @@ export function ModalDetalhesOrdem({
           <Skeleton className='h-48 w-full rounded-xl' />
           <Skeleton className='h-28 w-full rounded-xl' />
         </div>
-      </OrdemDialogShell>
+      </DialogShell>
     );
   }
 
   return (
-    <OrdemDialogShell
+    <DialogShell
       open={isOpen}
       onOpenChange={setIsOpen}
+      contentClassName='max-w-[720px] sm:max-w-[720px]'
       icon={orderIcon}
       title={`${isServico ? 'Ordem de serviço' : 'Ordem de venda'} #${ordem.id}`}
       description={`Criada em ${formatDate(ordem.data_criacao)}`}
@@ -271,6 +273,6 @@ export function ModalDetalhesOrdem({
           </TableBody>
         </Table>
       </div>
-    </OrdemDialogShell>
+    </DialogShell>
   );
 }
