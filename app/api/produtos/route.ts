@@ -5,13 +5,25 @@ import { logAction } from '@/lib/log-action';
 
 import { asc, eq } from 'drizzle-orm';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const peca = await db
-      .select()
-      .from(schema.pecas)
-      .orderBy(asc(schema.pecas.id));
-    return NextResponse.json(peca);
+    const { searchParams } = new URL(request.url);
+    const fornecedorIdParam = searchParams.get('fornecedor_id');
+
+    let pecas;
+    if (fornecedorIdParam) {
+      pecas = await db
+        .select()
+        .from(schema.pecas)
+        .where(eq(schema.pecas.fornecedor_id, Number(fornecedorIdParam)))
+        .orderBy(asc(schema.pecas.id));
+    } else {
+      pecas = await db
+        .select()
+        .from(schema.pecas)
+        .orderBy(asc(schema.pecas.id));
+    }
+    return NextResponse.json(pecas);
   } catch (error) {
     console.error('Erro ao buscar peças:', error);
     return NextResponse.json(
