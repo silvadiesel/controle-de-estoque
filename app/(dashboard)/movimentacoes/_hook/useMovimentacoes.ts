@@ -88,7 +88,7 @@ export interface UseMovimentacoesReturn {
   goToPreviousPage: () => void;
 }
 
-const ITENS_POR_PAGINA = 8;
+const ITENS_POR_PAGINA = 10;
 const AUTOR_DESCONHECIDO = 'Usuário removido';
 
 const AVATAR_COLORS = [

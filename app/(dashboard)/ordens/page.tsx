@@ -161,11 +161,11 @@ export default function OrdensPage() {
 
   const servicePagination = usePagination({
     items: filteredServiceOrders,
-    itemsPerPage: 8
+    itemsPerPage: 10
   });
   const salePagination = usePagination({
     items: filteredSaleOrders,
-    itemsPerPage: 8
+    itemsPerPage: 10
   });
 
   const isInitialLoading =

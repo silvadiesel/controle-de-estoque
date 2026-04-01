@@ -2,14 +2,19 @@
 
 import { AlertTriangle, Bell, CheckCircle, ShieldAlert } from 'lucide-react';
 
+import { PaginationControls } from '@/components/pagination-controls';
 import { Card, CardContent } from '@/components/ui/card';
 import { StatCard } from '@/components/ui/stat-card';
+import { usePagination } from '@/hooks/usePagination';
 
 import { AlertaGrid } from './_components/alerta-grid';
 import { useAlerta } from './_hooks/useAlerta';
 
 export default function Alertas() {
   const { pecasCriticas, pecasAtencao, pecasEmAlerta, isLoading } = useAlerta();
+
+  const criticasPagination = usePagination({ items: pecasCriticas, itemsPerPage: 10 });
+  const atencaoPagination = usePagination({ items: pecasAtencao, itemsPerPage: 10 });
 
   if (isLoading) {
     return (
@@ -87,7 +92,23 @@ export default function Alertas() {
                     {pecasCriticas.length === 1 ? 'peça' : 'peças'}
                   </span>
                 </div>
-                <AlertaGrid pecas={pecasCriticas} tipo='critica' />
+                <AlertaGrid pecas={criticasPagination.paginatedItems} tipo='critica' />
+                <div className='px-3 pb-3'>
+                  <PaginationControls
+                    currentPage={criticasPagination.currentPage}
+                    totalPages={criticasPagination.totalPages}
+                    totalItems={criticasPagination.totalItems}
+                    startItem={criticasPagination.startItem}
+                    endItem={criticasPagination.endItem}
+                    pageItems={criticasPagination.pageItems}
+                    isFirstPage={criticasPagination.isFirstPage}
+                    isLastPage={criticasPagination.isLastPage}
+                    onPageChange={criticasPagination.goToPage}
+                    onNextPage={criticasPagination.goToNextPage}
+                    onPreviousPage={criticasPagination.goToPreviousPage}
+                    itemLabel='peças'
+                  />
+                </div>
               </>
             )}
 
@@ -106,7 +127,23 @@ export default function Alertas() {
                     {pecasAtencao.length === 1 ? 'peça' : 'peças'}
                   </span>
                 </div>
-                <AlertaGrid pecas={pecasAtencao} tipo='atencao' />
+                <AlertaGrid pecas={atencaoPagination.paginatedItems} tipo='atencao' />
+                <div className='px-3 pb-3'>
+                  <PaginationControls
+                    currentPage={atencaoPagination.currentPage}
+                    totalPages={atencaoPagination.totalPages}
+                    totalItems={atencaoPagination.totalItems}
+                    startItem={atencaoPagination.startItem}
+                    endItem={atencaoPagination.endItem}
+                    pageItems={atencaoPagination.pageItems}
+                    isFirstPage={atencaoPagination.isFirstPage}
+                    isLastPage={atencaoPagination.isLastPage}
+                    onPageChange={atencaoPagination.goToPage}
+                    onNextPage={atencaoPagination.goToNextPage}
+                    onPreviousPage={atencaoPagination.goToPreviousPage}
+                    itemLabel='peças'
+                  />
+                </div>
               </>
             )}
           </CardContent>

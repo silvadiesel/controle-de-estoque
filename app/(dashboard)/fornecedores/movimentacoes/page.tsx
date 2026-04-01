@@ -3,6 +3,7 @@
 import type React from 'react';
 import { useState } from 'react';
 
+import { PaginationControls } from '@/components/pagination-controls';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -30,6 +31,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
+import { usePagination } from '@/hooks/usePagination';
 import { useStockStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
 
@@ -61,6 +63,21 @@ export default function Movimentacoes() {
     const matchesType = typeFilter === 'all' || movement.type === typeFilter;
     return matchesSearch && matchesType;
   });
+
+  const {
+    paginatedItems: paginatedMovements,
+    currentPage,
+    totalPages,
+    totalItems,
+    startItem,
+    endItem,
+    pageItems,
+    isFirstPage,
+    isLastPage,
+    goToPage,
+    goToNextPage,
+    goToPreviousPage
+  } = usePagination({ items: filteredMovements, itemsPerPage: 10 });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -337,7 +354,7 @@ export default function Movimentacoes() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredMovements.map((movement) => (
+                  paginatedMovements.map((movement) => (
                     <TableRow
                       key={movement.id}
                       className='border-border hover:bg-secondary/50'>
@@ -389,6 +406,21 @@ export default function Movimentacoes() {
           </div>
         </CardContent>
       </Card>
+
+      <PaginationControls
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        startItem={startItem}
+        endItem={endItem}
+        pageItems={pageItems}
+        isFirstPage={isFirstPage}
+        isLastPage={isLastPage}
+        onPageChange={goToPage}
+        onNextPage={goToNextPage}
+        onPreviousPage={goToPreviousPage}
+        itemLabel='movimentações'
+      />
     </div>
   );
 }
