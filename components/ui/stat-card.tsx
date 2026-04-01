@@ -22,11 +22,11 @@ export function StatCard({
     <div className='rounded-xl border border-border bg-card p-5'>
       <div className='mb-4 flex items-start justify-between gap-3'>
         <div className='min-w-0'>
-          <p className='text-label text-muted-foreground'>{label}</p>
+          <p className='text-xs font-semibold tracking-wider uppercase text-muted-foreground'>{label}</p>
           {isLoading ? (
             <Skeleton className='mt-3 h-8 w-20' />
           ) : (
-            <p className='mt-3 text-data text-foreground'>{value}</p>
+            <p className='mt-3 text-3xl font-bold leading-none tabular-nums text-foreground'>{value}</p>
           )}
         </div>
         <div className='flex size-9 rounded-md items-center justify-center border border-border bg-elevated text-primary'>

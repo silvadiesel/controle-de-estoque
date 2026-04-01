@@ -3,10 +3,7 @@
 import { useMemo } from 'react';
 
 import { Button } from '@/components/ui/button';
-import {
-  Collapsible,
-  CollapsibleContent
-} from '@/components/ui/collapsible';
+import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,8 +13,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
   Tooltip,
-  TooltipTrigger,
-  TooltipContent
+  TooltipContent,
+  TooltipTrigger
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
@@ -164,9 +161,9 @@ export function OrdemCard(props: OrdemCardProps) {
                   </p>
                 </div>
 
-                <div className='flex shrink-0 items-center gap-3'>
+                <div className='flex shrink-0   items-baseline-last gap-5'>
                   <OrdemStatusBadge status={ordem.status} />
-                  <div className='text-right'>
+                  <div className='text-left'>
                     <p className='text-[10px] uppercase tracking-[0.08em] text-muted-foreground'>
                       Total
                     </p>
@@ -310,7 +307,7 @@ export function OrdemCard(props: OrdemCardProps) {
         </div>
 
         {/* Expanded content */}
-        <CollapsibleContent className='overflow-hidden border-t border-border bg-background/50 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-1 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-1 data-[state=open]:duration-200'>
+        <CollapsibleContent className='border-t border-border bg-background/50'>
           <div className='flex flex-col gap-4 px-5 py-4'>
             {/* Info blocks */}
             <div className='grid gap-3 md:grid-cols-2 xl:grid-cols-4'>

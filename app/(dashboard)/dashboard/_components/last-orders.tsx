@@ -82,7 +82,7 @@ interface LastOrdersProps {
 
 type Tab = 'servico' | 'venda';
 
-const HEADER_CELL = 'text-label py-2' as const;
+const HEADER_CELL = 'text-xs font-semibold tracking-wider uppercase py-2' as const;
 const COL_CLIENTE = 'flex-[2]' as const;
 const COL_CONTEXT = 'hidden sm:block flex-[1.5]' as const;
 const COL_DATA = 'hidden sm:block flex-1' as const;
@@ -108,12 +108,12 @@ export function LastOrders({
       {/* Header */}
       <div className='flex items-start justify-between mb-4'>
         <div>
-          <h2 className='text-heading text-foreground'>Últimas Ordens</h2>
-          <p className='text-muted-sm mt-0.5'>5 mais recentes</p>
+          <h2 className='text-lg font-semibold leading-tight text-foreground'>Últimas Ordens</h2>
+          <p className='text-xs text-muted-foreground mt-0.5'>5 mais recentes</p>
         </div>
         <Link
           href='/ordens'
-          className='text-body text-primary hover:underline flex items-center gap-1'>
+          className='text-sm text-primary hover:underline flex items-center gap-1'>
           Ver todas
           <ArrowRight size={12} />
         </Link>
@@ -126,7 +126,7 @@ export function LastOrders({
           role='tab'
           aria-selected={tab === 'servico'}
           onClick={() => setTab('servico')}
-          className={`px-4 py-2 text-body font-medium transition-colors -mb-px border-b-2 ${
+          className={`px-4 py-2 text-sm font-medium transition-colors -mb-px border-b-2 outline-none focus-visible:border-border-hover focus-visible:text-foreground ${
             tab === 'servico'
               ? 'text-primary border-primary'
               : 'text-muted-foreground border-transparent hover:text-primary'
@@ -138,7 +138,7 @@ export function LastOrders({
           role='tab'
           aria-selected={tab === 'venda'}
           onClick={() => setTab('venda')}
-          className={`px-4 py-2 text-body font-medium transition-colors -mb-px border-b-2 ${
+          className={`px-4 py-2 text-sm font-medium transition-colors -mb-px border-b-2 outline-none focus-visible:border-border-hover focus-visible:text-foreground ${
             tab === 'venda'
               ? 'text-primary border-primary'
               : 'text-muted-foreground border-transparent hover:text-primary'
@@ -181,7 +181,7 @@ export function LastOrders({
         </Empty>
       ) : tab === 'servico' ? (
         servicoItems.length === 0 ? (
-          <p className='text-muted-sm py-8 text-center'>
+          <p className='text-xs text-muted-foreground py-8 text-center'>
             Nenhuma ordem de serviço encontrada
           </p>
         ) : (
@@ -193,16 +193,16 @@ export function LastOrders({
                 aria-label={`Ver ordem de serviço #${ordem.id}`}
                 className='flex items-center gap-3 px-2 py-2.5 rounded-lg hover:bg-accent transition-colors group'>
                 <span
-                  className={`${COL_CLIENTE} text-body text-foreground truncate`}>
+                  className={`${COL_CLIENTE} text-sm text-foreground truncate`}>
                   {getClientName(ordem.cliente)}
                 </span>
                 <span
-                  className={`${COL_CONTEXT} text-body text-muted-foreground truncate`}>
+                  className={`${COL_CONTEXT} text-sm text-muted-foreground truncate`}>
                   {ordem.veiculo
                     ? `${ordem.veiculo.modelo} · ${ordem.veiculo.placa}`
                     : '—'}
                 </span>
-                <span className={`${COL_DATA} text-body text-muted-foreground`}>
+                <span className={`${COL_DATA} text-sm text-muted-foreground`}>
                   {formatDate(ordem.data_criacao)}
                 </span>
                 <span className={COL_STATUS}>
@@ -222,7 +222,7 @@ export function LastOrders({
           </div>
         )
       ) : vendaItems.length === 0 ? (
-        <p className='text-muted-sm py-8 text-center'>
+        <p className='text-xs text-muted-foreground py-8 text-center'>
           Nenhuma ordem de venda encontrada
         </p>
       ) : (
@@ -234,17 +234,17 @@ export function LastOrders({
               aria-label={`Ver ordem de venda #${ordem.id}`}
               className='flex items-center gap-3 px-2 py-2.5 rounded-lg hover:bg-accent transition-colors group'>
               <span
-                className={`${COL_CLIENTE} text-body text-foreground truncate`}>
+                className={`${COL_CLIENTE} text-sm text-foreground truncate`}>
                 {getClientName(ordem.cliente)}
               </span>
               <span
-                className={`${COL_CONTEXT} text-body text-muted-foreground truncate`}>
+                className={`${COL_CONTEXT} text-sm text-muted-foreground truncate`}>
                 {ordem.metodo_pagamento
                   ? (PAGAMENTO_LABELS[ordem.metodo_pagamento] ??
                     ordem.metodo_pagamento)
                   : '—'}
               </span>
-              <span className={`${COL_DATA} text-body text-muted-foreground`}>
+              <span className={`${COL_DATA} text-sm text-muted-foreground`}>
                 {formatDate(ordem.data_criacao)}
               </span>
               <span className={COL_STATUS}>

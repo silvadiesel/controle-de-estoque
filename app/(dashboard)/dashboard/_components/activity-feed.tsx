@@ -101,8 +101,8 @@ export function ActivityFeed({
     <div className='flex-1 bg-card border border-border rounded-xl p-5'>
       <div className='mb-4 flex items-start justify-between gap-3'>
         <div>
-          <h2 className='text-heading text-foreground'>Atividade Recente</h2>
-          <p className='text-muted-sm mt-0.5'>Últimas ações no sistema</p>
+          <h2 className='text-lg font-semibold leading-tight text-foreground'>Atividade Recente</h2>
+          <p className='text-xs text-muted-foreground mt-0.5'>Últimas ações no sistema</p>
         </div>
         <div className='size-8 rounded-md flex items-center justify-center border border-border bg-elevated text-primary'>
           <Activity size={16} aria-hidden='true' />
@@ -126,7 +126,7 @@ export function ActivityFeed({
         </div>
       ) : items.length === 0 ? (
         <div className='flex items-center justify-center h-32'>
-          <p className='text-muted-sm'>Nenhuma atividade recente</p>
+          <p className='text-xs text-muted-foreground'>Nenhuma atividade recente</p>
         </div>
       ) : (
         <div className='relative'>
@@ -151,7 +151,7 @@ export function ActivityFeed({
 
                 {/* Texto */}
                 <div className='min-w-0 flex-1'>
-                  <p className='text-body leading-snug text-foreground'>
+                  <p className='text-sm leading-snug text-foreground'>
                     <span className='text-foreground'>{item.autor}</span>{' '}
                     <span className='text-muted-foreground'>
                       {ACAO_LABELS[item.tipo_acao] ?? item.tipo_acao}

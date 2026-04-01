@@ -11,7 +11,7 @@ const statusConfig = {
   ativa: {
     label: 'Ativa',
     icon: Clock3,
-    className: 'border-border bg-muted text-muted-foreground'
+    className: 'border-primary/20 bg-primary/10 text-primary'
   },
   fechada: {
     label: 'Fechada',
@@ -40,7 +40,7 @@ export function OrdemStatusBadge({ status, className }: OrdemStatusBadgeProps) {
     <Badge
       variant='outline'
       className={cn(
-        'gap-1.5 px-2.5 py-1 text-[10px] rounded-sm uppercase tracking-[0.08em]',
+        'gap-1.5 px-2.5 py-1 text-[10px]  rounded-sm uppercase tracking-[0.08em]',
         toneClassName,
         className
       )}>
