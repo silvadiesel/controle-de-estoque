@@ -1,84 +1,23 @@
-import type { ChangeEvent, FormEvent } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 
-import { pecaSchema } from '@/app/utils/validators';
+import type { PecaFormValues } from '@/app/utils/validators';
 import type { Categorias, Fornecedor, Peca } from '@/db/schema';
+import type { SearchableSelectOption } from '@/components/ui/searchable-select';
 
 import { toast } from 'sonner';
-import { ZodError } from 'zod';
 
-interface ComboItem {
-  id: number;
-  label: string;
-}
-
-export interface UsePecasReturn {
-  pecas: Peca[];
-  isLoading: boolean;
-  search: string;
-  setSearch: (search: string) => void;
-  filteredPecas: Peca[];
-  filteredProducts: Peca[];
-  isAddOpen: boolean;
-  setIsAddOpen: (isOpen: boolean) => void;
-  editingPeca: Peca | null;
-  setEditingPeca: (peca: Peca | null) => void;
-  newPeca: Partial<Peca>;
-  setNewPeca: (data: Partial<Peca>) => void;
-  handleAddPeca: () => Promise<void>;
-  handleUpdatePeca: () => Promise<void>;
-  handleDeletePeca: (id: number) => Promise<void>;
-  handleSubmit: (e: FormEvent) => Promise<void>;
-  handleEdit: (peca: Peca) => void;
-  deleteId: number | null;
-  setDeleteId: (id: number | null) => void;
-  isDeleteOpen: boolean;
-  setIsDeleteOpen: (isOpen: boolean) => void;
-  categories: Categorias[];
-  fornecedores: Fornecedor[];
-  categoryFilter: string;
-  setCategoryFilter: (filter: string) => void;
-  fornecedorFilter: string;
-  setFornecedorFilter: (filter: string) => void;
-  getCategoryName: (categoriaId?: number | null) => string;
-  getFornecedorName: (fornecedorId?: number | null) => string;
-  formatPrice: (price: number) => string;
-  formatLocalizacao: (localizacao: string[] | null | undefined) => string;
-  handleOpenChange: (open: boolean) => void;
-  handleImageChange: (e: ChangeEvent<HTMLInputElement>) => void;
-  handleRemoveImage: () => void;
-  categoryItems: ComboItem[];
-  fornecedorItems: ComboItem[];
-  precoInput: string;
-  handlePrecoChange: (e: ChangeEvent<HTMLInputElement>) => void;
-}
-
-const pecaVazia: Partial<Peca> = {
-  name_peca: '',
-  codigo: '',
-  categoria_id: undefined,
-  quantidade: 0,
-  preco: 0,
-  fornecedor_id: null,
-  localizacao: null,
-  imagem: null,
-  alerta: undefined
-};
-
-export function usePecas(): UsePecasReturn {
+export function usePecas() {
   const [pecas, setPecas] = useState<Peca[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingPeca, setEditingPeca] = useState<Peca | null>(null);
-  const [newPeca, setNewPeca] = useState<Partial<Peca>>(pecaVazia);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [categories, setCategories] = useState<Categorias[]>([]);
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [fornecedorFilter, setFornecedorFilter] = useState<string>('all');
-  const [precoInput, setPrecoInput] = useState('');
 
   // GET: Listar
   const fetchPecas = useCallback(async () => {
@@ -123,17 +62,18 @@ export function usePecas(): UsePecasReturn {
       .catch(console.error);
   }, []);
 
-  const categoryItems = categories.map((cat) => ({
-    id: cat.id,
+  // Options para SearchableSelect
+  const categoryOptions: SearchableSelectOption[] = categories.map((cat) => ({
+    value: String(cat.id),
     label: cat.name
   }));
 
-  const fornecedorItems = fornecedores.map((f) => ({
-    id: f.id,
+  const supplierOptions: SearchableSelectOption[] = fornecedores.map((f) => ({
+    value: String(f.id),
     label: f.name_empresa
   }));
 
-  // Filtered pecas
+  // Filtros
   const filteredPecas = pecas.filter(
     (peca) =>
       peca.name_peca.toLowerCase().includes(search.toLowerCase()) ||
@@ -150,33 +90,19 @@ export function usePecas(): UsePecasReturn {
     return matchesCategory && matchesFornecedor;
   });
 
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-
-      reader.onloadend = () => {
-        setNewPeca((prev) => ({
-          ...prev,
-          imagem: reader.result as string
-        }));
-      };
-
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleRemoveImage = () => {
-    setNewPeca((prev) => ({ ...prev, imagem: null }));
-  };
-
   // POST: Criar
-  const createPeca = async (data: Partial<Peca>) => {
+  const createPeca = async (
+    data: PecaFormValues,
+    image: string | null
+  ) => {
+    const localizacao =
+      data.estante || data.prateleira
+        ? [data.estante || '', data.prateleira || '']
+        : null;
+
     const res = await fetch('/api/produtos', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name_peca: data.name_peca,
         codigo: data.codigo,
@@ -184,11 +110,12 @@ export function usePecas(): UsePecasReturn {
         quantidade: data.quantidade,
         preco: data.preco,
         fornecedor_id: data.fornecedor_id,
-        localizacao: data.localizacao,
-        imagem: data.imagem,
+        localizacao,
+        imagem: image,
         alerta: data.alerta ?? 1
       })
     });
+
     if (res.status === 409) {
       const body = await res.json();
       throw new Error(body.error);
@@ -198,12 +125,19 @@ export function usePecas(): UsePecasReturn {
   };
 
   // PUT: Editar
-  const updatePeca = async (id: number, data: Partial<Peca>) => {
+  const updatePeca = async (
+    id: number,
+    data: PecaFormValues,
+    image: string | null
+  ) => {
+    const localizacao =
+      data.estante || data.prateleira
+        ? [data.estante || '', data.prateleira || '']
+        : null;
+
     const res = await fetch(`/api/produtos/${id}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name_peca: data.name_peca,
         codigo: data.codigo,
@@ -211,11 +145,12 @@ export function usePecas(): UsePecasReturn {
         quantidade: data.quantidade,
         preco: data.preco,
         fornecedor_id: data.fornecedor_id,
-        localizacao: data.localizacao,
-        imagem: data.imagem,
+        localizacao,
+        imagem: image,
         alerta: data.alerta ?? 1
       })
     });
+
     if (res.ok) await fetchPecas();
     else throw new Error('Erro ao atualizar peça');
   };
@@ -232,69 +167,48 @@ export function usePecas(): UsePecasReturn {
   };
 
   // Handlers
-  const handleAddPeca = async () => {
+  const handleSubmit = async (
+    data: PecaFormValues,
+    image: string | null
+  ): Promise<boolean> => {
     setIsLoading(true);
     try {
-      pecaSchema.parse(newPeca);
-
-      const codigoNovo = newPeca.codigo?.trim().toUpperCase();
+      const codigoNovo = data.codigo.trim().toUpperCase();
       const duplicado = pecas.some(
-        (p) => p.codigo.trim().toUpperCase() === codigoNovo
+        (p) =>
+          p.id !== editingPeca?.id &&
+          p.codigo.trim().toUpperCase() === codigoNovo
       );
       if (duplicado) {
-        toast.error(`Já existe uma peça cadastrada com o código '${newPeca.codigo}'`);
-        return;
+        toast.error(
+          `Já existe uma peça cadastrada com o código '${data.codigo}'`
+        );
+        return false;
       }
 
-      await createPeca(newPeca);
-      setNewPeca(pecaVazia);
-      setIsAddOpen(false);
-      toast.success('Peça adicionada com sucesso!');
-    } catch (error) {
-      if (error instanceof ZodError) {
-        toast.error(error.issues[0].message);
-      } else if (error instanceof Error) {
-        toast.error(error.message);
+      if (editingPeca) {
+        await updatePeca(editingPeca.id, data, image);
+        toast.success('Peça atualizada com sucesso!');
       } else {
-        toast.error('Erro ao adicionar peça');
+        await createPeca(data, image);
+        toast.success('Peça adicionada com sucesso!');
       }
+
+      setEditingPeca(null);
+      return true;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Erro ao salvar peça';
+      toast.error(message);
+      return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleUpdatePeca = async () => {
-    if (!editingPeca) return;
-
-    setIsLoading(true);
-    try {
-      pecaSchema.parse(newPeca);
-
-      const codigoEditado = newPeca.codigo?.trim().toUpperCase();
-      const duplicado = pecas.some(
-        (p) => p.id !== editingPeca.id && p.codigo.trim().toUpperCase() === codigoEditado
-      );
-      if (duplicado) {
-        toast.error(`Já existe outra peça cadastrada com o código '${newPeca.codigo}'`);
-        return;
-      }
-
-      await updatePeca(editingPeca.id, newPeca);
-      setEditingPeca(null);
-      setIsAddOpen(false);
-      toast.success('Peça atualizada com sucesso!');
-    } catch (error) {
-      console.error('Erro ao atualizar:', error);
-      if (error instanceof ZodError) {
-        toast.error(error.issues[0].message);
-      } else if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error('Erro ao atualizar peça');
-      }
-    } finally {
-      setIsLoading(false);
-    }
+  const handleEdit = (peca: Peca) => {
+    setEditingPeca(peca);
+    setIsAddOpen(true);
   };
 
   const handleDeletePeca = async (id: number) => {
@@ -305,36 +219,12 @@ export function usePecas(): UsePecasReturn {
       setDeleteId(null);
       toast.success('Peça deletada com sucesso!');
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Erro ao deletar peça';
+      const message =
+        error instanceof Error ? error.message : 'Erro ao deletar peça';
       toast.error(message);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (editingPeca) {
-      await handleUpdatePeca();
-    } else {
-      await handleAddPeca();
-    }
-  };
-
-  const handleEdit = (peca: Peca) => {
-    setEditingPeca(peca);
-    setNewPeca({
-      name_peca: peca.name_peca,
-      codigo: peca.codigo,
-      categoria_id: peca.categoria_id,
-      quantidade: peca.quantidade,
-      preco: peca.preco,
-      fornecedor_id: peca.fornecedor_id,
-      localizacao: peca.localizacao,
-      imagem: peca.imagem || null,
-      alerta: peca.alerta ?? 1
-    });
-    setIsAddOpen(true);
   };
 
   const getCategoryName = (categoriaId?: number | null) => {
@@ -356,78 +246,31 @@ export function usePecas(): UsePecasReturn {
     }).format(price / 100);
   };
 
-  const formatLocalizacao = (localizacao: string[] | null | undefined) => {
-    if (!localizacao || !Array.isArray(localizacao) || localizacao.length < 2) {
-      return '-';
-    }
-    return `E${localizacao[0]} P${localizacao[1]}`;
-  };
-
-  const handleOpenChange = useCallback((open: boolean) => {
-    setIsAddOpen(open);
-    if (!open) {
-      setEditingPeca(null);
-      setNewPeca(pecaVazia);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isAddOpen) {
-      const initialValue = newPeca.preco
-        ? (newPeca.preco / 100).toString().replace('.', ',')
-        : '';
-      setPrecoInput(initialValue);
-    } else {
-      setPrecoInput('');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAddOpen, editingPeca?.id]);
-
-  const handlePrecoChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const input = e.target.value;
-    const sanitized = input.replace(/[^\d.,]/g, '');
-    const parts = sanitized.split(/[.,]/);
-    const formatted =
-      parts.length > 2
-        ? parts[0] + ',' + parts.slice(1).join('')
-        : sanitized.replace('.', ',');
-
-    setPrecoInput(formatted);
-
-    const normalized = formatted.replace(',', '.');
-    const num = parseFloat(normalized);
-
-    if (!isNaN(num)) {
-      setNewPeca({ ...newPeca, preco: Math.round(num * 100) });
-    } else if (formatted === '') {
-      setNewPeca({ ...newPeca, preco: undefined });
-    }
-  };
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      setIsAddOpen(open);
+      if (!open) {
+        setEditingPeca(null);
+      }
+    },
+    []
+  );
 
   return {
     pecas,
     isLoading,
     search,
     setSearch,
-    filteredPecas,
     filteredProducts,
     isAddOpen,
-    setIsAddOpen,
     editingPeca,
-    setEditingPeca,
-    newPeca,
-    setNewPeca,
-    handleAddPeca,
-    handleUpdatePeca,
-    handleDeletePeca,
     handleSubmit,
     handleEdit,
+    handleDeletePeca,
     deleteId,
     setDeleteId,
     isDeleteOpen,
     setIsDeleteOpen,
-    categories,
-    fornecedores,
     categoryFilter,
     setCategoryFilter,
     fornecedorFilter,
@@ -435,13 +278,8 @@ export function usePecas(): UsePecasReturn {
     getCategoryName,
     getFornecedorName,
     formatPrice,
-    formatLocalizacao,
     handleOpenChange,
-    handleImageChange,
-    handleRemoveImage,
-    categoryItems,
-    fornecedorItems,
-    precoInput,
-    handlePrecoChange
+    categoryOptions,
+    supplierOptions
   };
 }
