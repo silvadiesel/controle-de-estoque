@@ -13,9 +13,8 @@ Convenções e decisões de arquitetura do projeto. Leia antes de qualquer taref
 
 ## Tipografia
 
-- **Preferir classes Tailwind nativas**: `text-xs`, `text-sm`, `text-base`, `text-lg`, `text-xl`, `text-2xl`
-- **Nunca criar novas utilities tipográficas** em `globals.css` — usar Tailwind nativo
-- As utilities existentes (`.text-label`, `.text-heading`, `.text-body`, `.text-muted-sm`) podem permanecer onde já estão em uso, mas não devem ser expandidas nem aplicadas em novos componentes
+- **Apenas classes Tailwind nativas**: `text-xs`, `text-sm`, `text-base`, `text-lg`, `text-xl`, `text-2xl`, `text-3xl`
+- **Nunca criar classes CSS customizadas** em `globals.css` — usar Tailwind nativo
 - Para `text-[10px]` (badges pequenos, timestamps): manter como `text-[10px]` — não há equivalente nativo
 - Referência de mapeamento:
   - `text-[12px]` → `text-xs`

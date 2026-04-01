@@ -109,8 +109,8 @@ export function MovementsChart({
     <div className='flex-[1.5] bg-card border border-border rounded-xl p-5'>
       <div className='flex items-center justify-between mb-4'>
         <div>
-          <h2 className='text-heading text-foreground'>Movimentações</h2>
-          <p className='text-muted-sm mt-0.5'>Últimos 7 dias</p>
+          <h2 className='text-lg font-semibold leading-tight text-foreground'>Movimentações</h2>
+          <p className='text-xs text-muted-foreground mt-0.5'>Últimos 7 dias</p>
         </div>
         <div className='size-8 rounded-md flex items-center justify-center border border-border bg-elevated text-primary'>
           <ChartColumnIncreasing size={16} aria-hidden='true' />
@@ -130,7 +130,7 @@ export function MovementsChart({
         <Skeleton className={`${CHART_HEIGHT} w-full rounded-md`} />
       ) : data.every((d) => d.count === 0) ? (
         <div className={`flex items-center justify-center ${CHART_HEIGHT}`}>
-          <p className='text-muted-sm'>
+          <p className='text-xs text-muted-foreground'>
             Nenhuma movimentação nos últimos 7 dias
           </p>
         </div>
