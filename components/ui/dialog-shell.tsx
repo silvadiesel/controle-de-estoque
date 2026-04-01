@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 
 import { type LucideIcon } from 'lucide-react';
 
-interface OrdemDialogShellProps {
+interface DialogShellProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   icon: LucideIcon;
@@ -27,7 +27,7 @@ interface OrdemDialogShellProps {
   bodyClassName?: string;
 }
 
-export function OrdemDialogShell({
+export function DialogShell({
   open,
   onOpenChange,
   icon: Icon,
@@ -38,13 +38,13 @@ export function OrdemDialogShell({
   trigger,
   contentClassName,
   bodyClassName
-}: OrdemDialogShellProps) {
+}: DialogShellProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
       <DialogContent
         className={cn(
-          'max-w-[720px] gap-0 overflow-hidden rounded-xl border-border bg-card p-0 sm:max-w-[720px]',
+          'max-w-[560px] gap-0 overflow-hidden rounded-xl border-border bg-card p-0 sm:max-w-[560px]',
           'data-[state=open]:duration-300 data-[state=closed]:duration-200',
           contentClassName
         )}

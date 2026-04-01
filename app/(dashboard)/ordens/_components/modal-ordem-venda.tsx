@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { OrdemDialogShell } from './ordem-dialog-shell';
+import { DialogShell } from '@/components/ui/dialog-shell';
 import {
   OrdemItemsBuilder,
   type OrdemItemBuilderValue
@@ -160,9 +160,10 @@ export function ModalOrdemVenda({
   };
 
   return (
-    <OrdemDialogShell
+    <DialogShell
       open={isOpen}
       onOpenChange={setIsOpen}
+      contentClassName='max-w-[720px] sm:max-w-[720px]'
       icon={ShoppingCart}
       title={isEdit ? 'Editar ordem de venda' : 'Nova ordem de venda'}
       description={
@@ -321,6 +322,6 @@ export function ModalOrdemVenda({
         pecas={pecas}
         onChange={(items) => setFormData((current) => ({ ...current, pecas: items }))}
       />
-    </OrdemDialogShell>
+    </DialogShell>
   );
 }

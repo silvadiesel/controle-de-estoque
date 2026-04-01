@@ -1,21 +1,13 @@
 'use client';
 
-import {
-  useDeferredValue,
-  useEffect,
-  useMemo,
-  useState
-} from 'react';
+import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 
 import { ModalDelete } from '@/components/modal-delete';
 import { PaginationControls } from '@/components/pagination-controls';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Collapsible,
-  CollapsibleContent
-} from '@/components/ui/collapsible';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import {
   Empty,
   EmptyDescription,
@@ -26,17 +18,17 @@ import {
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { StatCard } from '@/components/ui/stat-card';
-import { cn } from '@/lib/utils';
 import { usePagination } from '@/hooks/usePagination';
+import { cn } from '@/lib/utils';
 
+import { ModalClientes } from './_components/modal-clientes';
+import { ModalVeiculos } from './_components/modal-veiculos';
+import { useClientes, useVeiculos } from './_hooks';
 import {
   deriveClientesViewModel,
   resolveExpandedClienteIds,
   toggleExpandedCliente
 } from './_lib/clientes-view-model';
-import { ModalClientes } from './_components/modal-clientes';
-import { ModalVeiculos } from './_components/modal-veiculos';
-import { useClientes, useVeiculos } from './_hooks';
 import {
   Building2,
   Car,
@@ -212,7 +204,7 @@ export default function Clientes() {
       </div>
 
       <Card className='gap-0 overflow-hidden border-border bg-card shadow-none'>
-        <CardHeader className='gap-4 border-b border-border py-5'>
+        <CardHeader className='gap-4 border-b border-border'>
           <div className='flex flex-col gap-1'>
             <CardTitle className='text-base font-semibold'>
               Base de clientes
@@ -221,7 +213,7 @@ export default function Clientes() {
               Busque por nome, empresa, documento, telefone ou placa.
             </p>
           </div>
-          <div className='relative max-w-md'>
+          <div className='relative'>
             <Search className='absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
             <Input
               value={search}
@@ -232,52 +224,41 @@ export default function Clientes() {
             />
           </div>
         </CardHeader>
+      </Card>
 
-        <CardContent className='p-0'>
-          <div className='flex items-center justify-between border-b border-border px-6 py-3'>
-            <p className='text-sm text-muted-foreground'>
-              {viewModel.results.length}{' '}
-              {viewModel.results.length === 1
-                ? 'cliente encontrado'
-                : 'clientes encontrados'}
-            </p>
-          </div>
-
-          {isLoading ? (
-            <div className='flex flex-col gap-0'>
-              {Array.from({ length: 5 }).map((_, index) => (
-                <div
-                  key={index}
-                  className='border-b border-border px-6 py-4 last:border-b-0'>
-                  <div className='flex items-center gap-4'>
-                    <Skeleton className='size-11 rounded-lg' />
-                    <div className='flex flex-1 flex-col gap-2'>
-                      <Skeleton className='h-4 w-36' />
-                      <Skeleton className='h-3 w-56' />
-                    </div>
-                    <Skeleton className='h-9 w-20 rounded-md' />
-                  </div>
+      {isLoading ? (
+        <div className='flex flex-col gap-3'>
+          {Array.from({ length: 5 }).map((_, index) => (
+            <div
+              key={index}
+              className='rounded-xl border border-border bg-card px-5 py-4'>
+              <div className='flex items-center gap-4'>
+                <Skeleton className='size-11 rounded-lg' />
+                <div className='flex flex-1 flex-col gap-2'>
+                  <Skeleton className='h-4 w-36' />
+                  <Skeleton className='h-3 w-56' />
                 </div>
-              ))}
+                <Skeleton className='h-9 w-20 rounded-md' />
+              </div>
             </div>
-          ) : totalItems === 0 ? (
-            <div className='px-6 py-8'>
-              <Empty className='border-border bg-muted/20'>
-                <EmptyMedia variant='icon'>
-                  <Users />
-                </EmptyMedia>
-                <EmptyHeader>
-                  <EmptyTitle>Nenhum cliente encontrado</EmptyTitle>
-                  <EmptyDescription>
-                    Ajuste a busca para localizar um cliente ou uma placa
-                    específica.
-                  </EmptyDescription>
-                </EmptyHeader>
-              </Empty>
-            </div>
-          ) : (
-            <div className='flex flex-col'>
-              {paginatedClientes.map((result) => {
+          ))}
+        </div>
+      ) : totalItems === 0 ? (
+        <Empty className='border-border bg-muted/20'>
+          <EmptyMedia variant='icon'>
+            <Users />
+          </EmptyMedia>
+          <EmptyHeader>
+            <EmptyTitle>Nenhum cliente encontrado</EmptyTitle>
+            <EmptyDescription>
+              Ajuste a busca para localizar um cliente ou uma placa
+              específica.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : (
+        <div className='flex flex-col gap-3'>
+          {paginatedClientes.map((result) => {
                 const { cliente, matchedVehicleIds, veiculos, vehicleCount } =
                   result;
                 const isExpanded = expandedClienteIds.has(cliente.id);
@@ -285,12 +266,8 @@ export default function Clientes() {
 
                 return (
                   <Collapsible key={cliente.id} open={isExpanded}>
-                    <div
-                      className={cn(
-                        'border-b border-border last:border-b-0',
-                        isExpanded && 'bg-muted/10'
-                      )}>
-                      <div className='flex items-start gap-3 px-4 py-4 sm:px-6'>
+                    <div className='overflow-hidden rounded-xl border border-border bg-card'>
+                      <div className='flex items-start gap-4 px-5 py-4'>
                         <button
                           type='button'
                           onClick={() => handleToggleCliente(cliente.id)}
@@ -336,7 +313,9 @@ export default function Clientes() {
                                   {cliente.telefone}
                                 </span>
                               ) : null}
-                              {cliente.cpf ? <span>CPF {cliente.cpf}</span> : null}
+                              {cliente.cpf ? (
+                                <span>CPF {cliente.cpf}</span>
+                              ) : null}
                               {cliente.cnpj ? (
                                 <span>CNPJ {cliente.cnpj}</span>
                               ) : null}
@@ -409,15 +388,18 @@ export default function Clientes() {
                         </div>
                       </div>
 
-                      <CollapsibleContent className='overflow-hidden border-t border-border bg-background/60 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-1 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-1 data-[state=open]:duration-200'>
-                        <div className='flex flex-col gap-4 px-4 py-4 sm:px-6'>
-                          <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
-                            <div className='flex flex-col gap-1'>
-                              <p className='text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground'>
+                      <CollapsibleContent className='overflow-hidden border-t border-border bg-background/50 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-1 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-1 data-[state=open]:duration-200'>
+                        <div className='px-5 py-4'>
+                          <div className='mb-3 flex items-center justify-between'>
+                            <div>
+                              <p className='text-xs font-medium uppercase tracking-wider text-muted-foreground'>
                                 Veículos do cliente
                               </p>
-                              <p className='text-sm text-muted-foreground'>
-                                Cadastros vinculados ao atendimento deste cliente.
+                              <p className='mt-0.5 text-xs text-muted-foreground'>
+                                {vehicleCount}{' '}
+                                {vehicleCount === 1
+                                  ? 'veículo cadastrado'
+                                  : 'veículos cadastrados'}
                               </p>
                             </div>
 
@@ -454,11 +436,11 @@ export default function Clientes() {
 
                           {isLoadingVeiculos ||
                           (isInitialLoading && veiculos.length === 0) ? (
-                            <div className='flex flex-col gap-2'>
+                            <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
                               {Array.from({ length: 2 }).map((_, index) => (
                                 <div
                                   key={index}
-                                  className='flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3'>
+                                  className='flex items-center justify-between rounded-lg border border-border bg-card p-3'>
                                   <div className='flex items-center gap-3'>
                                     <Skeleton className='size-9 rounded-md' />
                                     <div className='flex flex-col gap-2'>
@@ -474,12 +456,14 @@ export default function Clientes() {
                               ))}
                             </div>
                           ) : veiculos.length === 0 ? (
-                            <Empty className='border-border bg-card px-4 py-8'>
+                            <Empty className='border-border bg-card py-8'>
                               <EmptyMedia variant='icon'>
                                 <Car />
                               </EmptyMedia>
                               <EmptyHeader>
-                                <EmptyTitle>Nenhum veículo cadastrado</EmptyTitle>
+                                <EmptyTitle>
+                                  Nenhum veículo cadastrado
+                                </EmptyTitle>
                                 <EmptyDescription>
                                   Adicione o primeiro veículo para manter o
                                   histórico deste cliente completo.
@@ -487,17 +471,16 @@ export default function Clientes() {
                               </EmptyHeader>
                             </Empty>
                           ) : (
-                            <div className='flex flex-col gap-2'>
+                            <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
                               {veiculos.map((veiculo) => {
-                                const isMatchedVehicle = matchedVehicleIds.includes(
-                                  veiculo.id
-                                );
+                                const isMatchedVehicle =
+                                  matchedVehicleIds.includes(veiculo.id);
 
                                 return (
                                   <div
                                     key={veiculo.id}
                                     className={cn(
-                                      'flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3 transition-colors',
+                                      'flex items-center justify-between rounded-lg border border-border bg-card p-3 transition-colors',
                                       isMatchedVehicle &&
                                         'border-primary/40 bg-primary/5'
                                     )}>
@@ -521,7 +504,9 @@ export default function Clientes() {
                                         initialData={
                                           editingVeiculo || undefined
                                         }
-                                        isOpen={editingVeiculo?.id === veiculo.id}
+                                        isOpen={
+                                          editingVeiculo?.id === veiculo.id
+                                        }
                                         setIsOpen={(open) =>
                                           !open && setEditingVeiculo(null)
                                         }
@@ -591,10 +576,8 @@ export default function Clientes() {
                   </Collapsible>
                 );
               })}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        </div>
+      )}
 
       <PaginationControls
         currentPage={currentPage}
