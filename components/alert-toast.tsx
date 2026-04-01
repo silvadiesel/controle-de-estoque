@@ -50,13 +50,12 @@ export function AlertToast() {
           ) : (
             <BellRing color='#ffd700' />
           )}
-          <AlertTitle className='text-popover-foreground'>
-            {hasCriticalItems
-              ? 'Estoque exigindo reposição'
-              : 'Estoque em alerta'}
-          </AlertTitle>
-          <AlertDescription className='gap-3 text-muted-foreground'>
-            <p>{description}</p>
+          <div className='flex items-center justify-between gap-2'>
+            <AlertTitle className='mb-0 text-popover-foreground'>
+              {hasCriticalItems
+                ? 'Estoque exigindo reposição'
+                : 'Estoque em alerta'}
+            </AlertTitle>
             <Button
               size='sm'
               onClick={() => {
@@ -65,6 +64,9 @@ export function AlertToast() {
               }}>
               Ver alertas
             </Button>
+          </div>
+          <AlertDescription className='text-muted-foreground p-0'>
+            {description}
           </AlertDescription>
         </Alert>
       ),
