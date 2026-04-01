@@ -44,21 +44,17 @@ export function PaginationControls({
   }
 
   return (
-    <div className='flex flex-col-reverse sm:flex-row items-center justify-between gap-4 mt-4'>
-      <p className='text-[12px] text-muted-foreground text-center sm:text-left'>
+    <div className='mt-4 flex flex-col-reverse items-center justify-between gap-4 sm:flex-row'>
+      <p className='text-center text-sm text-muted-foreground sm:text-left'>
         Mostrando {startItem} a {endItem} de {totalItems} {itemLabel}
       </p>
 
-      <Pagination>
+      <Pagination className='mx-0 w-auto justify-end'>
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
               onClick={onPreviousPage}
-              className={`bg-[#18181b] border border-[#27272a] text-[#71717a] h-8 rounded-[6px] ${
-                isFirstPage
-                  ? 'pointer-events-none opacity-50'
-                  : 'cursor-pointer'
-              }`}
+              className={isFirstPage ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
             />
           </PaginationItem>
 
@@ -68,11 +64,8 @@ export function PaginationControls({
                 <PaginationLink
                   onClick={() => onPageChange(item)}
                   isActive={item === currentPage}
-                  className={`cursor-pointer ${
-                    item === currentPage
-                      ? 'bg-primary text-primary-foreground font-semibold border-none h-8 w-8 rounded-[6px]'
-                      : 'bg-[#18181b] border border-[#27272a] text-[#71717a] h-8 w-8 rounded-[6px]'
-                  }`}>
+                  className='cursor-pointer'
+                >
                   {item}
                 </PaginationLink>
               </PaginationItem>
@@ -86,9 +79,7 @@ export function PaginationControls({
           <PaginationItem>
             <PaginationNext
               onClick={onNextPage}
-              className={`bg-[#18181b] border border-[#27272a] text-[#71717a] h-8 rounded-[6px] ${
-                isLastPage ? 'pointer-events-none opacity-50' : 'cursor-pointer'
-              }`}
+              className={isLastPage ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
             />
           </PaginationItem>
         </PaginationContent>

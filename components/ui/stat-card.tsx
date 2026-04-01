@@ -1,11 +1,10 @@
 import { Skeleton } from '@/components/ui/skeleton';
-
 import { type LucideIcon } from 'lucide-react';
 
 interface StatCardProps {
   label: string;
   value: number;
-  subtitle: string;
+  subtitle?: string;
   icon: LucideIcon;
   isLoading: boolean;
   state?: 'ready' | 'unavailable';
@@ -31,12 +30,14 @@ export function StatCard({
           )}
         </div>
         <div className='flex size-9 rounded-md items-center justify-center border border-border bg-elevated text-primary'>
-          <Icon size={20} />
+          <Icon size={20} aria-hidden='true' />
         </div>
       </div>
-      <p className='text-sm text-muted-foreground'>
-        {state === 'unavailable' ? 'Dado indisponível no momento' : subtitle}
-      </p>
+      {state === 'unavailable' || subtitle ? (
+        <p className='text-sm text-muted-foreground'>
+          {state === 'unavailable' ? 'Dado indisponível no momento' : subtitle}
+        </p>
+      ) : null}
     </div>
   );
 }

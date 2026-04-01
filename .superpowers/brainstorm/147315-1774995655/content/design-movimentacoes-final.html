@@ -1,0 +1,193 @@
+<h2>Design Final — Movimentações</h2>
+<p class="subtitle">Filtros em linha única: busca ocupa 1/3 + selects + período. Confirme para fecharmos o design.</p>
+
+<style>
+:root {
+  --bg: #07090d; --card: #0f1216; --elevated: #171b20;
+  --muted: #13161b; --input: #0d1014; --border: #26292e;
+  --foreground: #e7ebf2; --muted-fg: #a1a5ab;
+  --primary: #5376b8; --destructive: #ed4b40; --success: #4cb86a; --warning: #ddb63e;
+}
+.page-mock { background: var(--bg); border-radius: 12px; padding: 20px; font-family: inherit; }
+.page-h1 { font-size: 18px; font-weight: 700; color: var(--foreground); margin: 0 0 2px; }
+.page-sub { font-size: 12px; color: var(--muted-fg); margin-bottom: 20px; }
+
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.stat-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.stat-label { font-size: 10px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted-fg); }
+.stat-value { font-size: 28px; font-weight: 700; margin-top: 8px; line-height: 1; color: var(--foreground); }
+.stat-subtitle { font-size: 12px; color: var(--muted-fg); }
+.stat-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); background: var(--elevated); color: var(--primary); flex-shrink: 0; }
+
+/* ── Filtros: linha única, busca flex:1 com min 1/3 ── */
+.filters-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.f-search {
+  /* flex: 1 1 0 com min-width de 33% garante >= 1/3 */
+  flex: 1 1 0;
+  min-width: 33%;
+  display: flex; align-items: center; gap: 8px;
+  background: var(--input); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 12px;
+  color: var(--muted-fg); font-size: 12.5px;
+}
+.f-search span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.f-select {
+  flex: 0 0 auto;
+  display: flex; align-items: center; gap: 6px;
+  background: var(--input); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 12px;
+  color: var(--muted-fg); font-size: 12px; white-space: nowrap;
+}
+.f-sep { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
+.f-date-label { font-size: 11px; color: var(--muted-fg); flex-shrink: 0; }
+.f-chevron { opacity: .45; margin-left: 2px; }
+.f-arrow { color: var(--border); flex-shrink: 0; }
+
+/* Timeline */
+.timeline-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.timeline-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.timeline-title { font-size: 14px; font-weight: 600; color: var(--foreground); }
+.timeline-subtitle { font-size: 11px; color: var(--muted-fg); margin-top: 1px; }
+.timeline-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); background: var(--elevated); color: var(--primary); flex-shrink: 0; }
+
+.tl-item { display: flex; align-items: center; padding: 0 20px; transition: background 0.1s; }
+.tl-item:hover { background: var(--elevated); }
+.tl-track { display: flex; flex-direction: column; align-items: center; width: 24px; flex-shrink: 0; align-self: stretch; }
+.tl-track-top    { flex: 1; width: 1px; background: var(--border); }
+.tl-track-bottom { flex: 1; width: 1px; background: var(--border); }
+.tl-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.tl-item:first-child .tl-track-top    { background: transparent; }
+.tl-item:last-child  .tl-track-bottom { background: transparent; }
+
+.tl-row { flex: 1; display: flex; align-items: center; gap: 0; padding: 10px 0 10px 12px; border-bottom: 1px solid var(--border); min-width: 0; }
+.tl-item:last-child .tl-row { border-bottom: none; }
+
+.tl-desc    { flex: 2; min-width: 0; font-size: 13px; color: var(--foreground); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 16px; }
+.tl-entity  { flex: 1; min-width: 0; display: flex; align-items: center; padding-right: 12px; }
+.tl-action  { flex: 1; min-width: 0; display: flex; align-items: center; padding-right: 12px; }
+.tl-author  { flex: 1; min-width: 0; font-size: 12px; color: var(--muted-fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 12px; }
+.tl-datetime { flex: 1; min-width: 0; font-size: 11px; color: var(--muted-fg); white-space: nowrap; text-align: right; }
+
+.tl-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 99px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.b-produto  { background: rgba(249,115,22,.1); color: #fdba74; }
+.b-cliente  { background: rgba(139,92,246,.1); color: #c4b5fd; }
+.b-fornec   { background: rgba(217,119,6,.1);  color: #fcd34d; }
+.b-categ    { background: rgba(236,72,153,.1);  color: #f9a8d4; }
+.b-veiculo  { background: rgba(14,165,233,.1);  color: #7dd3fc; }
+.b-os       { background: rgba(99,102,241,.1);  color: #a5b4fc; }
+.b-usuario  { background: rgba(244,63,94,.1);   color: #fda4af; }
+.b-criacao  { background: rgba(76,184,106,.1);  color: var(--success); }
+.b-edicao   { background: rgba(83,118,184,.1);  color: var(--primary); }
+.b-exclusao { background: rgba(237,75,64,.1);   color: var(--destructive); }
+
+.pagination { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-top: 1px solid var(--border); }
+.pag-info { font-size: 11px; color: var(--muted-fg); }
+.pag-btn { background: var(--elevated); border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; font-size: 11px; color: var(--muted-fg); cursor: pointer; display: flex; align-items: center; gap: 4px; }
+
+svg { display: inline-block; vertical-align: middle; }
+</style>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="ic-package" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><polyline points="21 8 12 13 3 8"/><line x1="12" x2="12" y1="22" y2="13"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><line x1="3" x2="3" y1="16" y2="8"/></symbol>
+    <symbol id="ic-factory" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M17 18h1"/><path d="M12 18h1"/><path d="M7 18h1"/></symbol>
+    <symbol id="ic-tag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42Z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></symbol>
+    <symbol id="ic-car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17H5v-6l2-6h10l2 6v6Z"/><path d="M3 17h18"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/></symbol>
+    <symbol id="ic-wrench" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></symbol>
+    <symbol id="ic-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></symbol>
+    <symbol id="ic-usercog" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4"/><circle cx="19" cy="19" r="2"/><path d="M19 15v2"/><path d="M19 21v2"/><path d="m15.7 17.3 1.4.8"/><path d="m21.1 20.9 1.4.8"/><path d="m15.7 20.7 1.4-.8"/><path d="m21.1 17.1 1.4-.8"/></symbol>
+    <symbol id="ic-packageplus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><polyline points="21 8 12 13 3 8"/><line x1="12" x2="12" y1="22" y2="13"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/><line x1="3" x2="3" y1="16" y2="8"/><line x1="16" x2="22" y1="2" y2="2"/><line x1="19" x2="19" y1="-1" y2="5"/></symbol>
+    <symbol id="ic-filepen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h7l5 5v3"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M21.82 15.1 17 20l-3 1 1-3 4.82-4.9a1.09 1.09 0 0 1 2 0 1.09 1.09 0 0 1 0 2Z"/></symbol>
+    <symbol id="ic-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></symbol>
+    <symbol id="ic-activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
+    <symbol id="ic-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="ic-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+    <symbol id="ic-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></symbol>
+    <symbol id="ic-chevdown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="ic-arrowright" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+  </defs>
+</svg>
+
+<div class="mockup">
+  <div class="mockup-header">Movimentações — design final</div>
+  <div class="mockup-body">
+  <div class="page-mock">
+
+    <h1 class="page-h1">Movimentações</h1>
+    <p class="page-sub">Histórico de ações realizadas no sistema</p>
+
+    <!-- StatCards -->
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-card-top"><div><div class="stat-label">Total</div><div class="stat-value">248</div></div><div class="stat-icon"><svg width="18" height="18"><use href="#ic-activity"/></svg></div></div><div class="stat-subtitle">registros no período</div></div>
+      <div class="stat-card"><div class="stat-card-top"><div><div class="stat-label">Criações</div><div class="stat-value">134</div></div><div class="stat-icon"><svg width="18" height="18"><use href="#ic-packageplus"/></svg></div></div><div class="stat-subtitle">novos registros</div></div>
+      <div class="stat-card"><div class="stat-card-top"><div><div class="stat-label">Edições</div><div class="stat-value">89</div></div><div class="stat-icon"><svg width="18" height="18"><use href="#ic-filepen"/></svg></div></div><div class="stat-subtitle">atualizações</div></div>
+      <div class="stat-card"><div class="stat-card-top"><div><div class="stat-label">Exclusões</div><div class="stat-value">25</div></div><div class="stat-icon"><svg width="18" height="18"><use href="#ic-trash"/></svg></div></div><div class="stat-subtitle">remoções</div></div>
+    </div>
+
+    <!-- ── Filtros: linha única, busca ≥ 1/3 ── -->
+    <div class="filters-bar">
+      <div class="f-search">
+        <svg width="14" height="14"><use href="#ic-search"/></svg>
+        <span>Buscar por descrição ou autor...</span>
+      </div>
+      <div class="f-select">
+        <svg width="13" height="13"><use href="#ic-activity"/></svg>
+        Tipo de ação
+        <svg width="11" height="11" class="f-chevron"><use href="#ic-chevdown"/></svg>
+      </div>
+      <div class="f-select">
+        <svg width="13" height="13"><use href="#ic-grid"/></svg>
+        Entidade
+        <svg width="11" height="11" class="f-chevron"><use href="#ic-chevdown"/></svg>
+      </div>
+      <div class="f-select">
+        <svg width="13" height="13"><use href="#ic-cal"/></svg>
+        Mês
+        <svg width="11" height="11" class="f-chevron"><use href="#ic-chevdown"/></svg>
+      </div>
+      <div class="f-sep"></div>
+      <div class="f-select">
+        <svg width="13" height="13"><use href="#ic-cal"/></svg>
+        Data inicial
+      </div>
+      <svg width="13" height="13" class="f-arrow"><use href="#ic-arrowright"/></svg>
+      <div class="f-select">
+        <svg width="13" height="13"><use href="#ic-cal"/></svg>
+        Data final
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="timeline-card">
+      <div class="timeline-header">
+        <div><div class="timeline-title">Histórico de Atividades</div><div class="timeline-subtitle">248 registros · página 1 de 31</div></div>
+        <div class="timeline-icon"><svg width="16" height="16"><use href="#ic-activity"/></svg></div>
+      </div>
+      <div>
+        <div class="tl-item"><div class="tl-track"><div class="tl-track-top"></div><div class="tl-dot" style="background:var(--success)"></div><div class="tl-track-bottom"></div></div><div class="tl-row"><span class="tl-desc">Produto "Filtro de Óleo Premium" cadastrado</span><div class="tl-entity"><span class="tl-badge b-produto"><svg width="10" height="10"><use href="#ic-package"/></svg>Produto</span></div><div class="tl-action"><span class="tl-badge b-criacao"><svg width="10" height="10"><use href="#ic-packageplus"/></svg>Criação</span></div><span class="tl-author">João Silva</span><span class="tl-datetime">31/03/2026 · 14:32</span></div></div>
+        <div class="tl-item"><div class="tl-track"><div class="tl-track-top"></div><div class="tl-dot" style="background:var(--warning)"></div><div class="tl-track-bottom"></div></div><div class="tl-row"><span class="tl-desc">Fornecedor "Auto Peças Silva" atualizado</span><div class="tl-entity"><span class="tl-badge b-fornec"><svg width="10" height="10"><use href="#ic-factory"/></svg>Fornecedor</span></div><div class="tl-action"><span class="tl-badge b-edicao"><svg width="10" height="10"><use href="#ic-filepen"/></svg>Edição</span></div><span class="tl-author">Maria Santos</span><span class="tl-datetime">31/03/2026 · 13:15</span></div></div>
+        <div class="tl-item"><div class="tl-track"><div class="tl-track-top"></div><div class="tl-dot" style="background:var(--destructive)"></div><div class="tl-track-bottom"></div></div><div class="tl-row"><span class="tl-desc">Categoria "Filtros Antigos" removida</span><div class="tl-entity"><span class="tl-badge b-categ"><svg width="10" height="10"><use href="#ic-tag"/></svg>Categoria</span></div><div class="tl-action"><span class="tl-badge b-exclusao"><svg width="10" height="10"><use href="#ic-trash"/></svg>Exclusão</span></div><span class="tl-author">João Silva</span><span class="tl-datetime">31/03/2026 · 11:08</span></div></div>
+        <div class="tl-item"><div class="tl-track"><div class="tl-track-top"></div><div class="tl-dot" style="background:var(--success)"></div><div class="tl-track-bottom"></div></div><div class="tl-row"><span class="tl-desc">Veículo "Toyota Corolla 2022" cadastrado</span><div class="tl-entity"><span class="tl-badge b-veiculo"><svg width="10" height="10"><use href="#ic-car"/></svg>Veículo</span></div><div class="tl-action"><span class="tl-badge b-criacao"><svg width="10" height="10"><use href="#ic-packageplus"/></svg>Criação</span></div><span class="tl-author">Maria Santos</span><span class="tl-datetime">31/03/2026 · 09:50</span></div></div>
+        <div class="tl-item"><div class="tl-track"><div class="tl-track-top"></div><div class="tl-dot" style="background:var(--warning)"></div><div class="tl-track-bottom"></div></div><div class="tl-row"><span class="tl-desc">Ordem de Serviço #042 status alterado</span><div class="tl-entity"><span class="tl-badge b-os"><svg width="10" height="10"><use href="#ic-wrench"/></svg>Ordem de Serviço</span></div><div class="tl-action"><span class="tl-badge b-edicao"><svg width="10" height="10"><use href="#ic-filepen"/></svg>Edição</span></div><span class="tl-author">João Silva</span><span class="tl-datetime">30/03/2026 · 17:22</span></div></div>
+        <div class="tl-item"><div class="tl-track"><div class="tl-track-top"></div><div class="tl-dot" style="background:var(--success)"></div><div class="tl-track-bottom"></div></div><div class="tl-row"><span class="tl-desc">Cliente "Pedro Almeida" cadastrado</span><div class="tl-entity"><span class="tl-badge b-cliente"><svg width="10" height="10"><use href="#ic-user"/></svg>Cliente</span></div><div class="tl-action"><span class="tl-badge b-criacao"><svg width="10" height="10"><use href="#ic-packageplus"/></svg>Criação</span></div><span class="tl-author">Maria Santos</span><span class="tl-datetime">30/03/2026 · 15:44</span></div></div>
+        <div class="tl-item"><div class="tl-track"><div class="tl-track-top"></div><div class="tl-dot" style="background:var(--destructive)"></div><div class="tl-track-bottom"></div></div><div class="tl-row"><span class="tl-desc">Produto "Amortecedor Traseiro" removido</span><div class="tl-entity"><span class="tl-badge b-produto"><svg width="10" height="10"><use href="#ic-package"/></svg>Produto</span></div><div class="tl-action"><span class="tl-badge b-exclusao"><svg width="10" height="10"><use href="#ic-trash"/></svg>Exclusão</span></div><span class="tl-author">João Silva</span><span class="tl-datetime">30/03/2026 · 09:11</span></div></div>
+        <div class="tl-item"><div class="tl-track"><div class="tl-track-top"></div><div class="tl-dot" style="background:var(--warning)"></div><div class="tl-track-bottom"></div></div><div class="tl-row"><span class="tl-desc">Usuário "Carlos Melo" com permissões atualizadas</span><div class="tl-entity"><span class="tl-badge b-usuario"><svg width="10" height="10"><use href="#ic-usercog"/></svg>Usuário</span></div><div class="tl-action"><span class="tl-badge b-edicao"><svg width="10" height="10"><use href="#ic-filepen"/></svg>Edição</span></div><span class="tl-author">Maria Santos</span><span class="tl-datetime">29/03/2026 · 11:30</span></div></div>
+      </div>
+      <div class="pagination">
+        <span class="pag-info">Exibindo 1–8 de 248 registros</span>
+        <div style="display:flex;gap:6px">
+          <button class="pag-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>Anterior</button>
+          <button class="pag-btn">Próximo<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  </div>
+</div>

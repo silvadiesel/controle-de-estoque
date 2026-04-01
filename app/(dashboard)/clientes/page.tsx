@@ -1,28 +1,39 @@
 'use client';
 
-import { useState } from 'react';
+import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 
 import { ModalDelete } from '@/components/modal-delete';
 import { PaginationControls } from '@/components/pagination-controls';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { Collapsible, CollapsibleContent } from '@/components/ui/collapsible';
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger
-} from '@/components/ui/collapsible';
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle
+} from '@/components/ui/empty';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { StatCard } from '@/components/ui/stat-card';
 import { usePagination } from '@/hooks/usePagination';
-
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
+import { cn } from '@/lib/utils';
 
 import { ModalClientes } from './_components/modal-clientes';
 import { ModalVeiculos } from './_components/modal-veiculos';
 import { useClientes, useVeiculos } from './_hooks';
 import {
+  deriveClientesViewModel,
+  resolveExpandedClienteIds,
+  toggleExpandedCliente
+} from './_lib/clientes-view-model';
+import { formatCNPJ, formatCPF, formatPhone } from '@/app/utils/formatters';
+import {
+  Building2,
   Car,
   ChevronDown,
-  Loader2,
   Pencil,
   Phone,
   Plus,
@@ -31,19 +42,27 @@ import {
   Users
 } from 'lucide-react';
 
+const DESKTOP_BREAKPOINT = '(min-width: 1024px)';
+
+function getInitials(name: string) {
+  return name
+    .split(' ')
+    .map((part) => part[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+}
+
 export default function Clientes() {
   const {
     clientes,
     isLoading,
-    search,
-    setSearch,
-    filteredClientes,
+    isSaving: isSavingCliente,
     isAddOpen,
     setIsAddOpen,
     editingCliente,
     setEditingCliente,
-    newCliente,
-    setNewCliente,
     handleAddCliente,
     handleUpdateCliente,
     handleDeleteCliente,
@@ -52,16 +71,12 @@ export default function Clientes() {
     isDeleteOpen,
     setIsDeleteOpen
   } = useClientes();
-
   const {
+    veiculosByCliente,
     isAddOpen: isVeiculoAddOpen,
     setIsAddOpen: setIsVeiculoAddOpen,
     editingVeiculo,
     setEditingVeiculo,
-    newVeiculo,
-    setNewVeiculo,
-    currentClienteId,
-    setCurrentClienteId,
     deleteVeiculoId,
     setDeleteVeiculoId,
     isDeleteOpen: isVeiculoDeleteOpen,
@@ -71,11 +86,49 @@ export default function Clientes() {
     handleAddVeiculo,
     handleUpdateVeiculo,
     handleDeleteVeiculo,
-    getVeiculosForCliente,
-    isLoadingCliente,
     getTotalVeiculos,
-    isInitialLoading
+    isInitialLoading,
+    isLoadingCliente
   } = useVeiculos();
+
+  const [search, setSearch] = useState('');
+  const deferredSearch = useDeferredValue(search);
+  const [isDesktop, setIsDesktop] = useState(false);
+  const [activeClienteIdForNewVeiculo, setActiveClienteIdForNewVeiculo] =
+    useState<number | null>(null);
+  const [manuallyExpandedClienteIds, setManuallyExpandedClienteIds] = useState<
+    Set<number>
+  >(new Set());
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(DESKTOP_BREAKPOINT);
+    const updateViewport = () => setIsDesktop(mediaQuery.matches);
+
+    updateViewport();
+    mediaQuery.addEventListener('change', updateViewport);
+
+    return () => mediaQuery.removeEventListener('change', updateViewport);
+  }, []);
+
+  const viewModel = useMemo(
+    () =>
+      deriveClientesViewModel({
+        clientes,
+        veiculosByCliente,
+        search: deferredSearch
+      }),
+    [clientes, deferredSearch, veiculosByCliente]
+  );
+
+  const expandedClienteIds = useMemo(
+    () =>
+      resolveExpandedClienteIds({
+        manualExpandedClienteIds: manuallyExpandedClienteIds,
+        autoExpandedClienteIds: viewModel.autoExpandedClienteIds,
+        allowMultiple: isDesktop
+      }),
+    [isDesktop, manuallyExpandedClienteIds, viewModel.autoExpandedClienteIds]
+  );
 
   const {
     paginatedItems: paginatedClientes,
@@ -90,404 +143,422 @@ export default function Clientes() {
     goToPage,
     goToNextPage,
     goToPreviousPage
-  } = usePagination({ items: filteredClientes, itemsPerPage: 10 });
+  } = usePagination({ items: viewModel.results, itemsPerPage: 10 });
 
-  // Track which clients have their vehicles section expanded
-  const [expandedClientes, setExpandedClientes] = useState<Set<number>>(
-    new Set()
-  );
+  const handleToggleCliente = (clienteId: number) => {
+    const isCurrentlyExpanded = expandedClienteIds.has(clienteId);
 
-  const toggleExpandCliente = (clienteId: number) => {
-    setExpandedClientes((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(clienteId)) {
-        newSet.delete(clienteId);
-      } else {
-        newSet.add(clienteId);
-        // Fetch vehicles when expanding
-        fetchVeiculosByCliente(clienteId);
-        setCurrentClienteId(clienteId);
-      }
-      return newSet;
-    });
-  };
-
-  // Search also by vehicle plate
-  const searchFilteredClientes = filteredClientes.filter((cliente) => {
-    const veiculos = getVeiculosForCliente(cliente.id);
-    const matchesVeiculo = veiculos.some((v) =>
-      v.placa.toLowerCase().includes(search.toLowerCase())
+    setManuallyExpandedClienteIds((currentExpandedClienteIds) =>
+      toggleExpandedCliente({
+        currentExpandedClienteIds,
+        clienteId,
+        allowMultiple: isDesktop
+      })
     );
-    return matchesVeiculo || filteredClientes.includes(cliente);
-  });
 
-  // Get initials from client name
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .filter(Boolean)
-      .slice(0, 2)
-      .join('')
-      .toUpperCase();
+    if (!isCurrentlyExpanded) {
+      void fetchVeiculosByCliente(clienteId);
+    }
   };
 
   return (
-    <div className='flex flex-1 flex-col gap-4 p-4'>
-      {/* Header */}
+    <div className='flex flex-1 flex-col gap-6 p-4'>
       <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
         <div className='flex flex-col gap-1'>
-          <h1 className='text-[20px] font-semibold text-foreground'>
-            Clientes
-          </h1>
-          <p className='text-[13px] text-muted-foreground'>
-            Gerencie os clientes e seus veículos
+          <h1 className='text-2xl font-bold text-foreground'>Clientes</h1>
+          <p className='text-sm text-muted-foreground'>
+            Encontre clientes rápido e gerencie seus veículos sem sair da lista.
           </p>
         </div>
+
         <ModalClientes
           mode='create'
-          data={newCliente}
-          setData={setNewCliente}
+          initialData={undefined}
           isOpen={isAddOpen}
           setIsOpen={setIsAddOpen}
           onSubmit={handleAddCliente}
-          isLoading={isLoading}
+          isLoading={isSavingCliente}
           trigger={
-            <Button className='bg-primary hover:bg-primary/90 text-primary-foreground w-32'>
-              <Plus className='h-4 w-4' />
-              Novo Cliente
+            <Button className='w-full sm:w-auto'>
+              <Plus data-icon='inline-start' />
+              Novo cliente
             </Button>
           }
         />
       </div>
 
-      {/* Search */}
-      <div className='relative max-w-md'>
-        <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
-        <Input
-          placeholder='Buscar por nome, documento ou placa...'
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className='pl-10'
+      <div className='grid gap-3 lg:grid-cols-2'>
+        <StatCard
+          label='Clientes'
+          value={viewModel.totalClientes}
+          subtitle='Cadastros disponíveis para atendimento e operação'
+          icon={Users}
+          isLoading={isLoading}
+        />
+        <StatCard
+          label='Veículos'
+          value={getTotalVeiculos()}
+          subtitle='Veículos associados aos clientes cadastrados'
+          icon={Car}
+          isLoading={isInitialLoading}
         />
       </div>
 
-      {/* Stats */}
-      <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-        <div className='bg-card border border-border rounded-xl p-4'>
-          <div className='flex items-center gap-3'>
-            <div className='flex h-10 w-10 items-center justify-center rounded-[10px] bg-primary/12'>
-              <Users className='h-5 w-5 text-primary' />
-            </div>
-            <div>
-              <p className='text-2xl font-bold text-foreground'>
-                {clientes.length}
-              </p>
-              <p className='text-[12px] text-muted-foreground'>Total de Clientes</p>
-            </div>
+      <Card className='gap-0 overflow-hidden border-border bg-card shadow-none'>
+        <CardHeader className='gap-4 pb-0!'>
+          <div className='flex flex-col gap-1'>
+            <CardTitle className='text-base font-semibold'>
+              Base de clientes
+            </CardTitle>
+            <p className='text-sm text-muted-foreground'>
+              Busque por nome, empresa, documento, telefone ou placa.
+            </p>
           </div>
-        </div>
-        <div className='bg-card border border-border rounded-xl p-4'>
-          <div className='flex items-center gap-3'>
-            <div className='flex h-10 w-10 items-center justify-center rounded-[10px] bg-success/12'>
-              <Car className='h-5 w-5 text-success' />
-            </div>
-            <div>
-              {isInitialLoading ? (
-                <div className='h-8 w-12 animate-pulse rounded bg-muted'></div>
-              ) : (
-                <p className='text-2xl font-bold text-foreground animate-in fade-in duration-300'>
-                  {getTotalVeiculos()}
-                </p>
-              )}
-              <p className='text-[12px] text-muted-foreground'>
-                Veículos Cadastrados
-              </p>
-            </div>
+          <div className='relative'>
+            <Search className='absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+            <Input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder='Buscar cliente ou placa...'
+              aria-label='Buscar cliente ou placa'
+              className='pl-10 bg-input border-border'
+            />
           </div>
-        </div>
-      </div>
+        </CardHeader>
+      </Card>
 
-      {/* Clients List */}
-      <div className='space-y-2'>
-        <div className='flex items-center justify-between mb-2'>
-          <p className='text-[13px] text-muted-foreground'>
-            {searchFilteredClientes.length} cliente(s) encontrado(s)
-          </p>
+      {isLoading ? (
+        <div className='flex flex-col gap-3'>
+          {Array.from({ length: 5 }).map((_, index) => (
+            <div
+              key={index}
+              className='rounded-xl border border-border bg-card px-5 py-4'>
+              <div className='flex items-center gap-4'>
+                <Skeleton className='size-11 rounded-lg' />
+                <div className='flex flex-1 flex-col gap-2'>
+                  <Skeleton className='h-4 w-36' />
+                  <Skeleton className='h-3 w-56' />
+                </div>
+                <Skeleton className='h-9 w-20 rounded-md' />
+              </div>
+            </div>
+          ))}
         </div>
-
-        {isLoading ? (
-          <div className='flex items-center justify-center py-12'>
-            <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
-            <span className='ml-2 text-muted-foreground'>
-              Carregando clientes...
-            </span>
-          </div>
-        ) : searchFilteredClientes.length === 0 ? (
-          <Empty className='border-border bg-card'>
-            <EmptyHeader>
-              <EmptyTitle>Nenhum cliente encontrado</EmptyTitle>
-              <EmptyDescription>Tente outra busca ou revise os filtros aplicados.</EmptyDescription>
-            </EmptyHeader>
-          </Empty>
-        ) : (
-          paginatedClientes.map((cliente) => {
-            const isExpanded = expandedClientes.has(cliente.id);
-            const veiculos = getVeiculosForCliente(cliente.id);
+      ) : totalItems === 0 ? (
+        <Empty className='border-border bg-muted/20'>
+          <EmptyMedia variant='icon'>
+            <Users />
+          </EmptyMedia>
+          <EmptyHeader>
+            <EmptyTitle>Nenhum cliente encontrado</EmptyTitle>
+            <EmptyDescription>
+              Ajuste a busca para localizar um cliente ou uma placa específica.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : (
+        <div className='flex flex-col gap-3'>
+          {paginatedClientes.map((result) => {
+            const { cliente, matchedVehicleIds, veiculos, vehicleCount } =
+              result;
+            const isExpanded = expandedClienteIds.has(cliente.id);
             const isLoadingVeiculos = isLoadingCliente(cliente.id);
 
             return (
-              <Collapsible
-                key={cliente.id}
-                open={isExpanded}
-                onOpenChange={() => toggleExpandCliente(cliente.id)}>
-                <div className='bg-card border border-border rounded-xl overflow-hidden transition-all hover:border-border-hover'>
-                  {/* Client Row */}
-                  <div className='flex items-center justify-between p-4'>
-                    <div className='flex min-w-0 items-center gap-4'>
-                      {/* Avatar — shrink-0 para não ser comprimido */}
-                      <div className='flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/12'>
-                        <span className='text-sm font-semibold text-primary'>
-                          {getInitials(cliente.name_cliente)}
-                        </span>
+              <Collapsible key={cliente.id} open={isExpanded}>
+                <div className='overflow-hidden rounded-xl border border-border bg-card'>
+                  <div className='flex items-start gap-4 px-5 py-4'>
+                    <button
+                      type='button'
+                      onClick={() => handleToggleCliente(cliente.id)}
+                      className='group flex min-w-0 flex-1 items-start gap-4 text-left outline-none transition-colors hover:text-foreground focus-visible:text-foreground'>
+                      <div className='flex size-11 shrink-0 items-center justify-center rounded-lg border border-border bg-elevated text-sm font-semibold text-primary transition-colors group-hover:border-border-hover'>
+                        {getInitials(cliente.name_cliente)}
                       </div>
 
-                      {/* Client Info — min-w-0 permite truncate */}
-                      <div className='min-w-0 flex-1'>
-                        <p className='truncate text-sm font-medium text-foreground'>
-                          {cliente.name_cliente}
-                        </p>
-                        <div className='flex min-w-0 flex-wrap items-center gap-3 text-xs text-muted-foreground'>
-                          {cliente.cpf && <span className='truncate'>CPF: {cliente.cpf}</span>}
-                          {cliente.cnpj && <span className='truncate'>CNPJ: {cliente.cnpj}</span>}
-                          {cliente.telefone && (
-                            <span className='flex items-center gap-1 text-primary font-medium'>
-                              <Phone className='h-3 w-3' />
-                              {cliente.telefone}
-                            </span>
-                          )}
+                      <div className='flex min-w-0 flex-1 flex-col gap-2'>
+                        <div className='flex flex-col gap-1 lg:flex-row lg:items-center lg:justify-between'>
+                          <div className='min-w-0'>
+                            <p className='truncate text-sm font-semibold text-foreground'>
+                              {cliente.name_cliente}
+                            </p>
+                            <div className='mt-1 flex min-w-0 items-center gap-2 text-sm text-muted-foreground'>
+                              <Building2 className='size-3.5 shrink-0' />
+                              <span className='truncate'>
+                                {cliente.nome_empresa}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className='flex shrink-0 items-center gap-2'>
+                            <Badge
+                              variant='outline'
+                              className='border-border bg-background text-muted-foreground'>
+                              {vehicleCount}{' '}
+                              {vehicleCount === 1 ? 'veículo' : 'veículos'}
+                            </Badge>
+                            <ChevronDown
+                              className={cn(
+                                'size-4 shrink-0 text-muted-foreground transition-transform duration-200 ease-out',
+                                isExpanded && 'rotate-180 text-foreground'
+                              )}
+                            />
+                          </div>
                         </div>
+
+                        <div className='flex flex-wrap items-center gap-3 text-xs text-muted-foreground'>
+                          {cliente.telefone ? (
+                            <span className='inline-flex items-center gap-1.5'>
+                              <Phone className='size-3.5' />
+                              {formatPhone(cliente.telefone)}
+                            </span>
+                          ) : null}
+                          {cliente.cpf ? <span>CPF {formatCPF(cliente.cpf)}</span> : null}
+                          {cliente.cnpj ? (
+                            <span>CNPJ {formatCNPJ(cliente.cnpj)}</span>
+                          ) : null}
+                        </div>
+
+                        {matchedVehicleIds.length > 0 ? (
+                          <p className='text-xs font-medium text-primary'>
+                            Busca encontrou {matchedVehicleIds.length}{' '}
+                            {matchedVehicleIds.length === 1
+                              ? 'placa vinculada'
+                              : 'placas vinculadas'}
+                            .
+                          </p>
+                        ) : null}
                       </div>
-                    </div>
+                    </button>
 
-                    {/* Actions */}
-                    <div className='flex items-center gap-2'>
-                      {/* Vehicles Toggle */}
-                      <CollapsibleTrigger asChild>
-                        <Button
-                          variant='ghost'
-                          size='sm'
-                          className='gap-1.5 text-[12px] text-muted-foreground font-medium hover:text-foreground'>
-                          <Car className='h-4 w-4' />
-                          <span className='hidden sm:inline'>Veículos</span>
-                          <span className='text-[12px] text-muted-foreground font-medium'>
-                            {veiculos.length}
-                          </span>
-                          <ChevronDown
-                            className={`h-4 w-4 transition-transform duration-200 ${
-                              isExpanded ? 'rotate-180' : ''
-                            }`}
-                          />
-                        </Button>
-                      </CollapsibleTrigger>
-
-                      {/* Edit */}
+                    <div className='flex shrink-0 items-center gap-1'>
                       <ModalClientes
                         mode='edit'
-                        data={editingCliente || {}}
-                        setData={(data) =>
-                          setEditingCliente(data as typeof cliente)
-                        }
+                        initialData={editingCliente || undefined}
                         isOpen={editingCliente?.id === cliente.id}
                         setIsOpen={(open) => !open && setEditingCliente(null)}
-                        onSubmit={handleUpdateCliente}
-                        isLoading={isLoading}
+                        onSubmit={(data) =>
+                          handleUpdateCliente(cliente.id, data)
+                        }
+                        isLoading={isSavingCliente}
                         trigger={
                           <Button
                             variant='ghost'
-                            size='icon'
+                            size='icon-sm'
                             aria-label={`Editar cliente ${cliente.name_cliente}`}
-                            onClick={() => setEditingCliente(cliente)}>
-                            <Pencil className='h-4 w-4 text-muted-foreground' />
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setEditingCliente(cliente);
+                            }}>
+                            <Pencil />
                           </Button>
                         }
                       />
 
-                      {/* Delete */}
                       <ModalDelete
                         isOpen={isDeleteOpen && deleteId === cliente.id}
                         setIsOpen={(open) => {
                           setIsDeleteOpen(open);
-                          if (!open) setDeleteId(null);
+                          if (!open) {
+                            setDeleteId(null);
+                          }
                         }}
                         onConfirm={() => handleDeleteCliente(cliente.id)}
-                        isLoading={isLoading}
-                        title='Excluir Cliente'
-                        description={`Tem certeza que deseja excluir o cliente "${cliente.name_cliente}"? Todos os veículos associados também serão removidos. Esta ação não pode ser desfeita.`}
+                        isLoading={isSavingCliente}
+                        title='Excluir cliente'
+                        description={`Tem certeza que deseja excluir o cliente "${cliente.name_cliente}"? Todos os veículos associados também serão removidos.`}
                         trigger={
                           <Button
                             variant='ghost'
-                            size='icon'
+                            size='icon-sm'
                             aria-label={`Excluir cliente ${cliente.name_cliente}`}
-                            onClick={() => {
+                            onClick={(event) => {
+                              event.stopPropagation();
                               setDeleteId(cliente.id);
                               setIsDeleteOpen(true);
                             }}>
-                            <Trash2 className='h-4 w-4 text-muted-foreground' />
+                            <Trash2 />
                           </Button>
                         }
                       />
                     </div>
                   </div>
 
-                  {/* Vehicles Section (Expandable) */}
-                  <CollapsibleContent className='data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 overflow-hidden transition-all duration-300 ease-in-out'>
-                    <div className='border-t border-border bg-background p-4'>
-                      <div className='flex items-center justify-between mb-4'>
-                        <h4 className='text-[13px] font-medium text-muted-foreground flex items-center gap-2'>
-                          <Car className='h-4 w-4' />
-                          Veículos do Cliente
-                        </h4>
+                  <CollapsibleContent className='overflow-hidden border-t border-border bg-background/50 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-1 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-1 data-[state=open]:duration-200'>
+                    <div className='px-5 py-4'>
+                      <div className='mb-3 flex items-center justify-between'>
+                        <div>
+                          <p className='text-xs font-medium uppercase tracking-wider text-muted-foreground'>
+                            Veículos do cliente
+                          </p>
+                          <p className='mt-0.5 text-xs text-muted-foreground'>
+                            {vehicleCount}{' '}
+                            {vehicleCount === 1
+                              ? 'veículo cadastrado'
+                              : 'veículos cadastrados'}
+                          </p>
+                        </div>
+
                         <ModalVeiculos
                           mode='create'
-                          data={newVeiculo}
-                          setData={setNewVeiculo}
+                          initialData={undefined}
                           isOpen={
                             isVeiculoAddOpen &&
-                            currentClienteId === cliente.id
+                            activeClienteIdForNewVeiculo === cliente.id
                           }
                           setIsOpen={(open) => {
-                            setCurrentClienteId(cliente.id);
                             setIsVeiculoAddOpen(open);
+                            if (!open) {
+                              setActiveClienteIdForNewVeiculo(null);
+                            }
                           }}
-                          onSubmit={handleAddVeiculo}
+                          onSubmit={(data) =>
+                            handleAddVeiculo(cliente.id, data)
+                          }
                           isLoading={isSaving}
                           trigger={
                             <Button
                               variant='outline'
                               size='sm'
-                              className='border-border text-muted-foreground hover:text-foreground'
-                              onClick={() => setCurrentClienteId(cliente.id)}>
-                              <Plus className='h-3 w-3 mr-1' />
-                              Adicionar Veículo
+                              onClick={() =>
+                                setActiveClienteIdForNewVeiculo(cliente.id)
+                              }>
+                              <Plus data-icon='inline-start' />
+                              Adicionar veículo
                             </Button>
                           }
                         />
                       </div>
 
-                      {/* Loading Skeleton */}
-                      {isLoadingVeiculos && (
-                        <div className='grid gap-3 sm:grid-cols-2'>
-                          {[1, 2, 3].map((i) => (
+                      {isLoadingVeiculos ||
+                      (isInitialLoading && veiculos.length === 0) ? (
+                        <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
+                          {Array.from({ length: 2 }).map((_, index) => (
                             <div
-                              key={i}
-                              className='flex items-center justify-between p-3 rounded-lg bg-card border border-border'>
+                              key={index}
+                              className='flex items-center justify-between rounded-lg border border-border bg-card p-3'>
                               <div className='flex items-center gap-3'>
-                                <Skeleton className='h-10 w-10 rounded-[8px]' />
-                                <div className='space-y-2'>
-                                  <Skeleton className='h-4 w-20' />
-                                  <Skeleton className='h-3 w-16' />
+                                <Skeleton className='size-9 rounded-md' />
+                                <div className='flex flex-col gap-2'>
+                                  <Skeleton className='h-3.5 w-20' />
+                                  <Skeleton className='h-3 w-28' />
                                 </div>
                               </div>
                               <div className='flex gap-1'>
-                                <Skeleton className='h-8 w-8 rounded' />
-                                <Skeleton className='h-8 w-8 rounded' />
+                                <Skeleton className='size-8 rounded-md' />
+                                <Skeleton className='size-8 rounded-md' />
                               </div>
                             </div>
                           ))}
                         </div>
-                      )}
-
-                      {/* Empty State */}
-                      {!isLoadingVeiculos && veiculos.length === 0 && (
-                        <Empty className='border-border bg-card'>
+                      ) : veiculos.length === 0 ? (
+                        <Empty className='border-border bg-card py-8'>
+                          <EmptyMedia variant='icon'>
+                            <Car />
+                          </EmptyMedia>
                           <EmptyHeader>
-                            <EmptyTitle>Nenhum veículo</EmptyTitle>
-                            <EmptyDescription>Nenhum veículo cadastrado para este cliente.</EmptyDescription>
+                            <EmptyTitle>Nenhum veículo cadastrado</EmptyTitle>
+                            <EmptyDescription>
+                              Adicione o primeiro veículo para manter o
+                              histórico deste cliente completo.
+                            </EmptyDescription>
                           </EmptyHeader>
                         </Empty>
-                      )}
+                      ) : (
+                        <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
+                          {veiculos.map((veiculo) => {
+                            const isMatchedVehicle = matchedVehicleIds.includes(
+                              veiculo.id
+                            );
 
-                      {/* Vehicles Grid */}
-                      {!isLoadingVeiculos && veiculos.length > 0 && (
-                        <div className='grid gap-3 sm:grid-cols-2'>
-                          {veiculos.map((veiculo) => (
-                            <div
-                              key={veiculo.id}
-                              className='flex items-center justify-between p-3 rounded-lg bg-card border border-border hover:border-border-hover transition-colors'>
-                              <div className='flex items-center gap-3'>
-                                <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/12'>
-                                  <Car className='h-5 w-5 text-primary' />
+                            return (
+                              <div
+                                key={veiculo.id}
+                                className={cn(
+                                  'flex items-center justify-between rounded-lg border border-border bg-card p-3 transition-colors',
+                                  isMatchedVehicle &&
+                                    'border-primary/40 bg-primary/5'
+                                )}>
+                                <div className='flex min-w-0 items-center gap-3'>
+                                  <div className='flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-elevated text-primary'>
+                                    <Car className='size-4' />
+                                  </div>
+                                  <div className='min-w-0'>
+                                    <p className='text-sm font-semibold text-foreground'>
+                                      {veiculo.placa}
+                                    </p>
+                                    <p className='truncate text-sm text-muted-foreground'>
+                                      {veiculo.modelo}
+                                    </p>
+                                  </div>
                                 </div>
-                                <div>
-                                  <p className='text-[13px] font-semibold text-foreground'>
-                                    {veiculo.placa}
-                                  </p>
-                                  <p className='text-xs text-muted-foreground'>
-                                    {veiculo.modelo}
-                                  </p>
+
+                                <div className='flex shrink-0 items-center gap-1'>
+                                  <ModalVeiculos
+                                    mode='edit'
+                                    initialData={editingVeiculo || undefined}
+                                    isOpen={editingVeiculo?.id === veiculo.id}
+                                    setIsOpen={(open) =>
+                                      !open && setEditingVeiculo(null)
+                                    }
+                                    onSubmit={(data) =>
+                                      handleUpdateVeiculo(
+                                        veiculo.id,
+                                        cliente.id,
+                                        data
+                                      )
+                                    }
+                                    isLoading={isSaving}
+                                    trigger={
+                                      <Button
+                                        variant='ghost'
+                                        size='icon-sm'
+                                        aria-label={`Editar veículo ${veiculo.placa}`}
+                                        onClick={() => {
+                                          setEditingVeiculo(veiculo);
+                                        }}>
+                                        <Pencil />
+                                      </Button>
+                                    }
+                                  />
+
+                                  <ModalDelete
+                                    isOpen={
+                                      isVeiculoDeleteOpen &&
+                                      deleteVeiculoId === veiculo.id
+                                    }
+                                    setIsOpen={(open) => {
+                                      setIsVeiculoDeleteOpen(open);
+                                      if (!open) {
+                                        setDeleteVeiculoId(null);
+                                      }
+                                    }}
+                                    onConfirm={() =>
+                                      handleDeleteVeiculo(
+                                        veiculo.id,
+                                        cliente.id
+                                      )
+                                    }
+                                    isLoading={isSaving}
+                                    title='Excluir veículo'
+                                    description={`Tem certeza que deseja excluir o veículo "${veiculo.placa}"?`}
+                                    trigger={
+                                      <Button
+                                        variant='ghost'
+                                        size='icon-sm'
+                                        aria-label={`Excluir veículo ${veiculo.placa}`}
+                                        onClick={() => {
+                                          setDeleteVeiculoId(veiculo.id);
+                                          setIsVeiculoDeleteOpen(true);
+                                        }}>
+                                        <Trash2 />
+                                      </Button>
+                                    }
+                                  />
                                 </div>
                               </div>
-                              <div className='flex gap-1'>
-                                {/* Edit Vehicle */}
-                                <ModalVeiculos
-                                  mode='edit'
-                                  data={editingVeiculo || {}}
-                                  setData={(data) =>
-                                    setEditingVeiculo(data as typeof veiculo)
-                                  }
-                                  isOpen={editingVeiculo?.id === veiculo.id}
-                                  setIsOpen={(open) =>
-                                    !open && setEditingVeiculo(null)
-                                  }
-                                  onSubmit={handleUpdateVeiculo}
-                                  isLoading={isSaving}
-                                  trigger={
-                                    <Button
-                                      variant='ghost'
-                                      size='icon'
-                                      aria-label={`Editar veículo ${veiculo.placa}`}
-                                      onClick={() => {
-                                        setCurrentClienteId(cliente.id);
-                                        setEditingVeiculo(veiculo);
-                                      }}>
-                                      <Pencil className='h-3 w-3 text-muted-foreground' />
-                                    </Button>
-                                  }
-                                />
-                                {/* Delete Vehicle */}
-                                <ModalDelete
-                                  isOpen={
-                                    isVeiculoDeleteOpen &&
-                                    deleteVeiculoId === veiculo.id
-                                  }
-                                  setIsOpen={(open) => {
-                                    setIsVeiculoDeleteOpen(open);
-                                    if (!open) setDeleteVeiculoId(null);
-                                  }}
-                                  onConfirm={() =>
-                                    handleDeleteVeiculo(veiculo.id)
-                                  }
-                                  isLoading={isSaving}
-                                  title='Excluir Veículo'
-                                  description={`Tem certeza que deseja excluir o veículo "${veiculo.placa}"?`}
-                                  trigger={
-                                    <Button
-                                      variant='ghost'
-                                      size='icon'
-                                      aria-label={`Excluir veículo ${veiculo.placa}`}
-                                      onClick={() => {
-                                        setCurrentClienteId(cliente.id);
-                                        setDeleteVeiculoId(veiculo.id);
-                                        setIsVeiculoDeleteOpen(true);
-                                      }}>
-                                      <Trash2 className='h-3 w-3 text-destructive' />
-                                    </Button>
-                                  }
-                                />
-                              </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
                     </div>
@@ -495,24 +566,24 @@ export default function Clientes() {
                 </div>
               </Collapsible>
             );
-          })
-        )}
+          })}
+        </div>
+      )}
 
-        <PaginationControls
-          currentPage={currentPage}
-          totalPages={totalPages}
-          totalItems={totalItems}
-          startItem={startItem}
-          endItem={endItem}
-          pageItems={pageItems}
-          isFirstPage={isFirstPage}
-          isLastPage={isLastPage}
-          onPageChange={goToPage}
-          onNextPage={goToNextPage}
-          onPreviousPage={goToPreviousPage}
-          itemLabel='clientes'
-        />
-      </div>
+      <PaginationControls
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        startItem={startItem}
+        endItem={endItem}
+        pageItems={pageItems}
+        isFirstPage={isFirstPage}
+        isLastPage={isLastPage}
+        onPageChange={goToPage}
+        onNextPage={goToNextPage}
+        onPreviousPage={goToPreviousPage}
+        itemLabel='clientes'
+      />
     </div>
   );
 }

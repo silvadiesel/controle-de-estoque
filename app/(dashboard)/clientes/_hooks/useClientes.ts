@@ -6,53 +6,41 @@ import { clienteSchema } from '@/app/utils/validators';
 import type { Cliente } from '@/db/schema';
 
 import { toast } from 'sonner';
-import { ZodError } from 'zod';
+import { type z, ZodError } from 'zod';
+
+export type ClienteFormValues = z.infer<typeof clienteSchema>;
 
 export interface UseClientesReturn {
   clientes: Cliente[];
   isLoading: boolean;
-  search: string;
-  setSearch: (search: string) => void;
-  filteredClientes: Cliente[];
+  isSaving: boolean;
   isAddOpen: boolean;
   setIsAddOpen: (isOpen: boolean) => void;
   editingCliente: Cliente | null;
   setEditingCliente: (cliente: Cliente | null) => void;
-  newCliente: Partial<Cliente>;
-  setNewCliente: (data: Partial<Cliente>) => void;
-  handleAddCliente: () => Promise<void>;
-  handleUpdateCliente: () => Promise<void>;
-  handleDeleteCliente: (id: number) => Promise<void>;
+  handleAddCliente: (data: ClienteFormValues) => Promise<boolean>;
+  handleUpdateCliente: (clienteId: number, data: ClienteFormValues) => Promise<boolean>;
+  handleDeleteCliente: (id: number) => Promise<boolean>;
   deleteId: number | null;
   setDeleteId: (id: number | null) => void;
   isDeleteOpen: boolean;
   setIsDeleteOpen: (isOpen: boolean) => void;
 }
 
-const clienteVazio: Partial<Cliente> = {
-  name_cliente: '',
-  nome_empresa: '',
-  cnpj: '',
-  cpf: '',
-  telefone: ''
-};
-
 export function useClientes(): UseClientesReturn {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [search, setSearch] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingCliente, setEditingCliente] = useState<Cliente | null>(null);
-  const [newCliente, setNewCliente] = useState<Partial<Cliente>>(clienteVazio);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-  // GET: Listar
   const fetchClientes = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/clientes');
-      const data: Cliente[] = await res.json();
+      const response = await fetch('/api/clientes');
+      const data: Cliente[] = await response.json();
 
       setClientes(
         data.map((item) => ({
@@ -75,182 +63,176 @@ export function useClientes(): UseClientesReturn {
   }, []);
 
   useEffect(() => {
-    fetchClientes();
+    void fetchClientes();
   }, [fetchClientes]);
 
-  // Filtered clientes - searches by name, empresa, cpf, cnpj
-  const filteredClientes = clientes.filter(
-    (cliente) =>
-      cliente.name_cliente.toLowerCase().includes(search.toLowerCase()) ||
-      cliente.nome_empresa.toLowerCase().includes(search.toLowerCase()) ||
-      cliente.cpf.includes(search) ||
-      (cliente.cnpj && cliente.cnpj.includes(search)) ||
-      (cliente.telefone && cliente.telefone.includes(search))
-  );
-
-  // POST: Criar
-  const createCliente = async (data: Partial<Cliente>) => {
-    const res = await fetch('/api/clientes', {
+  const createCliente = async (data: ClienteFormValues) => {
+    const response = await fetch('/api/clientes', {
       method: 'POST',
       body: JSON.stringify({
         name_cliente: data.name_cliente,
         nome_empresa: data.nome_empresa,
         cnpj: data.cnpj || '',
-        cpf: data.cpf,
+        cpf: data.cpf || '',
         telefone: data.telefone,
         status: true
       })
     });
-    if (res.status === 409) {
-      const body = await res.json();
+
+    if (response.status === 409) {
+      const body = await response.json();
       throw new Error(body.error);
     }
-    if (!res.ok) throw new Error('Erro ao adicionar cliente');
+
+    if (!response.ok) {
+      throw new Error('Erro ao adicionar cliente');
+    }
+
     await fetchClientes();
   };
 
-  // PUT: Editar
-  const updateCliente = async (id: number, data: Partial<Cliente>) => {
-    const res = await fetch(`/api/clientes/${id}`, {
+  const updateCliente = async (id: number, data: ClienteFormValues) => {
+    const response = await fetch(`/api/clientes/${id}`, {
       method: 'PUT',
       body: JSON.stringify({
         name_cliente: data.name_cliente,
         nome_empresa: data.nome_empresa,
         cnpj: data.cnpj || '',
-        cpf: data.cpf,
+        cpf: data.cpf || '',
         telefone: data.telefone,
-        status: data.status ?? true
+        status: true
       })
     });
-    if (res.ok) await fetchClientes();
+
+    if (!response.ok) {
+      throw new Error('Erro ao atualizar cliente');
+    }
+
+    await fetchClientes();
   };
 
-  // DELETE: Remover
   const deleteCliente = async (id: number) => {
-    const res = await fetch(`/api/clientes/${id}`, { method: 'DELETE' });
-    if (res.ok) await fetchClientes();
+    const response = await fetch(`/api/clientes/${id}`, { method: 'DELETE' });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || 'Erro ao excluir cliente');
+    }
+
+    await fetchClientes();
   };
 
-  // Handlers
-  const handleAddCliente = async () => {
-    setIsLoading(true);
+  const validateUniqueDocument = (data: ClienteFormValues, clienteId?: number) => {
+    const cpf = data.cpf?.replace(/\D/g, '');
+    const cnpj = data.cnpj?.replace(/\D/g, '');
+
+    if (cpf) {
+      const hasDuplicateCpf = clientes.some(
+        (cliente) =>
+          cliente.id !== clienteId && cliente.cpf?.replace(/\D/g, '') === cpf
+      );
+
+      if (hasDuplicateCpf) {
+        throw new Error(
+          clienteId
+            ? 'Já existe outro cliente cadastrado com este CPF'
+            : 'Já existe um cliente cadastrado com este CPF'
+        );
+      }
+    }
+
+    if (cnpj) {
+      const hasDuplicateCnpj = clientes.some(
+        (cliente) =>
+          cliente.id !== clienteId && cliente.cnpj?.replace(/\D/g, '') === cnpj
+      );
+
+      if (hasDuplicateCnpj) {
+        throw new Error(
+          clienteId
+            ? 'Já existe outro cliente cadastrado com este CNPJ'
+            : 'Já existe um cliente cadastrado com este CNPJ'
+        );
+      }
+    }
+  };
+
+  const handleAddCliente = async (data: ClienteFormValues) => {
+    setIsSaving(true);
     try {
-      clienteSchema.parse(newCliente);
-
-      const cpfNovo = newCliente.cpf?.replace(/\D/g, '');
-      const cnpjNovo = newCliente.cnpj?.replace(/\D/g, '');
-
-      if (cpfNovo) {
-        const cpfDuplicado = clientes.some(
-          (c) => c.cpf?.replace(/\D/g, '') === cpfNovo
-        );
-        if (cpfDuplicado) {
-          toast.error('Já existe um cliente cadastrado com este CPF');
-          return;
-        }
-      }
-
-      if (cnpjNovo) {
-        const cnpjDuplicado = clientes.some(
-          (c) => c.cnpj?.replace(/\D/g, '') === cnpjNovo
-        );
-        if (cnpjDuplicado) {
-          toast.error('Já existe um cliente cadastrado com este CNPJ');
-          return;
-        }
-      }
-
-      await createCliente(newCliente);
-      setNewCliente(clienteVazio);
+      clienteSchema.parse(data);
+      validateUniqueDocument(data);
+      await createCliente(data);
       setIsAddOpen(false);
       toast.success('Cliente adicionado com sucesso!');
+      return true;
     } catch (error) {
       if (error instanceof ZodError) {
-        toast.error(error.issues[0].message);
+        toast.error(error.issues[0]?.message ?? 'Dados inválidos');
       } else if (error instanceof Error) {
         toast.error(error.message);
       } else {
         toast.error('Erro ao adicionar cliente');
       }
+      return false;
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
-  const handleUpdateCliente = async () => {
-    if (!editingCliente) return;
-
-    setIsLoading(true);
+  const handleUpdateCliente = async (
+    clienteId: number,
+    data: ClienteFormValues
+  ) => {
+    setIsSaving(true);
     try {
-      clienteSchema.parse(editingCliente);
-
-      const cpfEditado = editingCliente.cpf?.replace(/\D/g, '');
-      const cnpjEditado = editingCliente.cnpj?.replace(/\D/g, '');
-
-      if (cpfEditado) {
-        const cpfDuplicado = clientes.some(
-          (c) => c.id !== editingCliente.id && c.cpf?.replace(/\D/g, '') === cpfEditado
-        );
-        if (cpfDuplicado) {
-          toast.error('Já existe outro cliente cadastrado com este CPF');
-          return;
-        }
-      }
-
-      if (cnpjEditado) {
-        const cnpjDuplicado = clientes.some(
-          (c) => c.id !== editingCliente.id && c.cnpj?.replace(/\D/g, '') === cnpjEditado
-        );
-        if (cnpjDuplicado) {
-          toast.error('Já existe outro cliente cadastrado com este CNPJ');
-          return;
-        }
-      }
-
-      await updateCliente(editingCliente.id, editingCliente);
+      clienteSchema.parse(data);
+      validateUniqueDocument(data, clienteId);
+      await updateCliente(clienteId, data);
       setEditingCliente(null);
       toast.success('Cliente atualizado com sucesso!');
+      return true;
     } catch (error) {
-      console.error('Erro ao atualizar:', error);
+      console.error('Erro ao atualizar cliente:', error);
       if (error instanceof ZodError) {
-        toast.error(error.issues[0].message);
+        toast.error(error.issues[0]?.message ?? 'Dados inválidos');
       } else if (error instanceof Error) {
         toast.error(error.message);
       } else {
         toast.error('Erro ao atualizar cliente');
       }
+      return false;
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
   const handleDeleteCliente = async (id: number) => {
-    setIsLoading(true);
+    setIsSaving(true);
     try {
       await deleteCliente(id);
       setIsDeleteOpen(false);
       setDeleteId(null);
       toast.success('Cliente excluído com sucesso!');
+      return true;
     } catch (error) {
-      console.error('Erro ao excluir:', error);
-      toast.error('Erro ao excluir cliente');
+      console.error('Erro ao excluir cliente:', error);
+      const message = error instanceof Error ? error.message : 'Erro ao excluir cliente';
+      toast.error(message);
+      return false;
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
   return {
     clientes,
     isLoading,
-    search,
-    setSearch,
-    filteredClientes,
+    isSaving,
     isAddOpen,
     setIsAddOpen,
     editingCliente,
     setEditingCliente,
-    newCliente,
-    setNewCliente,
     handleAddCliente,
     handleUpdateCliente,
     handleDeleteCliente,

@@ -64,6 +64,7 @@ export interface OrdemVendaCompleta {
   id: number;
   data_criacao: string;
   data_pagamento: string | null;
+  data_previsao_pagamento: string | null;
   status: 'ativa' | 'fechada' | 'cancelada';
   cliente_id: number;
   observacao: string | null;
@@ -125,16 +126,12 @@ export interface UseOrdensReturn {
   setIsAddServicoOpen: (open: boolean) => void;
   editingServico: OrdemServicoCompleta | null;
   setEditingServico: (ordem: OrdemServicoCompleta | null) => void;
-  viewingServico: OrdemServicoCompleta | null;
-  setViewingServico: (ordem: OrdemServicoCompleta | null) => void;
 
   // Modal Ordem Venda
   isAddVendaOpen: boolean;
   setIsAddVendaOpen: (open: boolean) => void;
   editingVenda: OrdemVendaCompleta | null;
   setEditingVenda: (ordem: OrdemVendaCompleta | null) => void;
-  viewingVenda: OrdemVendaCompleta | null;
-  setViewingVenda: (ordem: OrdemVendaCompleta | null) => void;
 
   // Delete
   deleteId: { type: 'servico' | 'venda'; id: number } | null;
@@ -183,12 +180,10 @@ export function useOrdens(): UseOrdensReturn {
   // Modais Ordem Serviço
   const [isAddServicoOpen, setIsAddServicoOpen] = useState(false);
   const [editingServico, setEditingServico] = useState<OrdemServicoCompleta | null>(null);
-  const [viewingServico, setViewingServico] = useState<OrdemServicoCompleta | null>(null);
 
   // Modais Ordem Venda
   const [isAddVendaOpen, setIsAddVendaOpen] = useState(false);
   const [editingVenda, setEditingVenda] = useState<OrdemVendaCompleta | null>(null);
-  const [viewingVenda, setViewingVenda] = useState<OrdemVendaCompleta | null>(null);
 
   // Delete
   const [deleteId, setDeleteId] = useState<{ type: 'servico' | 'venda'; id: number } | null>(null);
@@ -471,15 +466,11 @@ export function useOrdens(): UseOrdensReturn {
     setIsAddServicoOpen,
     editingServico,
     setEditingServico,
-    viewingServico,
-    setViewingServico,
 
     isAddVendaOpen,
     setIsAddVendaOpen,
     editingVenda,
     setEditingVenda,
-    viewingVenda,
-    setViewingVenda,
 
     deleteId,
     setDeleteId,

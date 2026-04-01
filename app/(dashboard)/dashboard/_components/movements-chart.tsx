@@ -28,6 +28,12 @@ export interface ChartDay {
 
 const DAY_NAMES = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
+// Recharts renders SVG directly and does not accept Tailwind/CSS classes.
+// These constants align chart typography with the design system (text-[10px] ≈ 10px).
+const CHART_TICK_SIZE = 11;
+const CHART_TOOLTIP_SIZE = 12;
+const CHART_HEIGHT = 'h-[200px]';
+
 export function buildLast7Days(
   movimentacoes: { created_at: string }[]
 ): ChartDay[] {
@@ -107,12 +113,12 @@ export function MovementsChart({
           <p className='text-muted-sm mt-0.5'>Últimos 7 dias</p>
         </div>
         <div className='size-8 rounded-md flex items-center justify-center border border-border bg-elevated text-primary'>
-          <ChartColumnIncreasing size={16} />
+          <ChartColumnIncreasing size={16} aria-hidden='true' />
         </div>
       </div>
 
       {state === 'unavailable' ? (
-        <Empty className='border-border bg-card h-[200px]'>
+        <Empty className={`border-border bg-card ${CHART_HEIGHT}`}>
           <EmptyHeader>
             <EmptyTitle>Dados indisponíveis</EmptyTitle>
             <EmptyDescription>
@@ -121,15 +127,15 @@ export function MovementsChart({
           </EmptyHeader>
         </Empty>
       ) : isLoading ? (
-        <Skeleton className='h-[200px] w-full rounded-[8px]' />
+        <Skeleton className={`${CHART_HEIGHT} w-full rounded-md`} />
       ) : data.every((d) => d.count === 0) ? (
-        <div className='flex items-center justify-center h-[200px]'>
+        <div className={`flex items-center justify-center ${CHART_HEIGHT}`}>
           <p className='text-muted-sm'>
             Nenhuma movimentação nos últimos 7 dias
           </p>
         </div>
       ) : (
-        <div className='h-[200px]'>
+        <div className={CHART_HEIGHT} role='img' aria-label='Gráfico de barras com movimentações dos últimos 7 dias'>
           <ResponsiveContainer width='100%' height='100%'>
             <BarChart
               data={data}
@@ -156,7 +162,7 @@ export function MovementsChart({
                     x={x}
                     y={y + 12}
                     textAnchor='middle'
-                    fontSize={11}
+                    fontSize={CHART_TICK_SIZE}
                     fill={
                       data[index]?.isToday
                         ? 'var(--primary)'
@@ -171,7 +177,7 @@ export function MovementsChart({
               />
               <YAxis
                 allowDecimals={false}
-                tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
+                tick={{ fontSize: CHART_TICK_SIZE, fill: 'var(--muted-foreground)' }}
                 axisLine={false}
                 tickLine={false}
               />
@@ -182,8 +188,8 @@ export function MovementsChart({
                 contentStyle={{
                   backgroundColor: 'var(--popover)',
                   border: '1px solid var(--border)',
-                  borderRadius: 8,
-                  fontSize: 12,
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: CHART_TOOLTIP_SIZE,
                   color: 'var(--foreground)'
                 }}
                 labelStyle={{ color: 'var(--muted-foreground)' }}

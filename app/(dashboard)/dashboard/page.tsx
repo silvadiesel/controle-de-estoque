@@ -11,7 +11,7 @@ import { type Peca } from '@/db/schema/pecas';
 import { ActivityFeed, type MovimentacaoAPI } from './_components/activity-feed';
 import { buildLast7Days, MovementsChart } from './_components/movements-chart';
 import { LastOrders, type OrdemServicoItem, type OrdemVendaItem } from './_components/last-orders';
-import { StatCard } from './_components/stat-card';
+import { StatCard } from '@/components/ui/stat-card';
 import { deriveDashboardState, type RequestBucket } from './_lib/dashboard-state';
 
 export default function DashboardPage() {
@@ -92,7 +92,7 @@ export default function DashboardPage() {
     <div className="flex flex-1 flex-col gap-4 p-4 lg:p-6" data-dashboard-state={dashboardState}>
       {/* Header */}
       <div className="flex flex-col gap-0.5">
-        <h1 className="text-[22px] font-bold text-foreground">
+        <h1 className="text-xl font-bold text-foreground">
           Dashboard
         </h1>
         <p className="text-muted-sm">Visão geral do sistema</p>

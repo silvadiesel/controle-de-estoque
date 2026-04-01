@@ -51,8 +51,8 @@ export function ModalFornecedores({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className='bg-[#18181b] border-[#27272a] rounded-[12px] max-w-[540px] p-0'>
-        <DialogHeader className='p-6 pb-4 border-b border-[#27272a]'>
+      <DialogContent className='bg-card border-border rounded-xl max-w-[540px] p-0'>
+        <DialogHeader className='p-6 pb-4 border-b border-border'>
           <div className='flex items-center gap-3 mb-1'>
             <div className='flex h-9 w-9 items-center justify-center rounded-lg bg-primary/12'>
               <Factory className='h-4.5 w-4.5 text-primary' />
@@ -61,7 +61,7 @@ export function ModalFornecedores({
               <DialogTitle className='text-foreground'>
                 {isEdit ? 'Editar Fornecedor' : 'Adicionar Fornecedor'}
               </DialogTitle>
-              <DialogDescription className='text-[#71717a]'>
+              <DialogDescription className='text-muted-foreground'>
                 {isEdit
                   ? 'Altere os dados do fornecedor'
                   : 'Cadastre um novo fornecedor no sistema'}
@@ -73,49 +73,49 @@ export function ModalFornecedores({
           <div className='grid gap-4 p-6 pt-4'>
             <div className='grid gap-4 sm:grid-cols-2'>
               <div className='space-y-2'>
-                <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Nome / Razão Social *</Label>
+                <Label className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>Nome / Razão Social *</Label>
                 <Input
                   value={data.name_empresa || ''}
                   onChange={(e) =>
                     setData({ ...data, name_empresa: e.target.value })
                   }
                   placeholder='AutoPeças Brasil'
-                  className='bg-[#131316] border-[#27272a]'
+                  className='bg-input border-border'
                 />
               </div>
               <div className='space-y-2'>
-                <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>CNPJ *</Label>
+                <Label className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>CNPJ *</Label>
                 <Input
                   value={data.cnpj || ''}
                   onChange={(e) => handleCNPJChange(e.target.value)}
                   placeholder='00.000.000/0001-00'
-                  className='bg-[#131316] border-[#27272a]'
+                  className='bg-input border-border'
                 />
               </div>
             </div>
             <div className='grid gap-4 sm:grid-cols-2'>
               <div className='space-y-2'>
-                <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Telefone</Label>
+                <Label className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>Telefone</Label>
                 <Input
                   value={data.telefone || ''}
                   onChange={(e) => handlePhoneChange(e.target.value)}
                   placeholder='(11) 99999-9999'
-                  className='bg-[#131316] border-[#27272a]'
+                  className='bg-input border-border'
                 />
               </div>
               <div className='space-y-2'>
-                <Label className='text-[#a1a1aa] uppercase text-[10px] tracking-wider font-medium'>Email</Label>
+                <Label className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>Email</Label>
                 <Input
                   value={data.email || ''}
                   onChange={(e) => setData({ ...data, email: e.target.value })}
                   placeholder='vendas@fornecedor.com'
-                  className='bg-[#131316] border-[#27272a]'
+                  className='bg-input border-border'
                 />
               </div>
             </div>
           </div>
         </ScrollArea>
-        <DialogFooter className='px-6 py-4 border-t border-[#27272a]'>
+        <DialogFooter className='px-6 py-4 border-t border-border'>
           <Button variant='outline' onClick={() => setIsOpen(false)} className='w-32'>
             Cancelar
           </Button>

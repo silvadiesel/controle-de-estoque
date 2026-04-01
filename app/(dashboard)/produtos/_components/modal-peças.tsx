@@ -14,6 +14,7 @@ import {
 import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import type { Peca } from '@/db/schema';
+import { blockNonNumericKeyDown } from '@/app/utils/formatters';
 
 import { CloudDownload, Package, Trash2 } from 'lucide-react';
 
@@ -66,10 +67,10 @@ export function ModalPecas({
               <Package className='h-4 w-4 text-primary' />
             </div>
             <div>
-              <DialogTitle className='text-[16px] font-bold text-foreground'>
+              <DialogTitle className='text-base font-bold text-foreground'>
                 {editingPeca ? 'Editar Produto' : 'Adicionar Novo Produto'}
               </DialogTitle>
-              <p className='text-[12px] text-muted-foreground mt-0.5'>
+              <p className='text-xs text-muted-foreground mt-0.5'>
                 {editingPeca ? 'Atualize as informações do produto' : 'Preencha os dados do novo produto'}
               </p>
             </div>
@@ -79,7 +80,7 @@ export function ModalPecas({
         <div className='p-5'>
           <div className='grid grid-cols-1 md:grid-cols-12 gap-6'>
             <div className='md:col-span-4 flex flex-col gap-2'>
-              <span className='text-[10px] uppercase tracking-[0.8px] text-muted-foreground font-semibold'>
+              <span className='text-xs uppercase tracking-wider text-muted-foreground font-semibold'>
                 Imagem do Produto
               </span>
 
@@ -108,12 +109,12 @@ export function ModalPecas({
                   className='flex flex-col items-center justify-center w-full h-52 md:h-full min-h-[200px] border border-dashed rounded-lg cursor-pointer bg-background border-border hover:border-primary transition-colors group'>
                   <div className='flex flex-col items-center justify-center pt-5 pb-6 text-center px-4'>
                     <CloudDownload className='w-10 h-10 text-muted-foreground mb-3 group-hover:text-primary transition-colors' />
-                    <p className='mb-1 text-[13px] text-muted-foreground font-medium'>
+                    <p className='mb-1 text-sm text-muted-foreground font-medium'>
                       <span className='font-semibold text-foreground'>
                         Clique para adicionar
                       </span>
                     </p>
-                    <p className='text-[11px] text-muted-foreground'>(Opcional)</p>
+                    <p className='text-xs text-muted-foreground'>(Opcional)</p>
                   </div>
                   <input
                     id='dropzone-file'
@@ -132,7 +133,7 @@ export function ModalPecas({
                 onSubmit={onSubmit}
                 className='flex flex-col gap-5'>
                 <div>
-                  <span className='text-[10px] uppercase tracking-[0.8px] text-muted-foreground font-semibold'>
+                  <span className='text-xs uppercase tracking-wider text-muted-foreground font-semibold'>
                     Identificacao
                   </span>
                   <div className='grid grid-cols-1 md:grid-cols-3 gap-3 mt-2'>
@@ -170,7 +171,7 @@ export function ModalPecas({
                 </div>
 
                 <div>
-                  <span className='text-[10px] uppercase tracking-[0.8px] text-muted-foreground font-semibold'>
+                  <span className='text-xs uppercase tracking-wider text-muted-foreground font-semibold'>
                     Localizacao no Estoque
                   </span>
                   <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2'>
@@ -228,7 +229,7 @@ export function ModalPecas({
                 </div>
 
                 <div>
-                  <span className='text-[10px] uppercase tracking-[0.8px] text-muted-foreground font-semibold'>
+                  <span className='text-xs uppercase tracking-wider text-muted-foreground font-semibold'>
                     Classificacao
                   </span>
                   <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2'>
@@ -273,7 +274,7 @@ export function ModalPecas({
                 </div>
 
                 <div>
-                  <span className='text-[10px] uppercase tracking-[0.8px] text-muted-foreground font-semibold'>
+                  <span className='text-xs uppercase tracking-wider text-muted-foreground font-semibold'>
                     Estoque e Preco
                   </span>
                   <div className='grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2'>
@@ -282,14 +283,14 @@ export function ModalPecas({
                         <FieldLabel htmlFor='quantity'>Quantidade</FieldLabel>
                         <Input
                           id='quantity'
-                          type='number'
-                          value={newPeca.quantidade || ''}
-                          onChange={(e) =>
-                            setNewPeca({
-                              ...newPeca,
-                              quantidade: Number(e.target.value) || undefined
-                            })
-                          }
+                          type='text'
+                          inputMode='numeric'
+                          value={newPeca.quantidade ?? ''}
+                          onKeyDown={blockNonNumericKeyDown}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/\D/g, '');
+                            setNewPeca({ ...newPeca, quantidade: val ? Number(val) : undefined });
+                          }}
                           placeholder='0'
                           className='font-mono'
                         />
@@ -312,7 +313,7 @@ export function ModalPecas({
                 </div>
 
                 <div>
-                  <span className='text-[10px] uppercase tracking-[0.8px] text-muted-foreground font-semibold'>
+                  <span className='text-xs uppercase tracking-wider text-muted-foreground font-semibold'>
                     Alertas
                   </span>
                   <div className='mt-2'>
@@ -321,18 +322,15 @@ export function ModalPecas({
                         <FieldLabel htmlFor='alerta'>Quantidade para Alerta</FieldLabel>
                         <Input
                           id='alerta'
-                          type='number'
+                          type='text'
+                          inputMode='numeric'
                           value={newPeca.alerta ?? ''}
-                          onChange={(e) =>
-                            setNewPeca({
-                              ...newPeca,
-                              alerta: e.target.value
-                                ? Number(e.target.value)
-                                : undefined
-                            })
-                          }
+                          onKeyDown={blockNonNumericKeyDown}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/\D/g, '');
+                            setNewPeca({ ...newPeca, alerta: val ? Number(val) : undefined });
+                          }}
                           placeholder='1'
-                          min='0'
                           className='font-mono'
                         />
                         <FieldDescription>
@@ -354,14 +352,14 @@ export function ModalPecas({
             size='default'
             onClick={() => handleOpenChange(false)}
             disabled={isLoading}
-            className='text-[13px] text-muted-foreground hover:text-foreground'>
+            className='text-sm text-muted-foreground hover:text-foreground'>
             Cancelar
           </Button>
           <Button
             type='submit'
             form='peca-form'
             size='default'
-            className='bg-primary text-primary-foreground hover:bg-primary/90 text-[13px] px-6'
+            className='bg-primary text-primary-foreground hover:bg-primary/90 text-sm px-6'
             disabled={isLoading}>
             {isLoading
               ? 'Salvando...'
