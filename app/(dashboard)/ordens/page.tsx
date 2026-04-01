@@ -28,7 +28,6 @@ import { Peca } from '@/db/schema/pecas';
 import { usePagination } from '@/hooks/usePagination';
 
 import {
-  ModalDetalhesOrdem,
   ModalOrdemServico,
   ModalOrdemVenda
 } from './_components';
@@ -94,14 +93,10 @@ export default function OrdensPage() {
     setIsAddServicoOpen,
     editingServico,
     setEditingServico,
-    viewingServico,
-    setViewingServico,
     isAddVendaOpen,
     setIsAddVendaOpen,
     editingVenda,
     setEditingVenda,
-    viewingVenda,
-    setViewingVenda,
     setDeleteId,
     isDeleteOpen,
     setIsDeleteOpen,
@@ -455,7 +450,6 @@ export default function OrdensPage() {
                           toggleExpanded('servico', serviceOrder.id)
                         }
                         onEdit={() => setEditingServico(serviceOrder)}
-                        onViewDetails={() => setViewingServico(serviceOrder)}
                         onDelete={() => {
                           setDeleteId({ type: 'servico', id: serviceOrder.id });
                           setIsDeleteOpen(true);
@@ -491,7 +485,6 @@ export default function OrdensPage() {
                         }
                         onToggle={() => toggleExpanded('venda', saleOrder.id)}
                         onEdit={() => setEditingVenda(saleOrder)}
-                        onViewDetails={() => setViewingVenda(saleOrder)}
                         onDelete={() => {
                           setDeleteId({ type: 'venda', id: saleOrder.id });
                           setIsDeleteOpen(true);
@@ -665,32 +658,6 @@ export default function OrdensPage() {
               editingVenda.id,
               data as NovaOrdemVenda
             );
-          }
-        }}
-        isLoading={isLoading}
-      />
-
-      <ModalDetalhesOrdem
-        type='servico'
-        ordem={viewingServico}
-        isOpen={Boolean(viewingServico)}
-        setIsOpen={(open) => !open && setViewingServico(null)}
-        onUpdateStatus={(status) => {
-          if (viewingServico) {
-            handleUpdateOrdemServico(viewingServico.id, { status });
-          }
-        }}
-        isLoading={isLoading}
-      />
-
-      <ModalDetalhesOrdem
-        type='venda'
-        ordem={viewingVenda}
-        isOpen={Boolean(viewingVenda)}
-        setIsOpen={(open) => !open && setViewingVenda(null)}
-        onUpdateStatus={(status) => {
-          if (viewingVenda) {
-            handleUpdateOrdemVenda(viewingVenda.id, { status });
           }
         }}
         isLoading={isLoading}

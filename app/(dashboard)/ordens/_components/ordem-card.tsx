@@ -8,26 +8,25 @@ import {
   CollapsibleContent,
   CollapsibleTrigger
 } from '@/components/ui/collapsible';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
 import type {
   OrdemServicoCompleta,
   OrdemVendaCompleta
 } from '../_hooks/useOrdens';
+import { OrdemStatusBadge } from './ordem-status-badge';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
   CheckCircle2,
   ChevronDown,
-  ClipboardList,
   Pencil,
   ShoppingCart,
   Trash2,
   Wrench,
   XCircle
 } from 'lucide-react';
-
-import { OrdemStatusBadge } from './ordem-status-badge';
 
 type OrdemCardProps =
   | {
@@ -36,7 +35,6 @@ type OrdemCardProps =
       expanded: boolean;
       onToggle: () => void;
       onEdit: () => void;
-      onViewDetails: () => void;
       onDelete: () => void;
       onFinalize: () => void;
       onCancel: () => void;
@@ -48,7 +46,6 @@ type OrdemCardProps =
       expanded: boolean;
       onToggle: () => void;
       onEdit: () => void;
-      onViewDetails: () => void;
       onDelete: () => void;
       onFinalize: () => void;
       onCancel: () => void;
@@ -61,8 +58,10 @@ const formatCurrency = (value: number) =>
     currency: 'BRL'
   });
 
-const formatDate = (date: string | null | undefined, formatter = 'dd/MM/yyyy') =>
-  date ? format(new Date(date), formatter, { locale: ptBR }) : '-';
+const formatDate = (
+  date: string | null | undefined,
+  formatter = 'dd/MM/yyyy'
+) => (date ? format(new Date(date), formatter, { locale: ptBR }) : '-');
 
 const paymentMethodLabel: Record<string, string> = {
   pix: 'PIX',
@@ -73,13 +72,7 @@ const paymentMethodLabel: Record<string, string> = {
   dinheiro: 'Dinheiro'
 };
 
-function OrdemInfoBlock({
-  label,
-  value
-}: {
-  label: string;
-  value: string;
-}) {
+function OrdemInfoBlock({ label, value }: { label: string; value: string }) {
   return (
     <div className='rounded-lg border border-border bg-background/60 px-3 py-2.5'>
       <p className='text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground'>
@@ -97,7 +90,6 @@ export function OrdemCard(props: OrdemCardProps) {
     expanded,
     onToggle,
     onEdit,
-    onViewDetails,
     onDelete,
     onFinalize,
     onCancel,
@@ -116,7 +108,8 @@ export function OrdemCard(props: OrdemCardProps) {
     }
 
     return [
-      paymentMethodLabel[props.ordem.metodo_pagamento ?? ''] ?? 'Método não informado',
+      paymentMethodLabel[props.ordem.metodo_pagamento ?? ''] ??
+        'Método não informado',
       props.ordem.cliente?.nome_empresa || 'Cliente sem empresa'
     ]
       .filter(Boolean)
@@ -125,7 +118,6 @@ export function OrdemCard(props: OrdemCardProps) {
 
   const Icon = tipo === 'servico' ? Wrench : ShoppingCart;
   const cardLabel = tipo === 'servico' ? 'OS' : 'OV';
-  const previewItems = ordem.pecas.slice(0, 2);
 
   return (
     <Collapsible
@@ -135,81 +127,79 @@ export function OrdemCard(props: OrdemCardProps) {
         'overflow-hidden rounded-xl border border-border bg-card transition-[border-color,transform] duration-200 ease-out',
         'hover:border-border-hover',
         expanded && 'border-border-hover'
-      )}
-    >
+      )}>
       <CollapsibleTrigger asChild>
         <button
           type='button'
           className={cn(
-            'flex w-full items-start gap-3 px-4 py-4 text-left transition-colors duration-200 ease-out sm:items-center',
+            'flex w-full items-start gap-3 px-4 py-4 text-left transition-colors duration-200 ease-out sm:items-center justify-between',
             'hover:bg-elevated/40'
-          )}
-        >
-          <div className='flex size-9 items-center justify-center rounded-lg border border-border bg-elevated text-primary'>
-            <Icon />
-            <span className='sr-only'>{tipo}</span>
-          </div>
-
-          <div className='flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:gap-4'>
-            <div className='min-w-16 shrink-0'>
-              <p className='text-[10px] uppercase tracking-[0.08em] text-muted-foreground'>
-                {cardLabel}
-              </p>
-              <p className='text-sm font-semibold text-foreground'>
-                #{ordem.id}
-              </p>
+          )}>
+          <div className='flex items-center gap-3'>
+            <div className='flex size-9 items-center justify-center rounded-lg border border-border bg-elevated text-primary'>
+              <Icon />
+              <span className='sr-only'>{tipo}</span>
             </div>
 
-            <div className='min-w-0 sm:basis-1/4 sm:max-w-[24%] sm:shrink-0'>
-              <p className='truncate text-sm font-semibold text-foreground'>
-                {ordem.cliente?.name_cliente || 'Cliente não encontrado'}
-              </p>
-              <p className='truncate text-xs text-muted-foreground'>
-                {headerMeta}
-              </p>
-            </div>
-
-            <div className='min-w-0 flex-1'>
-              <p className='text-[10px] uppercase tracking-[0.08em] text-muted-foreground sm:hidden'>
-                Contexto operacional
-              </p>
-              <p className='truncate text-sm font-medium text-foreground'>
-                {tipo === 'servico'
-                  ? [ordem.veiculo?.placa, ordem.veiculo?.modelo]
-                      .filter(Boolean)
-                      .join(' · ') || 'Veículo não informado'
-                  : paymentMethodLabel[ordem.metodo_pagamento ?? ''] ??
-                    'Método não informado'}
-              </p>
-              <p className='truncate text-xs text-muted-foreground'>
-                {tipo === 'servico'
-                  ? `Resp. ${ordem.funcionario_responsavel?.name ?? 'Sem responsável'}`
-                  : ordem.cliente?.nome_empresa || 'Cliente sem empresa'}
-              </p>
+            <div className='min-w-20 shrink-0'>
+              <div className='flex flex-col items-start justify-center'>
+                <p className='text-[10px] uppercase tracking-[0.08em] text-muted-foreground'>
+                  {cardLabel}
+                </p>
+                <p className='text-sm font-semibold text-foreground'>
+                  #{ordem.id}
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className='ml-auto flex shrink-0 items-center gap-3'>
-            <div className='hidden shrink-0 md:block'>
-              <OrdemStatusBadge status={ordem.status} />
-            </div>
-
-            <div className='shrink-0 text-right'>
-              <p className='text-[10px] uppercase tracking-[0.08em] text-muted-foreground'>
-                Total
-              </p>
-              <p className='text-sm font-semibold text-foreground'>
-                {formatCurrency(ordem.valor_total)}
-              </p>
-            </div>
-
-            <ChevronDown
-              className={cn(
-                'shrink-0 text-muted-foreground transition-transform duration-200 ease-out',
-                expanded && 'rotate-180'
-              )}
-            />
+          <div className='min-w-0 w-1/4 sm:basis-1/4 sm:shrink-0'>
+            <p className='truncate text-sm font-semibold text-foreground'>
+              {ordem.cliente?.name_cliente || 'Cliente não encontrado'}
+            </p>
+            <p className='truncate text-xs text-muted-foreground'>
+              {headerMeta}
+            </p>
           </div>
+
+          <div className='min-w-0 flex w-1/4 flex-col items-start justify-center'>
+            <p className='text-[10px] uppercase tracking-[0.08em] text-muted-foreground sm:hidden'>
+              Contexto operacional
+            </p>
+            <p className='truncate text-sm font-medium text-foreground'>
+              {tipo === 'servico'
+                ? [ordem.veiculo?.placa, ordem.veiculo?.modelo]
+                    .filter(Boolean)
+                    .join(' · ') || 'Veículo não informado'
+                : (paymentMethodLabel[ordem.metodo_pagamento ?? ''] ??
+                  'Método não informado')}
+            </p>
+            <p className='truncate text-xs text-muted-foreground'>
+              {tipo === 'servico'
+                ? `Resp. ${ordem.funcionario_responsavel?.name ?? 'Sem responsável'}`
+                : ordem.cliente?.nome_empresa || 'Cliente sem empresa'}
+            </p>
+          </div>
+
+          <div className='hidden w-1/12 shrink-0 md:block '>
+            <OrdemStatusBadge status={ordem.status} />
+          </div>
+
+          <div className='shrink-0 text-right w-1/12'>
+            <p className='text-[10px] uppercase tracking-[0.08em] text-muted-foreground'>
+              Total
+            </p>
+            <p className='text-sm font-semibold text-foreground'>
+              {formatCurrency(ordem.valor_total)}
+            </p>
+          </div>
+
+          <ChevronDown
+            className={cn(
+              'shrink-0 text-muted-foreground transition-transform duration-200 ease-out',
+              expanded && 'rotate-180'
+            )}
+          />
         </button>
       </CollapsibleTrigger>
 
@@ -279,46 +269,38 @@ export function OrdemCard(props: OrdemCardProps) {
             </div>
           ) : null}
 
-          <div className='flex flex-col gap-2'>
-            <div className='flex items-center justify-between gap-3'>
+          <div className='flex flex-col gap-4'>
+            <div className='pl-2'>
               <p className='text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground'>
-                Itens ({ordem.pecas.length})
+                Itens (
+                <span className='text-primary'>{ordem.pecas.length}</span>)
               </p>
-              <Button variant='ghost' size='sm' onClick={onViewDetails}>
-                <ClipboardList data-icon='inline-start' />
-                Ver detalhes
-              </Button>
             </div>
 
-            {previewItems.length > 0 ? (
-              <div className='flex flex-col gap-2'>
-                {previewItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className='flex items-center justify-between gap-3 rounded-lg border border-border bg-background/60 px-3 py-2.5'
-                  >
-                    <div className='min-w-0'>
-                      <p className='truncate text-sm text-foreground'>
-                        {item.peca?.name_peca || 'Peça não encontrada'}
-                      </p>
-                      <p className='text-xs text-muted-foreground'>
-                        Qtd: {item.quantidade}
-                      </p>
+            {ordem.pecas.length > 0 ? (
+              <ScrollArea className='max-h-[220px]'>
+                <div className='flex flex-col gap-2'>
+                  {ordem.pecas.map((item) => (
+                    <div
+                      key={item.id}
+                      className='flex items-center justify-between gap-3 rounded-lg border border-border bg-background/60 px-3 py-2.5'>
+                      <div className='min-w-0'>
+                        <p className='truncate text-sm text-foreground'>
+                          {item.peca?.name_peca || 'Peça não encontrada'}
+                        </p>
+                        <p className='text-xs text-muted-foreground'>
+                          Qtd: {item.quantidade}
+                        </p>
+                      </div>
+                      <span className='text-sm font-medium text-foreground'>
+                        {formatCurrency(
+                          (item.peca?.preco || 0) * item.quantidade
+                        )}
+                      </span>
                     </div>
-                    <span className='text-sm font-medium text-foreground'>
-                      {formatCurrency((item.peca?.preco || 0) * item.quantidade)}
-                    </span>
-                  </div>
-                ))}
-                {ordem.pecas.length > previewItems.length ? (
-                  <p className='text-xs text-muted-foreground'>
-                    +{ordem.pecas.length - previewItems.length}{' '}
-                    {ordem.pecas.length - previewItems.length === 1
-                      ? 'item adicional'
-                      : 'itens adicionais'}
-                  </p>
-                ) : null}
-              </div>
+                  ))}
+                </div>
+              </ScrollArea>
             ) : (
               <div className='rounded-lg border border-dashed border-border bg-background/40 px-3 py-4 text-sm text-muted-foreground'>
                 Nenhum item vinculado a esta ordem.
@@ -329,39 +311,31 @@ export function OrdemCard(props: OrdemCardProps) {
           <div className='flex flex-wrap items-center justify-end gap-2'>
             {ordem.status === 'ativa' ? (
               <>
-                <Button variant='outline' size='sm' onClick={onEdit}>
+                <Button
+                  variant='outline'
+                  onClick={onEdit}
+                  className='border-border'>
                   <Pencil data-icon='inline-start' />
                   Editar
                 </Button>
                 <Button
-                  variant='outline'
-                  size='sm'
+                  variant='default'
                   onClick={onFinalize}
                   disabled={isBusy}
-                  className='border-success/20 text-success hover:bg-success/10 hover:text-success'
-                >
+                  className='bg-success text-success-foreground hover:bg-success/90'>
                   <CheckCircle2 data-icon='inline-start' />
                   Finalizar
                 </Button>
                 <Button
-                  variant='outline'
-                  size='sm'
+                  variant='destructive'
                   onClick={onCancel}
-                  disabled={isBusy}
-                  className='border-destructive/20 text-destructive hover:bg-destructive/10 hover:text-destructive'
-                >
+                  disabled={isBusy}>
                   <XCircle data-icon='inline-start' />
                   Cancelar
                 </Button>
               </>
             ) : null}
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={onDelete}
-              disabled={isBusy}
-              className='text-destructive hover:text-destructive'
-            >
+            <Button variant='destructive' onClick={onDelete} disabled={isBusy}>
               <Trash2 data-icon='inline-start' />
               Excluir
             </Button>

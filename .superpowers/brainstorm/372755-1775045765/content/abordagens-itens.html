@@ -1,0 +1,124 @@
+<h2>Como exibir todos os itens no card expandido?</h2>
+<p class="subtitle">3 abordagens — clique na que preferir. O card expandido mostraria os itens assim:</p>
+
+<div class="cards">
+
+  <!-- Approach A: Full inline list -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#1a1a2e;border-radius:8px;padding:16px;font-family:system-ui;color:#e0e0e0;font-size:13px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <span style="color:#8899aa;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Itens (<span style="color:#5376b8;">5</span>)</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;background:#12121e;border:1px solid #2a2a3e;border-radius:8px;padding:10px 12px;">
+            <div><div style="color:#e0e0e0;font-size:13px;">Filtro de óleo</div><div style="color:#8899aa;font-size:11px;">Qtd: 2</div></div>
+            <span style="color:#e0e0e0;font-weight:500;">R$ 45,00</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;background:#12121e;border:1px solid #2a2a3e;border-radius:8px;padding:10px 12px;">
+            <div><div style="color:#e0e0e0;font-size:13px;">Pastilha de freio</div><div style="color:#8899aa;font-size:11px;">Qtd: 4</div></div>
+            <span style="color:#e0e0e0;font-weight:500;">R$ 120,00</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;background:#12121e;border:1px solid #2a2a3e;border-radius:8px;padding:10px 12px;">
+            <div><div style="color:#e0e0e0;font-size:13px;">Correia dentada</div><div style="color:#8899aa;font-size:11px;">Qtd: 1</div></div>
+            <span style="color:#e0e0e0;font-weight:500;">R$ 89,90</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;background:#12121e;border:1px solid #2a2a3e;border-radius:8px;padding:10px 12px;">
+            <div><div style="color:#e0e0e0;font-size:13px;">Vela de ignição</div><div style="color:#8899aa;font-size:11px;">Qtd: 4</div></div>
+            <span style="color:#e0e0e0;font-weight:500;">R$ 60,00</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;background:#12121e;border:1px solid #2a2a3e;border-radius:8px;padding:10px 12px;">
+            <div><div style="color:#e0e0e0;font-size:13px;">Fluido de freio</div><div style="color:#8899aa;font-size:11px;">Qtd: 1</div></div>
+            <span style="color:#e0e0e0;font-weight:500;">R$ 35,00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Lista completa inline</h3>
+      <p>Mostra TODOS os itens diretamente no card expandido. Sem truncamento, sem modal. Simples e direto.</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros"><h4>Prós</h4><ul><li>Zero cliques extras</li><li>Toda informação visível de uma vez</li><li>Implementação mais simples</li></ul></div>
+        <div class="cons"><h4>Contras</h4><ul><li>Card pode ficar muito longo com 10+ itens</li><li>Empurra botões de ação pra baixo</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approach B: Scrollable area -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#1a1a2e;border-radius:8px;padding:16px;font-family:system-ui;color:#e0e0e0;font-size:13px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <span style="color:#8899aa;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Itens (<span style="color:#5376b8;">5</span>)</span>
+        </div>
+
+        <div style="max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;border:1px solid #2a2a3e;border-radius:8px;padding:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;background:#12121e;border:1px solid #2a2a3e;border-radius:6px;padding:10px 12px;">
+            <div><div style="color:#e0e0e0;font-size:13px;">Filtro de óleo</div><div style="color:#8899aa;font-size:11px;">Qtd: 2</div></div>
+            <span style="color:#e0e0e0;font-weight:500;">R$ 45,00</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;background:#12121e;border:1px solid #2a2a3e;border-radius:6px;padding:10px 12px;">
+            <div><div style="color:#e0e0e0;font-size:13px;">Pastilha de freio</div><div style="color:#8899aa;font-size:11px;">Qtd: 4</div></div>
+            <span style="color:#e0e0e0;font-weight:500;">R$ 120,00</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;background:#12121e;border:1px solid #2a2a3e;border-radius:6px;padding:10px 12px;">
+            <div><div style="color:#e0e0e0;font-size:13px;">Correia dentada</div><div style="color:#8899aa;font-size:11px;">Qtd: 1</div></div>
+            <span style="color:#e0e0e0;font-weight:500;">R$ 89,90</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;background:#12121e;border:1px solid #2a2a3e;border-radius:6px;padding:8px 12px;opacity:0.5;">
+            <div style="color:#8899aa;font-size:12px;">↓ Scroll para ver mais 2 itens</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — ScrollArea com altura fixa</h3>
+      <p>Todos os itens acessíveis por scroll dentro de uma área de altura limitada (~4 itens visíveis). Card não cresce descontrolado.</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros"><h4>Prós</h4><ul><li>Card mantém tamanho previsível</li><li>Todos itens acessíveis sem modal</li><li>Scroll é suave com RadixUI ScrollArea</li></ul></div>
+        <div class="cons"><h4>Contras</h4><ul><li>Itens no final ficam "escondidos" atrás do scroll</li><li>Pode parecer um mini-modal dentro do card</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approach C: Expandable inline -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="background:#1a1a2e;border-radius:8px;padding:16px;font-family:system-ui;color:#e0e0e0;font-size:13px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <span style="color:#8899aa;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;font-weight:600;">Itens (<span style="color:#5376b8;">5</span>)</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;background:#12121e;border:1px solid #2a2a3e;border-radius:8px;padding:10px 12px;">
+            <div><div style="color:#e0e0e0;font-size:13px;">Filtro de óleo</div><div style="color:#8899aa;font-size:11px;">Qtd: 2</div></div>
+            <span style="color:#e0e0e0;font-weight:500;">R$ 45,00</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;background:#12121e;border:1px solid #2a2a3e;border-radius:8px;padding:10px 12px;">
+            <div><div style="color:#e0e0e0;font-size:13px;">Pastilha de freio</div><div style="color:#8899aa;font-size:11px;">Qtd: 4</div></div>
+            <span style="color:#e0e0e0;font-weight:500;">R$ 120,00</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;background:#12121e;border:1px solid #2a2a3e;border-radius:8px;padding:10px 12px;">
+            <div><div style="color:#e0e0e0;font-size:13px;">Correia dentada</div><div style="color:#8899aa;font-size:11px;">Qtd: 1</div></div>
+            <span style="color:#e0e0e0;font-weight:500;">R$ 89,90</span>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;color:#5376b8;font-size:12px;cursor:pointer;">
+            <span>▼</span>
+            <span>Mostrar mais 2 itens</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Mostrar 3 + "ver mais" inline</h3>
+      <p>Mostra 3 itens inicialmente. Botão "Mostrar mais X itens" expande o resto inline — sem modal, sem scroll. Animação suave.</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros"><h4>Prós</h4><ul><li>Preview maior (3 vs 2 atuais)</li><li>Expansão inline sem sair do contexto</li><li>Melhor balanço entre tamanho e informação</li></ul></div>
+        <div class="cons"><h4>Contras</h4><ul><li>Ainda requer 1 clique para itens além do 3º</li><li>Card cresce quando expandido (mas controlado)</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>
