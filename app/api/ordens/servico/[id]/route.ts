@@ -65,7 +65,8 @@ export async function GET(_request: Request, { params }: Params) {
         id: schema.pecas.id,
         name_peca: schema.pecas.name_peca,
         codigo: schema.pecas.codigo,
-        preco: schema.pecas.preco
+        preco: schema.pecas.preco,
+        quantidade: schema.pecas.quantidade
       }
     })
     .from(schema.ordemServicoPecas)

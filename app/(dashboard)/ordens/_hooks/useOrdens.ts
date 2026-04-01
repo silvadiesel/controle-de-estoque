@@ -24,6 +24,7 @@ export interface OrdemPeca {
     name_peca: string;
     codigo: string;
     preco: number;
+    quantidade: number;
   } | null;
 }
 

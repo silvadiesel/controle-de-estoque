@@ -4,28 +4,33 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/date-picker';
+import { DialogShell } from '@/components/ui/dialog-shell';
 import {
   Field,
   FieldContent,
-  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel
 } from '@/components/ui/field';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { SearchableSelect } from '@/components/ui/searchable-select';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import type { Cliente, Peca, Veiculo } from '@/db/schema';
 import { useUser } from '@/hooks/useUser';
 
+import {
+  type OrdemItemBuilderValue,
+  OrdemItemsBuilder
+} from './ordem-items-builder';
 import { Wrench } from 'lucide-react';
 import { toast } from 'sonner';
-
-import { DialogShell } from '@/components/ui/dialog-shell';
-import {
-  OrdemItemsBuilder,
-  type OrdemItemBuilderValue
-} from './ordem-items-builder';
 
 interface OrdemServicoFormData {
   data_chegada: string;
@@ -116,7 +121,9 @@ export function ModalOrdemServico({
 
   const veiculosDisponiveis = useMemo(
     () =>
-      formData.cliente_id ? getVeiculosByCliente(formData.cliente_id) : veiculos,
+      formData.cliente_id
+        ? getVeiculosByCliente(formData.cliente_id)
+        : veiculos,
     [formData.cliente_id, getVeiculosByCliente, veiculos]
   );
 
@@ -134,7 +141,8 @@ export function ModalOrdemServico({
 
     if (!data.cliente_id) nextErrors.cliente_id = 'Selecione um cliente';
     if (!data.veiculo_id) nextErrors.veiculo_id = 'Selecione um veículo';
-    if (!data.data_chegada) nextErrors.data_chegada = 'Informe a data de chegada';
+    if (!data.data_chegada)
+      nextErrors.data_chegada = 'Informe a data de chegada';
     if (!data.funcionario_responsavel_id) {
       nextErrors.funcionario_responsavel_id =
         'Selecione o funcionário responsável';
@@ -210,11 +218,14 @@ export function ModalOrdemServico({
             Cancelar
           </Button>
           <Button onClick={handleSubmit} disabled={isLoading}>
-            {isLoading ? 'Salvando...' : isEdit ? 'Atualizar ordem' : 'Criar ordem'}
+            {isLoading
+              ? 'Salvando...'
+              : isEdit
+                ? 'Atualizar ordem'
+                : 'Criar ordem'}
           </Button>
         </>
-      }
-    >
+      }>
       <FieldGroup>
         <Field data-invalid={submitted && Boolean(errors.cliente_id)}>
           <FieldLabel>Cliente *</FieldLabel>
@@ -235,8 +246,7 @@ export function ModalOrdemServico({
         <div className='grid gap-4 md:grid-cols-3'>
           <Field
             data-invalid={submitted && Boolean(errors.data_chegada)}
-            className='md:col-span-1'
-          >
+            className='md:col-span-1'>
             <FieldLabel>Data de chegada *</FieldLabel>
             <FieldContent>
               <DatePicker
@@ -252,16 +262,21 @@ export function ModalOrdemServico({
                   }))
                 }
                 placeholder='Selecione a data'
-                className={submitted && errors.data_chegada ? 'border-destructive' : undefined}
+                className={
+                  submitted && errors.data_chegada
+                    ? 'border-destructive'
+                    : undefined
+                }
               />
               <FieldError>{errors.data_chegada}</FieldError>
             </FieldContent>
           </Field>
 
           <Field
-            data-invalid={submitted && Boolean(errors.funcionario_responsavel_id)}
-            className='md:col-span-2'
-          >
+            data-invalid={
+              submitted && Boolean(errors.funcionario_responsavel_id)
+            }
+            className='md:col-span-2'>
             <FieldLabel>Responsável técnico *</FieldLabel>
             <FieldContent>
               <Select
@@ -271,12 +286,12 @@ export function ModalOrdemServico({
                     ...current,
                     funcionario_responsavel_id: value
                   }))
-                }
-              >
+                }>
                 <SelectTrigger
                   className='w-full bg-input'
-                  aria-invalid={submitted && Boolean(errors.funcionario_responsavel_id)}
-                >
+                  aria-invalid={
+                    submitted && Boolean(errors.funcionario_responsavel_id)
+                  }>
                   <SelectValue placeholder='Selecione o responsável' />
                 </SelectTrigger>
                 <SelectContent>
@@ -289,15 +304,13 @@ export function ModalOrdemServico({
                   </SelectGroup>
                 </SelectContent>
               </Select>
-              <FieldDescription>
-                O usuário logado permanece como criador da ordem.
-              </FieldDescription>
+
               <FieldError>{errors.funcionario_responsavel_id}</FieldError>
             </FieldContent>
           </Field>
         </div>
 
-        <div className='grid gap-4 md:grid-cols-2'>
+        <div className='grid gap-4'>
           <Field data-invalid={submitted && Boolean(errors.veiculo_id)}>
             <FieldLabel>Veículo *</FieldLabel>
             <FieldContent>
@@ -309,12 +322,10 @@ export function ModalOrdemServico({
                     veiculo_id: Number(value)
                   }))
                 }
-                disabled={!formData.cliente_id}
-              >
+                disabled={!formData.cliente_id}>
                 <SelectTrigger
                   className='w-full bg-input'
-                  aria-invalid={submitted && Boolean(errors.veiculo_id)}
-                >
+                  aria-invalid={submitted && Boolean(errors.veiculo_id)}>
                   <SelectValue
                     placeholder={
                       formData.cliente_id
@@ -345,8 +356,7 @@ export function ModalOrdemServico({
                   value={formData.status}
                   onValueChange={(value: 'ativa' | 'fechada' | 'cancelada') =>
                     setFormData((current) => ({ ...current, status: value }))
-                  }
-                >
+                  }>
                   <SelectTrigger className='w-full bg-input'>
                     <SelectValue />
                   </SelectTrigger>
@@ -375,7 +385,7 @@ export function ModalOrdemServico({
                 }))
               }
               placeholder='Descreva o serviço executado ou o contexto operacional da ordem.'
-              className='min-h-24 resize-none bg-input'
+              className='min-h-24 resize-none bg-input! border-border!'
             />
           </FieldContent>
         </Field>
@@ -387,7 +397,9 @@ export function ModalOrdemServico({
         emptyDescription='Adicione os itens usados na ordem para calcular o total automaticamente.'
         items={formData.pecas}
         pecas={pecas}
-        onChange={(items) => setFormData((current) => ({ ...current, pecas: items }))}
+        onChange={(items) =>
+          setFormData((current) => ({ ...current, pecas: items }))
+        }
       />
     </DialogShell>
   );
