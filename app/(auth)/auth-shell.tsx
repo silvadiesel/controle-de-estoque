@@ -62,7 +62,7 @@ export function AuthShell({
 
           <div className='relative flex h-full flex-col justify-center gap-20 px-20'>
             <div className='flex items-center gap-4'>
-              <div className='flex h-16 w-16 items-center justify-center rounded-[1.25rem] border border-primary/15 bg-card/50 p-3 shadow-[0_18px_45px_rgba(91,127,165,0.16)] backdrop-blur-sm'>
+              <div className='flex h-16 w-16 items-center justify-center'>
                 <Image
                   src='/img/main_icon.svg'
                   alt='Logo do Igne System'
@@ -83,8 +83,8 @@ export function AuthShell({
               </div>
             </div>
 
-            <div className='max-w-3xl'>
-              <p className='text-6xl font-semibold leading-[0.94] tracking-[-0.06em] text-foreground'>
+            <div className='max-w-2xl'>
+              <p className='text-5xl font-semibold leading-[0.94] tracking-[-0.06em] text-foreground'>
                 Cresça com controle em cada etapa da{' '}
                 <span className='text-primary'>operação.</span>
               </p>
@@ -95,17 +95,17 @@ export function AuthShell({
                 consistência ao seu negócio.
               </p>
 
-              <div className='mt-8 grid gap-4 lg:max-w-2xl'>
+              <div className='mt-8 grid gap-4 max-w-2xl'>
                 {HERO_HIGHLIGHTS.map(({ title, description, icon: Icon }) => (
                   <div
                     key={title}
-                    className='flex gap-4 rounded-[1.6rem] border border-border bg-card/50 px-4 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] backdrop-blur-sm sm:px-5'>
+                    className='flex gap-4 rounded-[1.6rem] border border-border bg-card/50 px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] backdrop-blur-sm '>
                     <div className='flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-primary/14 bg-primary/10 text-primary'>
-                      <Icon className='h-5 w-5' />
+                      <Icon className='h-7 w-7' />
                     </div>
 
                     <div>
-                      <p className='text-base font-semibold text-foreground sm:text-lg'>
+                      <p className='text-base font-semibold text-foreground '>
                         {title}
                       </p>
                       <p className='mt-1 text-sm leading-6 text-muted-foreground sm:text-base'>

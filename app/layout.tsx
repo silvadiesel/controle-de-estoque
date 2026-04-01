@@ -17,7 +17,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'Igne System',
-  description: 'Tudo em um só lugar'
+  description: 'Tudo em um só lugar',
+  icons: {
+    icon: '/img/main_icon.svg'
+  }
 };
 
 export default function RootLayout({
@@ -27,7 +30,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='pt-BR'>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <a
           href='#main-content'
           className='sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground'>
