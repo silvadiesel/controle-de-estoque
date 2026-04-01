@@ -1,5 +1,6 @@
 'use client';
 
+import type { AppPermission } from '@/lib/permissions';
 import { useUser } from '@/hooks/useUser';
 import type { Cargo } from '@/lib/types/auth';
 
@@ -8,6 +9,8 @@ interface RoleGuardProps {
   roles?: Cargo[];
   /** Cargo mínimo na hierarquia (admin > estoquista > atendente) */
   minRole?: Cargo;
+  /** Permissão explícita necessária para visualizar o conteúdo */
+  permission?: AppPermission;
   /** Conteúdo a ser exibido se autorizado */
   children: React.ReactNode;
   /** Conteúdo alternativo se não autorizado (opcional) */
@@ -38,10 +41,11 @@ interface RoleGuardProps {
 export function RoleGuard({
   roles,
   minRole,
+  permission,
   children,
   fallback = null
 }: RoleGuardProps) {
-  const { hasRole, canAccess, isAuthenticated } = useUser();
+  const { hasRole, canAccess, hasPermission, isAuthenticated } = useUser();
 
   // Se não está autenticado, não mostra nada
   if (!isAuthenticated) {
@@ -55,6 +59,11 @@ export function RoleGuard({
 
   // Verificação por lista de cargos
   if (roles && !hasRole(...roles)) {
+    return fallback;
+  }
+
+  // Verificação por permissão explícita
+  if (permission && !hasPermission(permission)) {
     return fallback;
   }
 
@@ -90,6 +99,22 @@ export function EstoqueAccess({
 }) {
   return (
     <RoleGuard minRole='estoquista' fallback={fallback}>
+      {children}
+    </RoleGuard>
+  );
+}
+
+export function PermissionGuard({
+  permission,
+  children,
+  fallback = null
+}: {
+  permission: AppPermission;
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+}) {
+  return (
+    <RoleGuard permission={permission} fallback={fallback}>
       {children}
     </RoleGuard>
   );

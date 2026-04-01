@@ -18,6 +18,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { categorias } from '@/db/schema';
 import { logAction } from '@/lib/log-action';
+import { requireRoutePermission } from '@/lib/server/access-control';
 
 import { eq } from 'drizzle-orm';
 
@@ -38,6 +39,15 @@ type RouteParams = {
  * Útil para: preencher formulário de edição, validações, etc.
  */
 export async function GET(_request: Request, { params }: RouteParams) {
+  const permissionCheck = await requireRoutePermission(
+    _request,
+    'read_categoria_context'
+  );
+
+  if (permissionCheck instanceof Response) {
+    return permissionCheck;
+  }
+
   try {
     // Aguarda os parâmetros (Next.js 15+ requirement)
     const { id } = await params;
@@ -89,6 +99,15 @@ export async function GET(_request: Request, { params }: RouteParams) {
  * para atualizações parciais.
  */
 export async function PUT(request: Request, { params }: RouteParams) {
+  const permissionCheck = await requireRoutePermission(
+    request,
+    'manage_categorias'
+  );
+
+  if (permissionCheck instanceof Response) {
+    return permissionCheck;
+  }
+
   try {
     const { id } = await params;
     const body = await request.json();
@@ -151,6 +170,15 @@ export async function PUT(request: Request, { params }: RouteParams) {
  * 3. Verificar permissões do usuário
  */
 export async function DELETE(request: Request, { params }: RouteParams) {
+  const permissionCheck = await requireRoutePermission(
+    request,
+    'manage_categorias'
+  );
+
+  if (permissionCheck instanceof Response) {
+    return permissionCheck;
+  }
+
   try {
     const { id } = await params;
     const numericId = Number(id);

@@ -3,14 +3,12 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import type { Cliente, Peca, Veiculo } from '@/db/schema';
+import {
+  useFuncionariosContext,
+  type FuncionarioOption
+} from './useFuncionariosContext';
 
-export interface Funcionario {
-  id: string;
-  name: string;
-  email: string;
-  cargo: string | null;
-  status: boolean | null;
-}
+export type Funcionario = FuncionarioOption;
 
 import { toast } from 'sonner';
 
@@ -169,7 +167,7 @@ export function useOrdens(): UseOrdensReturn {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const [pecas, setPecas] = useState<Peca[]>([]);
-  const [funcionarios, setFuncionarios] = useState<Funcionario[]>([]);
+  const { funcionarios, fetchFuncionarios } = useFuncionariosContext();
   const [isLoading, setIsLoading] = useState(false);
 
   // Filtros
@@ -240,16 +238,6 @@ export function useOrdens(): UseOrdensReturn {
       setPecas(data);
     } catch (error) {
       console.error('Erro ao buscar peças:', error);
-    }
-  }, []);
-
-  const fetchFuncionarios = useCallback(async () => {
-    try {
-      const res = await fetch('/api/users');
-      const data: Funcionario[] = await res.json();
-      setFuncionarios(data);
-    } catch (error) {
-      console.error('Erro ao buscar funcionários:', error);
     }
   }, []);
 

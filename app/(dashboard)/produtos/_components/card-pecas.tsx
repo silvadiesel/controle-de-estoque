@@ -12,6 +12,7 @@ interface CardPecasProps {
   categoryName: string;
   supplierName: string;
   formattedPrice: string;
+  canManage: boolean;
   onEdit: (peca: Peca) => void;
   onDelete: (peca: Peca) => void;
 }
@@ -21,6 +22,7 @@ export const CardPecas = memo(function CardPecas({
   categoryName,
   supplierName,
   formattedPrice,
+  canManage,
   onEdit,
   onDelete
 }: CardPecasProps) {
@@ -81,25 +83,26 @@ export const CardPecas = memo(function CardPecas({
           </span>
         </div>
 
-        {/* Actions */}
-        <div className='flex gap-2 mt-3'>
-          <Button
-            variant='outline'
-            size='sm'
-            className='flex-1 h-8 text-xs'
-            onClick={() => onEdit(peca)}>
-            <Edit className='mr-1.5 h-3 w-3' aria-hidden='true' />
-            Editar
-          </Button>
-          <Button
-            variant='ghost'
-            size='sm'
-            className='h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md'
-            onClick={() => onDelete(peca)}
-            aria-label={`Excluir produto ${peca.name_peca}`}>
-            <Trash2 className='h-3.5 w-3.5' aria-hidden='true' />
-          </Button>
-        </div>
+        {canManage ? (
+          <div className='flex gap-2 mt-3'>
+            <Button
+              variant='outline'
+              size='sm'
+              className='flex-1 h-8 text-xs'
+              onClick={() => onEdit(peca)}>
+              <Edit className='mr-1.5 h-3 w-3' aria-hidden='true' />
+              Editar
+            </Button>
+            <Button
+              variant='ghost'
+              size='sm'
+              className='h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md'
+              onClick={() => onDelete(peca)}
+              aria-label={`Excluir produto ${peca.name_peca}`}>
+              <Trash2 className='h-3.5 w-3.5' aria-hidden='true' />
+            </Button>
+          </div>
+        ) : null}
       </div>
     </div>
   );

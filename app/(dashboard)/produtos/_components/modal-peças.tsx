@@ -1,12 +1,13 @@
 'use client';
 
 import type { ChangeEvent } from 'react';
-import { useEffect, useState } from 'react';
 
 import Image from 'next/image';
 
-import { pecaFormSchema } from '@/app/utils/validators';
 import { blockNonNumericKeyDown } from '@/app/utils/formatters';
+import type { PecaFormValues } from '@/app/utils/validators';
+import { pecaFormSchema } from '@/app/utils/validators';
+import { useModalPecaState } from '@/app/(dashboard)/produtos/_hook/useModalPecaState';
 import { Button } from '@/components/ui/button';
 import { DialogShell } from '@/components/ui/dialog-shell';
 import {
@@ -25,7 +26,6 @@ import {
 import type { Peca } from '@/db/schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import type { PecaFormValues } from '@/app/utils/validators';
 import { CloudDownload, Package, Trash2 } from 'lucide-react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -41,24 +41,6 @@ interface ModalPecasProps {
   supplierOptions: SearchableSelectOption[];
 }
 
-function getDefaultValues(initialData?: Partial<Peca>): PecaFormValues {
-  return {
-    name_peca: initialData?.name_peca ?? '',
-    codigo: initialData?.codigo ?? '',
-    estante: Array.isArray(initialData?.localizacao)
-      ? String(initialData.localizacao[0] || '')
-      : '',
-    prateleira: Array.isArray(initialData?.localizacao)
-      ? String(initialData.localizacao[1] || '')
-      : '',
-    categoria_id: initialData?.categoria_id ?? 0,
-    fornecedor_id: initialData?.fornecedor_id ?? null,
-    quantidade: initialData?.quantidade ?? 0,
-    preco: initialData?.preco ?? 0,
-    alerta: initialData?.alerta ?? 1
-  };
-}
-
 export function ModalPecas({
   mode,
   initialData,
@@ -71,12 +53,69 @@ export function ModalPecas({
   supplierOptions
 }: ModalPecasProps) {
   const isEdit = mode === 'edit';
-  const [image, setImage] = useState<string | null>(null);
-  const [precoDisplay, setPrecoDisplay] = useState('');
+  const formKey = `${mode}-${initialData?.id ?? 'new'}-${isOpen ? 'open' : 'closed'}`;
+
+  return (
+    <DialogShell
+      open={isOpen}
+      onOpenChange={setIsOpen}
+      icon={Package}
+      title={isEdit ? 'Editar Produto' : 'Adicionar Novo Produto'}
+      description={
+        isEdit
+          ? 'Atualize as informações do produto.'
+          : 'Preencha os dados do novo produto.'
+      }
+      trigger={trigger}
+      contentClassName='sm:max-w-[720px]'
+      bodyClassName='px-0'
+      footer={
+        <>
+          <Button variant='outline' onClick={() => setIsOpen(false)}>
+            Cancelar
+          </Button>
+          <Button type='submit' form='peca-form' disabled={isLoading}>
+            {isLoading
+              ? 'Salvando...'
+              : isEdit
+                ? 'Salvar Alterações'
+                : 'Adicionar Produto'}
+          </Button>
+        </>
+      }>
+      {isOpen ? (
+        <ModalPecasForm
+          key={formKey}
+          initialData={initialData}
+          onSubmit={onSubmit}
+          onClose={() => setIsOpen(false)}
+          categoryOptions={categoryOptions}
+          supplierOptions={supplierOptions}
+        />
+      ) : null}
+    </DialogShell>
+  );
+}
+
+function ModalPecasForm({
+  initialData,
+  onSubmit,
+  onClose,
+  categoryOptions,
+  supplierOptions
+}: {
+  initialData?: Partial<Peca>;
+  onSubmit: (data: PecaFormValues, image: string | null) => Promise<boolean>;
+  onClose: () => void;
+  categoryOptions: SearchableSelectOption[];
+  supplierOptions: SearchableSelectOption[];
+}) {
+  const { initialState, image, setImage, precoDisplay, setPrecoDisplay } =
+    useModalPecaState(initialData);
 
   const form = useForm<PecaFormValues>({
     resolver: zodResolver(pecaFormSchema),
-    defaultValues: getDefaultValues(initialData),
+    defaultValues: initialState.defaultValues,
     mode: 'onSubmit',
     reValidateMode: 'onChange'
   });
@@ -85,40 +124,13 @@ export function ModalPecas({
     control,
     formState: { errors },
     handleSubmit,
-    register,
-    reset
+    register
   } = form;
-
-  useEffect(() => {
-    if (isOpen) {
-      reset(getDefaultValues(initialData));
-      setImage(initialData?.imagem ?? null);
-
-      const preco = initialData?.preco;
-      if (preco) {
-        setPrecoDisplay((preco / 100).toString().replace('.', ','));
-      } else {
-        setPrecoDisplay('');
-      }
-    }
-  }, [initialData, isOpen, reset]);
-
-  const handleOpenChange = (open: boolean) => {
-    if (!open) {
-      reset(getDefaultValues());
-      setImage(null);
-      setPrecoDisplay('');
-    }
-    setIsOpen(open);
-  };
 
   const handleFormSubmit = handleSubmit(async (values) => {
     const didSave = await onSubmit(values, image);
     if (didSave) {
-      reset(getDefaultValues());
-      setImage(null);
-      setPrecoDisplay('');
-      setIsOpen(false);
+      onClose();
     }
   });
 
@@ -143,93 +155,62 @@ export function ModalPecas({
   ];
 
   return (
-    <DialogShell
-      open={isOpen}
-      onOpenChange={handleOpenChange}
-      icon={Package}
-      title={isEdit ? 'Editar Produto' : 'Adicionar Novo Produto'}
-      description={
-        isEdit
-          ? 'Atualize as informações do produto.'
-          : 'Preencha os dados do novo produto.'
-      }
-      trigger={trigger}
-      contentClassName='sm:max-w-[720px]'
-      bodyClassName='px-0'
-      footer={
-        <>
-          <Button variant='outline' onClick={() => handleOpenChange(false)}>
-            Cancelar
-          </Button>
-          <Button type='submit' form='peca-form' disabled={isLoading}>
-            {isLoading
-              ? 'Salvando...'
-              : isEdit
-                ? 'Salvar Alterações'
-                : 'Adicionar Produto'}
-          </Button>
-        </>
-      }
-    >
-      <div className='grid grid-cols-1 md:grid-cols-12 gap-6 px-6'>
-        {/* Image column */}
-        <div className='md:col-span-4 flex flex-col gap-2 md:sticky md:top-0 md:self-start'>
-          <span className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
-            Imagem do Produto
-          </span>
+    <div className='grid grid-cols-1 md:grid-cols-12 gap-6 px-6'>
+      {/* Image column */}
+      <div className='md:col-span-4 flex flex-col gap-2 md:sticky md:top-0 md:self-start'>
+        <span className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
+          Imagem do Produto
+        </span>
 
-          {image ? (
-            <div className='relative flex flex-col items-center justify-center w-full h-52 border border-border rounded-lg overflow-hidden bg-background'>
-              <Image
-                src={image}
-                alt='Prévia do produto'
-                fill
-                className='object-contain'
-                unoptimized
-              />
-              <Button
-                type='button'
-                variant='destructive'
-                size='icon'
-                className='absolute top-2 right-2 h-8 w-8 rounded-full shadow-md hover:scale-105 transition-transform'
-                onClick={handleRemoveImage}
-                aria-label='Remover imagem do produto'
-              >
-                <Trash2 className='h-4 w-4' />
-              </Button>
+        {image ? (
+          <div className='relative flex flex-col items-center justify-center w-full h-52 border border-border rounded-lg overflow-hidden bg-background'>
+            <Image
+              src={image}
+              alt='Prévia do produto'
+              fill
+              className='object-contain'
+              unoptimized
+            />
+            <Button
+              type='button'
+              variant='destructive'
+              size='icon'
+              className='absolute top-2 right-2 h-8 w-8 rounded-full shadow-md hover:scale-105 transition-transform'
+              onClick={handleRemoveImage}
+              aria-label='Remover imagem do produto'>
+              <Trash2 className='h-4 w-4' />
+            </Button>
+          </div>
+        ) : (
+          <label
+            htmlFor='dropzone-file'
+            className='flex flex-col items-center justify-center w-full h-52 border border-dashed rounded-lg cursor-pointer bg-background border-border hover:border-primary transition-colors group'>
+            <div className='flex flex-col items-center justify-center pt-5 pb-6 text-center px-4'>
+              <CloudDownload className='w-10 h-10 text-muted-foreground mb-3 group-hover:text-primary transition-colors' />
+              <p className='mb-1 text-sm text-muted-foreground font-medium'>
+                <span className='font-semibold text-foreground'>
+                  Clique para adicionar
+                </span>
+              </p>
+              <p className='text-xs text-muted-foreground'>(Opcional)</p>
             </div>
-          ) : (
-            <label
-              htmlFor='dropzone-file'
-              className='flex flex-col items-center justify-center w-full h-52 border border-dashed rounded-lg cursor-pointer bg-background border-border hover:border-primary transition-colors group'
-            >
-              <div className='flex flex-col items-center justify-center pt-5 pb-6 text-center px-4'>
-                <CloudDownload className='w-10 h-10 text-muted-foreground mb-3 group-hover:text-primary transition-colors' />
-                <p className='mb-1 text-sm text-muted-foreground font-medium'>
-                  <span className='font-semibold text-foreground'>
-                    Clique para adicionar
-                  </span>
-                </p>
-                <p className='text-xs text-muted-foreground'>(Opcional)</p>
-              </div>
-              <input
-                id='dropzone-file'
-                type='file'
-                className='hidden'
-                accept='image/*'
-                onChange={handleImageChange}
-              />
-            </label>
-          )}
-        </div>
+            <input
+              id='dropzone-file'
+              type='file'
+              className='hidden'
+              accept='image/*'
+              onChange={handleImageChange}
+            />
+          </label>
+        )}
+      </div>
 
-        {/* Form column */}
-        <div className='md:col-span-8'>
-          <form
-            id='peca-form'
-            onSubmit={handleFormSubmit}
-            className='flex flex-col gap-5'
-          >
+      {/* Form column */}
+      <div className='md:col-span-8'>
+        <form
+          id='peca-form'
+          onSubmit={handleFormSubmit}
+          className='flex flex-col gap-5'>
             {/* Identificação */}
             <div>
               <span className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
@@ -457,8 +438,7 @@ export function ModalPecas({
               </FieldGroup>
             </div>
           </form>
-        </div>
       </div>
-    </DialogShell>
+    </div>
   );
 }

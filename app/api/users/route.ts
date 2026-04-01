@@ -1,8 +1,18 @@
 import { db, schema } from '@/db';
+import { requireRoutePermission } from '@/lib/server/access-control';
 
 import { asc } from 'drizzle-orm';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const permissionCheck = await requireRoutePermission(
+    request,
+    'read_users_context'
+  );
+
+  if (permissionCheck instanceof Response) {
+    return permissionCheck;
+  }
+
   const users = await db
     .select({
       id: schema.user.id,

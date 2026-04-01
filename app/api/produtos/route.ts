@@ -2,10 +2,17 @@ import { NextResponse } from 'next/server';
 
 import { db, schema } from '@/db';
 import { logAction } from '@/lib/log-action';
+import { requireRoutePermission } from '@/lib/server/access-control';
 
 import { asc, eq } from 'drizzle-orm';
 
 export async function GET(request: Request) {
+  const permissionCheck = await requireRoutePermission(request, 'view_produtos');
+
+  if (permissionCheck instanceof Response) {
+    return permissionCheck;
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const fornecedorIdParam = searchParams.get('fornecedor_id');
@@ -34,6 +41,15 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const permissionCheck = await requireRoutePermission(
+    request,
+    'manage_produtos'
+  );
+
+  if (permissionCheck instanceof Response) {
+    return permissionCheck;
+  }
+
   try {
     const data = await request.json();
 
