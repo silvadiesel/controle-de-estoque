@@ -1,0 +1,199 @@
+<h2>Layout dos Filtros — qual preferir?</h2>
+<p class="subtitle">Três organizações para os filtros de Movimentações. Clique na que preferir.</p>
+
+<style>
+:root {
+  --bg: #07090d; --card: #0f1216; --elevated: #171b20;
+  --muted: #13161b; --input: #0d1014; --border: #26292e;
+  --border-hover: #393d45; --foreground: #e7ebf2; --muted-fg: #a1a5ab;
+  --primary: #5376b8;
+}
+.demo { background: var(--bg); padding: 16px; border-radius: 8px; }
+
+/* inputs */
+.f-input {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--input); border: 1px solid var(--border);
+  border-radius: 8px; padding: 7px 12px;
+  color: var(--muted-fg); font-size: 12px; white-space: nowrap;
+}
+.f-input.grow { flex: 1; min-width: 0; }
+.f-sep { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
+.f-label { font-size: 11px; color: var(--muted-fg); white-space: nowrap; }
+.f-clear {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; color: var(--muted-fg);
+  background: none; border: none; cursor: pointer;
+  padding: 6px 8px; border-radius: 6px;
+  white-space: nowrap;
+}
+svg { display: inline-block; vertical-align: middle; }
+</style>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="ic-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="ic-activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
+    <symbol id="ic-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+    <symbol id="ic-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></symbol>
+    <symbol id="ic-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="ic-chevdown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="ic-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></symbol>
+    <symbol id="ic-arrowright" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+  </defs>
+</svg>
+
+<div class="cards">
+
+  <!-- OPÇÃO A: Tudo numa linha só -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px;background:var(--bg,#07090d)">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:nowrap;overflow:hidden">
+        <!-- Search -->
+        <div class="f-input grow">
+          <svg width="13" height="13"><use href="#ic-search"/></svg>
+          <span style="flex:1;overflow:hidden;text-overflow:ellipsis">Buscar descrição ou autor...</span>
+        </div>
+        <div class="f-sep"></div>
+        <!-- Tipo -->
+        <div class="f-input">
+          <svg width="12" height="12"><use href="#ic-activity"/></svg>
+          Tipo
+          <svg width="11" height="11" style="margin-left:2px;opacity:.5"><use href="#ic-chevdown"/></svg>
+        </div>
+        <!-- Entidade -->
+        <div class="f-input">
+          <svg width="12" height="12"><use href="#ic-grid"/></svg>
+          Entidade
+          <svg width="11" height="11" style="margin-left:2px;opacity:.5"><use href="#ic-chevdown"/></svg>
+        </div>
+        <!-- Mês -->
+        <div class="f-input">
+          <svg width="12" height="12"><use href="#ic-cal"/></svg>
+          Mês
+          <svg width="11" height="11" style="margin-left:2px;opacity:.5"><use href="#ic-chevdown"/></svg>
+        </div>
+        <div class="f-sep"></div>
+        <!-- Datas -->
+        <div class="f-input">Data inicial</div>
+        <svg width="12" height="12" style="color:#26292e;flex-shrink:0"><use href="#ic-arrowright"/></svg>
+        <div class="f-input">Data final</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Linha única</h3>
+      <p>Busca + todos os filtros em uma barra horizontal compacta. Libera espaço vertical para o histórico.</p>
+    </div>
+  </div>
+
+  <!-- OPÇÃO B: Card de filtros com 2 linhas organizadas -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px;background:var(--bg,#07090d)">
+      <div style="background:var(--card,#0f1216);border:1px solid var(--border,#26292e);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px;">
+        <!-- Linha 1: search + tipo + entidade -->
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="f-input grow">
+            <svg width="13" height="13"><use href="#ic-search"/></svg>
+            <span style="flex:1">Buscar por descrição ou autor...</span>
+          </div>
+          <div class="f-input" style="width:140px">
+            <svg width="12" height="12"><use href="#ic-activity"/></svg>
+            Tipo de ação
+            <svg width="11" height="11" style="margin-left:auto;opacity:.5"><use href="#ic-chevdown"/></svg>
+          </div>
+          <div class="f-input" style="width:130px">
+            <svg width="12" height="12"><use href="#ic-grid"/></svg>
+            Entidade
+            <svg width="11" height="11" style="margin-left:auto;opacity:.5"><use href="#ic-chevdown"/></svg>
+          </div>
+        </div>
+        <!-- Linha 2: mês + período -->
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="f-input" style="width:160px">
+            <svg width="12" height="12"><use href="#ic-cal"/></svg>
+            Filtrar por mês
+            <svg width="11" height="11" style="margin-left:auto;opacity:.5"><use href="#ic-chevdown"/></svg>
+          </div>
+          <div class="f-sep"></div>
+          <span class="f-label">Período:</span>
+          <div class="f-input" style="width:130px"><svg width="12" height="12"><use href="#ic-cal"/></svg>Data inicial</div>
+          <svg width="12" height="12" style="color:#393d45;flex-shrink:0"><use href="#ic-arrowright"/></svg>
+          <div class="f-input" style="width:130px"><svg width="12" height="12"><use href="#ic-cal"/></svg>Data final</div>
+          <button class="f-clear" style="margin-left:auto">
+            <svg width="12" height="12"><use href="#ic-x"/></svg>
+            Limpar
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Card de filtros 2 linhas</h3>
+      <p>Filtros agrupados em card próprio: busca+tipo+entidade em cima, mês+período embaixo. Organizado e visual.</p>
+    </div>
+  </div>
+
+  <!-- OPÇÃO C: Filtros integrados no header do card da timeline -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px;background:var(--bg,#07090d)">
+      <div style="background:var(--card,#0f1216);border:1px solid var(--border,#26292e);border-radius:10px;overflow:hidden">
+        <!-- Header da timeline com filtros integrados -->
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border,#26292e);display:flex;flex-direction:column;gap:10px;">
+          <!-- Título + ícone -->
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--foreground,#e7ebf2)">Histórico de Atividades</div>
+              <div style="font-size:11px;color:var(--muted-fg,#a1a5ab);margin-top:1px">248 registros · página 1 de 31</div>
+            </div>
+            <div style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border,#26292e);background:var(--elevated,#171b20);color:var(--primary,#5376b8)">
+              <svg width="16" height="16"><use href="#ic-activity"/></svg>
+            </div>
+          </div>
+          <!-- Filtros integrados no header -->
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="f-input grow">
+              <svg width="13" height="13"><use href="#ic-search"/></svg>
+              <span style="flex:1">Buscar...</span>
+            </div>
+            <div class="f-input">
+              <svg width="12" height="12"><use href="#ic-activity"/></svg>
+              Tipo
+              <svg width="11" height="11" style="margin-left:2px;opacity:.5"><use href="#ic-chevdown"/></svg>
+            </div>
+            <div class="f-input">
+              <svg width="12" height="12"><use href="#ic-grid"/></svg>
+              Entidade
+              <svg width="11" height="11" style="margin-left:2px;opacity:.5"><use href="#ic-chevdown"/></svg>
+            </div>
+            <div class="f-sep"></div>
+            <div class="f-input">
+              <svg width="12" height="12"><use href="#ic-cal"/></svg>
+              Mês
+              <svg width="11" height="11" style="margin-left:2px;opacity:.5"><use href="#ic-chevdown"/></svg>
+            </div>
+            <div class="f-input"><svg width="12" height="12"><use href="#ic-cal"/></svg>Início</div>
+            <svg width="12" height="12" style="color:#393d45;flex-shrink:0"><use href="#ic-arrowright"/></svg>
+            <div class="f-input"><svg width="12" height="12"><use href="#ic-cal"/></svg>Fim</div>
+          </div>
+        </div>
+        <!-- Preview de 2 itens -->
+        <div style="padding:10px 16px;display:flex;flex-direction:column;gap:0">
+          <div style="display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border,#26292e);font-size:12px;color:var(--muted-fg,#a1a5ab)">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--success,#4cb86a);flex-shrink:0"></div>
+            <span style="flex:1;color:var(--foreground,#e7ebf2)">Produto "Filtro de Óleo" cadastrado</span>
+            <span>João Silva</span><span>·</span><span>14:32</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:9px 0;font-size:12px;color:var(--muted-fg,#a1a5ab)">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--warning,#ddb63e);flex-shrink:0"></div>
+            <span style="flex:1;color:var(--foreground,#e7ebf2)">Fornecedor "Auto Peças" atualizado</span>
+            <span>Maria Santos</span><span>·</span><span>13:15</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Filtros no header do card</h3>
+      <p>Sem seção separada para filtros — ficam integrados ao cabeçalho do histórico. Layout mais limpo, menos scroll.</p>
+    </div>
+  </div>
+
+</div>
