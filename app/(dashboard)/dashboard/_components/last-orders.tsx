@@ -126,7 +126,7 @@ export function LastOrders({
           role='tab'
           aria-selected={tab === 'servico'}
           onClick={() => setTab('servico')}
-          className={`px-4 py-2 text-sm font-medium transition-colors -mb-px border-b-2 ${
+          className={`px-4 py-2 text-sm font-medium transition-colors -mb-px border-b-2 outline-none focus-visible:border-border-hover focus-visible:text-foreground ${
             tab === 'servico'
               ? 'text-primary border-primary'
               : 'text-muted-foreground border-transparent hover:text-primary'
@@ -138,7 +138,7 @@ export function LastOrders({
           role='tab'
           aria-selected={tab === 'venda'}
           onClick={() => setTab('venda')}
-          className={`px-4 py-2 text-sm font-medium transition-colors -mb-px border-b-2 ${
+          className={`px-4 py-2 text-sm font-medium transition-colors -mb-px border-b-2 outline-none focus-visible:border-border-hover focus-visible:text-foreground ${
             tab === 'venda'
               ? 'text-primary border-primary'
               : 'text-muted-foreground border-transparent hover:text-primary'

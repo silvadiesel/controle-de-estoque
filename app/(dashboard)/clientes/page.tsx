@@ -391,7 +391,7 @@ export default function Clientes() {
                     </div>
                   </div>
 
-                  <CollapsibleContent className='overflow-hidden border-t border-border bg-background/50 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-1 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-1 data-[state=open]:duration-200'>
+                  <CollapsibleContent className='border-t border-border bg-background/50'>
                     <div className='px-5 py-4'>
                       <div className='mb-3 flex items-center justify-between'>
                         <div>

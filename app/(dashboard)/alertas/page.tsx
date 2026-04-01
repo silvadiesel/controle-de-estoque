@@ -1,7 +1,5 @@
 'use client';
 
-import { AlertTriangle, Bell, CheckCircle, ShieldAlert } from 'lucide-react';
-
 import { PaginationControls } from '@/components/pagination-controls';
 import { Card, CardContent } from '@/components/ui/card';
 import { StatCard } from '@/components/ui/stat-card';
@@ -9,12 +7,19 @@ import { usePagination } from '@/hooks/usePagination';
 
 import { AlertaGrid } from './_components/alerta-grid';
 import { useAlerta } from './_hooks/useAlerta';
+import { AlertTriangle, Bell, CheckCircle, ShieldAlert } from 'lucide-react';
 
 export default function Alertas() {
   const { pecasCriticas, pecasAtencao, pecasEmAlerta, isLoading } = useAlerta();
 
-  const criticasPagination = usePagination({ items: pecasCriticas, itemsPerPage: 10 });
-  const atencaoPagination = usePagination({ items: pecasAtencao, itemsPerPage: 10 });
+  const criticasPagination = usePagination({
+    items: pecasCriticas,
+    itemsPerPage: 10
+  });
+  const atencaoPagination = usePagination({
+    items: pecasAtencao,
+    itemsPerPage: 10
+  });
 
   if (isLoading) {
     return (
@@ -75,7 +80,7 @@ export default function Alertas() {
           </CardContent>
         </Card>
       ) : (
-        <Card className='bg-card border-border overflow-hidden'>
+        <Card className='bg-card border-border overflow-hidden py-0'>
           <CardContent className='p-0'>
             {/* Seção: Sem Estoque */}
             {pecasCriticas.length > 0 && (
@@ -92,7 +97,10 @@ export default function Alertas() {
                     {pecasCriticas.length === 1 ? 'peça' : 'peças'}
                   </span>
                 </div>
-                <AlertaGrid pecas={criticasPagination.paginatedItems} tipo='critica' />
+                <AlertaGrid
+                  pecas={criticasPagination.paginatedItems}
+                  tipo='critica'
+                />
                 <div className='px-3 pb-3'>
                   <PaginationControls
                     currentPage={criticasPagination.currentPage}
@@ -127,7 +135,10 @@ export default function Alertas() {
                     {pecasAtencao.length === 1 ? 'peça' : 'peças'}
                   </span>
                 </div>
-                <AlertaGrid pecas={atencaoPagination.paginatedItems} tipo='atencao' />
+                <AlertaGrid
+                  pecas={atencaoPagination.paginatedItems}
+                  tipo='atencao'
+                />
                 <div className='px-3 pb-3'>
                   <PaginationControls
                     currentPage={atencaoPagination.currentPage}
