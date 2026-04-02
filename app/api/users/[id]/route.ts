@@ -1,5 +1,6 @@
 import { db, schema } from '@/db';
 import { logAction } from '@/lib/log-action';
+import { requireRoutePermission } from '@/lib/server/access-control';
 
 import { eq } from 'drizzle-orm';
 
@@ -10,6 +11,15 @@ type Params = {
 };
 
 export async function GET(_request: Request, { params }: Params) {
+  const permissionCheck = await requireRoutePermission(
+    _request,
+    'manage_users'
+  );
+
+  if (permissionCheck instanceof Response) {
+    return permissionCheck;
+  }
+
   const { id } = await params;
 
   const user = await db
@@ -27,6 +37,12 @@ export async function GET(_request: Request, { params }: Params) {
 }
 
 export async function PUT(request: Request, { params }: Params) {
+  const permissionCheck = await requireRoutePermission(request, 'manage_users');
+
+  if (permissionCheck instanceof Response) {
+    return permissionCheck;
+  }
+
   const { id } = await params;
   const data = await request.json();
 
@@ -47,6 +63,12 @@ export async function PUT(request: Request, { params }: Params) {
 }
 
 export async function DELETE(request: Request, { params }: Params) {
+  const permissionCheck = await requireRoutePermission(request, 'manage_users');
+
+  if (permissionCheck instanceof Response) {
+    return permissionCheck;
+  }
+
   const { id } = await params;
 
   // Delete user sessions first (cascade should handle this, but being explicit)

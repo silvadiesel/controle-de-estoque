@@ -1,263 +1,268 @@
 # Sistema de Cargos e Permissões
 
-Sistema de controle de acesso baseado em cargos para o Igne System.
+Documentação oficial do controle de acesso do sistema.
 
 ## Visão Geral
 
-O sistema utiliza o campo `cargo` do usuário para controlar a exibição de componentes e validar permissões em toda a aplicação.
+O projeto usa o campo `cargo` do usuário autenticado para derivar permissões de:
 
-### Cargos Disponíveis
+- navegação
+- visualização de páginas
+- ações de UI
+- acesso a endpoints da API
 
-| Cargo        | Nível | Descrição                                       |
-| ------------ | ----- | ----------------------------------------------- |
-| `admin`      | 3     | Acesso total ao sistema                         |
-| `estoquista` | 2     | Acesso a funcionalidades de estoque + atendente |
-| `atendente`  | 1     | Acesso básico                                   |
+O núcleo dessa regra fica centralizado em [lib/permissions.ts](/home/larissa/Documentos/projects/controle-de-estoque/lib/permissions.ts). A regra não deve ser reimplementada com `if (cargo === ...)` espalhado pela aplicação.
 
----
+## Cargos
 
-## Uso Básico
+| Cargo | Descrição |
+| --- | --- |
+| `admin` | Acesso total ao sistema |
+| `estoquista` | Acesso total, exceto `configuracoes` |
+| `atendente` | Acesso operacional normal, com restrições em `fornecedores`, `configuracoes` e mutações de `produtos` |
 
-### Hook `useUser()`
+## Matriz de Permissões
 
-O hook principal para acessar informações do usuário logado e suas permissões.
+### Admin
+
+- acessa todas as páginas
+- executa todas as ações
+- consome todos os endpoints protegidos
+
+### Estoquista
+
+- acessa `dashboard`, `produtos`, `clientes`, `ordens`, `movimentacoes`, `fornecedores`, `alertas`
+- não acessa `configuracoes`
+- pode criar, editar e excluir `produtos`
+- pode criar, editar e excluir `fornecedores`
+- não pode gerenciar usuários nem categorias em `configuracoes`
+
+### Atendente
+
+- acessa `dashboard`, `produtos`, `clientes`, `ordens`, `movimentacoes`, `alertas`
+- não acessa a página `fornecedores`
+- não acessa `configuracoes`
+- em `produtos`, pode apenas visualizar
+- não pode criar, editar nem excluir `produtos`
+- pode continuar vendo contexto de fornecedor e categoria usado na tela de `produtos`
+
+## Permissões Técnicas
+
+As capabilities públicas do sistema são:
+
+```ts
+type AppPermission =
+  | 'view_dashboard'
+  | 'view_clientes'
+  | 'view_ordens'
+  | 'view_movimentacoes'
+  | 'view_alertas'
+  | 'view_produtos'
+  | 'manage_produtos'
+  | 'view_fornecedores_page'
+  | 'manage_fornecedores'
+  | 'view_configuracoes'
+  | 'manage_categorias'
+  | 'manage_users'
+  | 'read_fornecedor_context'
+  | 'read_categoria_context';
+```
+
+`read_fornecedor_context` e `read_categoria_context` existem para permitir leitura contextual em telas como `produtos`, sem liberar a página administrativa correspondente.
+
+## Hooks Client-Side
+
+### `useUser()`
+
+Arquivo: [hooks/useUser.ts](/home/larissa/Documentos/projects/controle-de-estoque/hooks/useUser.ts)
+
+Continua sendo o hook base de sessão e cargo. Agora também expõe:
+
+- `hasPermission(permission)`
+- `canAccessRoute(pathname)`
+
+Exemplo:
 
 ```tsx
-import { useUser } from '@/hooks/useUser';
+const { cargo, hasPermission } = useUser();
 
-function MeuComponente() {
-  const {
-    user, // Dados do usuário
-    cargo, // 'atendente' | 'estoquista' | 'admin'
-    isAdmin, // true se cargo === 'admin'
-    isEstoquista, // true se cargo === 'estoquista'
-    canAccess, // Função para verificar hierarquia
-    hasRole, // Função para verificar cargos específicos
-    isPending // true enquanto carrega a sessão
-  } = useUser();
-
-  if (isPending) return <Loading />;
-
-  return (
-    <div>
-      <p>Olá, {user?.name}!</p>
-      <p>Seu cargo: {cargo}</p>
-
-      {isAdmin && <BotaoConfig />}
-    </div>
-  );
+if (hasPermission('manage_produtos')) {
+  // Renderizar criar/editar/excluir produto
 }
 ```
 
-### Verificação por Hierarquia
+### Flags diretas em `useUser()`
 
-Use `canAccess()` quando quiser permitir cargos superiores automaticamente:
+As flags de uso diário ficam no próprio [hooks/useUser.ts](/home/larissa/Documentos/projects/controle-de-estoque/hooks/useUser.ts). Além de `hasPermission`, ele expõe:
+
+- `canViewFornecedoresPage`
+- `canManageFornecedores`
+- `canViewConfiguracoes`
+- `canManageCategorias`
+- `canManageUsers`
+- `canViewProdutos`
+- `canManageProdutos`
+- `canReadFornecedorContext`
+- `canReadCategoriaContext`
+
+Exemplo:
 
 ```tsx
-const { canAccess } = useUser();
+const { canManageProdutos } = useUser();
 
-// Admin pode acessar tudo
-// Estoquista pode acessar estoque e atendente
-// Atendente só pode acessar atendente
-
-if (canAccess('estoquista')) {
-  // Permite: admin, estoquista
-  // Bloqueia: atendente
-}
-
-if (canAccess('admin')) {
-  // Permite: admin
-  // Bloqueia: estoquista, atendente
-}
+return canManageProdutos ? <BotaoNovoProduto /> : null;
 ```
 
-### Verificação por Cargo Específico
+## Guards de Componente
 
-Use `hasRole()` quando quiser permitir apenas cargos específicos:
+Arquivo: [components/role-guard.tsx](/home/larissa/Documentos/projects/controle-de-estoque/components/role-guard.tsx)
 
-```tsx
-const { hasRole } = useUser();
+O `RoleGuard` suporta três formas de proteção:
 
-if (hasRole('admin', 'estoquista')) {
-  // Permite APENAS admin e estoquista
-  // Não usa hierarquia
-}
-```
+- `roles`
+- `minRole`
+- `permission`
 
----
-
-## Componentes de Controle de Acesso
-
-### `<RoleGuard>`
-
-Componente declarativo para controlar exibição baseada em cargo.
+Exemplo por permissão:
 
 ```tsx
-import { RoleGuard } from '@/components/role-guard';
-
-// Por lista de cargos
-<RoleGuard roles={['admin', 'estoquista']}>
-  <BotaoExcluir />
+<RoleGuard permission='manage_produtos'>
+  <BotaoExcluirProduto />
 </RoleGuard>
-
-// Por cargo mínimo (usa hierarquia)
-<RoleGuard minRole="estoquista">
-  <PainelEstoque />
-</RoleGuard>
-
-// Com fallback
-<RoleGuard roles={['admin']} fallback={<span>Sem permissão</span>}>
-  <ConfigAdmin />
-</RoleGuard>
 ```
 
-### `<AdminOnly>`
-
-Atalho para conteúdo exclusivo de admin:
+Também existe o atalho `PermissionGuard`:
 
 ```tsx
-import { AdminOnly } from '@/components/role-guard';
-
-<AdminOnly>
-  <BotaoExcluirUsuario />
-</AdminOnly>
-
-<AdminOnly fallback={<span>Apenas admins</span>}>
-  <PainelAdmin />
-</AdminOnly>
+<PermissionGuard permission='view_configuracoes'>
+  <PainelAdministrativo />
+</PermissionGuard>
 ```
 
-### `<EstoqueAccess>`
+## Proteção de Páginas
 
-Atalho para conteúdo de estoquista ou superior:
+Arquivo server-side: [lib/server/access-control.ts](/home/larissa/Documentos/projects/controle-de-estoque/lib/server/access-control.ts)
 
-```tsx
-import { EstoqueAccess } from '@/components/role-guard';
+Use `requirePagePermission(permission)` em layouts ou páginas server-side.
 
-<EstoqueAccess>
-  <ControlesEstoque />
-</EstoqueAccess>;
-```
+Comportamento:
 
----
+- sem sessão: redireciona para `/login`
+- com sessão mas sem permissão: redireciona para `/dashboard`
 
-## Tipos TypeScript
-
-### Importando Tipos
+Exemplo:
 
 ```tsx
-import type { Cargo, ExtendedUser } from '@/lib/types/auth';
-import { CARGO_COLORS, CARGO_HIERARCHY, CARGO_LABELS } from '@/lib/types/auth';
-```
-
-### Constantes Úteis
-
-```tsx
-// Labels para exibição
-CARGO_LABELS['admin']; // 'Administrador'
-CARGO_LABELS['estoquista']; // 'Estoquista'
-CARGO_LABELS['atendente']; // 'Atendente'
-
-// Cores para badges (Tailwind)
-CARGO_COLORS['admin']; // 'bg-emerald-100 text-emerald-800 ...'
-
-// Hierarquia numérica
-CARGO_HIERARCHY['admin']; // 3
-CARGO_HIERARCHY['estoquista']; // 2
-CARGO_HIERARCHY['atendente']; // 1
-```
-
-### Exemplo: Badge de Cargo
-
-```tsx
-import { useUser } from '@/hooks/useUser';
-import { CARGO_COLORS, CARGO_LABELS } from '@/lib/types/auth';
-
-function CargoBadge() {
-  const { cargo } = useUser();
-
-  return (
-    <span className={`px-2 py-1 rounded text-sm ${CARGO_COLORS[cargo]}`}>
-      {CARGO_LABELS[cargo]}
-    </span>
-  );
+export default async function ConfiguracoesLayout({
+  children
+}: {
+  children: React.ReactNode;
+}) {
+  await requirePagePermission('view_configuracoes');
+  return children;
 }
 ```
 
----
+Layouts protegidos atuais:
 
-## Exemplos Práticos
+- [app/(dashboard)/fornecedores/layout.tsx](/home/larissa/Documentos/projects/controle-de-estoque/app/(dashboard)/fornecedores/layout.tsx)
+- [app/(dashboard)/configuracoes/layout.tsx](/home/larissa/Documentos/projects/controle-de-estoque/app/(dashboard)/configuracoes/layout.tsx)
 
-### Botão Condicional na Sidebar
+## Proteção de API
 
-```tsx
-function Sidebar() {
-  const { isAdmin } = useUser();
+Use `requireRoutePermission(request, permission)` no início dos Route Handlers.
 
-  return (
-    <nav>
-      <Link href='/dashboard'>Dashboard</Link>
-      <Link href='/clientes'>Clientes</Link>
+Comportamento:
 
-      {isAdmin && <Link href='/configuracoes'>Configurações</Link>}
-    </nav>
+- sem sessão válida: `401`
+- com sessão mas sem permissão: `403`
+
+Exemplo:
+
+```ts
+export async function POST(request: Request) {
+  const permissionCheck = await requireRoutePermission(
+    request,
+    'manage_produtos'
   );
-}
-```
 
-### Tabela com Ações Condicionais
-
-```tsx
-function TabelaUsuarios({ usuarios }) {
-  return (
-    <table>
-      {usuarios.map((usuario) => (
-        <tr key={usuario.id}>
-          <td>{usuario.name}</td>
-          <td>{usuario.email}</td>
-          <td>
-            <BotaoEditar />
-
-            <AdminOnly>
-              <BotaoExcluir />
-            </AdminOnly>
-          </td>
-        </tr>
-      ))}
-    </table>
-  );
-}
-```
-
-### Página com Verificação de Acesso
-
-```tsx
-function PaginaEstoque() {
-  const { canAccess, isPending } = useUser();
-
-  if (isPending) return <Loading />;
-
-  if (!canAccess('estoquista')) {
-    return <AcessoNegado />;
+  if (permissionCheck instanceof Response) {
+    return permissionCheck;
   }
 
-  return (
-    <div>
-      <h1>Controle de Estoque</h1>
-      {/* conteúdo */}
-    </div>
-  );
+  // restante da lógica
 }
 ```
 
----
+## Regras Aplicadas Hoje
 
-## Arquivos do Sistema
+### Sidebar
 
-| Arquivo                     | Descrição                                 |
-| --------------------------- | ----------------------------------------- |
-| `lib/types/auth.ts`         | Tipos e constantes (Cargo, labels, cores) |
-| `lib/auth.ts`               | Configuração do better-auth (servidor)    |
-| `lib/auth-client.ts`        | Cliente de autenticação (navegador)       |
-| `hooks/useUser.ts`          | Hook principal para acesso a permissões   |
-| `components/role-guard.tsx` | Componentes de controle de exibição       |
+Arquivo: [components/app-sidebar.tsx](/home/larissa/Documentos/projects/controle-de-estoque/components/app-sidebar.tsx)
+
+- itens do menu têm permissão declarada
+- grupos vazios não são renderizados
+- `atendente` não vê `Fornecedores` nem `Configuracoes`
+- `estoquista` não vê `Configuracoes`
+
+### Produtos
+
+Arquivos:
+
+- [app/(dashboard)/produtos/page.tsx](/home/larissa/Documentos/projects/controle-de-estoque/app/(dashboard)/produtos/page.tsx)
+- [app/(dashboard)/produtos/_components/card-pecas.tsx](/home/larissa/Documentos/projects/controle-de-estoque/app/(dashboard)/produtos/_components/card-pecas.tsx)
+
+Regra:
+
+- `atendente` pode abrir a página e visualizar listagem, filtros e contexto de fornecedor
+- `atendente` não vê botão `Novo Produto`
+- `atendente` não vê ações de `Editar` e `Excluir`
+- mesmo que tente chamar a API manualmente, recebe `403` nas mutações
+
+### Fornecedores
+
+Arquivos:
+
+- [app/(dashboard)/fornecedores/layout.tsx](/home/larissa/Documentos/projects/controle-de-estoque/app/(dashboard)/fornecedores/layout.tsx)
+- [app/api/fornecedores/route.ts](/home/larissa/Documentos/projects/controle-de-estoque/app/api/fornecedores/route.ts)
+- [app/api/fornecedores/[id]/route.ts](/home/larissa/Documentos/projects/controle-de-estoque/app/api/fornecedores/[id]/route.ts)
+
+Regra:
+
+- `atendente` não entra na página
+- `atendente` ainda pode ler contexto de fornecedor em endpoints usados por `produtos`
+- criação, edição e exclusão de fornecedor exigem `manage_fornecedores`
+
+### Configurações
+
+Arquivos:
+
+- [app/(dashboard)/configuracoes/layout.tsx](/home/larissa/Documentos/projects/controle-de-estoque/app/(dashboard)/configuracoes/layout.tsx)
+- [app/api/users/route.ts](/home/larissa/Documentos/projects/controle-de-estoque/app/api/users/route.ts)
+- [app/api/users/[id]/route.ts](/home/larissa/Documentos/projects/controle-de-estoque/app/api/users/[id]/route.ts)
+- [app/api/categorias/route.ts](/home/larissa/Documentos/projects/controle-de-estoque/app/api/categorias/route.ts)
+- [app/api/categorias/[id]/route.ts](/home/larissa/Documentos/projects/controle-de-estoque/app/api/categorias/[id]/route.ts)
+
+Regra:
+
+- página disponível só para `admin`
+- `users` é admin only
+- `categorias` permite leitura contextual autenticada, mas mutações exigem `manage_categorias`
+
+## Arquivos Principais
+
+| Arquivo | Responsabilidade |
+| --- | --- |
+| [lib/permissions.ts](/home/larissa/Documentos/projects/controle-de-estoque/lib/permissions.ts) | Matriz central e helpers puros |
+| [lib/server/access-control.ts](/home/larissa/Documentos/projects/controle-de-estoque/lib/server/access-control.ts) | Proteção server-side de página e API |
+| [hooks/useUser.ts](/home/larissa/Documentos/projects/controle-de-estoque/hooks/useUser.ts) | Sessão, cargo, flags e helpers gerais |
+| [components/role-guard.tsx](/home/larissa/Documentos/projects/controle-de-estoque/components/role-guard.tsx) | Guards declarativos em componentes |
+| [components/app-sidebar.tsx](/home/larissa/Documentos/projects/controle-de-estoque/components/app-sidebar.tsx) | Filtragem de navegação por permissão |
+
+## Boas Práticas
+
+- Use `hasPermission()` ou as flags de `useUser()` na UI
+- Use `requirePagePermission()` em páginas ou layouts server-side
+- Use `requireRoutePermission()` em Route Handlers
+- Não replique a matriz de permissões em componentes ou endpoints
+- Se surgir uma nova regra de acesso, atualize primeiro `lib/permissions.ts`

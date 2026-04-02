@@ -27,6 +27,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { categorias } from '@/db/schema';
 import { logAction } from '@/lib/log-action';
+import { requireRoutePermission } from '@/lib/server/access-control';
 
 import { sql } from 'drizzle-orm';
 
@@ -41,7 +42,16 @@ import { sql } from 'drizzle-orm';
  * do Next.js, como manipulação de cookies e headers de forma mais fácil.
  * Para respostas simples, ambos funcionam igual.
  */
-export async function GET() {
+export async function GET(request: Request) {
+  const permissionCheck = await requireRoutePermission(
+    request,
+    'read_categoria_context'
+  );
+
+  if (permissionCheck instanceof Response) {
+    return permissionCheck;
+  }
+
   try {
     // Busca todas as categorias ordenadas pelo ID
     // O método .select() sem argumentos retorna todas as colunas
@@ -73,6 +83,15 @@ export async function GET() {
  * }
  */
 export async function POST(request: Request) {
+  const permissionCheck = await requireRoutePermission(
+    request,
+    'manage_categorias'
+  );
+
+  if (permissionCheck instanceof Response) {
+    return permissionCheck;
+  }
+
   try {
     // Extrai o JSON do corpo da requisição
     // request.json() é assíncrono, então usamos await

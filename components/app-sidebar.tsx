@@ -18,7 +18,9 @@ import {
   SidebarSeparator
 } from '@/components/ui/sidebar';
 import { useAlertaCount } from '@/hooks/useAlertaCount';
+import { useUser } from '@/hooks/useUser';
 import { signOut, useSession } from '@/lib/auth-client';
+import type { AppPermission } from '@/lib/permissions';
 
 import {
   AlertTriangle,
@@ -40,19 +42,22 @@ const menuItems = [
         id: 'dashboard',
         label: 'Dashboard',
         icon: LayoutDashboard,
-        href: '/dashboard'
+        href: '/dashboard',
+        permission: 'view_dashboard' as AppPermission
       },
       {
         id: 'produtos',
         label: 'Produtos',
         icon: Package,
-        href: '/produtos'
+        href: '/produtos',
+        permission: 'view_produtos' as AppPermission
       },
       {
         id: 'clientes',
         label: 'Clientes',
         icon: Users,
-        href: '/clientes'
+        href: '/clientes',
+        permission: 'view_clientes' as AppPermission
       }
     ]
   },
@@ -63,19 +68,22 @@ const menuItems = [
         id: 'ordens',
         label: 'Ordens',
         icon: ClipboardList,
-        href: '/ordens'
+        href: '/ordens',
+        permission: 'view_ordens' as AppPermission
       },
       {
         id: 'movimentacoes',
         label: 'Movimentacoes',
         icon: ArrowUpDown,
-        href: '/movimentacoes'
+        href: '/movimentacoes',
+        permission: 'view_movimentacoes' as AppPermission
       },
       {
         id: 'fornecedores',
         label: 'Fornecedores',
         icon: Factory,
-        href: '/fornecedores'
+        href: '/fornecedores',
+        permission: 'view_fornecedores_page' as AppPermission
       }
     ]
   },
@@ -86,13 +94,15 @@ const menuItems = [
         id: 'alertas',
         label: 'Alertas',
         icon: AlertTriangle,
-        href: '/alertas'
+        href: '/alertas',
+        permission: 'view_alertas' as AppPermission
       },
       {
         id: 'configuracoes',
         label: 'Configuracoes',
         icon: Settings,
-        href: '/configuracoes'
+        href: '/configuracoes',
+        permission: 'view_configuracoes' as AppPermission
       }
     ]
   }
@@ -112,6 +122,13 @@ export function AppSidebar() {
   const router = useRouter();
   const { data: session } = useSession();
   const { totalAlertas } = useAlertaCount();
+  const { hasPermission } = useUser();
+  const visibleGroups = menuItems
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => hasPermission(item.permission))
+    }))
+    .filter((group) => group.items.length > 0);
 
   const handleLogout = async () => {
     await signOut();
@@ -145,7 +162,7 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        {menuItems.map((group) => (
+        {visibleGroups.map((group) => (
           <SidebarGroup key={group.title}>
             <SidebarGroupLabel className='text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground'>
               {group.title}

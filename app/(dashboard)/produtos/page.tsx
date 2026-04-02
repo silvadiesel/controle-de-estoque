@@ -15,6 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { SearchableSelect } from '@/components/ui/searchable-select';
 import { usePagination } from '@/hooks/usePagination';
+import { useUser } from '@/hooks/useUser';
 
 import { CardPecas } from './_components/card-pecas';
 import { ModalPecas } from './_components/modal-peças';
@@ -22,6 +23,8 @@ import { usePecas } from './_hook/usePecas';
 import { PackageOpen, Plus, Search } from 'lucide-react';
 
 export default function Products() {
+  const { canManageProdutos } = useUser();
+
   const {
     isLoading,
     search,
@@ -90,22 +93,24 @@ export default function Products() {
             <p className='text-sm text-muted-foreground'>Gerencie o estoque</p>
           </div>
 
-          <ModalPecas
-            mode={editingPeca ? 'edit' : 'create'}
-            initialData={editingPeca ?? undefined}
-            isOpen={isAddOpen}
-            setIsOpen={handleOpenChange}
-            onSubmit={handleSubmit}
-            isLoading={isLoading}
-            categoryOptions={categoryOptions}
-            supplierOptions={supplierOptions}
-            trigger={
-              <Button className='w-full sm:w-auto'>
-                <Plus data-icon='inline-start' />
-                Novo Produto
-              </Button>
-            }
-          />
+          {canManageProdutos ? (
+            <ModalPecas
+              mode={editingPeca ? 'edit' : 'create'}
+              initialData={editingPeca ?? undefined}
+              isOpen={isAddOpen}
+              setIsOpen={handleOpenChange}
+              onSubmit={handleSubmit}
+              isLoading={isLoading}
+              categoryOptions={categoryOptions}
+              supplierOptions={supplierOptions}
+              trigger={
+                <Button className='w-full sm:w-auto'>
+                  <Plus data-icon='inline-start' />
+                  Novo Produto
+                </Button>
+              }
+            />
+          ) : null}
         </div>
 
         <div className='flex flex-col sm:flex-row gap-3 items-start sm:items-center'>
@@ -173,6 +178,7 @@ export default function Products() {
                 categoryName={getCategoryName(peca.categoria_id)}
                 supplierName={getFornecedorName(peca.fornecedor_id)}
                 formattedPrice={formatPrice(peca.preco)}
+                canManage={canManageProdutos}
                 onEdit={handleEdit}
                 onDelete={(p) => {
                   setDeleteId(p.id);
