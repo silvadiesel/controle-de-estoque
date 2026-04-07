@@ -20,7 +20,9 @@ export async function proxy(request: NextRequest) {
   }
 
   // Verificar se existe cookie de sessão do Better Auth
-  const sessionCookie = request.cookies.get('better-auth.session_token');
+  const sessionCookie =
+    request.cookies.get('better-auth.session_token') ||
+    request.cookies.get('__Secure-better-auth.session_token');
 
   // Se não há sessão e está tentando acessar rota protegida, redirecionar para login
   if (!sessionCookie) {

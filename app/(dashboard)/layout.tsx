@@ -12,7 +12,9 @@ export default async function DashboardLayout({
 }) {
   // Verificação adicional no servidor
   const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get('better-auth.session_token');
+  const sessionCookie =
+    cookieStore.get('better-auth.session_token') ||
+    cookieStore.get('__Secure-better-auth.session_token');
 
   if (!sessionCookie) {
     redirect('/login');
