@@ -45,9 +45,12 @@ export function RoleGuard({
   children,
   fallback = null
 }: RoleGuardProps) {
-  const { hasRole, canAccess, hasPermission, isAuthenticated } = useUser();
+  const { hasRole, canAccess, hasPermission, isAuthenticated, isPending } = useUser();
 
-  // Se não está autenticado, não mostra nada
+  if (isPending) {
+    return null;
+  }
+
   if (!isAuthenticated) {
     return fallback;
   }
