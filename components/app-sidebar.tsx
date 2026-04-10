@@ -133,9 +133,20 @@ export function AppSidebar() {
         .filter((group) => group.items.length > 0);
 
   const handleLogout = async () => {
-    await signOut();
-    router.push('/login');
-    router.refresh();
+    // Garante que o usuário vá para /login mesmo se a request de signOut falhar
+    // (rede intermitente, servidor indisponível, etc). A intenção de sair é soberana.
+    try {
+      await signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            router.push('/login');
+            router.refresh();
+          }
+        }
+      });
+    } catch {
+      window.location.href = '/login';
+    }
   };
 
   return (
@@ -163,7 +174,8 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
 
-      <SidebarContent className={isPending ? 'pointer-events-none opacity-50' : undefined}>
+      <SidebarContent
+        className={isPending ? 'pointer-events-none opacity-50' : undefined}>
         {visibleGroups.map((group) => (
           <SidebarGroup key={group.title}>
             <SidebarGroupLabel className='text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground'>
@@ -220,7 +232,7 @@ export function AppSidebar() {
           </div>
           <button
             onClick={handleLogout}
-            className='text-muted-foreground transition-colors hover:text-text-tertiary'
+            className='text-muted-foreground transition-colors hover:text-text-tertiary hover:cursor-pointer'
             title='Sair do sistema'
             type='button'>
             <LogOut className='size-4' />

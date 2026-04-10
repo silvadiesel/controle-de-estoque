@@ -5,11 +5,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 
 export const auth = betterAuth({
   baseURL: {
-    allowedHosts: [
-      'controle.silvadiesel.com',
-      '*.vercel.app',
-      'localhost:3001'
-    ],
+    allowedHosts: ['controle.silvadiesel.com', '*.vercel.app', 'localhost:*'],
     protocol: process.env.NODE_ENV === 'development' ? 'http' : 'https'
   },
   database: drizzleAdapter(db, {
