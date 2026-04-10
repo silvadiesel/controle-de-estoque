@@ -1,10 +1,20 @@
 import { NextResponse } from 'next/server';
 
 import { db, schema } from '@/db';
+import { requireRoutePermission } from '@/lib/server/access-control';
 
 import { desc, eq } from 'drizzle-orm';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const permissionCheck = await requireRoutePermission(
+    request,
+    'view_movimentacoes'
+  );
+
+  if (permissionCheck instanceof Response) {
+    return permissionCheck;
+  }
+
   try {
     const movs = await db
       .select({

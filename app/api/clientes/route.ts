@@ -2,10 +2,17 @@ import { NextResponse } from 'next/server';
 
 import { db, schema } from '@/db';
 import { logAction } from '@/lib/log-action';
+import { requireRoutePermission } from '@/lib/server/access-control';
 
 import { asc, eq, or } from 'drizzle-orm';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const permissionCheck = await requireRoutePermission(request, 'view_clientes');
+
+  if (permissionCheck instanceof Response) {
+    return permissionCheck;
+  }
+
   const clientes = await db
     .select()
     .from(schema.cliente)

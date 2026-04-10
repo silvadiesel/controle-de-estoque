@@ -1,10 +1,17 @@
 import { db, schema } from '@/db';
 import { logAction } from '@/lib/log-action';
+import { requireRoutePermission } from '@/lib/server/access-control';
 import { validateAndDecrementStock } from '@/lib/stock';
 
 import { desc, eq } from 'drizzle-orm';
 
-export async function GET() {
+export async function GET(request: Request) {
+  const permissionCheck = await requireRoutePermission(request, 'view_ordens');
+
+  if (permissionCheck instanceof Response) {
+    return permissionCheck;
+  }
+
   const ordens = await db
     .select({
       id: schema.ordemVenda.id,

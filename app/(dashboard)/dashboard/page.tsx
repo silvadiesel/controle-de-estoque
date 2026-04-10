@@ -7,6 +7,7 @@ import { AlertTriangle, Package, ShoppingCart, Users } from 'lucide-react';
 
 import { type Cliente } from '@/db/schema/cliente';
 import { type Peca } from '@/db/schema/pecas';
+import { fetchWithAuth } from '@/lib/fetch-with-auth';
 
 import { ActivityFeed, type MovimentacaoAPI } from './_components/activity-feed';
 import { buildLast7Days, MovementsChart } from './_components/movements-chart';
@@ -38,11 +39,11 @@ export default function DashboardPage() {
     setDashboardState('loading');
 
     const results = await Promise.allSettled([
-      fetch('/api/produtos').then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
-      fetch('/api/clientes').then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
-      fetch('/api/ordens/servico').then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
-      fetch('/api/ordens/venda').then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
-      fetch('/api/movimentacoes').then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+      fetchWithAuth('/api/produtos').then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+      fetchWithAuth('/api/clientes').then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+      fetchWithAuth('/api/ordens/servico').then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+      fetchWithAuth('/api/ordens/venda').then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+      fetchWithAuth('/api/movimentacoes').then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
     ]);
 
     const toBucket = <T,>(result: PromiseSettledResult<unknown>): RequestBucket<T> => ({
