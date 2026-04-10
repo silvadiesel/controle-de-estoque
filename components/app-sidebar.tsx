@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useAlertaCount } from '@/hooks/useAlertaCount';
 import { useUser } from '@/hooks/useUser';
-import { signOut, useSession } from '@/lib/auth-client';
+import { signOut } from '@/lib/auth-client';
 import type { AppPermission } from '@/lib/permissions';
 
 import {
@@ -120,15 +120,17 @@ function getInitials(name: string) {
 export function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { data: session } = useSession();
   const { totalAlertas } = useAlertaCount();
-  const { hasPermission } = useUser();
-  const visibleGroups = menuItems
-    .map((group) => ({
-      ...group,
-      items: group.items.filter((item) => hasPermission(item.permission))
-    }))
-    .filter((group) => group.items.length > 0);
+  const { hasPermission, user, isPending } = useUser();
+
+  const visibleGroups = isPending
+    ? menuItems
+    : menuItems
+        .map((group) => ({
+          ...group,
+          items: group.items.filter((item) => hasPermission(item.permission))
+        }))
+        .filter((group) => group.items.length > 0);
 
   const handleLogout = async () => {
     await signOut();
@@ -161,7 +163,7 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className={isPending ? 'pointer-events-none opacity-50' : undefined}>
         {visibleGroups.map((group) => (
           <SidebarGroup key={group.title}>
             <SidebarGroupLabel className='text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground'>
@@ -205,15 +207,15 @@ export function AppSidebar() {
         <div className='flex items-center gap-3 px-3 py-2'>
           <Avatar className='size-[30px]'>
             <AvatarFallback className='bg-secondary text-text-tertiary text-xs font-bold'>
-              {session?.user?.name ? getInitials(session.user.name) : '??'}
+              {user?.name ? getInitials(user.name) : '??'}
             </AvatarFallback>
           </Avatar>
           <div className='min-w-0 flex-1'>
             <p className='truncate text-sm font-medium text-foreground'>
-              {session?.user?.name || 'Usuario'}
+              {user?.name || 'Usuario'}
             </p>
             <p className='truncate text-xs text-muted-foreground'>
-              {session?.user?.email || ''}
+              {user?.email || ''}
             </p>
           </div>
           <button

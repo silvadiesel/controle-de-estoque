@@ -29,14 +29,14 @@ export function useUser() {
   const { data: session, isPending, error } = useSession();
 
   const user = session?.user;
-  const cargo = (user?.cargo as Cargo) ?? 'atendente';
+  const cargo: Cargo | null = user ? (user.cargo as Cargo) : null;
 
   /**
    * Verifica se o usuário tem acesso ao cargo mínimo especificado
    * Usa hierarquia: admin > estoquista > atendente
    */
   const canAccess = (minimumCargo: Cargo): boolean => {
-    if (!user) return false;
+    if (!user || !cargo) return false;
     return CARGO_HIERARCHY[cargo] >= CARGO_HIERARCHY[minimumCargo];
   };
 
@@ -44,17 +44,17 @@ export function useUser() {
    * Verifica se o usuário tem exatamente um dos cargos especificados
    */
   const hasRole = (...roles: Cargo[]): boolean => {
-    if (!user) return false;
+    if (!user || !cargo) return false;
     return roles.includes(cargo);
   };
 
   const hasPermission = (permission: AppPermission): boolean => {
-    if (!user) return false;
+    if (!user || !cargo) return false;
     return roleHasPermission(cargo, permission);
   };
 
   const canAccessRoute = (pathname: string): boolean => {
-    if (!user) return false;
+    if (!user || !cargo) return false;
     return hasRoutePermission(cargo, pathname);
   };
 
