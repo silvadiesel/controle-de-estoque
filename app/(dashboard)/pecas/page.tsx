@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { ModalDelete } from '@/components/modal-delete';
 import { PaginationControls } from '@/components/pagination-controls';
@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/empty';
 import { Input } from '@/components/ui/input';
 import { SearchableSelect } from '@/components/ui/searchable-select';
+import type { Peca } from '@/db/schema';
 import { usePagination } from '@/hooks/usePagination';
 import { useUser } from '@/hooks/useUser';
 
@@ -21,6 +22,7 @@ import { CardPecas } from './_components/card-pecas';
 import { ModalPecas } from './_components/modal-peças';
 import { usePecas } from './_hook/usePecas';
 import { PackageOpen, Plus, Search } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function Products() {
   const { canManageProdutos } = useUser();
@@ -48,7 +50,8 @@ export default function Products() {
     formatPrice,
     handleOpenChange,
     categoryOptions,
-    supplierOptions
+    supplierOptions,
+    restockPeca
   } = usePecas();
 
   const {
@@ -68,6 +71,20 @@ export default function Products() {
     items: filteredProducts,
     itemsPerPage: 20
   });
+
+  const handleRestock = useCallback(
+    async (peca: Peca, quantityToAdd: number) => {
+      try {
+        await restockPeca(peca.id, quantityToAdd);
+        toast.success('Estoque atualizado');
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'Erro ao repor estoque';
+        toast.error(message);
+      }
+    },
+    [restockPeca]
+  );
 
   // Reset paginação quando filtros/search mudam
   useEffect(() => {
@@ -180,6 +197,7 @@ export default function Products() {
                 formattedPrice={formatPrice(peca.preco)}
                 canManage={canManageProdutos}
                 onEdit={handleEdit}
+                onRestock={handleRestock}
                 onDelete={(p) => {
                   setDeleteId(p.id);
                   setIsDeleteOpen(true);
