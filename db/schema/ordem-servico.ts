@@ -27,7 +27,8 @@ export const ordemServico = pgTable('ordem_servico', {
     .notNull()
     .references(() => user.id),
   observacao: text('observacao'),
-  valor_total: integer('valor_total').notNull().default(0)
+  valor_total: integer('valor_total').notNull().default(0),
+  valor_mao_obra: integer('valor_mao_obra').notNull().default(0)
 });
 
 // Tabela de relacionamento entre Ordem de Serviço e Peças (many-to-many)
@@ -42,7 +43,19 @@ export const ordemServicoPecas = pgTable('ordem_servico_pecas', {
   quantidade: integer('quantidade').notNull()
 });
 
+// Tabela de mão de obra vinculada a Ordem de Serviço
+export const ordemServicoMaoObra = pgTable('ordem_servico_mao_obra', {
+  id: serial('id').primaryKey(),
+  ordem_servico_id: integer('ordem_servico_id')
+    .notNull()
+    .references(() => ordemServico.id, { onDelete: 'cascade' }),
+  descricao: text('descricao').notNull(),
+  valor: integer('valor').notNull()
+});
+
 // Tipos TypeScript
+export type OrdemServicoMaoObra = typeof ordemServicoMaoObra.$inferSelect;
+export type NewOrdemServicoMaoObra = typeof ordemServicoMaoObra.$inferInsert;
 export type OrdemServico = typeof ordemServico.$inferSelect;
 export type NewOrdemServico = typeof ordemServico.$inferInsert;
 export type OrdemServicoPecas = typeof ordemServicoPecas.$inferSelect;

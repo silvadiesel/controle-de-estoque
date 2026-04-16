@@ -13,6 +13,12 @@ export type Funcionario = FuncionarioOption;
 import { toast } from 'sonner';
 
 // Tipos para as ordens com dados relacionados
+export interface OrdemMaoObra {
+  id: number;
+  descricao: string;
+  valor: number;
+}
+
 export interface OrdemPeca {
   id: number;
   peca_id: number;
@@ -38,6 +44,7 @@ export interface OrdemServicoCompleta {
   funcionario_responsavel_id: string;
   observacao: string | null;
   valor_total: number;
+  valor_mao_obra: number;
   cliente: {
     id: number;
     name_cliente: string;
@@ -57,6 +64,7 @@ export interface OrdemServicoCompleta {
     name: string;
   } | null;
   pecas: OrdemPeca[];
+  mao_obra: OrdemMaoObra[];
 }
 
 export interface OrdemVendaCompleta {
@@ -87,7 +95,9 @@ export interface NovaOrdemServico {
   funcionario_responsavel_id: string;
   observacao?: string;
   valor_total: number;
+  valor_mao_obra: number;
   pecas: { peca_id: number; quantidade: number }[];
+  mao_obra: { descricao: string; valor: number }[];
 }
 
 export interface NovaOrdemVenda {
