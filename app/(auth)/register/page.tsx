@@ -10,12 +10,31 @@ import { AuthShell } from '@/app/(auth)/auth-shell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { signUp } from '@/lib/auth-client';
+import { signUpWithCodigo } from '@/lib/auth-client';
 
 import { AlertCircle, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
 
-function getRegisterErrorMessage(message?: string) {
+function getRegisterErrorMessage(
+  message?: string,
+  status?: number
+) {
+  if (status === 429) {
+    return 'Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.';
+  }
+
+  if (status === 401) {
+    return 'Código de verificação inválido. Solicite o código correto ao administrador.';
+  }
+
+  if (status === 400) {
+    return 'Código de verificação obrigatório.';
+  }
+
   const normalized = message?.toLowerCase() ?? '';
+
+  if (normalized.includes('código') || normalized.includes('codigo')) {
+    return message ?? 'Código de verificação inválido.';
+  }
 
   if (normalized.includes('exist') || normalized.includes('already')) {
     return 'Esse email ja esta em uso. Tente entrar ou use outro endereco.';
@@ -38,30 +57,29 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const CODIGO_LOJA = '367';
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (codigoVerificacao !== CODIGO_LOJA) {
-      setError(
-        'Codigo de verificacao invalido. Entre em contato com o administrador.'
-      );
+    if (!codigoVerificacao.trim()) {
+      setError('Código de verificação obrigatório.');
       return;
     }
 
     setLoading(true);
 
     try {
-      const result = await signUp.email({
+      const result = await signUpWithCodigo({
         name,
         email,
-        password
+        password,
+        codigo: codigoVerificacao.trim()
       });
 
       if (result.error) {
-        setError(getRegisterErrorMessage(result.error.message));
+        setError(
+          getRegisterErrorMessage(result.error.message, result.error.status)
+        );
       } else {
         startTransition(() => {
           router.push('/login');

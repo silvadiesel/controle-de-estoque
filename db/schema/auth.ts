@@ -1,4 +1,13 @@
-import { boolean, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import {
+  bigint,
+  boolean,
+  index,
+  integer,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp
+} from 'drizzle-orm/pg-core';
 
 // Enum para cargo do usuário
 export const cargoEnum = pgEnum('cargo', ['atendente', 'estoquista', 'admin']);
@@ -48,6 +57,28 @@ export const account = pgTable('account', {
   updatedAt: timestamp('updated_at').notNull().defaultNow()
 });
 
+// Tabela de verificação - tokens de verificação de email/password reset
+export const verification = pgTable(
+  'verification',
+  {
+    id: text('id').primaryKey(),
+    identifier: text('identifier').notNull(),
+    value: text('value').notNull(),
+    expiresAt: timestamp('expires_at').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow()
+  },
+  (t) => [index('verification_identifier_idx').on(t.identifier)]
+);
+
+// Tabela de rate limit - persistência de rate limiting no banco (necessário para serverless)
+export const rateLimit = pgTable('rate_limit', {
+  id: text('id').primaryKey(),
+  key: text('key').notNull().unique(),
+  count: integer('count').notNull(),
+  lastRequest: bigint('last_request', { mode: 'number' }).notNull()
+});
+
 // Tipos TypeScript
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
@@ -55,3 +86,7 @@ export type Session = typeof session.$inferSelect;
 export type NewSession = typeof session.$inferInsert;
 export type Account = typeof account.$inferSelect;
 export type NewAccount = typeof account.$inferInsert;
+export type Verification = typeof verification.$inferSelect;
+export type NewVerification = typeof verification.$inferInsert;
+export type RateLimit = typeof rateLimit.$inferSelect;
+export type NewRateLimit = typeof rateLimit.$inferInsert;

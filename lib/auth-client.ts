@@ -13,3 +13,24 @@ export const authClient = createAuthClient({
 });
 
 export const { signIn, signUp, signOut, useSession } = authClient;
+
+export type SignUpWithCodigoPayload = {
+  name: string;
+  email: string;
+  password: string;
+  codigo: string;
+};
+
+/**
+ * Wrapper tipado do signUp.email() que aceita o campo extra `codigo`.
+ *
+ * O Better Auth não declara `codigo` em `additionalFields` (o campo não deve
+ * ser persistido no `user` — ele só é lido pelo hook `before` do server para
+ * validar contra o código da empresa). O cast fica encapsulado aqui para
+ * evitar `@ts-expect-error` no caminho feliz do componente de signup.
+ */
+export function signUpWithCodigo(payload: SignUpWithCodigoPayload) {
+  return signUp.email(
+    payload as unknown as Parameters<typeof signUp.email>[0]
+  );
+}
