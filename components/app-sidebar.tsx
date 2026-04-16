@@ -47,9 +47,9 @@ const menuItems = [
       },
       {
         id: 'produtos',
-        label: 'Produtos',
+        label: 'Peças',
         icon: Package,
-        href: '/produtos',
+        href: '/pecas',
         permission: 'view_produtos' as AppPermission
       },
       {

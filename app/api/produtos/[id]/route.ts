@@ -60,7 +60,7 @@ export async function PUT(request: Request, { params }: Params) {
     .where(eq(schema.pecas.id, id))
     .returning();
 
-  await logAction(request, 'edicao', 'produto', String(id), `Produto '${updatedPeca[0]?.name_peca}' atualizado`);
+  await logAction(request, 'edicao', 'produto', String(id), `Peça '${updatedPeca[0]?.name_peca}' atualizada`);
   return new Response(JSON.stringify(updatedPeca));
 }
 
@@ -98,6 +98,6 @@ export async function DELETE(request: Request, { params }: Params) {
 
   await db.delete(schema.pecas).where(eq(schema.pecas.id, id));
 
-  await logAction(request, 'exclusao', 'produto', String(id), `Produto '${peca[0]?.name_peca}' excluído`);
+  await logAction(request, 'exclusao', 'produto', String(id), `Peça '${peca[0]?.name_peca}' excluída`);
   return new Response(JSON.stringify({ message: 'Peca deleted successfully' }));
 }

@@ -89,7 +89,7 @@ export default function Products() {
       <div className='flex flex-col gap-6'>
         <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
           <div className='flex flex-col gap-1'>
-            <h1 className='text-xl font-semibold text-foreground'>Produtos</h1>
+            <h1 className='text-xl font-semibold text-foreground'>Peças</h1>
             <p className='text-sm text-muted-foreground'>Gerencie o estoque</p>
           </div>
 
@@ -106,7 +106,7 @@ export default function Products() {
               trigger={
                 <Button className='w-full sm:w-auto'>
                   <Plus data-icon='inline-start' />
-                  Novo Produto
+                  Nova Peça
                 </Button>
               }
             />
@@ -121,7 +121,7 @@ export default function Products() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className='pl-10'
-              aria-label='Buscar produto'
+              aria-label='Buscar peça'
             />
           </div>
 
@@ -202,7 +202,7 @@ export default function Products() {
         onPageChange={goToPage}
         onNextPage={goToNextPage}
         onPreviousPage={goToPreviousPage}
-        itemLabel='produtos'
+        itemLabel='peças'
       />
 
       <ModalDelete
@@ -213,7 +213,7 @@ export default function Products() {
         }}
         onConfirm={() => deleteId && handleDeletePeca(deleteId)}
         isLoading={isLoading}
-        title='Excluir Produto'
+        title='Excluir Peça'
         description='Esta ação não pode ser desfeita.'
       />
     </div>

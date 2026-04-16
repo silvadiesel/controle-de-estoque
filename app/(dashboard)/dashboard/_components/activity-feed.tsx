@@ -32,7 +32,7 @@ interface FeedItem {
 }
 
 const ENTIDADE_LABELS: Record<string, string> = {
-  produto: 'Produto',
+  produto: 'Peça',
   cliente: 'Cliente',
   fornecedor: 'Fornecedor',
   categoria: 'Categoria',

@@ -23,7 +23,7 @@ const ENTIDADE_CONFIG: Record<
   { label: string; icon: React.ElementType; className: string }
 > = {
   produto: {
-    label: 'Produto',
+    label: 'Peça',
     icon: Package,
     className: 'bg-orange-500/10 text-orange-300'
   },

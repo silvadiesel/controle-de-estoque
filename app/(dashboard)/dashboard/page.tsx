@@ -102,7 +102,7 @@ export default function DashboardPage() {
       {/* Stat Cards */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Produtos"
+          label="Peças"
           value={totalProdutos}
           subtitle="itens em estoque"
           icon={Package}
@@ -128,7 +128,7 @@ export default function DashboardPage() {
         <StatCard
           label="Alertas de Estoque"
           value={alertasEstoque}
-          subtitle="produtos com estoque baixo"
+          subtitle="peças com estoque baixo"
           icon={AlertTriangle}
           isLoading={isLoading}
           state={produtosState}

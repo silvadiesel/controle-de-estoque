@@ -98,7 +98,7 @@ export const CardPecas = memo(function CardPecas({
               size='sm'
               className='h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md'
               onClick={() => onDelete(peca)}
-              aria-label={`Excluir produto ${peca.name_peca}`}>
+              aria-label={`Excluir peça ${peca.name_peca}`}>
               <Trash2 className='h-3.5 w-3.5' aria-hidden='true' />
             </Button>
           </div>
