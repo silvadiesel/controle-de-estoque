@@ -28,11 +28,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usePagination } from '@/hooks/usePagination';
 
 import { ModalUsuarios } from './_components/modal-usuarios';
-import { useCategories, useUsers } from './_hooks';
+import { useCategories, useEmpresa, useUsers } from './_hooks';
 import {
+  Building2,
   Loader2,
   Pencil,
   Plus,
+  RefreshCw,
+  Save,
   Search,
   Settings,
   Tags,
@@ -79,6 +82,19 @@ export default function Configuracoes() {
     handleDeleteUser
   } = useUsers();
 
+  // Empresa Hook
+  const {
+    empresa,
+    isLoading: isLoadingEmpresa,
+    isSaving: isSavingEmpresa,
+    isRegenerating: isRegeneratingCodigo,
+    formData: empresaForm,
+    updateField: updateEmpresaField,
+    fetchEmpresa,
+    handleUpdateEmpresa,
+    handleRegenerateCodigo
+  } = useEmpresa();
+
   // Pagination for categories
   const {
     paginatedItems: paginatedCategories,
@@ -114,7 +130,8 @@ export default function Configuracoes() {
   useEffect(() => {
     fetchCategories();
     fetchUsers();
-  }, [fetchCategories, fetchUsers]);
+    fetchEmpresa();
+  }, [fetchCategories, fetchUsers, fetchEmpresa]);
 
   const getCargoLabel = (cargo: string) => {
     switch (cargo) {
@@ -164,6 +181,12 @@ export default function Configuracoes() {
             className='  flex bg-muted  text-muted-foreground data-[state=active]:border-primary/70! data-[state=active]:bg-muted!'>
             <Users className='h-4 w-4' />
             Usuários
+          </TabsTrigger>
+          <TabsTrigger
+            value='empresa'
+            className='  flex bg-muted  text-muted-foreground data-[state=active]:border-primary/70! data-[state=active]:bg-muted!'>
+            <Building2 className='h-4 w-4' />
+            Dados Cadastrais
           </TabsTrigger>
         </TabsList>
 
@@ -535,6 +558,176 @@ export default function Configuracoes() {
                     itemLabel='usuários'
                   />
                 </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Tab: Dados Cadastrais */}
+        <TabsContent value='empresa'>
+          <Card className='bg-card border-border mt-4'>
+            <CardHeader>
+              <CardTitle className='text-foreground flex items-center gap-2'>
+                <Building2 className='h-5 w-5 text-primary' />
+                Dados Cadastrais da Empresa
+              </CardTitle>
+              <CardDescription className='text-muted-foreground'>
+                Informações da empresa dona deste sistema. O código de
+                verificação é usado por novos funcionários ao se cadastrarem.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='space-y-6'>
+              {isLoadingEmpresa ? (
+                <div className='flex items-center justify-center py-12'>
+                  <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
+                </div>
+              ) : !empresa ? (
+                <div className='text-center py-12 text-muted-foreground'>
+                  <Building2 className='h-12 w-12 mx-auto mb-4 opacity-50' />
+                  <p>Empresa não cadastrada</p>
+                  <p className='text-sm'>
+                    Rode o script <code>pnpm db:seed:empresa</code> para criar
+                    o registro inicial.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <div className='space-y-2 md:col-span-2'>
+                      <Label
+                        htmlFor='empresa-nome'
+                        className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>
+                        Nome Fantasia
+                      </Label>
+                      <Input
+                        id='empresa-nome'
+                        value={empresaForm.nomeFantasia}
+                        onChange={(e) =>
+                          updateEmpresaField('nomeFantasia', e.target.value)
+                        }
+                        className='bg-input border-border'
+                        placeholder='Ex: Silva Diesel'
+                      />
+                    </div>
+
+                    <div className='space-y-2'>
+                      <Label
+                        htmlFor='empresa-cnpj'
+                        className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>
+                        CNPJ
+                      </Label>
+                      <Input
+                        id='empresa-cnpj'
+                        value={empresaForm.cnpj}
+                        onChange={(e) =>
+                          updateEmpresaField('cnpj', e.target.value)
+                        }
+                        className='bg-input border-border'
+                        placeholder='00.000.000/0000-00'
+                      />
+                    </div>
+
+                    <div className='grid grid-cols-[1fr_auto] gap-2 items-end'>
+                      <div className='space-y-2'>
+                        <Label
+                          htmlFor='empresa-cidade'
+                          className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>
+                          Cidade
+                        </Label>
+                        <Input
+                          id='empresa-cidade'
+                          value={empresaForm.cidade}
+                          onChange={(e) =>
+                            updateEmpresaField('cidade', e.target.value)
+                          }
+                          className='bg-input border-border'
+                        />
+                      </div>
+                      <div className='space-y-2 w-20'>
+                        <Label
+                          htmlFor='empresa-estado'
+                          className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>
+                          UF
+                        </Label>
+                        <Input
+                          id='empresa-estado'
+                          value={empresaForm.estado}
+                          onChange={(e) =>
+                            updateEmpresaField(
+                              'estado',
+                              e.target.value.toUpperCase()
+                            )
+                          }
+                          maxLength={2}
+                          className='bg-input border-border uppercase'
+                        />
+                      </div>
+                    </div>
+
+                    <div className='space-y-2 md:col-span-2'>
+                      <Label
+                        htmlFor='empresa-codigo'
+                        className='text-muted-foreground uppercase text-[10px] tracking-wider font-medium'>
+                        Código de Verificação
+                      </Label>
+                      <div className='flex items-center gap-2'>
+                        <Input
+                          id='empresa-codigo'
+                          value={empresaForm.codigoVerificacao}
+                          onChange={(e) =>
+                            updateEmpresaField(
+                              'codigoVerificacao',
+                              e.target.value.replace(/\D/g, '').slice(0, 4)
+                            )
+                          }
+                          maxLength={4}
+                          className='bg-input border-border font-mono tracking-widest max-w-[160px] text-lg'
+                          placeholder='1234'
+                        />
+                        <Button
+                          type='button'
+                          variant='outline'
+                          onClick={handleRegenerateCodigo}
+                          disabled={isRegeneratingCodigo || isSavingEmpresa}>
+                          {isRegeneratingCodigo ? (
+                            <>
+                              <Loader2 className='h-4 w-4 mr-2 animate-spin' />
+                              Gerando...
+                            </>
+                          ) : (
+                            <>
+                              <RefreshCw className='h-4 w-4 mr-2' />
+                              Regenerar
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                      <p className='text-sm text-muted-foreground'>
+                        4 dígitos numéricos. Compartilhe com novos funcionários
+                        para que possam se cadastrar.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className='flex justify-end border-t border-border pt-4'>
+                    <Button
+                      onClick={handleUpdateEmpresa}
+                      className='bg-primary text-primary-foreground hover:bg-primary/90'
+                      disabled={isSavingEmpresa || isRegeneratingCodigo}>
+                      {isSavingEmpresa ? (
+                        <>
+                          <Loader2 className='h-4 w-4 mr-2 animate-spin' />
+                          Salvando...
+                        </>
+                      ) : (
+                        <>
+                          <Save className='h-4 w-4 mr-2' />
+                          Salvar alterações
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>

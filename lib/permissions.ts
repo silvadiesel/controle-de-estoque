@@ -13,6 +13,7 @@ export type AppPermission =
   | 'view_configuracoes'
   | 'manage_categorias'
   | 'manage_users'
+  | 'manage_empresa'
   | 'read_users_context'
   | 'read_fornecedor_context'
   | 'read_categoria_context';
@@ -31,6 +32,7 @@ export const ROLE_PERMISSIONS = {
     'view_configuracoes',
     'manage_categorias',
     'manage_users',
+    'manage_empresa',
     'read_users_context',
     'read_fornecedor_context',
     'read_categoria_context'

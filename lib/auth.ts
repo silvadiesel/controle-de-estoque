@@ -1,7 +1,10 @@
 import { db } from '@/db';
+import { EMPRESA_SINGLETON_ID, empresa } from '@/db/schema';
 
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { APIError, createAuthMiddleware } from 'better-auth/api';
+import { eq } from 'drizzle-orm';
 
 export const auth = betterAuth({
   baseURL: {
@@ -13,6 +16,48 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true
+  },
+  // Rate limit persistente no Postgres. `memory` NÃO funciona em serverless
+  // (Vercel) porque cada invocação pode ser uma instância nova, o que
+  // invalidaria a proteção contra brute force do código de 4 dígitos.
+  rateLimit: {
+    enabled: true,
+    storage: 'database',
+    customRules: {
+      '/sign-up/email': {
+        window: 600, // 10 minutos
+        max: 5
+      }
+    }
+  },
+  hooks: {
+    // Valida o `codigo` da empresa ANTES do Better Auth executar o signup.
+    // O campo `codigo` não está declarado em additionalFields, mas o endpoint
+    // /sign-up/email aceita body tipado como record aberto, então o campo
+    // chega intacto no ctx.body.
+    before: createAuthMiddleware(async (ctx) => {
+      if (ctx.path !== '/sign-up/email') return;
+
+      const body = ctx.body as Record<string, unknown> | undefined;
+      const codigo = typeof body?.codigo === 'string' ? body.codigo : undefined;
+
+      if (!codigo) {
+        throw new APIError('BAD_REQUEST', {
+          message: 'Código de verificação obrigatório'
+        });
+      }
+
+      const [row] = await db
+        .select({ codigo: empresa.codigoVerificacao })
+        .from(empresa)
+        .where(eq(empresa.id, EMPRESA_SINGLETON_ID));
+
+      if (!row || row.codigo !== codigo) {
+        throw new APIError('UNAUTHORIZED', {
+          message: 'Código de verificação inválido'
+        });
+      }
+    })
   },
   user: {
     additionalFields: {
