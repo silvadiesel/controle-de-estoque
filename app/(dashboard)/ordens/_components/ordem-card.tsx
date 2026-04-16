@@ -31,6 +31,7 @@ import {
   MoreHorizontal,
   Package,
   Pencil,
+  Printer,
   ShoppingCart,
   Trash2,
   Wrench,
@@ -247,6 +248,25 @@ export function OrdemCard(props: OrdemCardProps) {
                 </Tooltip>
               </>
             )}
+            {ordem.status !== 'cancelada' && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant='ghost'
+                    size='icon-sm'
+                    onClick={() =>
+                      window.open(
+                        `/ordens/pdf/${tipo}/${ordem.id}`,
+                        '_blank'
+                      )
+                    }
+                    aria-label='Imprimir ordem'>
+                    <Printer />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Imprimir</TooltipContent>
+              </Tooltip>
+            )}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -297,6 +317,22 @@ export function OrdemCard(props: OrdemCardProps) {
                       className='rounded-lg px-3 py-2'>
                       <XCircle />
                       Cancelar
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className='bg-border' />
+                  </>
+                )}
+                {ordem.status !== 'cancelada' && (
+                  <>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        window.open(
+                          `/ordens/pdf/${tipo}/${ordem.id}`,
+                          '_blank'
+                        )
+                      }
+                      className='rounded-lg px-3 py-2'>
+                      <Printer />
+                      Imprimir
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className='bg-border' />
                   </>
