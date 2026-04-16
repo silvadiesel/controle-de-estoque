@@ -26,6 +26,10 @@ import type { Cliente, Peca, Veiculo } from '@/db/schema';
 import { useUser } from '@/hooks/useUser';
 
 import {
+  type MaoDeObraItem,
+  MaoDeObraBuilder
+} from './mao-de-obra-builder';
+import {
   type OrdemItemBuilderValue,
   OrdemItemsBuilder
 } from './ordem-items-builder';
@@ -41,7 +45,9 @@ interface OrdemServicoFormData {
   funcionario_responsavel_id: string;
   observacao: string;
   valor_total: number;
+  valor_mao_obra: number;
   pecas: OrdemItemBuilderValue[];
+  mao_obra: MaoDeObraItem[];
 }
 
 interface Funcionario {
@@ -80,7 +86,9 @@ const emptyFormData: OrdemServicoFormData = {
   funcionario_responsavel_id: '',
   observacao: '',
   valor_total: 0,
-  pecas: []
+  valor_mao_obra: 0,
+  pecas: [],
+  mao_obra: []
 };
 
 export function ModalOrdemServico({
@@ -190,11 +198,18 @@ export function ModalOrdemServico({
       0
     );
 
+    const valor_mao_obra = formData.mao_obra.reduce(
+      (acc, item) => acc + item.valor,
+      0
+    );
+
     await onSubmit({
       ...formData,
       funcionario_id: funcionarioId,
       valor_total,
-      pecas: formData.pecas
+      valor_mao_obra,
+      pecas: formData.pecas,
+      mao_obra: formData.mao_obra
     });
   };
 
@@ -390,6 +405,13 @@ export function ModalOrdemServico({
           </FieldContent>
         </Field>
       </FieldGroup>
+
+      <MaoDeObraBuilder
+        items={formData.mao_obra}
+        onChange={(items) =>
+          setFormData((current) => ({ ...current, mao_obra: items }))
+        }
+      />
 
       <OrdemItemsBuilder
         label='Peças utilizadas'

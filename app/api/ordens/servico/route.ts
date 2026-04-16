@@ -27,6 +27,7 @@ export async function GET(request: Request) {
       funcionario_responsavel_id: schema.ordemServico.funcionario_responsavel_id,
       observacao: schema.ordemServico.observacao,
       valor_total: schema.ordemServico.valor_total,
+      valor_mao_obra: schema.ordemServico.valor_mao_obra,
       cliente: {
         id: schema.cliente.id,
         name_cliente: schema.cliente.name_cliente,
@@ -71,7 +72,16 @@ export async function GET(request: Request) {
         .leftJoin(schema.pecas, eq(schema.ordemServicoPecas.peca_id, schema.pecas.id))
         .where(eq(schema.ordemServicoPecas.ordem_servico_id, ordem.id));
 
-      return { ...ordem, pecas };
+      const maoObra = await db
+        .select({
+          id: schema.ordemServicoMaoObra.id,
+          descricao: schema.ordemServicoMaoObra.descricao,
+          valor: schema.ordemServicoMaoObra.valor
+        })
+        .from(schema.ordemServicoMaoObra)
+        .where(eq(schema.ordemServicoMaoObra.ordem_servico_id, ordem.id));
+
+      return { ...ordem, pecas, mao_obra: maoObra };
     })
   );
 
@@ -122,7 +132,8 @@ export async function POST(request: Request) {
           funcionario_id: data.funcionario_id,
           funcionario_responsavel_id: data.funcionario_responsavel_id,
           observacao: data.observacao || null,
-          valor_total: data.valor_total || 0
+          valor_total: data.valor_total || 0,
+          valor_mao_obra: data.valor_mao_obra || 0
         })
         .returning();
 
@@ -135,6 +146,17 @@ export async function POST(request: Request) {
             ordem_servico_id: ordemId,
             peca_id: peca.peca_id,
             quantidade: peca.quantidade
+          }))
+        );
+      }
+
+      // Inserir mão de obra
+      if (data.mao_obra && data.mao_obra.length > 0) {
+        await tx.insert(schema.ordemServicoMaoObra).values(
+          data.mao_obra.map((item: { descricao: string; valor: number }) => ({
+            ordem_servico_id: ordemId,
+            descricao: item.descricao,
+            valor: item.valor
           }))
         );
       }

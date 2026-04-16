@@ -1,6 +1,10 @@
 import { db, schema } from '@/db';
 import { logAction } from '@/lib/log-action';
-import { adjustStock, restoreStock, validateAndDecrementStock } from '@/lib/stock';
+import {
+  adjustStock,
+  restoreStock,
+  validateAndDecrementStock
+} from '@/lib/stock';
 
 import { aliasedTable, eq } from 'drizzle-orm';
 
@@ -10,7 +14,10 @@ export async function GET(_request: Request, { params }: Params) {
   const { id } = await params;
   const ordemId = parseInt(id);
 
-  const funcionarioResponsavel = aliasedTable(schema.user, 'funcionario_responsavel');
+  const funcionarioResponsavel = aliasedTable(
+    schema.user,
+    'funcionario_responsavel'
+  );
 
   const ordem = await db
     .select({
@@ -22,9 +29,11 @@ export async function GET(_request: Request, { params }: Params) {
       cliente_id: schema.ordemServico.cliente_id,
       veiculo_id: schema.ordemServico.veiculo_id,
       funcionario_id: schema.ordemServico.funcionario_id,
-      funcionario_responsavel_id: schema.ordemServico.funcionario_responsavel_id,
+      funcionario_responsavel_id:
+        schema.ordemServico.funcionario_responsavel_id,
       observacao: schema.ordemServico.observacao,
       valor_total: schema.ordemServico.valor_total,
+      valor_mao_obra: schema.ordemServico.valor_mao_obra,
       cliente: {
         id: schema.cliente.id,
         name_cliente: schema.cliente.name_cliente,
@@ -45,15 +54,32 @@ export async function GET(_request: Request, { params }: Params) {
       }
     })
     .from(schema.ordemServico)
-    .leftJoin(schema.cliente, eq(schema.ordemServico.cliente_id, schema.cliente.id))
-    .leftJoin(schema.veiculo, eq(schema.ordemServico.veiculo_id, schema.veiculo.id))
-    .leftJoin(schema.user, eq(schema.ordemServico.funcionario_id, schema.user.id))
-    .leftJoin(funcionarioResponsavel, eq(schema.ordemServico.funcionario_responsavel_id, funcionarioResponsavel.id))
+    .leftJoin(
+      schema.cliente,
+      eq(schema.ordemServico.cliente_id, schema.cliente.id)
+    )
+    .leftJoin(
+      schema.veiculo,
+      eq(schema.ordemServico.veiculo_id, schema.veiculo.id)
+    )
+    .leftJoin(
+      schema.user,
+      eq(schema.ordemServico.funcionario_id, schema.user.id)
+    )
+    .leftJoin(
+      funcionarioResponsavel,
+      eq(
+        schema.ordemServico.funcionario_responsavel_id,
+        funcionarioResponsavel.id
+      )
+    )
     .where(eq(schema.ordemServico.id, ordemId))
     .limit(1);
 
   if (ordem.length === 0) {
-    return new Response(JSON.stringify({ error: 'Ordem não encontrada' }), { status: 404 });
+    return new Response(JSON.stringify({ error: 'Ordem não encontrada' }), {
+      status: 404
+    });
   }
 
   const pecas = await db
@@ -70,10 +96,24 @@ export async function GET(_request: Request, { params }: Params) {
       }
     })
     .from(schema.ordemServicoPecas)
-    .leftJoin(schema.pecas, eq(schema.ordemServicoPecas.peca_id, schema.pecas.id))
+    .leftJoin(
+      schema.pecas,
+      eq(schema.ordemServicoPecas.peca_id, schema.pecas.id)
+    )
     .where(eq(schema.ordemServicoPecas.ordem_servico_id, ordemId));
 
-  return new Response(JSON.stringify({ ...ordem[0], pecas }));
+  const maoObra = await db
+    .select({
+      id: schema.ordemServicoMaoObra.id,
+      descricao: schema.ordemServicoMaoObra.descricao,
+      valor: schema.ordemServicoMaoObra.valor
+    })
+    .from(schema.ordemServicoMaoObra)
+    .where(eq(schema.ordemServicoMaoObra.ordem_servico_id, ordemId));
+
+  return new Response(
+    JSON.stringify({ ...ordem[0], pecas, mao_obra: maoObra })
+  );
 }
 
 export async function PUT(request: Request, { params }: Params) {
@@ -89,7 +129,9 @@ export async function PUT(request: Request, { params }: Params) {
       .where(eq(schema.ordemServico.id, ordemId));
 
     if (!ordemAtual) {
-      return new Response(JSON.stringify({ error: 'Ordem não encontrada' }), { status: 404 });
+      return new Response(JSON.stringify({ error: 'Ordem não encontrada' }), {
+        status: 404
+      });
     }
 
     const pecasAtuais = await db
@@ -112,11 +154,16 @@ export async function PUT(request: Request, { params }: Params) {
         }
       } else if (oldStatus === 'cancelada' && newStatus !== 'cancelada') {
         // Reativando ordem cancelada: decrementar estoque novamente
-        const pecasParaDecrementar = data.pecas !== undefined ? data.pecas : pecasAtuais;
+        const pecasParaDecrementar =
+          data.pecas !== undefined ? data.pecas : pecasAtuais;
         if (pecasParaDecrementar.length > 0) {
           await validateAndDecrementStock(tx, pecasParaDecrementar);
         }
-      } else if (oldStatus !== 'cancelada' && newStatus !== 'cancelada' && data.pecas !== undefined) {
+      } else if (
+        oldStatus !== 'cancelada' &&
+        newStatus !== 'cancelada' &&
+        data.pecas !== undefined
+      ) {
         // Editando peças em ordem ativa: ajustar diferença
         await adjustStock(tx, pecasAtuais, data.pecas);
       }
@@ -125,7 +172,9 @@ export async function PUT(request: Request, { params }: Params) {
       const ordemAtualizada = await tx
         .update(schema.ordemServico)
         .set({
-          data_chegada: data.data_chegada ? new Date(data.data_chegada) : undefined,
+          data_chegada: data.data_chegada
+            ? new Date(data.data_chegada)
+            : undefined,
           data_saida: data.data_saida ? new Date(data.data_saida) : null,
           status: data.status,
           cliente_id: data.cliente_id,
@@ -133,10 +182,28 @@ export async function PUT(request: Request, { params }: Params) {
           funcionario_id: data.funcionario_id,
           funcionario_responsavel_id: data.funcionario_responsavel_id,
           observacao: data.observacao,
-          valor_total: data.valor_total
+          valor_total: data.valor_total,
+          valor_mao_obra: data.valor_mao_obra
         })
         .where(eq(schema.ordemServico.id, ordemId))
         .returning();
+
+      // Atualizar mão de obra se fornecida
+      if (data.mao_obra !== undefined) {
+        await tx
+          .delete(schema.ordemServicoMaoObra)
+          .where(eq(schema.ordemServicoMaoObra.ordem_servico_id, ordemId));
+
+        if (data.mao_obra.length > 0) {
+          await tx.insert(schema.ordemServicoMaoObra).values(
+            data.mao_obra.map((item: { descricao: string; valor: number }) => ({
+              ordem_servico_id: ordemId,
+              descricao: item.descricao,
+              valor: item.valor
+            }))
+          );
+        }
+      }
 
       // Atualizar peças se fornecidas
       if (data.pecas !== undefined) {
@@ -158,10 +225,19 @@ export async function PUT(request: Request, { params }: Params) {
       return ordemAtualizada[0];
     });
 
-    await logAction(request, 'edicao', 'ordem_servico', String(ordemId), `Ordem de serviço #${ordemId} atualizada`);
+    await logAction(
+      request,
+      'edicao',
+      'ordem_servico',
+      String(ordemId),
+      `Ordem de serviço #${ordemId} atualizada`
+    );
     return new Response(JSON.stringify(result));
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Erro ao atualizar ordem de serviço';
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Erro ao atualizar ordem de serviço';
     return new Response(JSON.stringify({ error: message }), { status: 400 });
   }
 }
@@ -178,7 +254,9 @@ export async function DELETE(request: Request, { params }: Params) {
       .where(eq(schema.ordemServico.id, ordemId));
 
     if (!ordem) {
-      return new Response(JSON.stringify({ error: 'Ordem não encontrada' }), { status: 404 });
+      return new Response(JSON.stringify({ error: 'Ordem não encontrada' }), {
+        status: 404
+      });
     }
 
     const pecas = await db
@@ -195,13 +273,26 @@ export async function DELETE(request: Request, { params }: Params) {
         await restoreStock(tx, pecas);
       }
 
-      await tx.delete(schema.ordemServico).where(eq(schema.ordemServico.id, ordemId));
+      await tx
+        .delete(schema.ordemServico)
+        .where(eq(schema.ordemServico.id, ordemId));
     });
 
-    await logAction(request, 'exclusao', 'ordem_servico', String(ordemId), `Ordem de serviço #${ordemId} excluída`);
-    return new Response(JSON.stringify({ message: 'Ordem de serviço excluída com sucesso' }));
+    await logAction(
+      request,
+      'exclusao',
+      'ordem_servico',
+      String(ordemId),
+      `Ordem de serviço #${ordemId} excluída`
+    );
+    return new Response(
+      JSON.stringify({ message: 'Ordem de serviço excluída com sucesso' })
+    );
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Erro ao excluir ordem de serviço';
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Erro ao excluir ordem de serviço';
     return new Response(JSON.stringify({ error: message }), { status: 400 });
   }
 }

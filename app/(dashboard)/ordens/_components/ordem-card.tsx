@@ -113,7 +113,9 @@ export function OrdemCard(props: OrdemCardProps) {
         .filter(Boolean)
         .join(' · ');
 
-      return [veiculo, `Resp. ${responsavel}`].filter(Boolean).join(' · ');
+      return [veiculo, `Responsável: ${responsavel}`]
+        .filter(Boolean)
+        .join(' · ');
     }
 
     return [
@@ -168,8 +170,14 @@ export function OrdemCard(props: OrdemCardProps) {
                       Total
                     </p>
                     <p className='text-sm font-semibold text-foreground'>
-                      {formatCurrency(ordem.valor_total)}
-                    </p>
+                      {formatCurrency(
+                        ordem.valor_total +
+                          (tipo === 'servico'
+                            ? (props.ordem as OrdemServicoCompleta)
+                                .valor_mao_obra
+                            : 0)
+                      )}
+                    </p>{' '}
                   </div>
                   <ChevronDown
                     className={cn(
@@ -385,6 +393,47 @@ export function OrdemCard(props: OrdemCardProps) {
                 </p>
               </div>
             ) : null}
+
+            {/* Mão de obra */}
+            {tipo === 'servico' &&
+              (props.ordem as OrdemServicoCompleta).mao_obra?.length > 0 && (
+                <div className='flex flex-col gap-3'>
+                  <div>
+                    <p className='text-xs font-medium uppercase tracking-wider text-muted-foreground'>
+                      Mão de obra
+                    </p>
+                    <p className='mt-0.5 text-xs text-muted-foreground'>
+                      {(props.ordem as OrdemServicoCompleta).mao_obra.length}{' '}
+                      {(props.ordem as OrdemServicoCompleta).mao_obra.length ===
+                      1
+                        ? 'serviço vinculado'
+                        : 'serviços vinculados'}
+                    </p>
+                  </div>
+
+                  <div className='grid grid-cols-1 gap-2 sm:grid-cols-2'>
+                    {(props.ordem as OrdemServicoCompleta).mao_obra.map(
+                      (item) => (
+                        <div
+                          key={item.id}
+                          className='flex items-center justify-between rounded-lg border border-border bg-card p-3 transition-colors'>
+                          <div className='flex min-w-0 items-center gap-3'>
+                            <div className='flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-elevated text-primary'>
+                              <Wrench className='size-4' />
+                            </div>
+                            <p className='truncate text-sm font-semibold text-foreground'>
+                              {item.descricao}
+                            </p>
+                          </div>
+                          <span className='shrink-0 pl-2 text-sm font-semibold text-foreground'>
+                            {formatCurrency(item.valor)}
+                          </span>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              )}
 
             {/* Items — padrão visual de veículos (Clientes) */}
             <div className='flex flex-col gap-3'>

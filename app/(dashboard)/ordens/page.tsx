@@ -213,6 +213,11 @@ export default function OrdensPage() {
       funcionario_responsavel_id: ordem.funcionario_responsavel_id,
       observacao: ordem.observacao || '',
       valor_total: ordem.valor_total,
+      valor_mao_obra: ordem.valor_mao_obra,
+      mao_obra: ordem.mao_obra.map((item) => ({
+        descricao: item.descricao,
+        valor: item.valor
+      })),
       pecas: ordem.pecas.map((item) => {
         const pecaBanco = pecas.find((p) => p.id === item.peca_id);
         const estoqueEfetivo = (pecaBanco?.quantidade ?? item.peca?.quantidade ?? 0) + item.quantidade;
