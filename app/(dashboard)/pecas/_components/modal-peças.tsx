@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { blockNonNumericKeyDown } from '@/app/utils/formatters';
 import type { PecaFormValues } from '@/app/utils/validators';
 import { pecaFormSchema } from '@/app/utils/validators';
-import { useModalPecaState } from '@/app/(dashboard)/produtos/_hook/useModalPecaState';
+import { useModalPecaState } from '@/app/(dashboard)/pecas/_hook/useModalPecaState';
 import { Button } from '@/components/ui/button';
 import { DialogShell } from '@/components/ui/dialog-shell';
 import {
@@ -60,11 +60,11 @@ export function ModalPecas({
       open={isOpen}
       onOpenChange={setIsOpen}
       icon={Package}
-      title={isEdit ? 'Editar Produto' : 'Adicionar Novo Produto'}
+      title={isEdit ? 'Editar Peça' : 'Adicionar Nova Peça'}
       description={
         isEdit
-          ? 'Atualize as informações do produto.'
-          : 'Preencha os dados do novo produto.'
+          ? 'Atualize as informações da peça.'
+          : 'Preencha os dados da nova peça.'
       }
       trigger={trigger}
       contentClassName='sm:max-w-[720px]'
@@ -79,7 +79,7 @@ export function ModalPecas({
               ? 'Salvando...'
               : isEdit
                 ? 'Salvar Alterações'
-                : 'Adicionar Produto'}
+                : 'Adicionar Peça'}
           </Button>
         </>
       }>
@@ -159,14 +159,14 @@ function ModalPecasForm({
       {/* Image column */}
       <div className='md:col-span-4 flex flex-col gap-2 md:sticky md:top-0 md:self-start'>
         <span className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
-          Imagem do Produto
+          Imagem da Peça
         </span>
 
         {image ? (
           <div className='relative flex flex-col items-center justify-center w-full h-52 border border-border rounded-lg overflow-hidden bg-background'>
             <Image
               src={image}
-              alt='Prévia do produto'
+              alt='Prévia da peça'
               fill
               className='object-contain'
               unoptimized
@@ -177,7 +177,7 @@ function ModalPecasForm({
               size='icon'
               className='absolute top-2 right-2 h-8 w-8 rounded-full shadow-md hover:scale-105 transition-transform'
               onClick={handleRemoveImage}
-              aria-label='Remover imagem do produto'>
+              aria-label='Remover imagem da peça'>
               <Trash2 className='h-4 w-4' />
             </Button>
           </div>
@@ -219,7 +219,7 @@ function ModalPecasForm({
               <FieldGroup className='mt-2'>
                 <Field orientation='responsive'>
                   <FieldContent>
-                    <FieldLabel htmlFor='name_peca'>Nome do produto</FieldLabel>
+                    <FieldLabel htmlFor='name_peca'>Nome da peça</FieldLabel>
                     <Input
                       id='name_peca'
                       placeholder='Filtro de Óleo'

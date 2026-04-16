@@ -91,7 +91,7 @@ export async function POST(request: Request) {
       })
       .returning();
 
-    await logAction(request, 'criacao', 'produto', String(newPeca[0].id), `Produto '${newPeca[0].name_peca}' criado`);
+    await logAction(request, 'criacao', 'produto', String(newPeca[0].id), `Peça '${newPeca[0].name_peca}' criada`);
     return NextResponse.json(newPeca, { status: 201 });
   } catch (error) {
     console.error('Erro ao criar peça:', error);

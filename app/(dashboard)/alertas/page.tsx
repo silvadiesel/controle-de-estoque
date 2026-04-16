@@ -58,7 +58,7 @@ export default function Alertas() {
         <StatCard
           label='Total Monitorado'
           value={pecasEmAlerta.length}
-          subtitle='Produtos em alerta ativo'
+          subtitle='Peças em alerta ativo'
           icon={ShieldAlert}
           isLoading={false}
         />
@@ -75,7 +75,7 @@ export default function Alertas() {
               Tudo em dia!
             </h3>
             <p className='text-center text-sm text-muted-foreground'>
-              Todos os produtos estão com estoque acima do nível mínimo.
+              Todas as peças estão com estoque acima do nível mínimo.
             </p>
           </CardContent>
         </Card>

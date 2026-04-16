@@ -47,9 +47,9 @@ const menuItems = [
       },
       {
         id: 'produtos',
-        label: 'Produtos',
+        label: 'Peças',
         icon: Package,
-        href: '/produtos',
+        href: '/pecas',
         permission: 'view_produtos' as AppPermission
       },
       {
@@ -192,7 +192,7 @@ export function AppSidebar() {
                       <SidebarMenuButton
                         asChild
                         isActive={isActive}
-                        className='h-9 text-muted-foreground'
+                        className='h-9 text-muted-foreground data-[active=true]:bg-primary data-[active=true]:text-primary'
                         tooltip={item.label}>
                         <a href={item.href}>
                           <Icon className='size-4' />

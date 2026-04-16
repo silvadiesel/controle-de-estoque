@@ -15,14 +15,14 @@ const STOCK_ALERT_TOAST_ID = 'stock-alert-toast';
 
 function buildDescription(criticos: number, atencao: number) {
   if (criticos > 0 && atencao > 0) {
-    return `${criticos} produto${criticos > 1 ? 's' : ''} sem estoque e ${atencao} com estoque baixo.`;
+    return `${criticos} peça${criticos > 1 ? 's' : ''} sem estoque e ${atencao} com estoque baixo.`;
   }
 
   if (criticos > 0) {
-    return `${criticos} produto${criticos > 1 ? 's' : ''} sem estoque no momento.`;
+    return `${criticos} peça${criticos > 1 ? 's' : ''} sem estoque no momento.`;
   }
 
-  return `${atencao} produto${atencao > 1 ? 's' : ''} com estoque próximo do mínimo.`;
+  return `${atencao} peça${atencao > 1 ? 's' : ''} com estoque próximo do mínimo.`;
 }
 
 export function AlertToast() {

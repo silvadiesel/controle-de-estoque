@@ -199,10 +199,10 @@ export default function Configuracoes() {
                 <div>
                   <CardTitle className='text-foreground flex items-center gap-2'>
                     <Tags className='h-5 w-5 text-primary' />
-                    Categorias dos Produtos
+                    Categorias das Peças
                   </CardTitle>
                   <CardDescription className='text-muted-foreground'>
-                    Gerencie as categorias dos produtos disponíveis
+                    Gerencie as categorias das peças disponíveis
                   </CardDescription>
                 </div>
 
@@ -219,7 +219,7 @@ export default function Configuracoes() {
                         Adicionar Categoria
                       </DialogTitle>
                       <DialogDescription className='text-muted-foreground'>
-                        Crie uma nova categoria para organizar seus produtos
+                        Crie uma nova categoria para organizar suas peças
                       </DialogDescription>
                     </DialogHeader>
                     <div className='space-y-2'>

@@ -67,7 +67,7 @@ export function AlertaGrid({ pecas, tipo }: AlertaGridProps) {
               <Button
                 size='sm'
                 className='h-6 px-2.5 text-[10px] font-semibold bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20'
-                onClick={() => router.push('/produtos')}>
+                onClick={() => router.push('/pecas')}>
                 Repor
               </Button>
             </div>

@@ -70,7 +70,7 @@ export const APP_ROUTE_PERMISSIONS = {
   '/ordens': 'view_ordens',
   '/movimentacoes': 'view_movimentacoes',
   '/alertas': 'view_alertas',
-  '/produtos': 'view_produtos',
+  '/pecas': 'view_produtos',
   '/fornecedores': 'view_fornecedores_page',
   '/configuracoes': 'view_configuracoes'
 } as const satisfies Partial<Record<string, AppPermission>>;

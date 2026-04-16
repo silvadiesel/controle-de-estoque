@@ -166,6 +166,31 @@ export function usePecas() {
     }
   };
 
+  // PUT: Repor estoque (quantidade parcial)
+  const restockPeca = async (id: number, quantityToAdd: number) => {
+    const peca = pecas.find((p) => p.id === id);
+    if (!peca) throw new Error('Peça não encontrada');
+
+    const res = await fetch(`/api/produtos/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name_peca: peca.name_peca,
+        codigo: peca.codigo,
+        categoria_id: peca.categoria_id,
+        quantidade: peca.quantidade + quantityToAdd,
+        preco: peca.preco,
+        fornecedor_id: peca.fornecedor_id,
+        localizacao: peca.localizacao,
+        imagem: peca.imagem,
+        alerta: peca.alerta ?? 1
+      })
+    });
+
+    if (!res.ok) throw new Error('Erro ao repor estoque');
+    await fetchPecas();
+  };
+
   // Handlers
   const handleSubmit = async (
     data: PecaFormValues,
@@ -280,6 +305,7 @@ export function usePecas() {
     formatPrice,
     handleOpenChange,
     categoryOptions,
-    supplierOptions
+    supplierOptions,
+    restockPeca
   };
 }

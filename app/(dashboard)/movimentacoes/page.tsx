@@ -121,7 +121,7 @@ export default function Movimentacoes() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value='todas'>Todas as entidades</SelectItem>
-            <SelectItem value='produto'>Produto</SelectItem>
+            <SelectItem value='produto'>Peça</SelectItem>
             <SelectItem value='cliente'>Cliente</SelectItem>
             <SelectItem value='fornecedor'>Fornecedor</SelectItem>
             <SelectItem value='categoria'>Categoria</SelectItem>

@@ -186,14 +186,14 @@ export default function Movimentacoes() {
               </div>
 
               <div className='space-y-2'>
-                <Label>Produto</Label>
+                <Label>Peça</Label>
                 <Select
                   value={formData.productId}
                   onValueChange={(value) =>
                     setFormData({ ...formData, productId: value })
                   }>
                   <SelectTrigger className='bg-input border-border'>
-                    <SelectValue placeholder='Selecione o produto' />
+                    <SelectValue placeholder='Selecione a peça' />
                   </SelectTrigger>
                   <SelectContent className='bg-popover border-border max-h-60'>
                     {products.map((product) => (
@@ -329,7 +329,7 @@ export default function Movimentacoes() {
                 <TableRow className='border-border hover:bg-transparent'>
                   <TableHead className='text-muted-foreground'>Tipo</TableHead>
                   <TableHead className='text-muted-foreground'>
-                    Produto
+                    Peça
                   </TableHead>
                   <TableHead className='text-muted-foreground text-center'>
                     Qtd.
