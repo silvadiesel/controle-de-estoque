@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
-import type { Cliente, Peca, Veiculo } from '@/db/schema';
+import type { Cliente, MaoObra, Peca, Veiculo } from '@/db/schema';
 import {
   useFuncionariosContext,
   type FuncionarioOption
@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 // Tipos para as ordens com dados relacionados
 export interface OrdemMaoObra {
   id: number;
+  mao_obra_id: number | null;
   descricao: string;
   valor: number;
 }
@@ -97,7 +98,7 @@ export interface NovaOrdemServico {
   valor_total: number;
   valor_mao_obra: number;
   pecas: { peca_id: number; quantidade: number }[];
-  mao_obra: { descricao: string; valor: number }[];
+  mao_obra: { mao_obra_id: number | null; descricao: string; valor: number }[];
 }
 
 export interface NovaOrdemVenda {
@@ -117,6 +118,7 @@ export interface UseOrdensReturn {
   clientes: Cliente[];
   veiculos: Veiculo[];
   pecas: Peca[];
+  maoObras: MaoObra[];
   funcionarios: Funcionario[];
   isLoading: boolean;
 
@@ -177,6 +179,7 @@ export function useOrdens(): UseOrdensReturn {
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const [pecas, setPecas] = useState<Peca[]>([]);
+  const [maoObras, setMaoObras] = useState<MaoObra[]>([]);
   const { funcionarios, fetchFuncionarios } = useFuncionariosContext();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -251,6 +254,16 @@ export function useOrdens(): UseOrdensReturn {
     }
   }, []);
 
+  const fetchMaoObras = useCallback(async () => {
+    try {
+      const res = await fetch('/api/mao-obra');
+      const data: MaoObra[] = await res.json();
+      setMaoObras(data);
+    } catch (error) {
+      console.error('Erro ao buscar mãos de obra:', error);
+    }
+  }, []);
+
   const refreshData = useCallback(async () => {
     setIsLoading(true);
     await Promise.all([
@@ -259,10 +272,11 @@ export function useOrdens(): UseOrdensReturn {
       fetchClientes(),
       fetchVeiculos(),
       fetchPecas(),
+      fetchMaoObras(),
       fetchFuncionarios()
     ]);
     setIsLoading(false);
-  }, [fetchOrdensServico, fetchOrdensVenda, fetchClientes, fetchVeiculos, fetchPecas, fetchFuncionarios]);
+  }, [fetchOrdensServico, fetchOrdensVenda, fetchClientes, fetchVeiculos, fetchPecas, fetchMaoObras, fetchFuncionarios]);
 
   useEffect(() => {
     refreshData();
@@ -447,6 +461,7 @@ export function useOrdens(): UseOrdensReturn {
     clientes,
     veiculos,
     pecas,
+    maoObras,
     funcionarios,
     isLoading,
 

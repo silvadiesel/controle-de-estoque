@@ -86,6 +86,7 @@ export default function OrdensPage() {
     clientes,
     veiculos,
     pecas,
+    maoObras,
     funcionarios,
     isLoading,
     isAddServicoOpen,
@@ -215,6 +216,7 @@ export default function OrdensPage() {
       valor_total: ordem.valor_total,
       valor_mao_obra: ordem.valor_mao_obra,
       mao_obra: ordem.mao_obra.map((item) => ({
+        mao_obra_id: item.mao_obra_id,
         descricao: item.descricao,
         valor: item.valor
       })),
@@ -609,6 +611,7 @@ export default function OrdensPage() {
         clientes={clientes}
         veiculos={veiculos}
         pecas={pecas}
+        maoObras={maoObras}
         funcionarios={funcionarios}
         isOpen={isAddServicoOpen}
         setIsOpen={setIsAddServicoOpen}
@@ -630,6 +633,7 @@ export default function OrdensPage() {
         clientes={clientes}
         veiculos={veiculos}
         pecas={getAdjustedPecas(editingServico?.pecas ?? [])}
+        maoObras={maoObras}
         funcionarios={funcionarios}
         isOpen={Boolean(editingServico)}
         setIsOpen={(open) => !open && setEditingServico(null)}

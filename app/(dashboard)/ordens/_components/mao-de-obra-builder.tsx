@@ -11,18 +11,22 @@ import {
   FieldLabel
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { SearchableSelect } from '@/components/ui/searchable-select';
+import type { MaoObra } from '@/db/schema';
 import { cn } from '@/lib/utils';
 
 import { Plus, Trash2, Wrench } from 'lucide-react';
 import { toast } from 'sonner';
 
 export interface MaoDeObraItem {
+  mao_obra_id: number | null;
   descricao: string;
-  valor: number; // centavos
+  valor: number;
 }
 
 interface MaoDeObraBuilderProps {
   items: MaoDeObraItem[];
+  maoObras: MaoObra[];
   onChange: (items: MaoDeObraItem[]) => void;
 }
 
@@ -45,24 +49,49 @@ const formatCurrencyInput = (centavos: number): string => {
   });
 };
 
-export function MaoDeObraBuilder({ items, onChange }: MaoDeObraBuilderProps) {
-  const [descricao, setDescricao] = useState('');
+export function MaoDeObraBuilder({
+  items,
+  maoObras,
+  onChange
+}: MaoDeObraBuilderProps) {
+  const [selectedId, setSelectedId] = useState<string>('');
   const [valorCentavos, setValorCentavos] = useState(0);
+
+  const maoObraMap = useMemo(
+    () => new Map(maoObras.map((item) => [item.id, item])),
+    [maoObras]
+  );
+
+  const options = useMemo(
+    () =>
+      maoObras.map((item) => ({
+        value: String(item.id),
+        label: item.nome,
+        sublabel: formatCurrency(item.valor)
+      })),
+    [maoObras]
+  );
 
   const total = useMemo(
     () => items.reduce((acc, item) => acc + item.valor, 0),
     [items]
   );
 
+  const handleSelectChange = (value: string) => {
+    setSelectedId(value);
+    const selected = maoObraMap.get(Number(value));
+    if (selected) {
+      setValorCentavos(selected.valor);
+    }
+  };
+
   const handleValorChange = (raw: string) => {
     setValorCentavos(parseCurrencyInput(raw));
   };
 
   const handleAdd = () => {
-    const desc = descricao.trim();
-
-    if (!desc) {
-      toast.error('Informe a descrição da mão de obra.');
+    if (!selectedId) {
+      toast.error('Selecione uma mão de obra do catálogo.');
       return;
     }
 
@@ -71,54 +100,71 @@ export function MaoDeObraBuilder({ items, onChange }: MaoDeObraBuilderProps) {
       return;
     }
 
-    onChange([...items, { descricao: desc, valor: valorCentavos }]);
-    setDescricao('');
-    setValorCentavos(0);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleAdd();
+    const selected = maoObraMap.get(Number(selectedId));
+    if (!selected) {
+      toast.error('Mão de obra não encontrada.');
+      return;
     }
+
+    onChange([
+      ...items,
+      {
+        mao_obra_id: selected.id,
+        descricao: selected.nome,
+        valor: valorCentavos
+      }
+    ]);
+    setSelectedId('');
+    setValorCentavos(0);
   };
 
   const handleRemove = (index: number) => {
     onChange(items.filter((_, i) => i !== index));
   };
 
+  const emptyCatalog = maoObras.length === 0;
+
   return (
     <FieldGroup>
       <Field>
         <FieldLabel>Mão de obra</FieldLabel>
         <FieldContent>
-          <div className='flex gap-2'>
-            <Input
-              value={descricao}
-              onChange={(e) => setDescricao(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder='Descrição do serviço...'
-              className='flex-1 bg-input'
+          <div className='grid grid-cols-[1fr_140px_40px] gap-2'>
+            <SearchableSelect
+              options={options}
+              value={selectedId}
+              onValueChange={handleSelectChange}
+              placeholder={
+                emptyCatalog
+                  ? 'Cadastre uma mão de obra primeiro'
+                  : 'Selecione do catálogo...'
+              }
+              searchPlaceholder='Buscar mão de obra...'
+              emptyText='Nenhuma mão de obra encontrada'
+              disabled={emptyCatalog}
             />
             <Input
               value={formatCurrencyInput(valorCentavos)}
               onChange={(e) => handleValorChange(e.target.value)}
-              onKeyDown={handleKeyDown}
               placeholder='R$ 0,00'
-              className='w-32 bg-input text-right'
+              className='bg-input text-right'
               inputMode='numeric'
+              disabled={!selectedId}
             />
             <Button
               type='button'
               variant='default'
               size='icon'
               onClick={handleAdd}
-              aria-label='Adicionar mão de obra'>
+              aria-label='Adicionar mão de obra'
+              disabled={!selectedId || valorCentavos <= 0}>
               <Plus />
             </Button>
           </div>
           <FieldDescription>
-            Adicione os serviços de mão de obra com descrição e valor.
+            {emptyCatalog
+              ? 'Cadastre uma mão de obra na página "Mão de Obra" antes de usar aqui.'
+              : 'Selecione do catálogo · o valor vem preenchido mas pode ser ajustado.'}
           </FieldDescription>
         </FieldContent>
       </Field>
@@ -132,39 +178,64 @@ export function MaoDeObraBuilder({ items, onChange }: MaoDeObraBuilderProps) {
             Nenhuma mão de obra adicionada
           </p>
           <p className='mt-1 text-sm text-muted-foreground'>
-            Adicione os serviços realizados para registrar o custo de mão de
-            obra.
+            Selecione uma mão de obra do catálogo para registrar o custo da
+            ordem.
           </p>
         </div>
       ) : (
         <div className='flex flex-col gap-3'>
-          {items.map((item, index) => (
-            <div
-              key={index}
-              className='rounded-xl border border-border bg-input/60 px-4 py-3 transition-colors hover:border-border-hover'>
-              <div className='flex items-center justify-between'>
-                <p className='truncate text-sm font-medium text-foreground'>
-                  {item.descricao}
-                </p>
+          {items.map((item, index) => {
+            const catalog = item.mao_obra_id
+              ? maoObraMap.get(item.mao_obra_id)
+              : null;
+            const isAdjusted = catalog ? catalog.valor !== item.valor : false;
 
-                <div className='flex items-center gap-3'>
-                  <span className='min-w-24 text-right text-sm font-semibold text-foreground'>
-                    {formatCurrency(item.valor)}
-                  </span>
+            return (
+              <div
+                key={index}
+                className='rounded-xl border border-border bg-input/60 px-4 py-3 transition-colors hover:border-border-hover'>
+                <div className='flex items-center justify-between gap-3'>
+                  <div className='min-w-0 flex-1'>
+                    <p className='truncate text-sm font-medium text-foreground'>
+                      {item.descricao}
+                    </p>
+                    {catalog ? (
+                      <p className='text-xs text-muted-foreground'>
+                        Catálogo · valor padrão {formatCurrency(catalog.valor)}
+                        {isAdjusted ? ' · ajustado nesta ordem' : ''}
+                      </p>
+                    ) : (
+                      <p className='text-xs text-muted-foreground'>
+                        Item legado (sem vínculo com catálogo)
+                      </p>
+                    )}
+                  </div>
 
-                  <Button
-                    type='button'
-                    variant='ghost'
-                    size='icon-sm'
-                    onClick={() => handleRemove(index)}
-                    aria-label={`Remover ${item.descricao}`}
-                    className='text-destructive hover:text-destructive'>
-                    <Trash2 />
-                  </Button>
+                  <div className='flex items-center gap-3'>
+                    {isAdjusted ? (
+                      <span className='rounded-full bg-warning/20 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-warning'>
+                        Ajustado
+                      </span>
+                    ) : null}
+
+                    <span className='min-w-24 text-right text-sm font-semibold text-foreground'>
+                      {formatCurrency(item.valor)}
+                    </span>
+
+                    <Button
+                      type='button'
+                      variant='ghost'
+                      size='icon-sm'
+                      onClick={() => handleRemove(index)}
+                      aria-label={`Remover ${item.descricao}`}
+                      className='text-destructive hover:text-destructive'>
+                      <Trash2 />
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           <div
             className={cn(

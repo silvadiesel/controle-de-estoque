@@ -27,6 +27,7 @@ import {
   ArrowUpDown,
   ClipboardList,
   Factory,
+  HardHat,
   LayoutDashboard,
   LogOut,
   Package,
@@ -51,6 +52,13 @@ const menuItems = [
         icon: Package,
         href: '/pecas',
         permission: 'view_produtos' as AppPermission
+      },
+      {
+        id: 'mao-obra',
+        label: 'Mão de Obra',
+        icon: HardHat,
+        href: '/mao-obra',
+        permission: 'view_mao_obra' as AppPermission
       },
       {
         id: 'clientes',
