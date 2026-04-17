@@ -262,12 +262,7 @@ interface Props {
   logoUrl: string;
 }
 
-function Via({
-  ordem,
-  empresa,
-  logoUrl,
-  viaLabel
-}: Props & { viaLabel: string }) {
+function Via({ ordem, empresa, logoUrl }: Props) {
   const cliente = ordem.cliente;
   const totalPecas = ordem.pecas.reduce(
     (acc, item) => acc + (item.peca?.preco ?? 0) * item.quantidade,
@@ -377,9 +372,7 @@ function Via({
       {/* Valor Total */}
       <View style={styles.valorTotalBox}>
         <Text style={styles.vtLabel}>VALOR TOTAL</Text>
-        <Text style={styles.vtValue}>
-          {formatCurrency(ordem.valor_total)}
-        </Text>
+        <Text style={styles.vtValue}>{formatCurrency(ordem.valor_total)}</Text>
       </View>
 
       {/* Assinaturas */}
@@ -399,8 +392,6 @@ function Via({
         {empresa.nomeFantasia} - Injecao Eletronica | Tel: (55) 3744-3611 |
         CNPJ: {empresa.cnpj}
       </Text>
-
-      <Text style={styles.viaLabel}>{viaLabel}</Text>
     </View>
   );
 }
@@ -408,13 +399,8 @@ function Via({
 export function LayoutPdfVenda({ ordem, empresa, logoUrl }: Props) {
   return (
     <Document>
-      <Page size="A4" style={styles.page}>
-        <Via
-          ordem={ordem}
-          empresa={empresa}
-          logoUrl={logoUrl}
-          viaLabel="1a VIA - Estabelecimento"
-        />
+      <Page size='A4' style={styles.page}>
+        <Via ordem={ordem} empresa={empresa} logoUrl={logoUrl} />
 
         {/* Linha de recorte */}
         <View style={styles.cutLine}>
@@ -423,12 +409,7 @@ export function LayoutPdfVenda({ ordem, empresa, logoUrl }: Props) {
           <View style={styles.cutDashes} />
         </View>
 
-        <Via
-          ordem={ordem}
-          empresa={empresa}
-          logoUrl={logoUrl}
-          viaLabel="2a VIA - Cliente"
-        />
+        <Via ordem={ordem} empresa={empresa} logoUrl={logoUrl} />
       </Page>
     </Document>
   );

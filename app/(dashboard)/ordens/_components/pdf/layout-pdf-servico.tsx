@@ -299,7 +299,10 @@ function Via({ ordem, empresa, logoUrl }: Props & {}) {
           <View>
             <Text style={styles.companyName}>SILVA DIESEL</Text>
             <Text style={styles.companyDetail}>
-              Tel: (55) 3744-3611 | CNPJ: {empresa.cnpj}
+              Tel: (55) 98431-3863 | CNPJ: {empresa.cnpj}
+            </Text>
+            <Text style={styles.companyDetail}>
+              BR 386 km 38 - Linha Volta Grande - Frederico Westphalen - RS
             </Text>
           </View>
         </View>
@@ -444,7 +447,7 @@ function Via({ ordem, empresa, logoUrl }: Props & {}) {
 
       {/* Footer */}
       <Text style={styles.footer}>
-        {empresa.nomeFantasia} | Tel: (55) 3744-3611 | CNPJ: {empresa.cnpj}
+        {empresa.nomeFantasia} CNPJ: {empresa.cnpj}
       </Text>
     </View>
   );
@@ -462,6 +465,7 @@ export function LayoutPdfServico({ ordem, empresa, logoUrl }: Props) {
           <Text style={styles.cutText}>&#9986;recorte</Text>
           <View style={styles.cutDashes} />
         </View>
+        <Via ordem={ordem} empresa={empresa} logoUrl={logoUrl} />
       </Page>
     </Document>
   );
