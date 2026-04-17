@@ -193,7 +193,7 @@ export default function Configuracoes() {
         {/* Tab: Configurações Gerais */}
         <TabsContent value='general'>
           {/* Categories - single card with list rows */}
-          <Card className='bg-card border-border flex flex-col'>
+          <Card className='bg-card border-border flex flex-col mt-4'>
             <CardHeader>
               <div className='flex items-center justify-between'>
                 <div>
@@ -586,8 +586,8 @@ export default function Configuracoes() {
                   <Building2 className='h-12 w-12 mx-auto mb-4 opacity-50' />
                   <p>Empresa não cadastrada</p>
                   <p className='text-sm'>
-                    Rode o script <code>pnpm db:seed:empresa</code> para criar
-                    o registro inicial.
+                    Rode o script <code>pnpm db:seed:empresa</code> para criar o
+                    registro inicial.
                   </p>
                 </div>
               ) : (

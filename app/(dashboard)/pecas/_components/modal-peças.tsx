@@ -417,11 +417,11 @@ function ModalPecasForm({
                       <Input
                         id='alerta'
                         inputMode='numeric'
-                        value={field.value ?? ''}
+                        value={field.value || ''}
                         onKeyDown={blockNonNumericKeyDown}
                         onChange={(e) => {
                           const val = e.target.value.replace(/\D/g, '');
-                          field.onChange(val ? Number(val) : 1);
+                          field.onChange(val ? Number(val) : 0);
                         }}
                         placeholder='1'
                         className='font-mono'
