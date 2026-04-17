@@ -26,7 +26,15 @@ import { useUser } from '@/hooks/useUser';
 
 import { ModalMaoObra } from './_components/modal-mao-obra';
 import { useMaoObra } from './_hooks/useMaoObra';
-import { HardHat, Pencil, Plus, Search, Trash2, Wrench } from 'lucide-react';
+import {
+  HardHat,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+  TrendingUp,
+  Wrench
+} from 'lucide-react';
 
 const formatCurrency = (value: number) =>
   (value / 100).toLocaleString('pt-BR', {
@@ -37,6 +45,7 @@ const formatCurrency = (value: number) =>
 export default function MaoObraPage() {
   const {
     itens,
+    stats,
     isLoading,
     isSaving,
     isAddOpen,
@@ -69,17 +78,7 @@ export default function MaoObraPage() {
   }, [deferredSearch, itens]);
 
   const metrics = useMemo(() => {
-    if (itens.length === 0) {
-      return { total: 0, medio: 0, maior: 0, menor: 0 };
-    }
-    const valores = itens.map((item) => item.valor);
-    const soma = valores.reduce((acc, v) => acc + v, 0);
-    return {
-      total: itens.length,
-      medio: Math.round(soma / itens.length),
-      maior: Math.max(...valores),
-      menor: Math.min(...valores)
-    };
+    return { total: itens.length };
   }, [itens]);
 
   const pagination = usePagination({ items: filteredItens, itemsPerPage: 10 });
@@ -111,29 +110,19 @@ export default function MaoObraPage() {
         ) : null}
       </div>
 
-      <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
+      <div className='grid gap-3 sm:grid-cols-2'>
         <StatCard
           label='Cadastradas'
           value={metrics.total}
+          subtitle='Itens disponíveis no catálogo'
           icon={HardHat}
           isLoading={isLoading}
         />
         <StatCard
-          label='Valor médio'
-          value={metrics.medio}
-          icon={Wrench}
-          isLoading={isLoading}
-        />
-        <StatCard
-          label='Mais cara'
-          value={metrics.maior}
-          icon={Wrench}
-          isLoading={isLoading}
-        />
-        <StatCard
-          label='Mais barata'
-          value={metrics.menor}
-          icon={Wrench}
+          label='Faturamento do mês'
+          value={formatCurrency(stats.faturamento_mes)}
+          subtitle='Mão de obra aplicada nas ordens deste mês'
+          icon={TrendingUp}
           isLoading={isLoading}
         />
       </div>

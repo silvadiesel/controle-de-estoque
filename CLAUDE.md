@@ -1,4 +1,4 @@
-# CLAUDE.md — Igne System
+# CLAUDE.md — Core Controler
 
 Convenções e decisões de arquitetura do projeto. Leia antes de qualquer tarefa de UI.
 
@@ -44,6 +44,7 @@ Convenções e decisões de arquitetura do projeto. Leia antes de qualquer taref
 ## Padrões de Modal
 
 Estrutura obrigatória: `DialogHeader` (ícone + título + descrição) → `<ScrollArea>` → `DialogFooter`.
+
 - Fundo: `bg-card border-border rounded-xl`
 - Header/footer separados por `border-b/t border-border`, padding `p-6`
 - Labels de campo: `text-muted-foreground uppercase text-[10px] tracking-wider font-medium`

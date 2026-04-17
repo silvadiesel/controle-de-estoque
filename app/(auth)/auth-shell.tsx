@@ -65,7 +65,7 @@ export function AuthShell({
               <div className='flex h-16 w-16 items-center justify-center'>
                 <Image
                   src='/img/main_icon.svg'
-                  alt='Logo do Igne System'
+                  alt='Logo do Core Controler'
                   width={40}
                   height={40}
                   className='h-full w-full object-contain'
@@ -75,10 +75,10 @@ export function AuthShell({
 
               <div>
                 <p className='text-3xl font-semibold tracking-tight text-foreground sm:text-4xl'>
-                  Igne System
+                  Core Controler
                 </p>
                 <p className='mt-1 text-xs uppercase tracking-[0.28em] text-primary/80'>
-                  Controle inteligente
+                  Gestão inteligente
                 </p>
               </div>
             </div>
@@ -128,7 +128,7 @@ export function AuthShell({
                 <div className='flex h-14 w-14 items-center justify-center rounded-[1.1rem] border border-primary/15 bg-card/50 p-3 shadow-[0_16px_32px_rgba(91,127,165,0.14)] backdrop-blur-sm'>
                   <Image
                     src='/img/main_icon.svg'
-                    alt='Logo do Igne System'
+                    alt='Logo do Core Controler'
                     width={36}
                     height={36}
                     className='h-full w-full object-contain'
@@ -138,7 +138,7 @@ export function AuthShell({
 
                 <div>
                   <p className='text-2xl font-semibold tracking-tight text-foreground'>
-                    Igne System
+                    Core Controler
                   </p>
                   <p className='mt-1 text-xs uppercase tracking-[0.24em] text-primary/80'>
                     Controle inteligente

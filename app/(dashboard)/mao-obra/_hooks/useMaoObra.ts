@@ -10,8 +10,13 @@ import { ZodError } from 'zod';
 
 export type { MaoObraFormValues };
 
+export interface MaoObraStats {
+  faturamento_mes: number;
+}
+
 export interface UseMaoObraReturn {
   itens: MaoObra[];
+  stats: MaoObraStats;
   isLoading: boolean;
   isSaving: boolean;
   isAddOpen: boolean;
@@ -29,6 +34,7 @@ export interface UseMaoObraReturn {
 
 export function useMaoObra(): UseMaoObraReturn {
   const [itens, setItens] = useState<MaoObra[]>([]);
+  const [stats, setStats] = useState<MaoObraStats>({ faturamento_mes: 0 });
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -39,9 +45,14 @@ export function useMaoObra(): UseMaoObraReturn {
   const fetchItens = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/mao-obra');
-      const data: MaoObra[] = await response.json();
-      setItens(data);
+      const [itensRes, statsRes] = await Promise.all([
+        fetch('/api/mao-obra'),
+        fetch('/api/mao-obra/stats')
+      ]);
+      const itensData: MaoObra[] = await itensRes.json();
+      const statsData: MaoObraStats = await statsRes.json();
+      setItens(itensData);
+      setStats(statsData);
     } catch (error) {
       console.error('Erro ao buscar mãos de obra:', error);
       toast.error('Erro ao carregar mãos de obra');
@@ -164,6 +175,7 @@ export function useMaoObra(): UseMaoObraReturn {
 
   return {
     itens,
+    stats,
     isLoading,
     isSaving,
     isAddOpen,
