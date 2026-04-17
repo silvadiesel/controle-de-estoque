@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 
+import { sidebarSections } from '@/components/sidebar-items';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Sidebar,
@@ -20,93 +21,8 @@ import {
 import { useAlertaCount } from '@/hooks/useAlertaCount';
 import { useUser } from '@/hooks/useUser';
 import { signOut } from '@/lib/auth-client';
-import type { AppPermission } from '@/lib/permissions';
 
-import {
-  AlertTriangle,
-  ArrowUpDown,
-  ClipboardList,
-  Factory,
-  LayoutDashboard,
-  LogOut,
-  Package,
-  Settings,
-  Users
-} from 'lucide-react';
-
-const menuItems = [
-  {
-    title: 'Principal',
-    items: [
-      {
-        id: 'dashboard',
-        label: 'Dashboard',
-        icon: LayoutDashboard,
-        href: '/dashboard',
-        permission: 'view_dashboard' as AppPermission
-      },
-      {
-        id: 'produtos',
-        label: 'Peças',
-        icon: Package,
-        href: '/pecas',
-        permission: 'view_produtos' as AppPermission
-      },
-      {
-        id: 'clientes',
-        label: 'Clientes',
-        icon: Users,
-        href: '/clientes',
-        permission: 'view_clientes' as AppPermission
-      }
-    ]
-  },
-  {
-    title: 'Gestao',
-    items: [
-      {
-        id: 'ordens',
-        label: 'Ordens',
-        icon: ClipboardList,
-        href: '/ordens',
-        permission: 'view_ordens' as AppPermission
-      },
-      {
-        id: 'movimentacoes',
-        label: 'Movimentacoes',
-        icon: ArrowUpDown,
-        href: '/movimentacoes',
-        permission: 'view_movimentacoes' as AppPermission
-      },
-      {
-        id: 'fornecedores',
-        label: 'Fornecedores',
-        icon: Factory,
-        href: '/fornecedores',
-        permission: 'view_fornecedores_page' as AppPermission
-      }
-    ]
-  },
-  {
-    title: 'Sistema',
-    items: [
-      {
-        id: 'alertas',
-        label: 'Alertas',
-        icon: AlertTriangle,
-        href: '/alertas',
-        permission: 'view_alertas' as AppPermission
-      },
-      {
-        id: 'configuracoes',
-        label: 'Configuracoes',
-        icon: Settings,
-        href: '/configuracoes',
-        permission: 'view_configuracoes' as AppPermission
-      }
-    ]
-  }
-];
+import { LogOut } from 'lucide-react';
 
 function getInitials(name: string) {
   return name
@@ -124,8 +40,8 @@ export function AppSidebar() {
   const { hasPermission, user, isPending } = useUser();
 
   const visibleGroups = isPending
-    ? menuItems
-    : menuItems
+    ? sidebarSections
+    : sidebarSections
         .map((group) => ({
           ...group,
           items: group.items.filter((item) => hasPermission(item.permission))
@@ -156,7 +72,7 @@ export function AppSidebar() {
           <div className='flex size-9 items-center justify-center '>
             <Image
               src='/img/main_icon.svg'
-              alt='Logo do Igne System'
+              alt='Logo do Core Controler'
               width={40}
               height={40}
               className='h-full w-full object-contain'
@@ -165,10 +81,10 @@ export function AppSidebar() {
           </div>
           <div className='min-w-0'>
             <h1 className='truncate text-sm font-semibold text-sidebar-foreground'>
-              Igne System
+              Core Controler
             </h1>
             <p className='truncate text-xs text-muted-foreground'>
-              Controle tecnico do estoque
+              Gestão tecnica de estoque
             </p>
           </div>
         </div>

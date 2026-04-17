@@ -2,6 +2,7 @@ import { cliente } from './cliente';
 import { veiculo } from './veiculo';
 import { pecas } from './pecas';
 import { user } from './auth';
+import { maoObra } from './mao-obra';
 import { integer, pgEnum, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 
 // Enum para status da ordem de serviço
@@ -49,6 +50,7 @@ export const ordemServicoMaoObra = pgTable('ordem_servico_mao_obra', {
   ordem_servico_id: integer('ordem_servico_id')
     .notNull()
     .references(() => ordemServico.id, { onDelete: 'cascade' }),
+  mao_obra_id: integer('mao_obra_id').references(() => maoObra.id),
   descricao: text('descricao').notNull(),
   valor: integer('valor').notNull()
 });

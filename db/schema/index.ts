@@ -4,6 +4,7 @@ export * from './auth';
 export * from './cliente';
 export * from './veiculo';
 export * from './pecas';
+export * from './mao-obra';
 export * from './ordem-servico';
 export * from './ordem-venda';
 export * from './movimentacoes';

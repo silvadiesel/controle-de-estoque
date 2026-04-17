@@ -8,6 +8,8 @@ export type AppPermission =
   | 'view_alertas'
   | 'view_produtos'
   | 'manage_produtos'
+  | 'view_mao_obra'
+  | 'manage_mao_obra'
   | 'view_fornecedores_page'
   | 'manage_fornecedores'
   | 'view_configuracoes'
@@ -27,6 +29,8 @@ export const ROLE_PERMISSIONS = {
     'view_alertas',
     'view_produtos',
     'manage_produtos',
+    'view_mao_obra',
+    'manage_mao_obra',
     'view_fornecedores_page',
     'manage_fornecedores',
     'view_configuracoes',
@@ -45,6 +49,8 @@ export const ROLE_PERMISSIONS = {
     'view_alertas',
     'view_produtos',
     'manage_produtos',
+    'view_mao_obra',
+    'manage_mao_obra',
     'view_fornecedores_page',
     'manage_fornecedores',
     'read_users_context',
@@ -58,6 +64,7 @@ export const ROLE_PERMISSIONS = {
     'view_movimentacoes',
     'view_alertas',
     'view_produtos',
+    'view_mao_obra',
     'read_users_context',
     'read_fornecedor_context',
     'read_categoria_context'
@@ -71,6 +78,7 @@ export const APP_ROUTE_PERMISSIONS = {
   '/movimentacoes': 'view_movimentacoes',
   '/alertas': 'view_alertas',
   '/pecas': 'view_produtos',
+  '/mao-obra': 'view_mao_obra',
   '/fornecedores': 'view_fornecedores_page',
   '/configuracoes': 'view_configuracoes'
 } as const satisfies Partial<Record<string, AppPermission>>;

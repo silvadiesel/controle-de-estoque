@@ -22,7 +22,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import type { Cliente, Peca, Veiculo } from '@/db/schema';
+import type { Cliente, MaoObra, Peca, Veiculo } from '@/db/schema';
 import { useUser } from '@/hooks/useUser';
 
 import {
@@ -61,6 +61,7 @@ interface ModalOrdemServicoProps {
   clientes: Cliente[];
   veiculos: Veiculo[];
   pecas: Peca[];
+  maoObras: MaoObra[];
   funcionarios: Funcionario[];
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
@@ -97,6 +98,7 @@ export function ModalOrdemServico({
   clientes,
   veiculos,
   pecas,
+  maoObras,
   funcionarios,
   isOpen,
   setIsOpen,
@@ -408,6 +410,7 @@ export function ModalOrdemServico({
 
       <MaoDeObraBuilder
         items={formData.mao_obra}
+        maoObras={maoObras}
         onChange={(items) =>
           setFormData((current) => ({ ...current, mao_obra: items }))
         }

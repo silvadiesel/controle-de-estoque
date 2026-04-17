@@ -12,7 +12,8 @@ export const entidadeEnum = pgEnum('entidade', [
   'veiculo',
   'ordem_venda',
   'ordem_servico',
-  'usuario'
+  'usuario',
+  'mao_obra'
 ]);
 
 export const movimentacoes = pgTable('movimentacoes', {

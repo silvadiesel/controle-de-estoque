@@ -105,6 +105,7 @@ export async function GET(_request: Request, { params }: Params) {
   const maoObra = await db
     .select({
       id: schema.ordemServicoMaoObra.id,
+      mao_obra_id: schema.ordemServicoMaoObra.mao_obra_id,
       descricao: schema.ordemServicoMaoObra.descricao,
       valor: schema.ordemServicoMaoObra.valor
     })
@@ -196,11 +197,18 @@ export async function PUT(request: Request, { params }: Params) {
 
         if (data.mao_obra.length > 0) {
           await tx.insert(schema.ordemServicoMaoObra).values(
-            data.mao_obra.map((item: { descricao: string; valor: number }) => ({
-              ordem_servico_id: ordemId,
-              descricao: item.descricao,
-              valor: item.valor
-            }))
+            data.mao_obra.map(
+              (item: {
+                mao_obra_id?: number | null;
+                descricao: string;
+                valor: number;
+              }) => ({
+                ordem_servico_id: ordemId,
+                mao_obra_id: item.mao_obra_id ?? null,
+                descricao: item.descricao,
+                valor: item.valor
+              })
+            )
           );
         }
       }

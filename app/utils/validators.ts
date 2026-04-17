@@ -199,6 +199,21 @@ export const veiculoSchema = z.object({
     })
 });
 
+export const maoObraSchema = z.object({
+  nome: z
+    .string()
+    .min(1, 'Nome é obrigatório')
+    .refine((name) => name.trim().length > 0, {
+      message: 'Nome não pode ser vazio'
+    }),
+  valor: z
+    .number({ message: 'Valor é obrigatório' })
+    .min(1, 'Valor deve ser maior que zero'),
+  descricao: z.string().optional()
+});
+
+export type MaoObraFormValues = z.infer<typeof maoObraSchema>;
+
 export const pecaFormSchema = z.object({
   name_peca: z
     .string()

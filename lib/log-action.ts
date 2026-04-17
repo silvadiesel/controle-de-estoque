@@ -10,7 +10,8 @@ type Entidade =
   | 'veiculo'
   | 'ordem_venda'
   | 'ordem_servico'
-  | 'usuario';
+  | 'usuario'
+  | 'mao_obra';
 
 export async function logAction(
   request: Request,
