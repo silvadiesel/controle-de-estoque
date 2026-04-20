@@ -121,8 +121,9 @@ export function MovimentacaoTimeline({
   }
 
   return (
-    <div>
-      {movimentacoes.map((mov, idx) => {
+    <div className='overflow-x-auto'>
+      <div className='min-w-[720px]'>
+        {movimentacoes.map((mov, idx) => {
         const entidade = ENTIDADE_CONFIG[mov.entidade];
         const acao = ACAO_CONFIG[mov.tipo_acao];
         const EntidadeIcon = entidade?.icon;
@@ -194,7 +195,8 @@ export function MovimentacaoTimeline({
             </div>
           </div>
         );
-      })}
+        })}
+      </div>
     </div>
   );
 }

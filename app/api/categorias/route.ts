@@ -31,6 +31,8 @@ import { requireRoutePermission } from '@/lib/server/access-control';
 
 import { sql } from 'drizzle-orm';
 
+export const revalidate = 60;
+
 /**
  * GET /api/categorias
  *
@@ -128,7 +130,13 @@ export async function POST(request: Request) {
       .values({ name: body.name.trim() })
       .returning();
 
-    await logAction(request, 'criacao', 'categoria', String(newCategory.id), `Categoria '${newCategory.name}' criada`);
+    await logAction(
+      request,
+      'criacao',
+      'categoria',
+      String(newCategory.id),
+      `Categoria '${newCategory.name}' criada`
+    );
 
     // Retorna a categoria criada com status 201 (Created)
     return NextResponse.json(newCategory, { status: 201 });

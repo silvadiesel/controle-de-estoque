@@ -1,8 +1,18 @@
-import { pgEnum, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
-
 import { user } from './auth';
+import {
+  index,
+  pgEnum,
+  pgTable,
+  serial,
+  text,
+  timestamp
+} from 'drizzle-orm/pg-core';
 
-export const tipoAcaoEnum = pgEnum('tipo_acao', ['criacao', 'edicao', 'exclusao']);
+export const tipoAcaoEnum = pgEnum('tipo_acao', [
+  'criacao',
+  'edicao',
+  'exclusao'
+]);
 
 export const entidadeEnum = pgEnum('entidade', [
   'produto',
@@ -16,15 +26,25 @@ export const entidadeEnum = pgEnum('entidade', [
   'mao_obra'
 ]);
 
-export const movimentacoes = pgTable('movimentacoes', {
-  id: serial('id').primaryKey(),
-  tipo_acao: tipoAcaoEnum('tipo_acao').notNull(),
-  entidade: entidadeEnum('entidade').notNull(),
-  entidade_id: text('entidade_id'),
-  descricao: text('descricao').notNull(),
-  usuario_id: text('usuario_id').references(() => user.id, { onDelete: 'set null' }),
-  created_at: timestamp('created_at').notNull().defaultNow()
-});
+export const movimentacoes = pgTable(
+  'movimentacoes',
+  {
+    id: serial('id').primaryKey(),
+    tipo_acao: tipoAcaoEnum('tipo_acao').notNull(),
+    entidade: entidadeEnum('entidade').notNull(),
+    entidade_id: text('entidade_id'),
+    descricao: text('descricao').notNull(),
+    usuario_id: text('usuario_id').references(() => user.id, {
+      onDelete: 'set null'
+    }),
+    created_at: timestamp('created_at').notNull().defaultNow()
+  },
+  (table) => ({
+    movimentacoesUsuarioIdx: index('movimentacoes_usuario_id_idx').on(
+      table.usuario_id
+    )
+  })
+);
 
 export type Movimentacao = typeof movimentacoes.$inferSelect;
 export type NewMovimentacao = typeof movimentacoes.$inferInsert;

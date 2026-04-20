@@ -1,11 +1,15 @@
 import { db, schema } from '@/db';
 import { EMPRESA_SINGLETON_ID } from '@/db/schema/empresa';
+import { requireRoutePermission } from '@/lib/server/access-control';
 
 import { aliasedTable, eq } from 'drizzle-orm';
 
 type Params = { params: Promise<{ tipo: string; id: string }> };
 
-export async function GET(_request: Request, { params }: Params) {
+export async function GET(request: Request, { params }: Params) {
+  const permissionCheck = await requireRoutePermission(request, 'view_ordens');
+  if (permissionCheck instanceof Response) return permissionCheck;
+
   const { tipo, id } = await params;
   const ordemId = parseInt(id);
 

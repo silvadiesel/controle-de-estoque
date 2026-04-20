@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
-import { empresa, EMPRESA_SINGLETON_ID } from '@/db/schema';
+import { EMPRESA_SINGLETON_ID, empresa } from '@/db/schema';
 import { requireRoutePermission } from '@/lib/server/access-control';
 
 import { eq } from 'drizzle-orm';
+
+export const revalidate = 60;
 
 /**
  * GET /api/empresa

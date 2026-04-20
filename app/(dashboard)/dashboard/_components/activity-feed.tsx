@@ -1,8 +1,3 @@
-// app/(dashboard)/dashboard/_components/activity-feed.tsx
-'use client';
-
-import { useMemo } from 'react';
-
 import {
   Empty,
   EmptyDescription,
@@ -11,17 +6,11 @@ import {
 } from '@/components/ui/empty';
 import { Skeleton } from '@/components/ui/skeleton';
 
+import type {
+  DashboardBlockState,
+  MovimentacaoAPI
+} from '../_lib/dashboard-types';
 import { Activity } from 'lucide-react';
-
-export interface MovimentacaoAPI {
-  id: number;
-  tipo_acao: 'criacao' | 'edicao' | 'exclusao';
-  entidade: string;
-  entidade_id: string | null;
-  descricao: string;
-  created_at: string;
-  usuario: { id: string; name: string } | null;
-}
 
 interface FeedItem {
   id: number;
@@ -70,39 +59,39 @@ function timeAgo(isoDate: string): string {
 
 interface ActivityFeedProps {
   movimentacoes: MovimentacaoAPI[];
-  isLoading: boolean;
-  state?: 'ready' | 'unavailable';
+  isLoading?: boolean;
+  state?: DashboardBlockState;
 }
 
 export function ActivityFeed({
   movimentacoes,
-  isLoading,
+  isLoading = false,
   state = 'ready'
 }: ActivityFeedProps) {
-  const items: FeedItem[] = useMemo(
-    () =>
-      [...movimentacoes]
-        .sort(
-          (a, b) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        )
-        .slice(0, 8)
-        .map((m) => ({
-          id: m.id,
-          tipo_acao: m.tipo_acao,
-          entidade: m.entidade,
-          created_at: m.created_at,
-          autor: m.usuario?.name ?? 'Usuário removido'
-        })),
-    [movimentacoes]
-  );
+  const items: FeedItem[] = [...movimentacoes]
+    .sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    )
+    .slice(0, 8)
+    .map((movimentacao) => ({
+      id: movimentacao.id,
+      tipo_acao: movimentacao.tipo_acao,
+      entidade: movimentacao.entidade,
+      created_at: movimentacao.created_at,
+      autor: movimentacao.usuario?.name ?? 'Usuário removido'
+    }));
 
   return (
     <div className='flex-1 bg-card border border-border rounded-xl p-5'>
       <div className='mb-4 flex items-start justify-between gap-3'>
         <div>
-          <h2 className='text-lg font-semibold leading-tight text-foreground'>Atividade Recente</h2>
-          <p className='text-xs text-muted-foreground mt-0.5'>Últimas ações no sistema</p>
+          <h2 className='text-lg font-semibold leading-tight text-foreground'>
+            Atividade Recente
+          </h2>
+          <p className='text-xs text-muted-foreground mt-0.5'>
+            Últimas ações no sistema
+          </p>
         </div>
         <div className='size-8 rounded-md flex items-center justify-center border border-border bg-elevated text-primary'>
           <Activity size={16} aria-hidden='true' />
@@ -126,7 +115,9 @@ export function ActivityFeed({
         </div>
       ) : items.length === 0 ? (
         <div className='flex items-center justify-center h-32'>
-          <p className='text-xs text-muted-foreground'>Nenhuma atividade recente</p>
+          <p className='text-xs text-muted-foreground'>
+            Nenhuma atividade recente
+          </p>
         </div>
       ) : (
         <div className='relative'>

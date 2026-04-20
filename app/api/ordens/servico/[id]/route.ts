@@ -1,5 +1,6 @@
 import { db, schema } from '@/db';
 import { logAction } from '@/lib/log-action';
+import { requireRoutePermission } from '@/lib/server/access-control';
 import {
   adjustStock,
   restoreStock,
@@ -10,7 +11,10 @@ import { aliasedTable, eq } from 'drizzle-orm';
 
 type Params = { params: Promise<{ id: string }> };
 
-export async function GET(_request: Request, { params }: Params) {
+export async function GET(request: Request, { params }: Params) {
+  const permissionCheck = await requireRoutePermission(request, 'view_ordens');
+  if (permissionCheck instanceof Response) return permissionCheck;
+
   const { id } = await params;
   const ordemId = parseInt(id);
 
@@ -118,6 +122,9 @@ export async function GET(_request: Request, { params }: Params) {
 }
 
 export async function PUT(request: Request, { params }: Params) {
+  const permissionCheck = await requireRoutePermission(request, 'view_ordens');
+  if (permissionCheck instanceof Response) return permissionCheck;
+
   const { id } = await params;
   const ordemId = parseInt(id);
   const data = await request.json();
@@ -251,6 +258,9 @@ export async function PUT(request: Request, { params }: Params) {
 }
 
 export async function DELETE(request: Request, { params }: Params) {
+  const permissionCheck = await requireRoutePermission(request, 'view_ordens');
+  if (permissionCheck instanceof Response) return permissionCheck;
+
   const { id } = await params;
   const ordemId = parseInt(id);
 

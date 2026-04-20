@@ -4,21 +4,15 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { usePathname } from 'next/navigation';
 
-import type { Peca } from '@/db/schema';
-
 import { toast } from 'sonner';
 
-export type AlertaPeca = Pick<
-  Peca,
-  | 'id'
-  | 'name_peca'
-  | 'codigo'
-  | 'quantidade'
-  | 'alerta'
-  | 'localizacao'
-  | 'categoria_id'
-  | 'fornecedor_id'
->;
+export interface AlertaPeca {
+  id: number;
+  name_peca: string;
+  codigo: string;
+  quantidade: number;
+  alerta: number;
+}
 
 export interface UseAlertaReturn {
   pecasEmAlerta: AlertaPeca[];
@@ -43,37 +37,13 @@ export function useAlerta({
   const fetchAlertas = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/produtos');
+      const res = await fetch('/api/produtos/alertas');
       if (!res.ok) {
         throw new Error(`Erro ${res.status}`);
       }
 
-      const data: Peca[] = await res.json();
-      const emAlerta: AlertaPeca[] = data
-        .filter((p) => p.quantidade <= p.alerta)
-        .map(
-          ({
-            id,
-            name_peca,
-            codigo,
-            quantidade,
-            alerta,
-            localizacao,
-            categoria_id,
-            fornecedor_id
-          }) => ({
-            id,
-            name_peca,
-            codigo,
-            quantidade,
-            alerta,
-            localizacao,
-            categoria_id,
-            fornecedor_id
-          })
-        );
-
-      setPecas(emAlerta);
+      const data: AlertaPeca[] = await res.json();
+      setPecas(data);
     } catch (error) {
       console.error('Erro ao buscar alertas:', error);
       if (showErrorToast) {

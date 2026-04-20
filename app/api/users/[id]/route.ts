@@ -1,6 +1,9 @@
+import { NextResponse } from 'next/server';
+
 import { db, schema } from '@/db';
 import { logAction } from '@/lib/log-action';
 import { requireRoutePermission } from '@/lib/server/access-control';
+import { updateUserServerSchema } from '@/app/utils/validators';
 
 import { eq } from 'drizzle-orm';
 
@@ -44,15 +47,22 @@ export async function PUT(request: Request, { params }: Params) {
   }
 
   const { id } = await params;
-  const data = await request.json();
+  const parsed = updateUserServerSchema.safeParse(await request.json());
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Dados inválidos', issues: parsed.error.flatten() },
+      { status: 400 }
+    );
+  }
+  const { name, email, cargo, status } = parsed.data;
 
   const updatedUser = await db
     .update(schema.user)
     .set({
-      name: data.name,
-      email: data.email,
-      cargo: data.cargo,
-      status: data.status,
+      name,
+      email,
+      cargo,
+      status,
       updatedAt: new Date()
     })
     .where(eq(schema.user.id, id))

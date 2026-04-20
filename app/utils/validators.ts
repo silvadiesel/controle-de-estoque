@@ -243,3 +243,12 @@ export const pecaFormSchema = z.object({
 });
 
 export type PecaFormValues = z.infer<typeof pecaFormSchema>;
+
+export const CARGO_VALUES = ['atendente', 'estoquista', 'admin'] as const;
+
+export const updateUserServerSchema = z.object({
+  name: z.string().trim().min(1, 'Nome é obrigatório').max(120),
+  email: emailSchema.max(180),
+  cargo: z.enum(CARGO_VALUES),
+  status: z.boolean()
+});

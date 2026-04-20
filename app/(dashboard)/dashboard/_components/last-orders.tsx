@@ -13,32 +13,14 @@ import {
 } from '@/components/ui/empty';
 import { Skeleton } from '@/components/ui/skeleton';
 
+import type {
+  DashboardBlockState,
+  OrdemServicoItem,
+  OrdemVendaItem
+} from '../_lib/dashboard-types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ArrowRight } from 'lucide-react';
-
-export interface OrdemServicoItem {
-  id: number;
-  data_criacao: string;
-  status: 'ativa' | 'fechada' | 'cancelada';
-  cliente: { name_cliente: string; nome_empresa: string | null } | null;
-  veiculo: { placa: string; modelo: string } | null;
-}
-
-export interface OrdemVendaItem {
-  id: number;
-  data_criacao: string;
-  status: 'ativa' | 'fechada' | 'cancelada';
-  metodo_pagamento:
-    | 'pix'
-    | 'boleto'
-    | 'cheque'
-    | 'debito'
-    | 'credito'
-    | 'dinheiro'
-    | null;
-  cliente: { name_cliente: string; nome_empresa: string | null } | null;
-}
 
 const STATUS_STYLES: Record<string, string> = {
   ativa: 'bg-success/15 text-success',
@@ -76,13 +58,14 @@ interface LastOrdersProps {
   ordensServico: OrdemServicoItem[];
   ordensVenda: OrdemVendaItem[];
   isLoading: boolean;
-  servicoState?: 'ready' | 'unavailable';
-  vendaState?: 'ready' | 'unavailable';
+  servicoState?: DashboardBlockState;
+  vendaState?: DashboardBlockState;
 }
 
 type Tab = 'servico' | 'venda';
 
-const HEADER_CELL = 'text-xs font-semibold tracking-wider uppercase py-2' as const;
+const HEADER_CELL =
+  'text-xs font-semibold tracking-wider uppercase py-2' as const;
 const COL_CLIENTE = 'flex-[2]' as const;
 const COL_CONTEXT = 'hidden sm:block flex-[1.5]' as const;
 const COL_DATA = 'hidden sm:block flex-1' as const;
@@ -108,8 +91,12 @@ export function LastOrders({
       {/* Header */}
       <div className='flex items-start justify-between mb-4'>
         <div>
-          <h2 className='text-lg font-semibold leading-tight text-foreground'>Últimas Ordens</h2>
-          <p className='text-xs text-muted-foreground mt-0.5'>5 mais recentes</p>
+          <h2 className='text-lg font-semibold leading-tight text-foreground'>
+            Últimas Ordens
+          </h2>
+          <p className='text-xs text-muted-foreground mt-0.5'>
+            5 mais recentes
+          </p>
         </div>
         <Link
           href='/ordens'
