@@ -286,13 +286,13 @@ export default function Configuracoes() {
                 <div className='flex flex-col flex-1 justify-between'>
                   {/* List rows instead of table */}
                   <div className='rounded-lg border border-border overflow-hidden divide-y divide-border'>
-                    {paginatedCategories.map((category) => (
+                    {paginatedCategories.map((category, index) => (
                       <div
                         key={category.id}
                         className='flex items-center justify-between px-4 py-3 hover:bg-input transition-colors'>
                         <div className='flex items-center gap-3'>
                           <span className='text-xs text-muted-foreground w-8'>
-                            #{category.id}
+                            #{startItemCategories + index}
                           </span>
                           <span className='font-medium text-foreground'>
                             {category.name}

@@ -30,9 +30,6 @@ export async function POST(request: Request) {
     if (!data.name_cliente?.trim()) {
       return NextResponse.json({ error: 'Nome do cliente é obrigatório' }, { status: 400 });
     }
-    if (!data.nome_empresa?.trim()) {
-      return NextResponse.json({ error: 'Nome da empresa é obrigatório' }, { status: 400 });
-    }
     if (!data.telefone?.trim()) {
       return NextResponse.json({ error: 'Telefone é obrigatório' }, { status: 400 });
     }
@@ -72,11 +69,17 @@ export async function POST(request: Request) {
       .insert(schema.cliente)
       .values({
         name_cliente: data.name_cliente,
-        nome_empresa: data.nome_empresa,
+        nome_empresa: data.nome_empresa || '',
         cnpj: data.cnpj || '',
         cpf: data.cpf,
         telefone: data.telefone,
-        status: data.status ?? true
+        status: data.status ?? true,
+        rua: data.rua ?? null,
+        numero: data.numero ?? null,
+        bairro: data.bairro ?? null,
+        cidade: data.cidade ?? null,
+        estado: data.estado ?? null,
+        cep: data.cep ?? null
       })
       .returning();
 
