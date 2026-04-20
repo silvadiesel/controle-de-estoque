@@ -21,6 +21,9 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const permissionCheck = await requireRoutePermission(request, 'view_clientes');
+  if (permissionCheck instanceof Response) return permissionCheck;
+
   try {
     const data = await request.json();
 

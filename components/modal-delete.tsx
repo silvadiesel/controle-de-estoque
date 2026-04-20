@@ -1,5 +1,3 @@
-import { AlertTriangle } from 'lucide-react';
-
 import { Button } from './ui/button';
 import {
   Dialog,
@@ -10,6 +8,7 @@ import {
   DialogTitle,
   DialogTrigger
 } from './ui/dialog';
+import { AlertTriangle } from 'lucide-react';
 
 interface ModalDeleteProps {
   isOpen: boolean;
@@ -36,7 +35,7 @@ export function ModalDelete({
       <DialogContent className='max-w-[540px] gap-0 rounded-xl border-border bg-card p-0'>
         <DialogHeader className='border-b border-border px-6 py-5'>
           <div className='flex items-center gap-3'>
-            <div className='flex size-10 items-center justify-center rounded-lg border border-destructive/20 bg-destructive/10 text-destructive'>
+            <div className='flex size-10 items-center justify-center rounded-lg md:border border-destructive/20 md:bg-destructive/10 text-destructive'>
               <AlertTriangle className='size-4' />
             </div>
             <div className='flex min-w-0 flex-col gap-1'>

@@ -1,3 +1,5 @@
+import { randomInt } from 'node:crypto';
+
 import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
@@ -7,7 +9,7 @@ import { requireRoutePermission } from '@/lib/server/access-control';
 import { eq } from 'drizzle-orm';
 
 function gerarCodigo(): string {
-  return String(Math.floor(1000 + Math.random() * 9000));
+  return String(randomInt(1000, 10000));
 }
 
 /**
