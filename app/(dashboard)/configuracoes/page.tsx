@@ -169,22 +169,22 @@ export default function Configuracoes() {
       </div>
 
       <Tabs defaultValue='general' className='w-full gap-0'>
-        <TabsList className='h-11 w-full gap-2! bg-transparent! flex p-0'>
+        <TabsList className='h-11 w-full gap-2! bg-transparent! flex p-0 overflow-x-auto justify-start sm:justify-stretch scrollbar-none'>
           <TabsTrigger
             value='general'
-            className='  flex bg-muted  text-muted-foreground data-[state=active]:border-primary/70! data-[state=active]:bg-muted!'>
+            className='flex shrink-0 bg-muted text-muted-foreground data-[state=active]:border-primary/70! data-[state=active]:bg-muted!'>
             <Settings className='h-4 w-4' />
             Configurações Gerais
           </TabsTrigger>
           <TabsTrigger
             value='users'
-            className='  flex bg-muted  text-muted-foreground data-[state=active]:border-primary/70! data-[state=active]:bg-muted!'>
+            className='flex shrink-0 bg-muted text-muted-foreground data-[state=active]:border-primary/70! data-[state=active]:bg-muted!'>
             <Users className='h-4 w-4' />
             Usuários
           </TabsTrigger>
           <TabsTrigger
             value='empresa'
-            className='  flex bg-muted  text-muted-foreground data-[state=active]:border-primary/70! data-[state=active]:bg-muted!'>
+            className='flex shrink-0 bg-muted text-muted-foreground data-[state=active]:border-primary/70! data-[state=active]:bg-muted!'>
             <Building2 className='h-4 w-4' />
             Dados Cadastrais
           </TabsTrigger>
@@ -466,39 +466,43 @@ export default function Configuracoes() {
                       <div
                         key={user.id}
                         className='flex items-center justify-between px-4 py-3 hover:bg-input transition-colors'>
-                        <div className='flex items-center gap-4 flex-1 min-w-0'>
+                        <div className='flex items-start gap-3 flex-1 min-w-0 sm:items-center sm:gap-4'>
                           {/* Avatar */}
                           <div className='flex h-8 w-8 items-center justify-center rounded-full bg-border text-xs font-bold text-muted-foreground shrink-0'>
                             {user.name?.charAt(0)?.toUpperCase() || '?'}
                           </div>
-                          <div className='flex-1 min-w-0'>
-                            <p className='font-medium text-foreground text-sm'>
-                              {user.name}
-                            </p>
-                            <p className='text-xs text-muted-foreground'>
-                              {user.email}
-                            </p>
-                          </div>
-                          <div className='flex items-center gap-2 shrink-0'>
-                            <Badge
-                              variant={
-                                getCargoVariant(user.cargo) as
-                                  | 'default'
-                                  | 'secondary'
-                                  | 'outline'
-                                  | 'destructive'
-                              }>
-                              {getCargoLabel(user.cargo)}
-                            </Badge>
-                            <Badge
-                              variant={user.status ? 'default' : 'destructive'}
-                              className={
-                                user.status
-                                  ? 'bg-success/10 text-success border-success/20'
-                                  : ''
-                              }>
-                              {user.status ? 'Ativo' : 'Inativo'}
-                            </Badge>
+                          <div className='flex-1 min-w-0 flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-4'>
+                            <div className='flex-1 min-w-0'>
+                              <p className='font-medium text-foreground text-sm truncate'>
+                                {user.name}
+                              </p>
+                              <p className='text-xs text-muted-foreground truncate'>
+                                {user.email}
+                              </p>
+                            </div>
+                            <div className='flex items-center gap-2 shrink-0 flex-wrap'>
+                              <Badge
+                                variant={
+                                  getCargoVariant(user.cargo) as
+                                    | 'default'
+                                    | 'secondary'
+                                    | 'outline'
+                                    | 'destructive'
+                                }>
+                                {getCargoLabel(user.cargo)}
+                              </Badge>
+                              <Badge
+                                variant={
+                                  user.status ? 'default' : 'destructive'
+                                }
+                                className={
+                                  user.status
+                                    ? 'bg-success/10 text-success border-success/20'
+                                    : ''
+                                }>
+                                {user.status ? 'Ativo' : 'Inativo'}
+                              </Badge>
+                            </div>
                           </div>
                         </div>
                         <div className='flex items-center gap-1 ml-4'>

@@ -19,7 +19,7 @@ interface DialogShellProps {
   onOpenChange: (open: boolean) => void;
   icon: LucideIcon;
   title: string;
-  description: string;
+  description?: string;
   children: React.ReactNode;
   footer: React.ReactNode;
   trigger?: React.ReactNode;
@@ -56,7 +56,13 @@ export function DialogShell({
             </div>
             <div className='flex min-w-0 flex-col gap-1'>
               <DialogTitle>{title}</DialogTitle>
-              <DialogDescription>{description}</DialogDescription>
+              {description ? (
+                <DialogDescription>{description}</DialogDescription>
+              ) : (
+                <DialogDescription className='sr-only'>
+                  {`Diálogo: ${title}`}
+                </DialogDescription>
+              )}
             </div>
           </div>
         </DialogHeader>

@@ -72,6 +72,9 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
           <DialogPrimitive.Title className='sr-only'>
             Menu de navegação
           </DialogPrimitive.Title>
+          <DialogPrimitive.Description className='sr-only'>
+            Acesse as seções do sistema Core Controler
+          </DialogPrimitive.Description>
 
           <div className='flex items-center justify-between border-b border-sidebar-border px-4 py-4'>
             <div className='flex items-center gap-3'>
