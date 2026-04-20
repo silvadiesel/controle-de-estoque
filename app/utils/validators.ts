@@ -105,12 +105,7 @@ export const clienteSchema = z
       .refine((name) => name.trim().length > 0, {
         message: 'Nome não pode ser vazio'
       }),
-    nome_empresa: z
-      .string()
-      .min(1, 'Nome da empresa é obrigatório')
-      .refine((name) => name.trim().length > 0, {
-        message: 'Nome da empresa não pode ser vazio'
-      }),
+    nome_empresa: z.string().optional(),
     cpf: z.string().optional(),
     cnpj: z.string().optional(),
     telefone: z
@@ -124,6 +119,24 @@ export const clienteSchema = z
         {
           message: 'Telefone deve ter 10 ou 11 dígitos'
         }
+      ),
+    rua: z.string().optional(),
+    numero: z.string().optional(),
+    bairro: z.string().optional(),
+    cidade: z.string().optional(),
+    estado: z
+      .string()
+      .optional()
+      .refine(
+        (uf) => !uf || /^[A-Z]{2}$/.test(uf),
+        { message: 'Estado deve ter 2 letras maiúsculas (ex: RS)' }
+      ),
+    cep: z
+      .string()
+      .optional()
+      .refine(
+        (cep) => !cep || cep.replace(/\D/g, '').length === 8,
+        { message: 'CEP deve ter 8 dígitos' }
       )
   })
   .superRefine((data, ctx) => {

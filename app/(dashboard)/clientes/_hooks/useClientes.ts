@@ -51,7 +51,13 @@ export function useClientes(): UseClientesReturn {
           cpf: item.cpf,
           telefone: item.telefone,
           status: item.status,
-          id_veiculos: item.id_veiculos
+          id_veiculos: item.id_veiculos,
+          rua: item.rua,
+          numero: item.numero,
+          bairro: item.bairro,
+          cidade: item.cidade,
+          estado: item.estado,
+          cep: item.cep
         }))
       );
     } catch (error) {
@@ -71,10 +77,16 @@ export function useClientes(): UseClientesReturn {
       method: 'POST',
       body: JSON.stringify({
         name_cliente: data.name_cliente,
-        nome_empresa: data.nome_empresa,
+        nome_empresa: data.nome_empresa || '',
         cnpj: data.cnpj || '',
         cpf: data.cpf || '',
         telefone: data.telefone,
+        rua: data.rua || null,
+        numero: data.numero || null,
+        bairro: data.bairro || null,
+        cidade: data.cidade || null,
+        estado: data.estado || null,
+        cep: data.cep || null,
         status: true
       })
     });
@@ -96,10 +108,16 @@ export function useClientes(): UseClientesReturn {
       method: 'PUT',
       body: JSON.stringify({
         name_cliente: data.name_cliente,
-        nome_empresa: data.nome_empresa,
+        nome_empresa: data.nome_empresa || '',
         cnpj: data.cnpj || '',
         cpf: data.cpf || '',
         telefone: data.telefone,
+        rua: data.rua || null,
+        numero: data.numero || null,
+        bairro: data.bairro || null,
+        cidade: data.cidade || null,
+        estado: data.estado || null,
+        cep: data.cep || null,
         status: true
       })
     });

@@ -35,6 +35,7 @@ import {
   Building2,
   Car,
   ChevronDown,
+  MapPin,
   Pencil,
   Phone,
   Plus,
@@ -283,12 +284,14 @@ export default function Clientes() {
                             <p className='truncate text-sm font-semibold text-foreground'>
                               {cliente.name_cliente}
                             </p>
-                            <div className='mt-1 flex min-w-0 items-center gap-2 text-sm text-muted-foreground'>
-                              <Building2 className='size-3.5 shrink-0' />
-                              <span className='truncate'>
-                                {cliente.nome_empresa}
-                              </span>
-                            </div>
+                            {cliente.nome_empresa ? (
+                              <div className='mt-1 flex min-w-0 items-center gap-2 text-sm text-muted-foreground'>
+                                <Building2 className='size-3.5 shrink-0' />
+                                <span className='truncate'>
+                                  {cliente.nome_empresa}
+                                </span>
+                              </div>
+                            ) : null}
                           </div>
 
                           <div className='flex shrink-0 items-center gap-2'>
@@ -317,6 +320,12 @@ export default function Clientes() {
                           {cliente.cpf ? <span>CPF {formatCPF(cliente.cpf)}</span> : null}
                           {cliente.cnpj ? (
                             <span>CNPJ {formatCNPJ(cliente.cnpj)}</span>
+                          ) : null}
+                          {cliente.cidade || cliente.estado ? (
+                            <span className='inline-flex items-center gap-1.5'>
+                              <MapPin className='size-3.5' />
+                              {[cliente.cidade, cliente.estado].filter(Boolean).join('/')}
+                            </span>
                           ) : null}
                         </div>
 

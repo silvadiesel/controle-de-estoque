@@ -36,11 +36,17 @@ export async function PUT(request: Request, { params }: Params) {
     .update(schema.cliente)
     .set({
       name_cliente: data.name_cliente,
-      nome_empresa: data.nome_empresa,
+      nome_empresa: data.nome_empresa || '',
       cnpj: data.cnpj || '',
       cpf: data.cpf,
       telefone: data.telefone,
-      status: data.status
+      status: data.status,
+      rua: data.rua ?? null,
+      numero: data.numero ?? null,
+      bairro: data.bairro ?? null,
+      cidade: data.cidade ?? null,
+      estado: data.estado ?? null,
+      cep: data.cep ?? null
     })
     .where(eq(schema.cliente.id, id))
     .returning();

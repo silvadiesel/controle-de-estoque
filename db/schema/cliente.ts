@@ -8,7 +8,13 @@ export const cliente = pgTable('cliente', {
   cpf: text('cpf').notNull(),
   telefone: text('telefone').notNull(),
   status: boolean('status').default(true),
-  id_veiculos: integer('id_veiculos').array()
+  id_veiculos: integer('id_veiculos').array(),
+  rua: text('rua'),
+  numero: text('numero'),
+  bairro: text('bairro'),
+  cidade: text('cidade'),
+  estado: text('estado'),
+  cep: text('cep')
 });
 
 export type Cliente = typeof cliente.$inferSelect;

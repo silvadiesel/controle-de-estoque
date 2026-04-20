@@ -18,7 +18,13 @@ const clientes: Cliente[] = [
     cnpj: '',
     telefone: '(11) 91234-0000',
     status: true,
-    id_veiculos: [10]
+    id_veiculos: [10],
+    rua: null,
+    numero: null,
+    bairro: null,
+    cidade: null,
+    estado: null,
+    cep: null
   },
   {
     id: 2,
@@ -28,7 +34,13 @@ const clientes: Cliente[] = [
     cnpj: '12.345.678/0001-90',
     telefone: '(11) 95555-9999',
     status: true,
-    id_veiculos: [20, 21]
+    id_veiculos: [20, 21],
+    rua: null,
+    numero: null,
+    bairro: null,
+    cidade: null,
+    estado: null,
+    cep: null
   }
 ];
 
