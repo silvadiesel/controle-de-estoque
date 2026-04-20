@@ -5,6 +5,7 @@ import { AlertToast } from '@/components/alert-toast';
 import { AppSidebar } from '@/components/app-sidebar';
 import { MobileHeader } from '@/components/mobile-header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { AlertaProvider } from '@/hooks/useAlertaContext';
 import { getServerSession } from '@/lib/server/access-control';
 
 export default async function DashboardLayout({
@@ -27,14 +28,16 @@ export default async function DashboardLayout({
 
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
-      <div className='hidden md:contents'>
-        <AppSidebar />
-      </div>
-      <SidebarInset>
-        <AlertToast />
-        <MobileHeader />
-        <main id='main-content'>{children}</main>
-      </SidebarInset>
+      <AlertaProvider>
+        <div className='hidden md:contents'>
+          <AppSidebar />
+        </div>
+        <SidebarInset>
+          <AlertToast />
+          <MobileHeader />
+          <main id='main-content'>{children}</main>
+        </SidebarInset>
+      </AlertaProvider>
     </SidebarProvider>
   );
 }

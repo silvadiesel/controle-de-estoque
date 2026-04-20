@@ -8,7 +8,7 @@ import { usePathname, useRouter } from 'next/navigation';
 
 import { sidebarSections } from '@/components/sidebar-items';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { useAlertaCount } from '@/hooks/useAlertaCount';
+import { useAlertaCountCtx } from '@/hooks/useAlertaContext';
 import { useUser } from '@/hooks/useUser';
 import { signOut } from '@/lib/auth-client';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
@@ -32,7 +32,7 @@ type MobileSidebarProps = {
 export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { totalAlertas } = useAlertaCount();
+  const { totalAlertas } = useAlertaCountCtx();
   const { hasPermission, user, isPending } = useUser();
 
   // Fecha ao navegar: sem isso o menu fica aberto por cima da página nova.

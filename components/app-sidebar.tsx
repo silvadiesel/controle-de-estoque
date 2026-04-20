@@ -18,7 +18,7 @@ import {
   SidebarMenuItem,
   SidebarSeparator
 } from '@/components/ui/sidebar';
-import { useAlertaCount } from '@/hooks/useAlertaCount';
+import { useAlertaCountCtx } from '@/hooks/useAlertaContext';
 import { useUser } from '@/hooks/useUser';
 import { signOut } from '@/lib/auth-client';
 
@@ -36,7 +36,7 @@ function getInitials(name: string) {
 export function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { totalAlertas } = useAlertaCount();
+  const { totalAlertas } = useAlertaCountCtx();
   const { hasPermission, user, isPending } = useUser();
 
   const visibleGroups = isPending

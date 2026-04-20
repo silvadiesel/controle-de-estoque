@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { usePathname } from 'next/navigation';
 
+import { useSession } from '@/lib/auth-client';
+
 import { toast } from 'sonner';
 
 export interface AlertaPeca {
@@ -31,6 +33,8 @@ export function useAlerta({
   showErrorToast = true
 }: UseAlertaOptions = {}): UseAlertaReturn {
   const pathname = usePathname();
+  const { data: session, isPending: isSessionPending } = useSession();
+  const hasSession = !!session && !isSessionPending;
   const [pecas, setPecas] = useState<AlertaPeca[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -56,10 +60,18 @@ export function useAlerta({
   }, [showErrorToast]);
 
   useEffect(() => {
-    fetchAlertas();
-  }, [fetchAlertas, pathname]);
+    // Aguarda o Better Auth resolver a sessão: sem este gate, o primeiro
+    // fetch pós-login sai antes do cookie estar disponível e cai em 401.
+    if (!hasSession) {
+      setIsLoading(false);
+      return;
+    }
+    void fetchAlertas();
+  }, [fetchAlertas, pathname, hasSession]);
 
   useEffect(() => {
+    if (!hasSession) return;
+
     const handleFocus = () => {
       void fetchAlertas();
     };
@@ -77,7 +89,7 @@ export function useAlerta({
       window.removeEventListener('focus', handleFocus);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [fetchAlertas]);
+  }, [fetchAlertas, hasSession]);
 
   const pecasCriticas = pecas.filter((p) => p.quantidade === 0);
   const pecasAtencao = pecas.filter((p) => p.quantidade > 0);

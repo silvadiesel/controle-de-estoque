@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { useAlerta } from '@/hooks/useAlerta';
+import { useAlertaCtx } from '@/hooks/useAlertaContext';
 
 import { AlertTriangle, BellRing } from 'lucide-react';
 import { toast } from 'sonner';
@@ -28,7 +28,8 @@ function buildDescription(criticos: number, atencao: number) {
 export function AlertToast() {
   const pathname = usePathname();
   const router = useRouter();
-  const { pecasCriticas, pecasAtencao, totalAlertas, isLoading } = useAlerta();
+  const { pecasCriticas, pecasAtencao, totalAlertas, isLoading } =
+    useAlertaCtx();
 
   useEffect(() => {
     if (isLoading || pathname === '/alertas' || totalAlertas === 0) {
