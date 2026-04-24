@@ -4,7 +4,6 @@ type OrdemStatus = 'ativa' | 'fechada' | 'cancelada';
 
 type OrdemCliente = {
   id: number;
-  name_cliente: string;
   nome_empresa: string;
 } | null;
 
@@ -135,7 +134,6 @@ export function filterOrdens<T extends OrdemServiceSearchable | OrdemSaleSearcha
     const baseSearchFields = [
       ordem.id,
       ordem.observacao,
-      ordem.cliente?.name_cliente,
       ordem.cliente?.nome_empresa
     ];
 

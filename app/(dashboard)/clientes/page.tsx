@@ -275,23 +275,18 @@ export default function Clientes() {
                       onClick={() => handleToggleCliente(cliente.id)}
                       className='group flex min-w-0 flex-1 items-start gap-4 text-left outline-none transition-colors hover:text-foreground focus-visible:text-foreground'>
                       <div className='flex size-11 shrink-0 items-center justify-center rounded-lg border border-border bg-elevated text-sm font-semibold text-primary transition-colors group-hover:border-border-hover'>
-                        {getInitials(cliente.name_cliente)}
+                        {getInitials(cliente.nome_empresa)}
                       </div>
 
                       <div className='flex min-w-0 flex-1 flex-col gap-2'>
                         <div className='flex flex-col gap-1 lg:flex-row lg:items-center lg:justify-between'>
                           <div className='min-w-0'>
-                            <p className='truncate text-sm font-semibold text-foreground'>
-                              {cliente.name_cliente}
-                            </p>
-                            {cliente.nome_empresa ? (
-                              <div className='mt-1 flex min-w-0 items-center gap-2 text-sm text-muted-foreground'>
-                                <Building2 className='size-3.5 shrink-0' />
-                                <span className='truncate'>
-                                  {cliente.nome_empresa}
-                                </span>
-                              </div>
-                            ) : null}
+                            <div className='flex min-w-0 items-center gap-2 text-sm font-semibold text-foreground'>
+                              <Building2 className='size-3.5 shrink-0 text-muted-foreground' />
+                              <span className='truncate'>
+                                {cliente.nome_empresa}
+                              </span>
+                            </div>
                           </div>
 
                           <div className='flex shrink-0 items-center gap-2'>
@@ -347,7 +342,7 @@ export default function Clientes() {
                           <Button
                             variant='ghost'
                             size='icon-sm'
-                            aria-label={`Editar cliente ${cliente.name_cliente}`}
+                            aria-label={`Editar cliente ${cliente.nome_empresa}`}
                             onClick={(event) => {
                               event.stopPropagation();
                               setEditingCliente(cliente);
@@ -373,7 +368,7 @@ export default function Clientes() {
                           <Button
                             variant='ghost'
                             size='icon-sm'
-                            aria-label={`Excluir cliente ${cliente.name_cliente}`}
+                            aria-label={`Excluir cliente ${cliente.nome_empresa}`}
                             onClick={(event) => {
                               event.stopPropagation();
                               setDeleteId(cliente.id);
@@ -395,7 +390,7 @@ export default function Clientes() {
                         onConfirm={() => handleDeleteCliente(cliente.id)}
                         isLoading={isSavingCliente}
                         title='Excluir cliente'
-                        description={`Tem certeza que deseja excluir o cliente "${cliente.name_cliente}"? Todos os veículos associados também serão removidos.`}
+                        description={`Tem certeza que deseja excluir o cliente "${cliente.nome_empresa}"? Todos os veículos associados também serão removidos.`}
                       />
                     </div>
                   </div>

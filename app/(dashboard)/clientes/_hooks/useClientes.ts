@@ -45,7 +45,6 @@ export function useClientes(): UseClientesReturn {
       setClientes(
         data.map((item) => ({
           id: item.id,
-          name_cliente: item.name_cliente,
           nome_empresa: item.nome_empresa,
           cnpj: item.cnpj,
           cpf: item.cpf,
@@ -76,11 +75,10 @@ export function useClientes(): UseClientesReturn {
     const response = await fetch('/api/clientes', {
       method: 'POST',
       body: JSON.stringify({
-        name_cliente: data.name_cliente,
-        nome_empresa: data.nome_empresa || '',
+        nome_empresa: data.nome_empresa,
         cnpj: data.cnpj || '',
         cpf: data.cpf || '',
-        telefone: data.telefone,
+        telefone: data.telefone || '',
         rua: data.rua || null,
         numero: data.numero || null,
         bairro: data.bairro || null,
@@ -107,11 +105,10 @@ export function useClientes(): UseClientesReturn {
     const response = await fetch(`/api/clientes/${id}`, {
       method: 'PUT',
       body: JSON.stringify({
-        name_cliente: data.name_cliente,
-        nome_empresa: data.nome_empresa || '',
+        nome_empresa: data.nome_empresa,
         cnpj: data.cnpj || '',
         cpf: data.cpf || '',
-        telefone: data.telefone,
+        telefone: data.telefone || '',
         rua: data.rua || null,
         numero: data.numero || null,
         bairro: data.bairro || null,

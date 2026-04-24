@@ -99,20 +99,20 @@ export const fornecedorSchema = z.object({
 
 export const clienteSchema = z
   .object({
-    name_cliente: z
+    nome_empresa: z
       .string()
-      .min(1, 'Nome do cliente é obrigatório')
+      .min(1, 'Nome da empresa é obrigatório')
       .refine((name) => name.trim().length > 0, {
-        message: 'Nome não pode ser vazio'
+        message: 'Nome da empresa não pode ser vazio'
       }),
-    nome_empresa: z.string().optional(),
     cpf: z.string().optional(),
     cnpj: z.string().optional(),
     telefone: z
       .string()
-      .min(1, 'Telefone é obrigatório')
+      .optional()
       .refine(
         (phone) => {
+          if (!phone || phone.trim() === '') return true;
           const cleanPhone = phone.replace(/[^\d]/g, '');
           return cleanPhone.length === 10 || cleanPhone.length === 11;
         },

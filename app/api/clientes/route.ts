@@ -27,11 +27,8 @@ export async function POST(request: Request) {
   try {
     const data = await request.json();
 
-    if (!data.name_cliente?.trim()) {
-      return NextResponse.json({ error: 'Nome do cliente é obrigatório' }, { status: 400 });
-    }
-    if (!data.telefone?.trim()) {
-      return NextResponse.json({ error: 'Telefone é obrigatório' }, { status: 400 });
+    if (!data.nome_empresa?.trim()) {
+      return NextResponse.json({ error: 'Nome da empresa é obrigatório' }, { status: 400 });
     }
 
     const cpfNormalizado = data.cpf?.replace(/\D/g, '') || '';
@@ -68,11 +65,10 @@ export async function POST(request: Request) {
     const newCliente = await db
       .insert(schema.cliente)
       .values({
-        name_cliente: data.name_cliente,
-        nome_empresa: data.nome_empresa || '',
+        nome_empresa: data.nome_empresa,
         cnpj: data.cnpj || '',
         cpf: data.cpf,
-        telefone: data.telefone,
+        telefone: data.telefone?.trim() ? data.telefone : null,
         status: data.status ?? true,
         rua: data.rua ?? null,
         numero: data.numero ?? null,
@@ -83,7 +79,7 @@ export async function POST(request: Request) {
       })
       .returning();
 
-    await logAction(request, 'criacao', 'cliente', String(newCliente[0].id), `Cliente '${newCliente[0].name_cliente}' criado`);
+    await logAction(request, 'criacao', 'cliente', String(newCliente[0].id), `Cliente '${newCliente[0].nome_empresa}' criado`);
     return NextResponse.json(newCliente, { status: 201 });
   } catch (error) {
     console.error('Erro ao criar cliente:', error);

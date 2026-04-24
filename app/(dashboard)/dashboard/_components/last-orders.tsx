@@ -48,10 +48,9 @@ function formatDate(isoDate: string): string {
 }
 
 function getClientName(
-  cliente: { name_cliente: string; nome_empresa: string | null } | null
+  cliente: { nome_empresa: string } | null
 ): string {
-  if (!cliente) return '—';
-  return cliente.nome_empresa ?? cliente.name_cliente;
+  return cliente?.nome_empresa ?? '—';
 }
 
 interface LastOrdersProps {

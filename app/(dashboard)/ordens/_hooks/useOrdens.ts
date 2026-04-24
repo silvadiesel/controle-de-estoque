@@ -48,7 +48,6 @@ export interface OrdemServicoCompleta {
   valor_mao_obra: number;
   cliente: {
     id: number;
-    name_cliente: string;
     nome_empresa: string;
   } | null;
   veiculo: {
@@ -80,7 +79,6 @@ export interface OrdemVendaCompleta {
   metodo_pagamento: 'pix' | 'boleto' | 'cheque' | 'debito' | 'credito' | 'dinheiro' | null;
   cliente: {
     id: number;
-    name_cliente: string;
     nome_empresa: string;
   } | null;
   pecas: OrdemPeca[];

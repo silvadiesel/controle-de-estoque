@@ -157,7 +157,7 @@ export function OrdemCard(props: OrdemCardProps) {
                 <div className='min-w-0'>
                   <p className='truncate text-sm font-semibold text-foreground'>
                     {cardLabel} #{ordem.id} ·{' '}
-                    {ordem.cliente?.name_cliente || 'Cliente não encontrado'}
+                    {ordem.cliente?.nome_empresa || 'Cliente não encontrado'}
                   </p>
                   <p className='mt-1 truncate text-sm text-muted-foreground'>
                     {headerMeta}
@@ -357,11 +357,7 @@ export function OrdemCard(props: OrdemCardProps) {
             <div className='grid gap-3 md:grid-cols-2 xl:grid-cols-4'>
               <OrdemInfoBlock
                 label='Cliente'
-                value={
-                  ordem.cliente?.nome_empresa
-                    ? `${ordem.cliente.name_cliente} · ${ordem.cliente.nome_empresa}`
-                    : ordem.cliente?.name_cliente || 'Não informado'
-                }
+                value={ordem.cliente?.nome_empresa || 'Não informado'}
               />
 
               {tipo === 'servico' ? (

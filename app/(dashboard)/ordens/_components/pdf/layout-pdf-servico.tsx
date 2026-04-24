@@ -252,11 +252,10 @@ interface OrdemServicoData {
   valor_total: number;
   valor_mao_obra: number;
   cliente: {
-    name_cliente: string;
     nome_empresa: string;
     cnpj: string;
     cpf: string;
-    telefone: string;
+    telefone: string | null;
   } | null;
   veiculo: {
     placa: string;
@@ -320,7 +319,7 @@ function Via({ ordem, empresa, logoUrl }: Props & {}) {
       <View style={styles.infoRow}>
         <Text>
           <Text style={styles.label}>Cliente: </Text>
-          {cliente?.nome_empresa || cliente?.name_cliente || '-'}
+          {cliente?.nome_empresa || '-'}
         </Text>
         <Text>
           <Text style={styles.label}>CPF/CNPJ: </Text>

@@ -42,7 +42,7 @@ export async function GET(request: Request, { params }: Params) {
         valor_total: schema.ordemServico.valor_total,
         valor_mao_obra: schema.ordemServico.valor_mao_obra,
         cliente: {
-          name_cliente: schema.cliente.name_cliente,
+          
           nome_empresa: schema.cliente.nome_empresa,
           cnpj: schema.cliente.cnpj,
           cpf: schema.cliente.cpf,
@@ -127,7 +127,7 @@ export async function GET(request: Request, { params }: Params) {
       valor_total: schema.ordemVenda.valor_total,
       metodo_pagamento: schema.ordemVenda.metodo_pagamento,
       cliente: {
-        name_cliente: schema.cliente.name_cliente,
+        
         nome_empresa: schema.cliente.nome_empresa,
         cnpj: schema.cliente.cnpj,
         cpf: schema.cliente.cpf,

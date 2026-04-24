@@ -28,7 +28,6 @@ export async function getDashboardData() {
         data_criacao: schema.ordemServico.data_criacao,
         status: schema.ordemServico.status,
         cliente: {
-          name_cliente: schema.cliente.name_cliente,
           nome_empresa: schema.cliente.nome_empresa
         },
         veiculo: {
@@ -52,9 +51,8 @@ export async function getDashboardData() {
           data_criacao: row.data_criacao.toISOString(),
           status: row.status,
           cliente:
-            row.cliente && row.cliente.name_cliente
+            row.cliente && row.cliente.nome_empresa
               ? {
-                  name_cliente: row.cliente.name_cliente,
                   nome_empresa: row.cliente.nome_empresa
                 }
               : null,
@@ -74,7 +72,6 @@ export async function getDashboardData() {
         status: schema.ordemVenda.status,
         metodo_pagamento: schema.ordemVenda.metodo_pagamento,
         cliente: {
-          name_cliente: schema.cliente.name_cliente,
           nome_empresa: schema.cliente.nome_empresa
         }
       })
@@ -91,9 +88,8 @@ export async function getDashboardData() {
           status: row.status,
           metodo_pagamento: row.metodo_pagamento,
           cliente:
-            row.cliente && row.cliente.name_cliente
+            row.cliente && row.cliente.nome_empresa
               ? {
-                  name_cliente: row.cliente.name_cliente,
                   nome_empresa: row.cliente.nome_empresa
                 }
               : null

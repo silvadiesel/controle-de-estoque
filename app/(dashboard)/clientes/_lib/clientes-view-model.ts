@@ -85,7 +85,6 @@ export function deriveClientesViewModel({
     const matchesCliente =
       !hasActiveSearch ||
       [
-        cliente.name_cliente,
         cliente.nome_empresa,
         cliente.cpf,
         cliente.cnpj,

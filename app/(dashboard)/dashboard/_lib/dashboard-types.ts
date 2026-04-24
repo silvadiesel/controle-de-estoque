@@ -14,7 +14,7 @@ export interface OrdemServicoItem {
   id: number;
   data_criacao: string;
   status: 'ativa' | 'fechada' | 'cancelada';
-  cliente: { name_cliente: string; nome_empresa: string | null } | null;
+  cliente: { nome_empresa: string } | null;
   veiculo: { placa: string; modelo: string } | null;
 }
 
@@ -30,5 +30,5 @@ export interface OrdemVendaItem {
     | 'credito'
     | 'dinheiro'
     | null;
-  cliente: { name_cliente: string; nome_empresa: string | null } | null;
+  cliente: { nome_empresa: string } | null;
 }

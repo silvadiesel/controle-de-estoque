@@ -33,7 +33,6 @@ interface ModalClientesProps {
 
 function getDefaultValues(initialData?: Partial<Cliente>): ClienteFormValues {
   return {
-    name_cliente: initialData?.name_cliente ?? '',
     nome_empresa: initialData?.nome_empresa ?? '',
     cpf: initialData?.cpf ?? '',
     cnpj: initialData?.cnpj ?? '',
@@ -120,30 +119,16 @@ export function ModalClientes({
     >
       <form id='cliente-form' onSubmit={handleFormSubmit}>
         <FieldGroup className='flex flex-col gap-4'>
-          <Field orientation='responsive'>
-            <FieldContent>
-              <FieldLabel htmlFor='name_cliente'>Nome do cliente</FieldLabel>
-              <Input
-                id='name_cliente'
-                placeholder='João Silva'
-                className='bg-input border-border'
-                aria-invalid={!!errors.name_cliente}
-                {...register('name_cliente')}
-              />
-              <FieldError errors={[errors.name_cliente]} />
-            </FieldContent>
-
-            <FieldContent>
-              <FieldLabel htmlFor='nome_empresa'>Empresa</FieldLabel>
-              <Input
-                id='nome_empresa'
-                placeholder='Transportadora Silva'
-                className='bg-input border-border'
-                aria-invalid={!!errors.nome_empresa}
-                {...register('nome_empresa')}
-              />
-              <FieldError errors={[errors.nome_empresa]} />
-            </FieldContent>
+          <Field>
+            <FieldLabel htmlFor='nome_empresa'>Empresa</FieldLabel>
+            <Input
+              id='nome_empresa'
+              placeholder='Transportadora Silva'
+              className='bg-input border-border'
+              aria-invalid={!!errors.nome_empresa}
+              {...register('nome_empresa')}
+            />
+            <FieldError errors={[errors.nome_empresa]} />
           </Field>
 
           <Field orientation='responsive'>

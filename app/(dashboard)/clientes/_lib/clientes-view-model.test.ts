@@ -12,7 +12,6 @@ import {
 const clientes: Cliente[] = [
   {
     id: 1,
-    name_cliente: 'Ana Souza',
     nome_empresa: 'Trans Souza',
     cpf: '123.456.789-00',
     cnpj: '',
@@ -28,7 +27,6 @@ const clientes: Cliente[] = [
   },
   {
     id: 2,
-    name_cliente: 'Bruno Lima',
     nome_empresa: 'Lima Cargas',
     cpf: '',
     cnpj: '12.345.678/0001-90',

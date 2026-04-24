@@ -141,7 +141,7 @@ export function ModalOrdemServico({
     () =>
       clientes.map((cliente) => ({
         value: cliente.id.toString(),
-        label: `${cliente.name_cliente}${cliente.nome_empresa ? ` - ${cliente.nome_empresa}` : ''}`
+        label: cliente.nome_empresa
       })),
     [clientes]
   );

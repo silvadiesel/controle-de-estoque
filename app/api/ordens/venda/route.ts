@@ -26,7 +26,7 @@ export async function GET(request: Request) {
       metodo_pagamento: schema.ordemVenda.metodo_pagamento,
       cliente: {
         id: schema.cliente.id,
-        name_cliente: schema.cliente.name_cliente,
+        
         nome_empresa: schema.cliente.nome_empresa
       }
     })

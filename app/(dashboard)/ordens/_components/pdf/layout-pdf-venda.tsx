@@ -240,11 +240,10 @@ interface OrdemVendaData {
   valor_total: number;
   metodo_pagamento: string | null;
   cliente: {
-    name_cliente: string;
     nome_empresa: string;
     cnpj: string;
     cpf: string;
-    telefone: string;
+    telefone: string | null;
   } | null;
   pecas: PecaItem[];
 }
@@ -297,7 +296,7 @@ function Via({ ordem, empresa, logoUrl }: Props) {
       <View style={styles.infoRow}>
         <Text>
           <Text style={styles.label}>Cliente: </Text>
-          {cliente?.nome_empresa || cliente?.name_cliente || '-'}
+          {cliente?.nome_empresa || '-'}
         </Text>
         <Text>
           <Text style={styles.label}>CPF/CNPJ: </Text>

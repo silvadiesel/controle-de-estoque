@@ -32,14 +32,20 @@ export async function PUT(request: Request, { params }: Params) {
   const id = Number(idParam);
   const data = await request.json();
 
+  if (!data.nome_empresa?.trim()) {
+    return new Response(
+      JSON.stringify({ error: 'Nome da empresa é obrigatório' }),
+      { status: 400 }
+    );
+  }
+
   const updatedCliente = await db
     .update(schema.cliente)
     .set({
-      name_cliente: data.name_cliente,
-      nome_empresa: data.nome_empresa || '',
+      nome_empresa: data.nome_empresa,
       cnpj: data.cnpj || '',
       cpf: data.cpf,
-      telefone: data.telefone,
+      telefone: data.telefone?.trim() ? data.telefone : null,
       status: data.status,
       rua: data.rua ?? null,
       numero: data.numero ?? null,
@@ -51,7 +57,7 @@ export async function PUT(request: Request, { params }: Params) {
     .where(eq(schema.cliente.id, id))
     .returning();
 
-  await logAction(request, 'edicao', 'cliente', String(id), `Cliente '${updatedCliente[0]?.name_cliente}' atualizado`);
+  await logAction(request, 'edicao', 'cliente', String(id), `Cliente '${updatedCliente[0]?.nome_empresa}' atualizado`);
   return new Response(JSON.stringify(updatedCliente));
 }
 

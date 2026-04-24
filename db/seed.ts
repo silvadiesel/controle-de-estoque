@@ -68,16 +68,16 @@ const supplierNames = [
 ] as const;
 
 const clientProfiles = [
-  ['Joao Silva', 'Transportadora Silva'],
-  ['Maria Oliveira', 'Logistica Oliveira'],
-  ['Carlos Souza', 'Frota Souza'],
-  ['Ana Martins', 'Martins Entregas'],
-  ['Pedro Santos', 'Santos Cargas'],
-  ['Fernanda Lima', 'Lima Transportes'],
-  ['Ricardo Almeida', 'Almeida Distribuicao'],
-  ['Juliana Costa', 'Costa Express'],
-  ['Bruno Pereira', 'Pereira Auto Service'],
-  ['Patricia Rocha', 'Rocha Rotas']
+  'Transportadora Silva',
+  'Logistica Oliveira',
+  'Frota Souza',
+  'Martins Entregas',
+  'Santos Cargas',
+  'Lima Transportes',
+  'Almeida Distribuicao',
+  'Costa Express',
+  'Pereira Auto Service',
+  'Rocha Rotas'
 ] as const;
 
 const vehicleModels = [
@@ -335,8 +335,7 @@ async function seedDatabase() {
     const insertedClients = await tx
       .insert(schema.cliente)
       .values(
-        clientProfiles.map(([nameCliente, nomeEmpresa], index) => ({
-          name_cliente: nameCliente,
+        clientProfiles.map((nomeEmpresa, index) => ({
           nome_empresa: nomeEmpresa,
           cnpj: buildCnpj(index + 20),
           cpf: buildCpf(index),
@@ -347,7 +346,7 @@ async function seedDatabase() {
       )
       .returning({
         id: schema.cliente.id,
-        name_cliente: schema.cliente.name_cliente
+        nome_empresa: schema.cliente.nome_empresa
       });
 
     const vehicleTargets = buildVehicleTargets(insertedClients.length, random);

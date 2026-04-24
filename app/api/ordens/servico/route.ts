@@ -35,7 +35,7 @@ export async function GET(request: Request) {
       valor_mao_obra: schema.ordemServico.valor_mao_obra,
       cliente: {
         id: schema.cliente.id,
-        name_cliente: schema.cliente.name_cliente,
+        
         nome_empresa: schema.cliente.nome_empresa
       },
       veiculo: {
