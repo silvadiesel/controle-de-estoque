@@ -41,8 +41,6 @@ export default function Products() {
     setDeleteId,
     isDeleteOpen,
     setIsDeleteOpen,
-    categoryFilter,
-    setCategoryFilter,
     fornecedorFilter,
     setFornecedorFilter,
     getCategoryName,
@@ -89,12 +87,7 @@ export default function Products() {
   // Reset paginação quando filtros/search mudam
   useEffect(() => {
     goToPage(1);
-  }, [search, categoryFilter, fornecedorFilter]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const categoryFilterOptions = [
-    { value: 'all', label: 'Todas as categorias' },
-    ...categoryOptions
-  ];
+  }, [search, fornecedorFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const supplierFilterOptions = [
     { value: 'all', label: 'Todos os fornecedores' },
@@ -134,23 +127,13 @@ export default function Products() {
           <div className='relative w-full '>
             <Search className='absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
             <Input
-              placeholder='Procurar por nome, código ou categoria...'
+              placeholder='Procurar por nome ou código...'
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className='pl-10'
               aria-label='Buscar peça'
             />
           </div>
-
-          <SearchableSelect
-            options={categoryFilterOptions}
-            value={categoryFilter}
-            onValueChange={setCategoryFilter}
-            placeholder='Categoria'
-            searchPlaceholder='Buscar categoria...'
-            emptyText='Nenhuma categoria encontrada.'
-            className='w-full sm:w-[200px]'
-          />
 
           <SearchableSelect
             options={supplierFilterOptions}

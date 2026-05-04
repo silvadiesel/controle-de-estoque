@@ -16,7 +16,6 @@ export function usePecas() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [categories, setCategories] = useState<Categorias[]>([]);
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [fornecedorFilter, setFornecedorFilter] = useState<string>('all');
 
   // GET: Listar
@@ -81,13 +80,10 @@ export function usePecas() {
   );
 
   const filteredProducts = filteredPecas.filter((peca) => {
-    const matchesCategory =
-      categoryFilter === 'all' ||
-      peca.categoria_id?.toString() === categoryFilter;
     const matchesFornecedor =
       fornecedorFilter === 'all' ||
       peca.fornecedor_id?.toString() === fornecedorFilter;
-    return matchesCategory && matchesFornecedor;
+    return matchesFornecedor;
   });
 
   // POST: Criar
@@ -296,8 +292,6 @@ export function usePecas() {
     setDeleteId,
     isDeleteOpen,
     setIsDeleteOpen,
-    categoryFilter,
-    setCategoryFilter,
     fornecedorFilter,
     setFornecedorFilter,
     getCategoryName,

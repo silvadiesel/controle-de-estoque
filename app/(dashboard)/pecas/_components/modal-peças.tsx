@@ -155,6 +155,11 @@ function ModalPecasForm({
     ...supplierOptions
   ];
 
+  const categoryOptionsWithNone: SearchableSelectOption[] = [
+    { value: '', label: 'Nenhuma' },
+    ...categoryOptions
+  ];
+
   return (
     <div className='grid grid-cols-1 md:grid-cols-12 gap-6 px-6'>
       {/* Image column */}
@@ -287,15 +292,14 @@ function ModalPecasForm({
                       control={control}
                       render={({ field }) => (
                         <SearchableSelect
-                          options={categoryOptions}
+                          options={categoryOptionsWithNone}
                           value={field.value ? String(field.value) : ''}
                           onValueChange={(v) =>
-                            field.onChange(v ? Number(v) : undefined)
+                            field.onChange(v ? Number(v) : null)
                           }
                           placeholder='Selecione a categoria'
                           searchPlaceholder='Buscar...'
                           emptyText='Nenhuma categoria encontrada.'
-                          hasError={!!errors.categoria_id}
                         />
                       )}
                     />

@@ -242,7 +242,7 @@ export const pecaFormSchema = z.object({
     }),
   estante: z.string(),
   prateleira: z.string(),
-  categoria_id: z.number().min(1, 'Categoria é obrigatória'),
+  categoria_id: z.number().nullable().optional(),
   fornecedor_id: z.number().nullable(),
   quantidade: z
     .number()
