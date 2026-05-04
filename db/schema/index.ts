@@ -9,3 +9,4 @@ export * from './ordem-servico';
 export * from './ordem-venda';
 export * from './movimentacoes';
 export * from './empresa';
+export * from './heartbeat';

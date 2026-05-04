@@ -6,10 +6,17 @@ const publicRoutes = ['/login', '/register'];
 // Rotas da API de autenticação (better-auth handler)
 const authApiRoutes = ['/api/auth'];
 
+// Rotas de cron — autenticadas via Bearer CRON_SECRET na própria route
+const cronApiRoutes = ['/api/cron'];
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (authApiRoutes.some((route) => pathname.startsWith(route))) {
+    return NextResponse.next();
+  }
+
+  if (cronApiRoutes.some((route) => pathname.startsWith(route))) {
     return NextResponse.next();
   }
 
