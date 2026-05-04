@@ -20,6 +20,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { handleEnterAsTab } from '@/hooks/use-enter-as-tab';
 
 import type { UserWithoutPassword } from '../_hooks/useUsers';
 import { Loader2, UserCog } from 'lucide-react';
@@ -67,7 +68,7 @@ export function ModalUsuarios({
               </div>
             </div>
           </DialogHeader>
-          <div className='p-6'>
+          <div className='p-6' data-enter-as-tab-root onKeyDown={handleEnterAsTab}>
             <p className='text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-3'>DADOS DO USUÁRIO</p>
             <div className='grid gap-4'>
             <div className='space-y-2'>
@@ -134,6 +135,7 @@ export function ModalUsuarios({
             </Button>
             <Button
               onClick={handleSubmit}
+              data-submit-button
               className='bg-primary text-primary-foreground hover:bg-primary/90'
               disabled={isLoading}>
               {isLoading ? (

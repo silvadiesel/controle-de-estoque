@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import type { Cliente } from '@/db/schema';
+import { handleEnterAsTab } from '@/hooks/use-enter-as-tab';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import type { ClienteFormValues } from '../_hooks/useClientes';
@@ -111,13 +112,13 @@ export function ModalClientes({
           <Button variant='outline' onClick={() => handleOpenChange(false)}>
             Cancelar
           </Button>
-          <Button type='submit' form='cliente-form' disabled={isLoading}>
+          <Button type='submit' form='cliente-form' data-submit-button disabled={isLoading}>
             {isLoading ? 'Salvando...' : isEdit ? 'Salvar' : 'Adicionar'}
           </Button>
         </>
       }
     >
-      <form id='cliente-form' onSubmit={handleFormSubmit}>
+      <form id='cliente-form' onSubmit={handleFormSubmit} onKeyDown={handleEnterAsTab}>
         <FieldGroup className='flex flex-col gap-4'>
           <Field>
             <FieldLabel htmlFor='nome_empresa'>Empresa</FieldLabel>

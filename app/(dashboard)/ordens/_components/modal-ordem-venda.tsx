@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import type { Cliente, Peca } from '@/db/schema';
+import { handleEnterAsTab } from '@/hooks/use-enter-as-tab';
 
 import {
   type OrdemItemBuilderValue,
@@ -184,7 +185,7 @@ export function ModalOrdemVenda({
           <Button variant='outline' onClick={() => setIsOpen(false)}>
             Cancelar
           </Button>
-          <Button onClick={handleSubmit} disabled={isLoading}>
+          <Button onClick={handleSubmit} data-submit-button disabled={isLoading}>
             {isLoading
               ? 'Salvando...'
               : isEdit
@@ -193,6 +194,7 @@ export function ModalOrdemVenda({
           </Button>
         </>
       }>
+      <div data-enter-as-tab-root onKeyDown={handleEnterAsTab} className='contents'>
       <FieldGroup>
         <Field data-invalid={submitted && Boolean(errors.cliente_id)}>
           <FieldLabel>Cliente *</FieldLabel>
@@ -331,6 +333,7 @@ export function ModalOrdemVenda({
           setFormData((current) => ({ ...current, pecas: items }))
         }
       />
+      </div>
     </DialogShell>
   );
 }

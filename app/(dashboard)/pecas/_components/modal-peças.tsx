@@ -5,6 +5,7 @@ import type { ChangeEvent } from 'react';
 import Image from 'next/image';
 
 import { blockNonNumericKeyDown } from '@/app/utils/formatters';
+import { handleEnterAsTab } from '@/hooks/use-enter-as-tab';
 import type { PecaFormValues } from '@/app/utils/validators';
 import { pecaFormSchema } from '@/app/utils/validators';
 import { useModalPecaState } from '@/app/(dashboard)/pecas/_hook/useModalPecaState';
@@ -74,7 +75,7 @@ export function ModalPecas({
           <Button variant='outline' onClick={() => setIsOpen(false)}>
             Cancelar
           </Button>
-          <Button type='submit' form='peca-form' disabled={isLoading}>
+          <Button type='submit' form='peca-form' data-submit-button disabled={isLoading}>
             {isLoading
               ? 'Salvando...'
               : isEdit
@@ -210,6 +211,7 @@ function ModalPecasForm({
         <form
           id='peca-form'
           onSubmit={handleFormSubmit}
+          onKeyDown={handleEnterAsTab}
           className='flex flex-col gap-5'>
             {/* Identificação */}
             <div>

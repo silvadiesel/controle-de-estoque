@@ -15,6 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import type { MaoObra } from '@/db/schema';
+import { handleEnterAsTab } from '@/hooks/use-enter-as-tab';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import type { MaoObraFormValues } from '../_hooks/useMaoObra';
@@ -117,13 +118,13 @@ export function ModalMaoObra({
           <Button variant='outline' onClick={() => handleOpenChange(false)}>
             Cancelar
           </Button>
-          <Button type='submit' form='mao-obra-form' disabled={isLoading}>
+          <Button type='submit' form='mao-obra-form' data-submit-button disabled={isLoading}>
             {isLoading ? 'Salvando...' : isEdit ? 'Salvar' : 'Adicionar'}
           </Button>
         </>
       }
     >
-      <form id='mao-obra-form' onSubmit={handleFormSubmit}>
+      <form id='mao-obra-form' onSubmit={handleFormSubmit} onKeyDown={handleEnterAsTab}>
         <FieldGroup className='flex flex-col gap-4'>
           <Field>
             <FieldContent>

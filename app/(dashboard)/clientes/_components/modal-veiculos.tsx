@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import type { Veiculo } from '@/db/schema';
+import { handleEnterAsTab } from '@/hooks/use-enter-as-tab';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
@@ -104,13 +105,13 @@ export function ModalVeiculos({
           <Button variant='outline' onClick={() => handleOpenChange(false)}>
             Cancelar
           </Button>
-          <Button type='submit' form='veiculo-form' disabled={isLoading}>
+          <Button type='submit' form='veiculo-form' data-submit-button disabled={isLoading}>
             {isLoading ? 'Salvando...' : isEdit ? 'Salvar' : 'Adicionar'}
           </Button>
         </>
       }
     >
-      <form id='veiculo-form' onSubmit={handleFormSubmit}>
+      <form id='veiculo-form' onSubmit={handleFormSubmit} onKeyDown={handleEnterAsTab}>
         <FieldGroup>
           <Field orientation='responsive'>
             <FieldContent>

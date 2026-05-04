@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { DialogShell } from '@/components/ui/dialog-shell';
 import { SearchableSelect } from '@/components/ui/searchable-select';
 import type { Peca } from '@/db/schema';
+import { handleEnterAsTab } from '@/hooks/use-enter-as-tab';
 import { Package } from 'lucide-react';
 
 const formatCurrency = (value: number) =>
@@ -55,20 +56,22 @@ export function ModalVincularPeca({
       footer={
         <>
           <Button variant='outline' onClick={() => handleOpenChange(false)}>Cancelar</Button>
-          <Button onClick={handleSubmit} disabled={!selectedPecaId || isLoading}>
+          <Button onClick={handleSubmit} data-submit-button disabled={!selectedPecaId || isLoading}>
             {isLoading ? 'Vinculando...' : 'Vincular'}
           </Button>
         </>
       }
     >
-      <SearchableSelect
-        options={options}
-        value={selectedPecaId}
-        onValueChange={setSelectedPecaId}
-        placeholder='Selecione uma peça...'
-        searchPlaceholder='Buscar peça...'
-        emptyText='Nenhuma peça disponível'
-      />
+      <div data-enter-as-tab-root onKeyDown={handleEnterAsTab} className='contents'>
+        <SearchableSelect
+          options={options}
+          value={selectedPecaId}
+          onValueChange={setSelectedPecaId}
+          placeholder='Selecione uma peça...'
+          searchPlaceholder='Buscar peça...'
+          emptyText='Nenhuma peça disponível'
+        />
+      </div>
     </DialogShell>
   );
 }
