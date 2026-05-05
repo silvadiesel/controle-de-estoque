@@ -23,8 +23,13 @@ export function handleEnterAsTab(e: KeyboardEvent<HTMLElement>) {
   const tag = target.tagName
   const role = target.getAttribute("role")
 
-  if (tag === "BUTTON" || role === "combobox") return
-  if (tag !== "INPUT" && tag !== "TEXTAREA") return
+  if (role === "combobox") {
+    if (target.getAttribute("aria-expanded") === "true") return
+  } else if (tag === "BUTTON") {
+    return
+  } else if (tag !== "INPUT" && tag !== "TEXTAREA") {
+    return
+  }
 
   e.preventDefault()
 
