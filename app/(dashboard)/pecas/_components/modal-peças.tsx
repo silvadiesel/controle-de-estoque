@@ -5,6 +5,7 @@ import type { ChangeEvent } from 'react';
 import Image from 'next/image';
 
 import { blockNonNumericKeyDown } from '@/app/utils/formatters';
+import { handleEnterAsTab } from '@/hooks/use-enter-as-tab';
 import type { PecaFormValues } from '@/app/utils/validators';
 import { pecaFormSchema } from '@/app/utils/validators';
 import { useModalPecaState } from '@/app/(dashboard)/pecas/_hook/useModalPecaState';
@@ -74,7 +75,7 @@ export function ModalPecas({
           <Button variant='outline' onClick={() => setIsOpen(false)}>
             Cancelar
           </Button>
-          <Button type='submit' form='peca-form' disabled={isLoading}>
+          <Button type='submit' form='peca-form' data-submit-button disabled={isLoading}>
             {isLoading
               ? 'Salvando...'
               : isEdit
@@ -154,6 +155,11 @@ function ModalPecasForm({
     ...supplierOptions
   ];
 
+  const categoryOptionsWithNone: SearchableSelectOption[] = [
+    { value: '', label: 'Nenhuma' },
+    ...categoryOptions
+  ];
+
   return (
     <div className='grid grid-cols-1 md:grid-cols-12 gap-6 px-6'>
       {/* Image column */}
@@ -210,6 +216,7 @@ function ModalPecasForm({
         <form
           id='peca-form'
           onSubmit={handleFormSubmit}
+          onKeyDown={handleEnterAsTab}
           className='flex flex-col gap-5'>
             {/* Identificação */}
             <div>
@@ -285,15 +292,14 @@ function ModalPecasForm({
                       control={control}
                       render={({ field }) => (
                         <SearchableSelect
-                          options={categoryOptions}
+                          options={categoryOptionsWithNone}
                           value={field.value ? String(field.value) : ''}
                           onValueChange={(v) =>
-                            field.onChange(v ? Number(v) : undefined)
+                            field.onChange(v ? Number(v) : null)
                           }
                           placeholder='Selecione a categoria'
                           searchPlaceholder='Buscar...'
                           emptyText='Nenhuma categoria encontrada.'
-                          hasError={!!errors.categoria_id}
                         />
                       )}
                     />

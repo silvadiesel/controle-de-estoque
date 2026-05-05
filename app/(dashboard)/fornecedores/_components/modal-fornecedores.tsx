@@ -8,6 +8,7 @@ import { DialogShell } from '@/components/ui/dialog-shell';
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import type { Fornecedor } from '@/db/schema';
+import { handleEnterAsTab } from '@/hooks/use-enter-as-tab';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Factory } from 'lucide-react';
 import { Controller, useForm } from 'react-hook-form';
@@ -73,13 +74,13 @@ export function ModalFornecedores({
       footer={
         <>
           <Button variant='outline' onClick={() => handleOpenChange(false)}>Cancelar</Button>
-          <Button type='submit' form='fornecedor-form' disabled={isLoading}>
+          <Button type='submit' form='fornecedor-form' data-submit-button disabled={isLoading}>
             {isLoading ? 'Salvando...' : isEdit ? 'Salvar' : 'Adicionar'}
           </Button>
         </>
       }
     >
-      <form id='fornecedor-form' onSubmit={handleFormSubmit}>
+      <form id='fornecedor-form' onSubmit={handleFormSubmit} onKeyDown={handleEnterAsTab}>
         <FieldGroup className='flex flex-col gap-4'>
           <Field orientation='responsive'>
             <FieldContent>

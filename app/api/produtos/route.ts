@@ -59,9 +59,6 @@ export async function POST(request: Request) {
     if (!data.codigo?.trim()) {
       return NextResponse.json({ error: 'Código é obrigatório' }, { status: 400 });
     }
-    if (!data.categoria_id) {
-      return NextResponse.json({ error: 'Categoria é obrigatória' }, { status: 400 });
-    }
 
     const existing = await db
       .select()
@@ -81,7 +78,7 @@ export async function POST(request: Request) {
       .values({
         name_peca: data.name_peca,
         codigo: data.codigo,
-        categoria_id: data.categoria_id,
+        categoria_id: data.categoria_id ?? null,
         quantidade: data.quantidade,
         preco: data.preco,
         fornecedor_id: data.fornecedor_id,

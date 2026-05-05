@@ -23,7 +23,7 @@ export function getPecaFormDefaultValues(
     prateleira: Array.isArray(initialData?.localizacao)
       ? String(initialData?.localizacao[1] || '')
       : '',
-    categoria_id: initialData?.categoria_id ?? 0,
+    categoria_id: initialData?.categoria_id ?? null,
     fornecedor_id: initialData?.fornecedor_id ?? null,
     quantidade: initialData?.quantidade ?? 0,
     preco: initialData?.preco ?? 0,
