@@ -182,11 +182,9 @@ export default function Movimentacoes() {
             <h2 className='text-base font-semibold text-foreground'>
               Histórico de Atividades
             </h2>
-            <p className='text-sm text-muted-foreground mt-0.5'>
-              {isLoading
-                ? 'Carregando...'
-                : `${totalItems} registros · página ${currentPage} de ${totalPages}`}
-            </p>
+            {isLoading && (
+              <p className='text-sm text-muted-foreground mt-0.5'>Carregando...</p>
+            )}
           </div>
           <div className='size-8 rounded-md flex items-center justify-center border border-border bg-elevated text-primary'>
             <Activity size={16} />

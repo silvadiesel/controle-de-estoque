@@ -4,7 +4,7 @@ import { db, schema } from '@/db';
 import { logAction } from '@/lib/log-action';
 import { requireRoutePermission } from '@/lib/server/access-control';
 
-import { asc, eq } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 
 export async function GET(request: Request) {
   const permissionCheck = await requireRoutePermission(request, 'view_produtos');
@@ -23,12 +23,12 @@ export async function GET(request: Request) {
         .select()
         .from(schema.pecas)
         .where(eq(schema.pecas.fornecedor_id, Number(fornecedorIdParam)))
-        .orderBy(asc(schema.pecas.id));
+        .orderBy(desc(schema.pecas.data_cadastro), desc(schema.pecas.id));
     } else {
       pecas = await db
         .select()
         .from(schema.pecas)
-        .orderBy(asc(schema.pecas.id));
+        .orderBy(desc(schema.pecas.data_cadastro), desc(schema.pecas.id));
     }
     return NextResponse.json(pecas);
   } catch (error) {

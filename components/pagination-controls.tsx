@@ -44,12 +44,12 @@ export function PaginationControls({
   }
 
   return (
-    <div className='mt-4 flex flex-col-reverse items-center justify-between gap-4 sm:flex-row'>
-      <p className='text-center text-sm text-muted-foreground sm:text-left'>
-        Mostrando {startItem} a {endItem} de {totalItems} {itemLabel}
+    <div className='mt-4 flex flex-col items-center justify-center gap-3'>
+      <p className='text-center text-sm text-muted-foreground'>
+        {endItem - startItem + 1} de {totalItems} {itemLabel}
       </p>
 
-      <Pagination className='mx-0 w-auto justify-end'>
+      <Pagination className='mx-0 w-auto justify-center'>
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
