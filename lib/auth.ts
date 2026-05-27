@@ -17,6 +17,12 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true
   },
+  session: {
+    // Sessão "praticamente eterna": dura 1 ano e renova a cada 1 dia de uso.
+    // Enquanto o usuário acessar o sistema pelo menos 1x por ano, nunca expira.
+    expiresIn: 60 * 60 * 24 * 365,
+    updateAge: 60 * 60 * 24
+  },
   // Rate limit persistente no Postgres. `memory` NÃO funciona em serverless
   // (Vercel) porque cada invocação pode ser uma instância nova, o que
   // invalidaria a proteção contra brute force do código de 4 dígitos.

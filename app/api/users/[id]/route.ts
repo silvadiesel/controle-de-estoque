@@ -16,7 +16,7 @@ type Params = {
 export async function GET(_request: Request, { params }: Params) {
   const permissionCheck = await requireRoutePermission(
     _request,
-    'manage_users'
+    'read_users_context'
   );
 
   if (permissionCheck instanceof Response) {

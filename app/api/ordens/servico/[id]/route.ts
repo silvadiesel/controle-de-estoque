@@ -122,7 +122,7 @@ export async function GET(request: Request, { params }: Params) {
 }
 
 export async function PUT(request: Request, { params }: Params) {
-  const permissionCheck = await requireRoutePermission(request, 'view_ordens');
+  const permissionCheck = await requireRoutePermission(request, 'manage_ordens');
   if (permissionCheck instanceof Response) return permissionCheck;
 
   const { id } = await params;
@@ -258,7 +258,7 @@ export async function PUT(request: Request, { params }: Params) {
 }
 
 export async function DELETE(request: Request, { params }: Params) {
-  const permissionCheck = await requireRoutePermission(request, 'view_ordens');
+  const permissionCheck = await requireRoutePermission(request, 'manage_ordens');
   if (permissionCheck instanceof Response) return permissionCheck;
 
   const { id } = await params;

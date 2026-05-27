@@ -9,6 +9,7 @@ import { handleEnterAsTab } from '@/hooks/use-enter-as-tab';
 import type { PecaFormValues } from '@/app/utils/validators';
 import { pecaFormSchema } from '@/app/utils/validators';
 import { useModalPecaState } from '@/app/(dashboard)/pecas/_hook/useModalPecaState';
+import { compressImage } from '@/lib/image-compress';
 import { Button } from '@/components/ui/button';
 import { DialogShell } from '@/components/ui/dialog-shell';
 import {
@@ -29,6 +30,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import { CloudDownload, Package, Trash2 } from 'lucide-react';
 import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 interface ModalPecasProps {
   mode: 'create' | 'edit';
@@ -135,14 +137,20 @@ function ModalPecasForm({
     }
   });
 
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    try {
+      const compressed = await compressImage(file);
+      setImage(compressed);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Erro ao processar imagem.';
+      toast.error(message);
+    } finally {
+      // Limpa o input para permitir reescolher o mesmo arquivo após erro
+      e.target.value = '';
     }
   };
 

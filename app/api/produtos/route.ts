@@ -60,10 +60,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Código é obrigatório' }, { status: 400 });
     }
 
+    const codigoNormalizado = data.codigo.trim().toUpperCase();
+
     const existing = await db
       .select()
       .from(schema.pecas)
-      .where(eq(schema.pecas.codigo, data.codigo.trim().toUpperCase()))
+      .where(eq(schema.pecas.codigo, codigoNormalizado))
       .limit(1);
 
     if (existing.length > 0) {
@@ -76,8 +78,8 @@ export async function POST(request: Request) {
     const newPeca = await db
       .insert(schema.pecas)
       .values({
-        name_peca: data.name_peca,
-        codigo: data.codigo,
+        name_peca: data.name_peca.trim(),
+        codigo: codigoNormalizado,
         categoria_id: data.categoria_id ?? null,
         quantidade: data.quantidade,
         preco: data.preco,

@@ -1,8 +1,10 @@
+import { NextResponse } from 'next/server';
+
 import { db, schema } from '@/db';
 import { logAction } from '@/lib/log-action';
 import { requireRoutePermission } from '@/lib/server/access-control';
 
-import { eq } from 'drizzle-orm';
+import { and, eq, ne } from 'drizzle-orm';
 
 type Params = {
   params: Promise<{
@@ -44,15 +46,39 @@ export async function PUT(request: Request, { params }: Params) {
   const id = Number(idParam);
   const data = await request.json();
 
+  if (!data.name_peca?.trim()) {
+    return NextResponse.json({ error: 'Nome da peça é obrigatório' }, { status: 400 });
+  }
+  if (!data.codigo?.trim()) {
+    return NextResponse.json({ error: 'Código é obrigatório' }, { status: 400 });
+  }
+
+  const codigoNormalizado = data.codigo.trim().toUpperCase();
+
+  const duplicado = await db
+    .select({ id: schema.pecas.id })
+    .from(schema.pecas)
+    .where(
+      and(eq(schema.pecas.codigo, codigoNormalizado), ne(schema.pecas.id, id))
+    )
+    .limit(1);
+
+  if (duplicado.length > 0) {
+    return NextResponse.json(
+      { error: `Já existe outra peça cadastrada com o código '${data.codigo}'` },
+      { status: 409 }
+    );
+  }
+
   const updatedPeca = await db
     .update(schema.pecas)
     .set({
-      name_peca: data.name_peca,
-      codigo: data.codigo,
-      categoria_id: data.categoria_id,
+      name_peca: data.name_peca.trim(),
+      codigo: codigoNormalizado,
+      categoria_id: data.categoria_id ?? null,
       quantidade: data.quantidade,
       preco: data.preco,
-      fornecedor_id: data.fornecedor_id,
+      fornecedor_id: data.fornecedor_id ?? null,
       localizacao: data.localizacao,
       imagem: data.imagem,
       alerta: data.alerta ?? 1

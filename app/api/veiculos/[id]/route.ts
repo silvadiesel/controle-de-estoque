@@ -25,7 +25,7 @@ export async function GET(request: Request, { params }: Params) {
 }
 
 export async function PUT(request: Request, { params }: Params) {
-  const permissionCheck = await requireRoutePermission(request, 'view_clientes');
+  const permissionCheck = await requireRoutePermission(request, 'manage_clientes');
   if (permissionCheck instanceof Response) return permissionCheck;
 
   const { id: idParam } = await params;
@@ -47,7 +47,7 @@ export async function PUT(request: Request, { params }: Params) {
 }
 
 export async function DELETE(request: Request, { params }: Params) {
-  const permissionCheck = await requireRoutePermission(request, 'view_clientes');
+  const permissionCheck = await requireRoutePermission(request, 'manage_clientes');
   if (permissionCheck instanceof Response) return permissionCheck;
 
   const { id: idParam } = await params;

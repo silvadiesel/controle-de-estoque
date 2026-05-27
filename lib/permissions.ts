@@ -3,7 +3,9 @@ import type { Cargo } from '@/lib/types/auth';
 export type AppPermission =
   | 'view_dashboard'
   | 'view_clientes'
+  | 'manage_clientes'
   | 'view_ordens'
+  | 'manage_ordens'
   | 'view_movimentacoes'
   | 'view_alertas'
   | 'view_produtos'
@@ -24,7 +26,9 @@ export const ROLE_PERMISSIONS = {
   admin: [
     'view_dashboard',
     'view_clientes',
+    'manage_clientes',
     'view_ordens',
+    'manage_ordens',
     'view_movimentacoes',
     'view_alertas',
     'view_produtos',
@@ -44,7 +48,9 @@ export const ROLE_PERMISSIONS = {
   estoquista: [
     'view_dashboard',
     'view_clientes',
+    'manage_clientes',
     'view_ordens',
+    'manage_ordens',
     'view_movimentacoes',
     'view_alertas',
     'view_produtos',

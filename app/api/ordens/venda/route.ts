@@ -80,7 +80,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const permissionCheck = await requireRoutePermission(request, 'view_ordens');
+  const permissionCheck = await requireRoutePermission(request, 'manage_ordens');
   if (permissionCheck instanceof Response) return permissionCheck;
 
   const data = await request.json();

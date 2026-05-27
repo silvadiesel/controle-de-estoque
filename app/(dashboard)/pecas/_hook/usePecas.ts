@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { PecaFormValues } from '@/app/utils/validators';
 import type { Categorias, Fornecedor, Peca } from '@/db/schema';
 import type { SearchableSelectOption } from '@/components/ui/searchable-select';
+import { apiFetch, ApiError, formatApiError } from '@/lib/api-fetch';
 
 import { toast } from 'sonner';
 
@@ -96,7 +97,7 @@ export function usePecas() {
         ? [data.estante || '', data.prateleira || '']
         : null;
 
-    const res = await fetch('/api/produtos', {
+    await apiFetch('/api/produtos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -111,12 +112,6 @@ export function usePecas() {
         alerta: data.alerta ?? 1
       })
     });
-
-    if (res.status === 409) {
-      const body = await res.json();
-      throw new Error(body.error);
-    }
-    if (!res.ok) throw new Error('Erro ao criar peça');
     await fetchPecas();
   };
 
@@ -131,7 +126,7 @@ export function usePecas() {
         ? [data.estante || '', data.prateleira || '']
         : null;
 
-    const res = await fetch(`/api/produtos/${id}`, {
+    await apiFetch(`/api/produtos/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -146,20 +141,13 @@ export function usePecas() {
         alerta: data.alerta ?? 1
       })
     });
-
-    if (res.ok) await fetchPecas();
-    else throw new Error('Erro ao atualizar peça');
+    await fetchPecas();
   };
 
   // DELETE: Remover
   const deletePeca = async (id: number) => {
-    const res = await fetch(`/api/produtos/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      await fetchPecas();
-    } else {
-      const body = await res.json().catch(() => ({}));
-      throw new Error(body?.error ?? 'Erro ao deletar peça');
-    }
+    await apiFetch(`/api/produtos/${id}`, { method: 'DELETE' });
+    await fetchPecas();
   };
 
   // PUT: Repor estoque (quantidade parcial)
@@ -167,7 +155,7 @@ export function usePecas() {
     const peca = pecas.find((p) => p.id === id);
     if (!peca) throw new Error('Peça não encontrada');
 
-    const res = await fetch(`/api/produtos/${id}`, {
+    await apiFetch(`/api/produtos/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -182,8 +170,6 @@ export function usePecas() {
         alerta: peca.alerta ?? 1
       })
     });
-
-    if (!res.ok) throw new Error('Erro ao repor estoque');
     await fetchPecas();
   };
 
@@ -219,7 +205,11 @@ export function usePecas() {
       return true;
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : 'Erro ao salvar peça';
+        error instanceof ApiError
+          ? error.message
+          : error instanceof Error
+            ? error.message
+            : formatApiError(0);
       toast.error(message);
       return false;
     } finally {
@@ -241,7 +231,11 @@ export function usePecas() {
       toast.success('Peça deletada com sucesso!');
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : 'Erro ao deletar peça';
+        error instanceof ApiError
+          ? error.message
+          : error instanceof Error
+            ? error.message
+            : formatApiError(0);
       toast.error(message);
     } finally {
       setIsLoading(false);
