@@ -18,6 +18,7 @@ export type AppPermission =
   | 'manage_categorias'
   | 'manage_users'
   | 'manage_empresa'
+  | 'change_password'
   | 'read_users_context'
   | 'read_fornecedor_context'
   | 'read_categoria_context';
@@ -41,6 +42,7 @@ export const ROLE_PERMISSIONS = {
     'manage_categorias',
     'manage_users',
     'manage_empresa',
+    'change_password',
     'read_users_context',
     'read_fornecedor_context',
     'read_categoria_context'
@@ -59,6 +61,7 @@ export const ROLE_PERMISSIONS = {
     'manage_mao_obra',
     'view_fornecedores_page',
     'manage_fornecedores',
+    'change_password',
     'read_users_context',
     'read_fornecedor_context',
     'read_categoria_context'
@@ -71,6 +74,7 @@ export const ROLE_PERMISSIONS = {
     'view_alertas',
     'view_produtos',
     'view_mao_obra',
+    'change_password',
     'read_users_context',
     'read_fornecedor_context',
     'read_categoria_context'
@@ -86,7 +90,7 @@ export const APP_ROUTE_PERMISSIONS = {
   '/pecas': 'view_produtos',
   '/mao-obra': 'view_mao_obra',
   '/fornecedores': 'view_fornecedores_page',
-  '/configuracoes': 'view_configuracoes'
+  '/configuracoes': 'change_password'
 } as const satisfies Partial<Record<string, AppPermission>>;
 
 function getPermissionSet(cargo: Cargo) {
