@@ -26,11 +26,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usePagination } from '@/hooks/usePagination';
+import { useUser } from '@/hooks/useUser';
 
+import { ChangePasswordCard } from './_components/change-password-card';
 import { ModalUsuarios } from './_components/modal-usuarios';
 import { useCategories, useEmpresa, useUsers } from './_hooks';
 import {
   Building2,
+  KeyRound,
   Loader2,
   Pencil,
   Plus,
@@ -95,6 +98,10 @@ export default function Configuracoes() {
     handleRegenerateCodigo
   } = useEmpresa();
 
+  // Permissões: só admin (view_configuracoes) vê as abas administrativas.
+  // Os demais cargos acessam Configurações apenas para a aba "Alterar Senha".
+  const { canViewConfiguracoes, isPending } = useUser();
+
   // Pagination for categories
   const {
     paginatedItems: paginatedCategories,
@@ -128,10 +135,13 @@ export default function Configuracoes() {
   } = usePagination({ items: filteredUsers, itemsPerPage: 10 });
 
   useEffect(() => {
+    // Não-admin não enxerga as abas administrativas; evitar disparar as APIs
+    // (categorias/usuários/empresa) que retornariam 403 para esses cargos.
+    if (!canViewConfiguracoes) return;
     fetchCategories();
     fetchUsers();
     fetchEmpresa();
-  }, [fetchCategories, fetchUsers, fetchEmpresa]);
+  }, [canViewConfiguracoes, fetchCategories, fetchUsers, fetchEmpresa]);
 
   const getCargoLabel = (cargo: string) => {
     switch (cargo) {
@@ -168,28 +178,47 @@ export default function Configuracoes() {
         </p>
       </div>
 
-      <Tabs defaultValue='general' className='w-full gap-0'>
+      {isPending ? (
+        <div className='flex items-center justify-center py-16'>
+          <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
+        </div>
+      ) : (
+      <Tabs
+        defaultValue={canViewConfiguracoes ? 'general' : 'senha'}
+        className='w-full gap-0'>
         <TabsList className='h-11 w-full gap-2! bg-transparent! flex p-0 overflow-x-auto justify-start sm:justify-stretch scrollbar-none'>
+          {canViewConfiguracoes && (
+            <>
+              <TabsTrigger
+                value='general'
+                className='flex shrink-0 bg-muted text-muted-foreground data-[state=active]:border-primary/70! data-[state=active]:bg-muted!'>
+                <Settings className='h-4 w-4' />
+                Configurações Gerais
+              </TabsTrigger>
+              <TabsTrigger
+                value='users'
+                className='flex shrink-0 bg-muted text-muted-foreground data-[state=active]:border-primary/70! data-[state=active]:bg-muted!'>
+                <Users className='h-4 w-4' />
+                Usuários
+              </TabsTrigger>
+              <TabsTrigger
+                value='empresa'
+                className='flex shrink-0 bg-muted text-muted-foreground data-[state=active]:border-primary/70! data-[state=active]:bg-muted!'>
+                <Building2 className='h-4 w-4' />
+                Dados Cadastrais
+              </TabsTrigger>
+            </>
+          )}
           <TabsTrigger
-            value='general'
+            value='senha'
             className='flex shrink-0 bg-muted text-muted-foreground data-[state=active]:border-primary/70! data-[state=active]:bg-muted!'>
-            <Settings className='h-4 w-4' />
-            Configurações Gerais
-          </TabsTrigger>
-          <TabsTrigger
-            value='users'
-            className='flex shrink-0 bg-muted text-muted-foreground data-[state=active]:border-primary/70! data-[state=active]:bg-muted!'>
-            <Users className='h-4 w-4' />
-            Usuários
-          </TabsTrigger>
-          <TabsTrigger
-            value='empresa'
-            className='flex shrink-0 bg-muted text-muted-foreground data-[state=active]:border-primary/70! data-[state=active]:bg-muted!'>
-            <Building2 className='h-4 w-4' />
-            Dados Cadastrais
+            <KeyRound className='h-4 w-4' />
+            Alterar Senha
           </TabsTrigger>
         </TabsList>
 
+        {canViewConfiguracoes && (
+          <>
         {/* Tab: Configurações Gerais */}
         <TabsContent value='general'>
           {/* Categories - single card with list rows */}
@@ -736,7 +765,15 @@ export default function Configuracoes() {
             </CardContent>
           </Card>
         </TabsContent>
+          </>
+        )}
+
+        {/* Tab: Alterar Senha — disponível para todos os cargos */}
+        <TabsContent value='senha'>
+          <ChangePasswordCard />
+        </TabsContent>
       </Tabs>
+      )}
     </div>
   );
 }

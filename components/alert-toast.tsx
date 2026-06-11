@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useAlertaCtx } from '@/hooks/useAlertaContext';
 
 import { AlertTriangle, BellRing } from 'lucide-react';
@@ -28,11 +29,14 @@ function buildDescription(criticos: number, atencao: number) {
 export function AlertToast() {
   const pathname = usePathname();
   const router = useRouter();
+  const isMobile = useIsMobile();
   const { pecasCriticas, pecasAtencao, totalAlertas, isLoading } =
     useAlertaCtx();
 
   useEffect(() => {
-    if (isLoading || pathname === '/alertas' || totalAlertas === 0) {
+    // No mobile só exibimos o ponto de notificação (badge no sino); o toast
+    // de alerta de estoque fica restrito ao desktop.
+    if (isMobile || isLoading || pathname === '/alertas' || totalAlertas === 0) {
       toast.dismiss(STOCK_ALERT_TOAST_ID);
       return;
     }
@@ -79,6 +83,7 @@ export function AlertToast() {
       toast.dismiss(STOCK_ALERT_TOAST_ID);
     };
   }, [
+    isMobile,
     isLoading,
     pathname,
     pecasAtencao.length,

@@ -7,7 +7,7 @@ export default async function ConfiguracoesLayout({
 }: {
   children: ReactNode;
 }) {
-  await requirePagePermission('view_configuracoes');
+  await requirePagePermission('change_password');
 
   return children;
 }

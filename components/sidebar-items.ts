@@ -101,7 +101,7 @@ export const sidebarSections: SidebarSection[] = [
         label: 'Configuracoes',
         icon: Settings,
         href: '/configuracoes',
-        permission: 'view_configuracoes'
+        permission: 'change_password'
       }
     ]
   }
