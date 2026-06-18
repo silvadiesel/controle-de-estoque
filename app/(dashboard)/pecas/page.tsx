@@ -25,7 +25,7 @@ import { PackageOpen, Plus, Search } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Products() {
-  const { canManageProdutos } = useUser();
+  const { canManageProdutos, canEditProdutoImagem } = useUser();
 
   const {
     isLoading,
@@ -34,8 +34,11 @@ export default function Products() {
     filteredProducts,
     isAddOpen,
     editingPeca,
+    isImageOnly,
     handleSubmit,
+    handleSubmitImagem,
     handleEdit,
+    handleEditImagem,
     handleDeletePeca,
     deleteId,
     setDeleteId,
@@ -103,21 +106,25 @@ export default function Products() {
             <p className='text-sm text-muted-foreground'>Gerencie o estoque</p>
           </div>
 
-          {canManageProdutos ? (
+          {canManageProdutos || canEditProdutoImagem ? (
             <ModalPecas
-              mode={editingPeca ? 'edit' : 'create'}
+              mode={
+                isImageOnly ? 'image' : editingPeca ? 'edit' : 'create'
+              }
               initialData={editingPeca ?? undefined}
               isOpen={isAddOpen}
               setIsOpen={handleOpenChange}
-              onSubmit={handleSubmit}
+              onSubmit={isImageOnly ? handleSubmitImagem : handleSubmit}
               isLoading={isLoading}
               categoryOptions={categoryOptions}
               supplierOptions={supplierOptions}
               trigger={
-                <Button className='w-full sm:w-auto'>
-                  <Plus data-icon='inline-start' />
-                  Nova Peça
-                </Button>
+                canManageProdutos ? (
+                  <Button className='w-full sm:w-auto'>
+                    <Plus data-icon='inline-start' />
+                    Nova Peça
+                  </Button>
+                ) : undefined
               }
             />
           ) : null}
@@ -179,7 +186,9 @@ export default function Products() {
                 supplierName={getFornecedorName(peca.fornecedor_id)}
                 formattedPrice={formatPrice(peca.preco)}
                 canManage={canManageProdutos}
+                canEditImagem={!canManageProdutos && canEditProdutoImagem}
                 onEdit={handleEdit}
+                onEditImagem={handleEditImagem}
                 onRestock={handleRestock}
                 onDelete={(p) => {
                   setDeleteId(p.id);

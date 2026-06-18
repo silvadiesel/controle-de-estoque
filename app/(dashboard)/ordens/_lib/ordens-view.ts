@@ -1,4 +1,21 @@
 import type { Peca } from '@/db/schema';
+import type { FuzzySearchConfig } from '@/lib/fuzzy-search';
+import { fuzzyFilter } from '@/lib/fuzzy-search';
+
+const ORDEM_SERVICE_SEARCH: FuzzySearchConfig = {
+  fuzzyKeys: [
+    'observacao',
+    'cliente.nome_empresa',
+    'veiculo.modelo',
+    'funcionario_responsavel.name'
+  ],
+  exactKeys: ['id', 'veiculo.placa']
+};
+
+const ORDEM_SALE_SEARCH: FuzzySearchConfig = {
+  fuzzyKeys: ['observacao', 'cliente.nome_empresa', 'metodo_pagamento'],
+  exactKeys: ['id']
+};
 
 type OrdemStatus = 'ativa' | 'fechada' | 'cancelada';
 
@@ -82,9 +99,6 @@ export interface OrdemVendaFormInitialData {
   }[];
 }
 
-const normalizeSearchValue = (value: string | number | null | undefined) =>
-  String(value ?? '').trim().toLowerCase();
-
 export function buildOrdensMetrics(
   ordens: Array<Pick<OrdemServiceSearchable, 'status' | 'valor_total'>>
 ): OrdemMetrics {
@@ -128,33 +142,8 @@ export function filterOrdens<T extends OrdemServiceSearchable | OrdemSaleSearcha
   ordens: T[],
   filters: OrdemFilters
 ) {
-  const search = normalizeSearchValue(filters.search);
-
-  return ordens.filter((ordem) => {
-    const baseSearchFields = [
-      ordem.id,
-      ordem.observacao,
-      ordem.cliente?.nome_empresa
-    ];
-
-    const serviceSearchFields =
-      'veiculo' in ordem
-        ? [
-            ordem.veiculo?.placa,
-            ordem.veiculo?.modelo,
-            ordem.funcionario_responsavel?.name
-          ]
-        : [];
-
-    const saleSearchFields =
-      'metodo_pagamento' in ordem ? [ordem.metodo_pagamento] : [];
-
-    const matchesSearch =
-      search.length === 0 ||
-      [...baseSearchFields, ...serviceSearchFields, ...saleSearchFields].some(
-        (field) => normalizeSearchValue(field).includes(search)
-      );
-
+  // 1. Filtros estruturados (baratos) primeiro
+  const structured = ordens.filter((ordem) => {
     const matchesStatus =
       filters.status === 'all' || ordem.status === filters.status;
 
@@ -163,8 +152,17 @@ export function filterOrdens<T extends OrdemServiceSearchable | OrdemSaleSearcha
       buildAvailableMonths([{ data_criacao: ordem.data_criacao }])[0] ===
         filters.month;
 
-    return matchesSearch && matchesStatus && matchesMonth;
+    return matchesStatus && matchesMonth;
   });
+
+  // 2. Busca fuzzy no texto sobre o subset já filtrado
+  const search = filters.search.trim();
+  if (!search || structured.length === 0) return structured;
+
+  const config: FuzzySearchConfig =
+    'veiculo' in structured[0] ? ORDEM_SERVICE_SEARCH : ORDEM_SALE_SEARCH;
+
+  return fuzzyFilter(structured, search, config);
 }
 
 export function buildVendaFormInitialData(

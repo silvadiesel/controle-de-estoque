@@ -4,8 +4,15 @@ import type { PecaFormValues } from '@/app/utils/validators';
 import type { Categorias, Fornecedor, Peca } from '@/db/schema';
 import type { SearchableSelectOption } from '@/components/ui/searchable-select';
 import { apiFetch, ApiError, formatApiError } from '@/lib/api-fetch';
+import type { FuzzySearchConfig } from '@/lib/fuzzy-search';
+import { useFuzzySearch } from '@/hooks/useFuzzySearch';
 
 import { toast } from 'sonner';
+
+const PECA_SEARCH: FuzzySearchConfig = {
+  fuzzyKeys: ['name_peca'],
+  exactKeys: ['codigo']
+};
 
 export function usePecas() {
   const [pecas, setPecas] = useState<Peca[]>([]);
@@ -13,6 +20,7 @@ export function usePecas() {
   const [search, setSearch] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingPeca, setEditingPeca] = useState<Peca | null>(null);
+  const [isImageOnly, setIsImageOnly] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [categories, setCategories] = useState<Categorias[]>([]);
@@ -74,11 +82,7 @@ export function usePecas() {
   }));
 
   // Filtros
-  const filteredPecas = pecas.filter(
-    (peca) =>
-      peca.name_peca.toLowerCase().includes(search.toLowerCase()) ||
-      peca.codigo.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredPecas = useFuzzySearch(pecas, search, PECA_SEARCH);
 
   const filteredProducts = filteredPecas.filter((peca) => {
     const matchesFornecedor =
@@ -140,6 +144,16 @@ export function usePecas() {
         imagem: image,
         alerta: data.alerta ?? 1
       })
+    });
+    await fetchPecas();
+  };
+
+  // PATCH: Atualizar apenas a imagem (fluxo do atendente)
+  const updatePecaImagem = async (id: number, image: string | null) => {
+    await apiFetch(`/api/produtos/${id}/imagem`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imagem: image })
     });
     await fetchPecas();
   };
@@ -217,8 +231,41 @@ export function usePecas() {
     }
   };
 
+  // Submit do modo "somente imagem" (atendente): ignora os campos, salva só a imagem
+  const handleSubmitImagem = async (
+    _data: PecaFormValues,
+    image: string | null
+  ): Promise<boolean> => {
+    if (!editingPeca) return false;
+    setIsLoading(true);
+    try {
+      await updatePecaImagem(editingPeca.id, image);
+      toast.success('Imagem atualizada com sucesso!');
+      setEditingPeca(null);
+      return true;
+    } catch (error) {
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : error instanceof Error
+            ? error.message
+            : formatApiError(0);
+      toast.error(message);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleEdit = (peca: Peca) => {
     setEditingPeca(peca);
+    setIsImageOnly(false);
+    setIsAddOpen(true);
+  };
+
+  const handleEditImagem = (peca: Peca) => {
+    setEditingPeca(peca);
+    setIsImageOnly(true);
     setIsAddOpen(true);
   };
 
@@ -266,6 +313,7 @@ export function usePecas() {
       setIsAddOpen(open);
       if (!open) {
         setEditingPeca(null);
+        setIsImageOnly(false);
       }
     },
     []
@@ -279,8 +327,11 @@ export function usePecas() {
     filteredProducts,
     isAddOpen,
     editingPeca,
+    isImageOnly,
     handleSubmit,
+    handleSubmitImagem,
     handleEdit,
+    handleEditImagem,
     handleDeletePeca,
     deleteId,
     setDeleteId,

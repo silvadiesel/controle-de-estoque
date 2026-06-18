@@ -6,7 +6,16 @@ import { blockNonNumericKeyDown } from '@/app/utils/formatters';
 import { Button } from '@/components/ui/button';
 import type { Peca } from '@/db/schema';
 
-import { Check, Edit, Minus, Package, Plus, Trash2, X } from 'lucide-react';
+import {
+  Check,
+  Edit,
+  ImagePlus,
+  Minus,
+  Package,
+  Plus,
+  Trash2,
+  X
+} from 'lucide-react';
 
 interface CardPecasProps {
   peca: Peca;
@@ -14,7 +23,9 @@ interface CardPecasProps {
   supplierName: string;
   formattedPrice: string;
   canManage: boolean;
+  canEditImagem?: boolean;
   onEdit: (peca: Peca) => void;
+  onEditImagem?: (peca: Peca) => void;
   onDelete: (peca: Peca) => void;
   onRestock: (peca: Peca, quantityToAdd: number) => Promise<void>;
 }
@@ -25,7 +36,9 @@ export const CardPecas = memo(function CardPecas({
   supplierName,
   formattedPrice,
   canManage,
+  canEditImagem = false,
   onEdit,
+  onEditImagem,
   onDelete,
   onRestock
 }: CardPecasProps) {
@@ -215,6 +228,17 @@ export const CardPecas = memo(function CardPecas({
               </Button>
             </div>
           )
+        ) : canEditImagem ? (
+          <div className='flex mt-3'>
+            <Button
+              variant='outline'
+              size='sm'
+              className='flex-1 h-8 text-xs'
+              onClick={() => onEditImagem?.(peca)}>
+              <ImagePlus className='mr-1.5 h-3 w-3' aria-hidden='true' />
+              Editar imagem
+            </Button>
+          </div>
         ) : null}
       </div>
     </div>

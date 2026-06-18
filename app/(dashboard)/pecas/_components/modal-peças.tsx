@@ -10,6 +10,7 @@ import type { PecaFormValues } from '@/app/utils/validators';
 import { pecaFormSchema } from '@/app/utils/validators';
 import { useModalPecaState } from '@/app/(dashboard)/pecas/_hook/useModalPecaState';
 import { compressImage } from '@/lib/image-compress';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { DialogShell } from '@/components/ui/dialog-shell';
 import {
@@ -33,7 +34,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 interface ModalPecasProps {
-  mode: 'create' | 'edit';
+  mode: 'create' | 'edit' | 'image';
   initialData?: Partial<Peca>;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
@@ -56,6 +57,7 @@ export function ModalPecas({
   supplierOptions
 }: ModalPecasProps) {
   const isEdit = mode === 'edit';
+  const isImageOnly = mode === 'image';
   const formKey = `${mode}-${initialData?.id ?? 'new'}-${isOpen ? 'open' : 'closed'}`;
 
   return (
@@ -63,11 +65,19 @@ export function ModalPecas({
       open={isOpen}
       onOpenChange={setIsOpen}
       icon={Package}
-      title={isEdit ? 'Editar Peça' : 'Adicionar Nova Peça'}
+      title={
+        isImageOnly
+          ? 'Editar Imagem da Peça'
+          : isEdit
+            ? 'Editar Peça'
+            : 'Adicionar Nova Peça'
+      }
       description={
-        isEdit
-          ? 'Atualize as informações da peça.'
-          : 'Preencha os dados da nova peça.'
+        isImageOnly
+          ? 'Adicione ou altere a imagem desta peça. Os demais campos não podem ser editados.'
+          : isEdit
+            ? 'Atualize as informações da peça.'
+            : 'Preencha os dados da nova peça.'
       }
       trigger={trigger}
       contentClassName='sm:max-w-[720px]'
@@ -80,9 +90,11 @@ export function ModalPecas({
           <Button type='submit' form='peca-form' data-submit-button disabled={isLoading}>
             {isLoading
               ? 'Salvando...'
-              : isEdit
-                ? 'Salvar Alterações'
-                : 'Adicionar Peça'}
+              : isImageOnly
+                ? 'Salvar Imagem'
+                : isEdit
+                  ? 'Salvar Alterações'
+                  : 'Adicionar Peça'}
           </Button>
         </>
       }>
@@ -94,6 +106,7 @@ export function ModalPecas({
           onClose={() => setIsOpen(false)}
           categoryOptions={categoryOptions}
           supplierOptions={supplierOptions}
+          isImageOnly={isImageOnly}
         />
       ) : null}
     </DialogShell>
@@ -105,13 +118,15 @@ function ModalPecasForm({
   onSubmit,
   onClose,
   categoryOptions,
-  supplierOptions
+  supplierOptions,
+  isImageOnly = false
 }: {
   initialData?: Partial<Peca>;
   onSubmit: (data: PecaFormValues, image: string | null) => Promise<boolean>;
   onClose: () => void;
   categoryOptions: SearchableSelectOption[];
   supplierOptions: SearchableSelectOption[];
+  isImageOnly?: boolean;
 }) {
   const { initialState, image, setImage, precoDisplay, setPrecoDisplay } =
     useModalPecaState(initialData);
@@ -226,6 +241,12 @@ function ModalPecasForm({
           onSubmit={handleFormSubmit}
           onKeyDown={handleEnterAsTab}
           className='flex flex-col gap-5'>
+          <fieldset
+            disabled={isImageOnly}
+            className={cn(
+              'flex flex-col gap-5 min-w-0 border-0 p-0 m-0',
+              isImageOnly && 'opacity-60'
+            )}>
             {/* Identificação */}
             <div>
               <span className='text-[10px] uppercase tracking-wider text-muted-foreground font-medium'>
@@ -451,7 +472,8 @@ function ModalPecasForm({
                 </Field>
               </FieldGroup>
             </div>
-          </form>
+          </fieldset>
+        </form>
       </div>
     </div>
   );

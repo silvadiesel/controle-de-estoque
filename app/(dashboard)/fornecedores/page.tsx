@@ -1,6 +1,6 @@
 'use client';
 
-import { useDeferredValue, useEffect, useMemo, useState } from 'react';
+import { useDeferredValue, useEffect, useState } from 'react';
 
 import { ModalDelete } from '@/components/modal-delete';
 import { PaginationControls } from '@/components/pagination-controls';
@@ -14,8 +14,15 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { StatCard } from '@/components/ui/stat-card';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { usePagination } from '@/hooks/usePagination';
+import { useFuzzySearch } from '@/hooks/useFuzzySearch';
+import type { FuzzySearchConfig } from '@/lib/fuzzy-search';
 import { cn } from '@/lib/utils';
 import { formatCNPJ, formatPhone } from '@/app/utils/formatters';
+
+const FORNECEDOR_SEARCH: FuzzySearchConfig = {
+  fuzzyKeys: ['name_empresa', 'email'],
+  exactKeys: ['cnpj', 'telefone']
+};
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value / 100);
@@ -74,16 +81,11 @@ export default function Fornecedores() {
     return () => mq.removeEventListener('change', update);
   }, []);
 
-  const filteredFornecedores = useMemo(() => {
-    const q = deferredSearch.toLowerCase();
-    if (!q) return fornecedores;
-    return fornecedores.filter((f) =>
-      f.name_empresa.toLowerCase().includes(q) ||
-      f.cnpj.includes(q) ||
-      (f.telefone && f.telefone.includes(q)) ||
-      (f.email && f.email.toLowerCase().includes(q))
-    );
-  }, [fornecedores, deferredSearch]);
+  const filteredFornecedores = useFuzzySearch(
+    fornecedores,
+    deferredSearch,
+    FORNECEDOR_SEARCH
+  );
 
   const {
     paginatedItems: paginatedFornecedores,
