@@ -5,6 +5,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 import { useSession } from '@/lib/auth-client';
+import { hasPermission } from '@/lib/permissions';
+import type { Cargo } from '@/lib/types/auth';
 
 import { toast } from 'sonner';
 
@@ -34,7 +36,11 @@ export function useAlerta({
 }: UseAlertaOptions = {}): UseAlertaReturn {
   const pathname = usePathname();
   const { data: session, isPending: isSessionPending } = useSession();
-  const hasSession = !!session && !isSessionPending;
+  const cargo = session?.user?.cargo as Cargo | undefined;
+  const canViewAlertas = cargo
+    ? hasPermission(cargo, 'view_alertas')
+    : false;
+  const hasSession = !!session && !isSessionPending && canViewAlertas;
   const [pecas, setPecas] = useState<AlertaPeca[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
