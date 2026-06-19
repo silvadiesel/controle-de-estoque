@@ -17,7 +17,7 @@ export function MobileHeader() {
         <div className='flex items-center gap-2'>
           <Image
             src='/img/main_icon.svg'
-            alt='Logo do Core Controler'
+            alt='Logo do Controle Peças'
             width={32}
             height={32}
             className='size-8 object-contain'

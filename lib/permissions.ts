@@ -10,6 +10,7 @@ export type AppPermission =
   | 'view_alertas'
   | 'view_produtos'
   | 'manage_produtos'
+  | 'manage_produto_imagem'
   | 'view_mao_obra'
   | 'manage_mao_obra'
   | 'view_fornecedores_page'
@@ -34,6 +35,7 @@ export const ROLE_PERMISSIONS = {
     'view_alertas',
     'view_produtos',
     'manage_produtos',
+    'manage_produto_imagem',
     'view_mao_obra',
     'manage_mao_obra',
     'view_fornecedores_page',
@@ -57,6 +59,7 @@ export const ROLE_PERMISSIONS = {
     'view_alertas',
     'view_produtos',
     'manage_produtos',
+    'manage_produto_imagem',
     'view_mao_obra',
     'manage_mao_obra',
     'view_fornecedores_page',
@@ -73,6 +76,7 @@ export const ROLE_PERMISSIONS = {
     'view_movimentacoes',
     'view_alertas',
     'view_produtos',
+    'manage_produto_imagem',
     'view_mao_obra',
     'change_password',
     'read_users_context',

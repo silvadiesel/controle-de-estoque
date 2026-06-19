@@ -23,6 +23,8 @@ import {
 } from '@/components/ui/tooltip';
 import { usePagination } from '@/hooks/usePagination';
 import { useUser } from '@/hooks/useUser';
+import { useFuzzySearch } from '@/hooks/useFuzzySearch';
+import type { FuzzySearchConfig } from '@/lib/fuzzy-search';
 
 import { ModalMaoObra } from './_components/modal-mao-obra';
 import { useMaoObra } from './_hooks/useMaoObra';
@@ -41,6 +43,10 @@ const formatCurrency = (value: number) =>
     style: 'currency',
     currency: 'BRL'
   });
+
+const MAO_OBRA_SEARCH: FuzzySearchConfig = {
+  fuzzyKeys: ['nome', 'descricao']
+};
 
 export default function MaoObraPage() {
   const {
@@ -67,15 +73,7 @@ export default function MaoObraPage() {
   const [search, setSearch] = useState('');
   const deferredSearch = useDeferredValue(search);
 
-  const filteredItens = useMemo(() => {
-    const term = deferredSearch.trim().toLowerCase();
-    if (!term) return itens;
-    return itens.filter(
-      (item) =>
-        item.nome.toLowerCase().includes(term) ||
-        (item.descricao?.toLowerCase().includes(term) ?? false)
-    );
-  }, [deferredSearch, itens]);
+  const filteredItens = useFuzzySearch(itens, deferredSearch, MAO_OBRA_SEARCH);
 
   const metrics = useMemo(() => {
     return { total: itens.length };

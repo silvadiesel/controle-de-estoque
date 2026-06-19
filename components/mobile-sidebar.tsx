@@ -73,7 +73,7 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
             Menu de navegação
           </DialogPrimitive.Title>
           <DialogPrimitive.Description className='sr-only'>
-            Acesse as seções do sistema Core Controler
+            Acesse as seções do sistema Controle Peças
           </DialogPrimitive.Description>
 
           <div className='flex items-center justify-between border-b border-sidebar-border px-4 py-4'>
@@ -81,7 +81,7 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
               <div className='flex size-9 items-center justify-center'>
                 <Image
                   src='/img/main_icon.svg'
-                  alt='Logo do Core Controler'
+                  alt='Logo do Controle Peças'
                   width={40}
                   height={40}
                   className='h-full w-full object-contain'
@@ -90,7 +90,7 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
               </div>
               <div className='min-w-0'>
                 <h1 className='truncate text-sm font-semibold text-sidebar-foreground'>
-                  Core Controler
+                  Controle Peças
                 </h1>
                 <p className='truncate text-xs text-muted-foreground'>
                   Gestão tecnica de estoque

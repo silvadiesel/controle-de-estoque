@@ -1,4 +1,11 @@
 import type { Cliente, Veiculo } from '@/db/schema';
+import type { FuzzySearchConfig } from '@/lib/fuzzy-search';
+import { fuzzyFilter } from '@/lib/fuzzy-search';
+
+const CLIENTE_SEARCH: FuzzySearchConfig = {
+  fuzzyKeys: ['nome_empresa'],
+  exactKeys: ['cpf', 'cnpj', 'telefone']
+};
 
 export interface ClienteViewResult {
   cliente: Cliente;
@@ -74,6 +81,12 @@ export function deriveClientesViewModel({
   const normalizedSearch = normalizeValue(search);
   const hasActiveSearch = normalizedSearch.length > 0;
 
+  // Match do cliente via fuzzy (nome) + exato (documentos). O match do veículo
+  // por placa segue exato/compacto (placa é código).
+  const clienteMatchIds = hasActiveSearch
+    ? new Set(fuzzyFilter(clientes, search, CLIENTE_SEARCH).map((c) => c.id))
+    : new Set<number>();
+
   const results = clientes.reduce<ClienteViewResult[]>((acc, cliente) => {
     const veiculos = veiculosByCliente.get(cliente.id) ?? [];
     const matchedVehicleIds = hasActiveSearch
@@ -82,14 +95,7 @@ export function deriveClientesViewModel({
           .map((veiculo) => veiculo.id)
       : [];
 
-    const matchesCliente =
-      !hasActiveSearch ||
-      [
-        cliente.nome_empresa,
-        cliente.cpf,
-        cliente.cnpj,
-        cliente.telefone
-      ].some((value) => matchesQuery(value, normalizedSearch));
+    const matchesCliente = !hasActiveSearch || clienteMatchIds.has(cliente.id);
 
     if (!matchesCliente && matchedVehicleIds.length === 0) {
       return acc;

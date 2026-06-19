@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 
 import { Toaster } from '@/components/ui/sonner';
@@ -16,11 +16,19 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Core Controler',
+  title: 'Controle Peças',
   description: 'Tudo em um só lugar',
   icons: {
-    icon: '/img/main_icon.svg'
+    icon: [
+      { url: '/img/main_icon.svg', type: 'image/svg+xml' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' }
+    ],
+    apple: '/apple-icon.png'
   }
+};
+
+export const viewport: Viewport = {
+  themeColor: '#07090d'
 };
 
 export default function RootLayout({

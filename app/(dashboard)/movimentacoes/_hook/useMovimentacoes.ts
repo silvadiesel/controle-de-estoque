@@ -3,6 +3,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { usePagination } from '@/hooks/usePagination';
+import type { FuzzySearchConfig } from '@/lib/fuzzy-search';
+import { fuzzyFilter } from '@/lib/fuzzy-search';
+
+const MOVIMENTACAO_SEARCH: FuzzySearchConfig = {
+  fuzzyKeys: ['descricao', 'autor']
+};
 
 export type TipoAcao = 'criacao' | 'edicao' | 'exclusao';
 
@@ -241,14 +247,8 @@ export function useMovimentacoes(): UseMovimentacoesReturn {
     filtroDataFinal !== undefined;
 
   const movimentacoesFiltradas = useMemo(() => {
-    return todasMovimentacoes.filter((movimentacao) => {
-      const termoBuscaLower = termoBusca.toLowerCase();
-
-      const correspondeAoBusca =
-        termoBusca === '' ||
-        movimentacao.descricao.toLowerCase().includes(termoBuscaLower) ||
-        movimentacao.autor.toLowerCase().includes(termoBuscaLower);
-
+    // Filtros estruturados (tipo/entidade/período) primeiro
+    const estruturadas = todasMovimentacoes.filter((movimentacao) => {
       const correspondeAoTipoAcao =
         filtroTipoAcao === 'todas' || movimentacao.tipo_acao === filtroTipoAcao;
 
@@ -278,12 +278,12 @@ export function useMovimentacoes(): UseMovimentacoesReturn {
       }
 
       return (
-        correspondeAoBusca &&
-        correspondeAoTipoAcao &&
-        correspondeAEntidade &&
-        correspondeAPeriodo
+        correspondeAoTipoAcao && correspondeAEntidade && correspondeAPeriodo
       );
     });
+
+    // Busca fuzzy no texto (descrição/autor) sobre o subset
+    return fuzzyFilter(estruturadas, termoBusca, MOVIMENTACAO_SEARCH);
   }, [
     todasMovimentacoes,
     termoBusca,

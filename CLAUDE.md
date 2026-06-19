@@ -1,4 +1,4 @@
-# CLAUDE.md — Core Controler
+# CLAUDE.md — Controle Peças
 
 Convenções e decisões de arquitetura do projeto. Leia antes de qualquer tarefa de UI.
 

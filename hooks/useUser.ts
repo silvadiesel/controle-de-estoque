@@ -84,6 +84,7 @@ export function useUser() {
     canManageUsers: hasPermission('manage_users'),
     canViewProdutos: hasPermission('view_produtos'),
     canManageProdutos: hasPermission('manage_produtos'),
+    canEditProdutoImagem: hasPermission('manage_produto_imagem'),
     canReadFornecedorContext: hasPermission('read_fornecedor_context'),
     canReadCategoriaContext: hasPermission('read_categoria_context'),
 

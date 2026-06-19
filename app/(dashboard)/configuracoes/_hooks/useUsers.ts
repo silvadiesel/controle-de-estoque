@@ -8,10 +8,16 @@ import {
 } from 'react';
 
 import type { User } from '@/db/schema';
+import type { FuzzySearchConfig } from '@/lib/fuzzy-search';
+import { useFuzzySearch } from '@/hooks/useFuzzySearch';
 
 import { toast } from 'sonner';
 
 export type UserWithoutPassword = Omit<User, 'emailVerified' | 'updatedAt'>;
+
+const USER_SEARCH: FuzzySearchConfig = {
+  fuzzyKeys: ['name', 'email']
+};
 
 export interface UseUsersReturn {
   users: UserWithoutPassword[];
@@ -62,12 +68,8 @@ export function useUsers(): UseUsersReturn {
     }
   }, []);
 
-  // Filtered users - searches by name, email
-  const filteredUsers = users.filter(
-    (user) =>
-      user.name.toLowerCase().includes(search.toLowerCase()) ||
-      user.email.toLowerCase().includes(search.toLowerCase())
-  );
+  // Filtered users - fuzzy search by name, email
+  const filteredUsers = useFuzzySearch(users, search, USER_SEARCH);
 
   // PUT: Update user
   const handleUpdateUser = useCallback(async () => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 interface UsePaginationProps<T> {
   items: T[];
@@ -77,6 +77,20 @@ export function usePagination<T>({
     result.push(totalPages);
     return result;
   }, [validCurrentPage, paginationData]);
+
+  // Ao trocar de página, sobe para o topo da lista — sem isso a tela continua
+  // mostrando o final da página anterior e não fica claro que algo mudou.
+  // Pula o mount inicial para não interferir no scroll de entrada.
+  const isInitialRender = useRef(true);
+  useEffect(() => {
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      return;
+    }
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [validCurrentPage]);
 
   const goToPage = (page: number) => {
     const validPage = Math.max(1, Math.min(page, paginationData.totalPages));
