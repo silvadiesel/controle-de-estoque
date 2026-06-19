@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Core Controler',
-    short_name: 'Core Controler',
+    name: 'Controle Peças',
+    short_name: 'Controle Peças',
     description: 'Tudo em um só lugar',
     start_url: '/',
     display: 'standalone',

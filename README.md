@@ -1,4 +1,4 @@
-# 📦 Core Controler — Controle de Estoque
+# 📦 Controle Peças — Controle de Estoque
 
 Sistema de **gestão de estoque e ordens de serviço/venda** pensado para uso misto entre operação (chão de oficina/loja) e administrativo. Foco em leitura rápida, identificação imediata de estados e densidade suficiente para tomada de decisão sob pressão.
 

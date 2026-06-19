@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Core Controler',
+  title: 'Controle Peças',
   description: 'Tudo em um só lugar',
   icons: {
     icon: [
