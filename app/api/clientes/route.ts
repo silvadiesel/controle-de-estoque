@@ -7,7 +7,10 @@ import { requireRoutePermission } from '@/lib/server/access-control';
 import { asc, eq, or } from 'drizzle-orm';
 
 export async function GET(request: Request) {
-  const permissionCheck = await requireRoutePermission(request, 'view_clientes');
+  const permissionCheck = await requireRoutePermission(
+    request,
+    'read_clientes_context'
+  );
 
   if (permissionCheck instanceof Response) {
     return permissionCheck;

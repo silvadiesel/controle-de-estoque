@@ -22,7 +22,8 @@ export type AppPermission =
   | 'change_password'
   | 'read_users_context'
   | 'read_fornecedor_context'
-  | 'read_categoria_context';
+  | 'read_categoria_context'
+  | 'read_clientes_context';
 
 export const ROLE_PERMISSIONS = {
   admin: [
@@ -47,7 +48,8 @@ export const ROLE_PERMISSIONS = {
     'change_password',
     'read_users_context',
     'read_fornecedor_context',
-    'read_categoria_context'
+    'read_categoria_context',
+    'read_clientes_context'
   ],
   estoquista: [
     'view_dashboard',
@@ -67,21 +69,20 @@ export const ROLE_PERMISSIONS = {
     'change_password',
     'read_users_context',
     'read_fornecedor_context',
-    'read_categoria_context'
+    'read_categoria_context',
+    'read_clientes_context'
   ],
   atendente: [
     'view_dashboard',
-    'view_clientes',
     'view_ordens',
-    'view_movimentacoes',
-    'view_alertas',
     'view_produtos',
     'manage_produto_imagem',
     'view_mao_obra',
     'change_password',
     'read_users_context',
     'read_fornecedor_context',
-    'read_categoria_context'
+    'read_categoria_context',
+    'read_clientes_context'
   ]
 } as const satisfies Record<Cargo, readonly AppPermission[]>;
 
