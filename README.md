@@ -62,10 +62,21 @@ npm install
 
 Crie um `.env` na raiz com pelo menos:
 
-````bash
+```bash
 DATABASE_URL="postgres://user:pass@localhost:5432/core_controler"
 BETTER_AUTH_SECRET="uma-string-secreta-bem-aleatoria"
 BETTER_AUTH_URL="http://localhost:3000"
+
+# Keep-alive do Supabase Free (rotas /api/cron/*)
+CRON_SECRET="outra-string-secreta"                 # Bearer exigido pelas rotas de cron
+SUPABASE_URL="https://<project-ref>.supabase.co"   # Project Settings > API > Project URL
+SUPABASE_SERVICE_ROLE_KEY="..."                    # Project Settings > API Keys > service_role (server-only)
+```
+
+> O Supabase pausa projetos Free com atividade insuficiente em 7 dias. O endpoint
+> `/api/cron/heartbeat` gera atividade via Postgres (INSERT) e via REST (GET) e é
+> chamado diariamente pelo cron da Vercel e a cada 6h por um agendador externo
+> (cron-job.org) com o header `Authorization: Bearer $CRON_SECRET`.
 
 ### 4️⃣ Banco de dados
 
@@ -74,7 +85,7 @@ npm run db:generate     # Gera migrations a partir do schema
 npm run db:migrate      # Aplica migrations no banco
 npm run db:seed:empresa # Cria a linha singleton de empresa
 npm run db:studio       # 🔍 Abre o Drizzle Studio (GUI)
-````
+```
 
 ### 5️⃣ Dev server
 
