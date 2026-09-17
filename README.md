@@ -62,11 +62,10 @@ npm install
 
 Crie um `.env` na raiz com pelo menos:
 
-```bash
+````bash
 DATABASE_URL="postgres://user:pass@localhost:5432/core_controler"
 BETTER_AUTH_SECRET="uma-string-secreta-bem-aleatoria"
 BETTER_AUTH_URL="http://localhost:3000"
-```
 
 ### 4️⃣ Banco de dados
 
@@ -75,7 +74,7 @@ npm run db:generate     # Gera migrations a partir do schema
 npm run db:migrate      # Aplica migrations no banco
 npm run db:seed:empresa # Cria a linha singleton de empresa
 npm run db:studio       # 🔍 Abre o Drizzle Studio (GUI)
-```
+````
 
 ### 5️⃣ Dev server
 
