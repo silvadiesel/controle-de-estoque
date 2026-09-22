@@ -18,6 +18,9 @@ export const user = pgTable('user', {
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
   emailVerified: boolean('email_verified').notNull().default(false),
+  // Campo core do better-auth (>=1.7.3 valida o schema na inicialização).
+  // Não usado pelo app; fica NULL.
+  image: text('image'),
   cargo: cargoEnum().notNull().default('atendente'),
   status: boolean('status').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
