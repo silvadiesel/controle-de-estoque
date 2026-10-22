@@ -28,7 +28,7 @@ export const pecas = pgTable(
     pecasCategoriaIdx: index('pecas_categoria_id_idx').on(table.categoria_id),
     pecasFornecedorIdx: index('pecas_fornecedor_id_idx').on(table.fornecedor_id)
   })
-);
+).enableRLS();
 
 export type Peca = typeof pecas.$inferSelect;
 export type NewPeca = typeof pecas.$inferInsert;

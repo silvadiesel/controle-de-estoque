@@ -59,7 +59,7 @@ export const ordemServico = pgTable(
       'ordem_servico_funcionario_responsavel_id_idx'
     ).on(table.funcionario_responsavel_id)
   })
-);
+).enableRLS();
 
 // Tabela de relacionamento entre Ordem de Serviço e Peças (many-to-many)
 export const ordemServicoPecas = pgTable(
@@ -82,7 +82,7 @@ export const ordemServicoPecas = pgTable(
       table.peca_id
     )
   })
-);
+).enableRLS();
 
 // Tabela de mão de obra vinculada a Ordem de Serviço
 export const ordemServicoMaoObra = pgTable('ordem_servico_mao_obra', {
@@ -93,7 +93,7 @@ export const ordemServicoMaoObra = pgTable('ordem_servico_mao_obra', {
   mao_obra_id: integer('mao_obra_id').references(() => maoObra.id),
   descricao: text('descricao').notNull(),
   valor: integer('valor').notNull()
-});
+}).enableRLS();
 
 // Tipos TypeScript
 export type OrdemServicoMaoObra = typeof ordemServicoMaoObra.$inferSelect;

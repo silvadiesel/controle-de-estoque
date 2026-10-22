@@ -48,7 +48,7 @@ export const ordemVenda = pgTable(
       table.cliente_id
     )
   })
-);
+).enableRLS();
 
 // Tabela de relacionamento entre Ordem de Venda e Peças (many-to-many)
 export const ordemVendaPecas = pgTable(
@@ -71,7 +71,7 @@ export const ordemVendaPecas = pgTable(
       table.peca_id
     )
   })
-);
+).enableRLS();
 
 // Tipos TypeScript
 export type OrdemVenda = typeof ordemVenda.$inferSelect;

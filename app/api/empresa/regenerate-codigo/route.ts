@@ -1,21 +1,16 @@
-import { randomInt } from 'node:crypto';
-
 import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
 import { empresa, EMPRESA_SINGLETON_ID } from '@/db/schema';
 import { requireRoutePermission } from '@/lib/server/access-control';
+import { gerarCodigoVerificacao } from '@/lib/server/codigo-verificacao';
 
 import { eq } from 'drizzle-orm';
-
-function gerarCodigo(): string {
-  return String(randomInt(1000, 10000));
-}
 
 /**
  * POST /api/empresa/regenerate-codigo
  *
- * Gera um novo código de verificação de 4 dígitos para a empresa.
+ * Gera um novo código de verificação de 8 caracteres para a empresa.
  * Útil quando um funcionário desligado conhece o código antigo.
  * Protegido por `manage_empresa`.
  */
@@ -33,7 +28,7 @@ export async function POST(request: Request) {
     const [updated] = await db
       .update(empresa)
       .set({
-        codigoVerificacao: gerarCodigo(),
+        codigoVerificacao: gerarCodigoVerificacao(),
         updatedAt: new Date()
       })
       .where(eq(empresa.id, EMPRESA_SINGLETON_ID))

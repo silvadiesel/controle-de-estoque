@@ -20,7 +20,7 @@ export const veiculo = pgTable(
   (table) => ({
     veiculoClienteIdx: index('veiculo_cliente_id_idx').on(table.cliente_id)
   })
-);
+).enableRLS();
 
 export type Veiculo = typeof veiculo.$inferSelect;
 export type NewVeiculo = typeof veiculo.$inferInsert;

@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { db, schema } from '@/db';
 import { logAction } from '@/lib/log-action';
 import { requireRoutePermission } from '@/lib/server/access-control';
+import { isImagemValida } from '@/lib/server/imagem';
 
 import { eq } from 'drizzle-orm';
 
@@ -32,7 +33,8 @@ export async function PATCH(request: Request, { params }: Params) {
 
   const data = await request.json();
 
-  if (data.imagem !== null && typeof data.imagem !== 'string') {
+  // undefined passa em isImagemValida, mas aqui o campo é o único do update
+  if (data.imagem === undefined || !isImagemValida(data.imagem)) {
     return NextResponse.json(
       { error: 'Imagem inválida' },
       { status: 400 }

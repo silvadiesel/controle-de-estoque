@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { db, schema } from '@/db';
+import { requireRoutePermission } from '@/lib/server/access-control';
 
 import { eq } from 'drizzle-orm';
 
@@ -8,7 +9,16 @@ type RouteParams = {
   params: Promise<{ id: string }>;
 };
 
-export async function GET(_request: Request, { params }: RouteParams) {
+export async function GET(request: Request, { params }: RouteParams) {
+  const permissionCheck = await requireRoutePermission(
+    request,
+    'view_movimentacoes'
+  );
+
+  if (permissionCheck instanceof Response) {
+    return permissionCheck;
+  }
+
   try {
     const { id } = await params;
     const numericId = Number(id);

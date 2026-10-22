@@ -195,10 +195,11 @@ export default function RegisterPage() {
             value={codigoVerificacao}
             onChange={(e) => setCodigoVerificacao(e.target.value)}
             autoComplete='off'
+            autoCapitalize='characters'
             aria-invalid={Boolean(error)}
             required
             disabled={loading}
-            className='h-14 rounded-2xl border-border bg-input px-4 text-base text-foreground placeholder:text-muted-foreground'
+            className='h-14 rounded-2xl border-border bg-input px-4 text-base uppercase text-foreground placeholder:normal-case placeholder:text-muted-foreground'
           />
           <p className='text-sm leading-6 text-muted-foreground'>
             Solicite o codigo ao administrador para liberar o cadastro.

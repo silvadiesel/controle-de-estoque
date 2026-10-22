@@ -7,7 +7,7 @@ export const heartbeat = pgTable('heartbeat', {
   pingedAt: timestamp('pinged_at', { withTimezone: true })
     .notNull()
     .defaultNow()
-});
+}).enableRLS();
 
 export type Heartbeat = typeof heartbeat.$inferSelect;
 export type NewHeartbeat = typeof heartbeat.$inferInsert;

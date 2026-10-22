@@ -44,7 +44,7 @@ export const movimentacoes = pgTable(
       table.usuario_id
     )
   })
-);
+).enableRLS();
 
 export type Movimentacao = typeof movimentacoes.$inferSelect;
 export type NewMovimentacao = typeof movimentacoes.$inferInsert;

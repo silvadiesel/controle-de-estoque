@@ -17,7 +17,7 @@ export default async function DashboardLayout({
   // Um cookie persistente com sessão expirada/revogada precisa cair para /login.
   const session = await getServerSession();
 
-  if (!session) {
+  if (!session || session.user.status === false) {
     redirect('/login');
   }
 

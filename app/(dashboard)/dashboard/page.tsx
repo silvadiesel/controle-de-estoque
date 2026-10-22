@@ -1,5 +1,6 @@
 // app/(dashboard)/dashboard/page.tsx
 import { StatCard } from '@/components/ui/stat-card';
+import { requirePagePermission } from '@/lib/server/access-control';
 
 import { ActivityFeed } from './_components/activity-feed';
 import { LastOrders } from './_components/last-orders';
@@ -8,6 +9,9 @@ import { getDashboardData } from './_data/getDashboardData';
 import { AlertTriangle, Package, ShoppingCart, Users } from 'lucide-react';
 
 export default async function DashboardPage() {
+  // O layout (dashboard) não re-renderiza em navegação client-side, então a página checa a sessão.
+  await requirePagePermission('view_dashboard');
+
   const {
     dashboardState,
     totalProdutos,

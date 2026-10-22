@@ -17,6 +17,10 @@ import { AlertCircle, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
 function getLoginErrorMessage(message?: string) {
   const normalized = message?.toLowerCase() ?? '';
 
+  if (normalized.includes('inativo')) {
+    return 'Usuário inativo. Fale com o administrador.';
+  }
+
   if (
     normalized.includes('invalid') ||
     normalized.includes('credential') ||

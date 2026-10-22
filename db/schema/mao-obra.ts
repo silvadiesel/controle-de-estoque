@@ -5,7 +5,7 @@ export const maoObra = pgTable('mao_obra', {
   nome: text('nome').notNull(),
   valor: integer('valor').notNull(),
   descricao: text('descricao')
-});
+}).enableRLS();
 
 export type MaoObra = typeof maoObra.$inferSelect;
 export type NewMaoObra = typeof maoObra.$inferInsert;

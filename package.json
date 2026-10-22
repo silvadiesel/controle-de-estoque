@@ -15,7 +15,7 @@
     "db:studio": "drizzle-kit studio",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "clear": "rm -rf node_modules && rm -rf .next && rm -rf .turbo && rm -rf pnpm-lock.yaml && rm -rf bun.lock && rm -rf bun.lockb && rm -rf package-lock.json && rm -rf yarn.lock "
+    "clear": "rm -rf node_modules && rm -rf .next && rm -rf .turbo"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -56,7 +56,7 @@
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.556.0",
-    "next": "^16.2.2",
+    "next": "^16.3.8",
     "postgres": "^3.4.8",
     "react": "19.2.1",
     "react-day-picker": "^9.14.0",
@@ -79,10 +79,9 @@
     "baseline-browser-mapping": "^2.10.13",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9.39.4",
-    "eslint-config-next": "16.0.8",
+    "eslint-config-next": "16.3.8",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
-    "shadcn": "^3.8.5",
     "tailwindcss": "^4.2.2",
     "tsx": "^4.21.0",
     "tw-animate-css": "^1.4.0",

@@ -22,12 +22,12 @@ export const empresa = pgTable(
     cnpj: text('cnpj').notNull(),
     cidade: text('cidade').notNull(),
     estado: varchar('estado', { length: 2 }).notNull(),
-    codigoVerificacao: varchar('codigo_verificacao', { length: 4 }).notNull(),
+    codigoVerificacao: varchar('codigo_verificacao', { length: 8 }).notNull(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow()
   },
   (t) => [check('empresa_singleton', sql`${t.id} = 1`)]
-);
+).enableRLS();
 
 export type Empresa = typeof empresa.$inferSelect;
 export type NewEmpresa = typeof empresa.$inferInsert;

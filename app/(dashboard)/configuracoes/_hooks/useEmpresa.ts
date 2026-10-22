@@ -3,6 +3,7 @@
 import { useCallback, useState } from 'react';
 
 import type { Empresa } from '@/db/schema';
+import { CODIGO_REGEX, normalizarCodigo } from '@/lib/codigo-verificacao';
 
 import { toast } from 'sonner';
 
@@ -100,8 +101,10 @@ export function useEmpresa(): UseEmpresaReturn {
       return;
     }
 
-    if (!/^\d{4}$/.test(formData.codigoVerificacao.trim())) {
-      toast.error('Código de verificação deve ter 4 dígitos numéricos');
+    if (!CODIGO_REGEX.test(normalizarCodigo(formData.codigoVerificacao))) {
+      toast.error(
+        'Código deve ter 8 caracteres (letras A-Z sem I/O e números 2-9)'
+      );
       return;
     }
 
