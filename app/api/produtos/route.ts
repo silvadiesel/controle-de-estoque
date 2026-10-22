@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { db, schema } from '@/db';
 import { logAction } from '@/lib/log-action';
 import { requireRoutePermission } from '@/lib/server/access-control';
+import { isImagemValida } from '@/lib/server/imagem';
 
 import { desc, eq } from 'drizzle-orm';
 
@@ -58,6 +59,9 @@ export async function POST(request: Request) {
     }
     if (!data.codigo?.trim()) {
       return NextResponse.json({ error: 'Código é obrigatório' }, { status: 400 });
+    }
+    if (!isImagemValida(data.imagem)) {
+      return NextResponse.json({ error: 'Imagem inválida' }, { status: 400 });
     }
 
     const codigoNormalizado = data.codigo.trim().toUpperCase();

@@ -9,7 +9,7 @@ export default async function PrintLayout({
 }) {
   const session = await getServerSession();
 
-  if (!session) {
+  if (!session || session.user.status === false) {
     redirect('/login');
   }
 

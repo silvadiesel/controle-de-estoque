@@ -25,7 +25,7 @@ export const user = pgTable('user', {
   status: boolean('status').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
-});
+}).enableRLS();
 
 // Tabela de sessões - gerencia sessões ativas
 export const session = pgTable('session', {
@@ -39,7 +39,7 @@ export const session = pgTable('session', {
   userId: text('user_id')
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' })
-});
+}).enableRLS();
 
 // Tabela de contas - armazena credenciais (senha, OAuth providers)
 export const account = pgTable('account', {
@@ -58,7 +58,7 @@ export const account = pgTable('account', {
   password: text('password'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow()
-});
+}).enableRLS();
 
 // Tabela de verificação - tokens de verificação de email/password reset
 export const verification = pgTable(
@@ -72,7 +72,7 @@ export const verification = pgTable(
     updatedAt: timestamp('updated_at').notNull().defaultNow()
   },
   (t) => [index('verification_identifier_idx').on(t.identifier)]
-);
+).enableRLS();
 
 // Tabela de rate limit - persistência de rate limiting no banco (necessário para serverless)
 export const rateLimit = pgTable('rate_limit', {
@@ -80,7 +80,7 @@ export const rateLimit = pgTable('rate_limit', {
   key: text('key').notNull().unique(),
   count: integer('count').notNull(),
   lastRequest: bigint('last_request', { mode: 'number' }).notNull()
-});
+}).enableRLS();
 
 // Tipos TypeScript
 export type User = typeof user.$inferSelect;

@@ -8,7 +8,7 @@ export const fornecedor = pgTable('fornecedor', {
   telefone: text('telefone').notNull(),
   email: text('email').notNull(),
   createdAt: timestamp('created_at').defaultNow()
-});
+}).enableRLS();
 
 export type Fornecedor = typeof fornecedor.$inferSelect;
 export type NewFornecedor = typeof fornecedor.$inferInsert;

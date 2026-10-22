@@ -27,6 +27,11 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usePagination } from '@/hooks/usePagination';
 import { useUser } from '@/hooks/useUser';
+import {
+  CODIGO_ALFABETO,
+  CODIGO_LENGTH,
+  normalizarCodigo
+} from '@/lib/codigo-verificacao';
 
 import { ChangePasswordCard } from './_components/change-password-card';
 import { ModalUsuarios } from './_components/modal-usuarios';
@@ -710,12 +715,14 @@ export default function Configuracoes() {
                           onChange={(e) =>
                             updateEmpresaField(
                               'codigoVerificacao',
-                              e.target.value.replace(/\D/g, '').slice(0, 4)
+                              [...normalizarCodigo(e.target.value)]
+                                .filter((c) => CODIGO_ALFABETO.includes(c))
+                                .join('')
+                                .slice(0, CODIGO_LENGTH)
                             )
                           }
-                          maxLength={4}
                           className='bg-input border-border font-mono tracking-widest max-w-[160px] text-lg'
-                          placeholder='1234'
+                          placeholder='K7QM2XPA'
                         />
                         <Button
                           type='button'
@@ -736,8 +743,9 @@ export default function Configuracoes() {
                         </Button>
                       </div>
                       <p className='text-sm text-muted-foreground'>
-                        4 dígitos numéricos. Compartilhe com novos funcionários
-                        para que possam se cadastrar.
+                        8 caracteres (letras sem I/O e números 2-9).
+                        Compartilhe com novos funcionários para que possam se
+                        cadastrar.
                       </p>
                     </div>
                   </div>

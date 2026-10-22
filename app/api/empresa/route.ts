@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { db } from '@/db';
 import { EMPRESA_SINGLETON_ID, empresa } from '@/db/schema';
+import { CODIGO_REGEX, normalizarCodigo } from '@/lib/codigo-verificacao';
 import { requireRoutePermission } from '@/lib/server/access-control';
 
 import { eq } from 'drizzle-orm';
@@ -76,7 +77,7 @@ export async function PUT(request: Request) {
         : '';
     const codigoVerificacao =
       typeof body.codigoVerificacao === 'string'
-        ? body.codigoVerificacao.trim()
+        ? normalizarCodigo(body.codigoVerificacao)
         : '';
 
     if (!nomeFantasia || !cnpj || !cidade || !estado || !codigoVerificacao) {
@@ -93,9 +94,12 @@ export async function PUT(request: Request) {
       );
     }
 
-    if (!/^\d{4}$/.test(codigoVerificacao)) {
+    if (!CODIGO_REGEX.test(codigoVerificacao)) {
       return NextResponse.json(
-        { error: 'Código de verificação deve ter 4 dígitos numéricos' },
+        {
+          error:
+            'Código deve ter 8 caracteres (letras A-Z sem I/O e números 2-9)'
+        },
         { status: 400 }
       );
     }

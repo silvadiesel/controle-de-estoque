@@ -56,6 +56,13 @@ export async function PUT(request: Request, { params }: Params) {
   }
   const { name, email, cargo, status } = parsed.data;
 
+  if (id === permissionCheck.session.user.id && status === false) {
+    return NextResponse.json(
+      { error: 'Você não pode desativar o próprio usuário' },
+      { status: 400 }
+    );
+  }
+
   const updatedUser = await db
     .update(schema.user)
     .set({
@@ -67,6 +74,11 @@ export async function PUT(request: Request, { params }: Params) {
     })
     .where(eq(schema.user.id, id))
     .returning();
+
+  // Usuário desativado perde as sessões ativas na hora.
+  if (status === false) {
+    await db.delete(schema.session).where(eq(schema.session.userId, id));
+  }
 
   await logAction(request, 'edicao', 'usuario', id, `Usuário '${updatedUser[0]?.name}' atualizado`);
   return new Response(JSON.stringify(updatedUser));

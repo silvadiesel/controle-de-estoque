@@ -14,7 +14,7 @@ export const cliente = pgTable('cliente', {
   cidade: text('cidade'),
   estado: text('estado'),
   cep: text('cep')
-});
+}).enableRLS();
 
 export type Cliente = typeof cliente.$inferSelect;
 export type NewCliente = typeof cliente.$inferInsert;

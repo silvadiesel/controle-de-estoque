@@ -21,7 +21,7 @@ export async function getServerSession() {
 export async function requirePagePermission(permission: AppPermission) {
   const session = await getServerSession();
 
-  if (!session) {
+  if (!session || session.user.status === false) {
     redirect('/login');
   }
 
@@ -47,6 +47,10 @@ export async function requireRoutePermission(
 
   if (!session) {
     return NextResponse.json({ error: 'Não autenticado' }, { status: 401 });
+  }
+
+  if (session.user.status === false) {
+    return NextResponse.json({ error: 'Usuário inativo' }, { status: 403 });
   }
 
   const cargo = getCargoFromSession(session);

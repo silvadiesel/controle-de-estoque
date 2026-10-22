@@ -13,6 +13,7 @@
  * /configuracoes (admin).
  */
 import { empresa, EMPRESA_SINGLETON_ID } from '../db/schema';
+import { gerarCodigoVerificacao } from '../lib/server/codigo-verificacao';
 import 'dotenv/config';
 import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
@@ -26,10 +27,6 @@ if (!connectionString) {
 
 const client = postgres(connectionString, { prepare: false });
 const db = drizzle(client);
-
-function gerarCodigo(): string {
-  return String(Math.floor(1000 + Math.random() * 9000));
-}
 
 async function seedEmpresa() {
   const existente = await db
@@ -47,7 +44,7 @@ async function seedEmpresa() {
   const cnpj = process.env.EMPRESA_CNPJ ?? '00000000000000';
   const cidade = process.env.EMPRESA_CIDADE ?? 'Cidade Exemplo';
   const estado = (process.env.EMPRESA_ESTADO ?? 'SC').slice(0, 2).toUpperCase();
-  const codigoVerificacao = gerarCodigo();
+  const codigoVerificacao = gerarCodigoVerificacao();
 
   const [inserida] = await db
     .insert(empresa)

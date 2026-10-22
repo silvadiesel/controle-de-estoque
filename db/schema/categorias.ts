@@ -4,7 +4,7 @@ export const categorias = pgTable('categorias', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
   status: boolean('status').notNull().default(true)
-});
+}).enableRLS();
 
 // Exporte seus tipos para usar no TypeScript
 export type Categorias = typeof categorias.$inferSelect;

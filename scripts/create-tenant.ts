@@ -21,12 +21,9 @@ import { stdin as input, stdout as output } from 'node:process';
 import { db } from '../db';
 import { empresa, user, EMPRESA_SINGLETON_ID } from '../db/schema';
 import { auth } from '../lib/auth';
+import { gerarCodigoVerificacao } from '../lib/server/codigo-verificacao';
 import 'dotenv/config';
 import { eq } from 'drizzle-orm';
-
-function gerarCodigo(): string {
-  return String(Math.floor(1000 + Math.random() * 9000));
-}
 
 async function prompt(rl: readline.Interface, label: string): Promise<string> {
   const value = (await rl.question(`${label}: `)).trim();
@@ -74,7 +71,7 @@ async function main() {
       throw new Error('Senha deve ter no mínimo 8 caracteres');
     }
 
-    const codigoVerificacao = gerarCodigo();
+    const codigoVerificacao = gerarCodigoVerificacao();
 
     console.log('\nInserindo empresa...');
     await db.insert(empresa).values({

@@ -1,5 +1,6 @@
 import { db } from '@/db';
-import { EMPRESA_SINGLETON_ID, empresa } from '@/db/schema';
+import { EMPRESA_SINGLETON_ID, empresa, user } from '@/db/schema';
+import { normalizarCodigo } from '@/lib/codigo-verificacao';
 
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
@@ -25,7 +26,7 @@ export const auth = betterAuth({
   },
   // Rate limit persistente no Postgres. `memory` NÃO funciona em serverless
   // (Vercel) porque cada invocação pode ser uma instância nova, o que
-  // invalidaria a proteção contra brute force do código de 4 dígitos.
+  // invalidaria a proteção contra brute force do código de verificação.
   rateLimit: {
     enabled: true,
     storage: 'database',
@@ -33,6 +34,23 @@ export const auth = betterAuth({
       '/sign-up/email': {
         window: 600, // 10 minutos
         max: 5
+      }
+    }
+  },
+  databaseHooks: {
+    session: {
+      create: {
+        // Bloqueia login de usuário desativado no painel de usuários.
+        before: async (session) => {
+          const [row] = await db
+            .select({ status: user.status })
+            .from(user)
+            .where(eq(user.id, session.userId));
+
+          if (row?.status === false) {
+            throw new APIError('FORBIDDEN', { message: 'Usuário inativo' });
+          }
+        }
       }
     }
   },
@@ -58,7 +76,7 @@ export const auth = betterAuth({
         .from(empresa)
         .where(eq(empresa.id, EMPRESA_SINGLETON_ID));
 
-      if (!row || row.codigo !== codigo) {
+      if (!row || row.codigo !== normalizarCodigo(codigo)) {
         throw new APIError('UNAUTHORIZED', {
           message: 'Código de verificação inválido'
         });
